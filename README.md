@@ -6,9 +6,9 @@
  /\__/ /  __/ (_| (_) | | | | (_| | |_) | (_) | |_
  \____/ \___|\___\___/|_| |_|\__,_|_.__/ \___/ \__|
 ```
-BetterSecondbot
+Secondbot
 ===============
-BetterSecondbot is a CommandLine based bot for SecondLife based on [LibreMetaverse](https://bitbucket.org/streamadmin/libremetaverse-core/src/master/)
+Secondbot is a CommandLine based bot for SecondLife based on [LibreMetaverse](https://bitbucket.org/streamadmin/libremetaverse-core/src/master/)
 
 Status
 ---------------
