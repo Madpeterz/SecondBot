@@ -18,4 +18,4 @@ Status
 
 Docker
 ---------------
-(Linux): [DockerHub](https://hub.docker.com/r/madpeter/secondbot-bitbucket-auto)
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/madpeter/secondbot-bitbucket-auto?style=flat-square)
