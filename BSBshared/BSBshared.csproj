@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Configurations>Debug;Release;DockerBuild</Configurations>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DockerBuild|x64'">
+    <ErrorReport>none</ErrorReport>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishSingleFile>false</PublishSingleFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libremetaverse-core\Libremetaverse.structureddata\LibreMetaverse.StructuredData.csproj" />
+    <ProjectReference Include="..\libremetaverse-core\Libremetaversetypes\LibreMetaverse.Types.csproj" />
+    <ProjectReference Include="..\libremetaverse-core\Libremetaverse\LibreMetaverse.csproj" />
+  </ItemGroup>
+</Project>
+
