@@ -1,12 +1,8 @@
 ﻿using BetterSecondBot.WikiMake;
 using BetterSecondBotShared.IO;
 using BetterSecondBotShared.Json;
-using BetterSecondBotShared.Static;
-using CommandLine;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using static BetterSecondBot.Program;
 using BetterSecondBotShared.logs;
 namespace BetterSecondBot
@@ -16,17 +12,22 @@ namespace BetterSecondBot
         public CliHardware(string[] args)
         {
             SimpleIO io = new SimpleIO();
-            JsonConfig Config;
+            JsonConfig Config = new JsonConfig();
             string json_file = "";
 #if DEBUG
             ConsoleLog.Status("Hardware/Debug version");
             json_file = "debug.json";
 #else
             ConsoleLog.Status("Hardware/Live version");
-            Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
+            if(args.Length == 1)
             {
-                json_file = o.Json;
-            });
+                json_file = ""+args[0]+".json";
+            }
+            else
+            {
+                json_file = "mybot.json";
+                ConsoleLog.Warn("Using: mybot.json as the config");
+            }
 
 #endif
             if (SimpleIO.dir_exists("wiki") == false)
@@ -35,12 +36,6 @@ namespace BetterSecondBot
                 new DebugModeCreateWiki(AssemblyInfo.GetGitHash(), io);
                 ConsoleLog.Info("Basic Wiki [Ready]");
                 io = new SimpleIO();
-            }
-            Config = MakeJsonConfig.GetDefault();
-            if (helpers.notempty(json_file) == false)
-            {
-                json_file = "mybot.json";
-                ConsoleLog.Warn("Using: mybot.json as the config");
             }
             bool ok_to_try_start = false;
             if (SimpleIO.FileType(json_file, "json") == true)
@@ -75,7 +70,7 @@ namespace BetterSecondBot
                     io.WriteJsonConfig(MakeJsonConfig.GetDefault(), json_file);
                 }
             }
-            else ConsoleLog.Crit("you must select a .json file for config!");
+            else ConsoleLog.Crit("you must select a .json file for config! example \"BetterSecondBot.exe mybot\" will use the mybot.json file!");
             if(ok_to_try_start == true)
             {
                 Config = MakeJsonConfig.http_config_check(Config);
