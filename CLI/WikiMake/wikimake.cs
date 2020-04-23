@@ -302,10 +302,6 @@ namespace BetterSecondBot.WikiMake
             html_footer = ReadResourceFile("wiki_footer.txt");
             io.ChangeRoot("wiki");
             io.ChangeRoot("wiki/files");
-            // CLI
-            Options cli = new Options();
-            api_reports.Add("CLI", new KeyValuePair<int, string>(cli.ApiCommandsCount, "Ready"));
-            InterfaceWiki("CLI", cli);
 
             // JSONcfg
             MakeJsonConfig defaultJson = new MakeJsonConfig();
