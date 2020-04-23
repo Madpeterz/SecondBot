@@ -46,35 +46,6 @@ namespace BetterSecondBot
             }
         }
     }
-    class Options : API_supported_interface
-    {
-        [Option('j', "json", Required = false, HelpText = "see api")]
-        public string Json { get; set; }
-
-        public override int ApiCommandsCount { get { return 1; } }
-
-        public override string[] GetCommandsList()
-        { 
-            return new string[] { "j"};
-        }
-        public override string[] GetCommandArgTypes(string cmd)
-        {
-            return new string[] { "Text" };
-        }
-        public override string[] GetCommandArgHints(string cmd)
-        {
-            return new string[] { "\"Bot4.json\"" };
-        }
-
-        public override string GetCommandHelp(string cmd)
-        {
-            return "json config file [Defaults to: mybot.json] <br/>Example: \"BetterSecondBot.exe -j=otherbot.json\"";
-        }
-        public override int GetCommandArgs(string cmd)
-        {
-            return 1;
-        }
-    }
 }
 
 
