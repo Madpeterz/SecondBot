@@ -1,21 +1,9 @@
 ﻿using System;
-using CommandLine;
 using System.Threading;
-using System.Runtime.InteropServices;
-using System.IO;
-using Newtonsoft.Json;
 using System.Reflection;
 using System.Linq;
-using System.Collections.Generic;
-using BSB;
-using BSB.bottypes;
-using BetterSecondBot.HttpServer;
-using BetterSecondBotShared.Json;
-using BetterSecondBotShared.IO;
-using BetterSecondBotShared.API;
 using BetterSecondBotShared.Static;
 using BetterSecondBotShared.logs;
-using BetterSecondBot.WikiMake;
 namespace BetterSecondBot
 {
     class Program
