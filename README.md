@@ -12,20 +12,10 @@ BetterSecondbot is a CommandLine based bot for SecondLife based on [LibreMetaver
 
 Status
 ---------------
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/600e4427a535416d83cbf71f0e53b715)](https://www.codacy.com/manual/madpeter/SecondBot_2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Madpeterz/SecondBot&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/56870fb7ed744ebcbac88fe5b77e2086)](https://www.codacy.com/manual/madpeter/SecondBot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Madpeterz/SecondBot&amp;utm_campaign=Badge_Grade)
+
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3765/badge)](https://bestpractices.coreinfrastructure.org/projects/3765)
 
 Docker
 ---------------
 (Linux): [DockerHub](https://hub.docker.com/r/madpeter/secondbot-bitbucket-auto)
-
-Windows and Linux builds [Updated 01/04/2020 @ 03:10 GMT]
----------------
-[Download](https://github.com/Madpeterz/SecondBot/)
-
-
-Wiki
----------------
-https://secondbot.space/documentation
-
-
