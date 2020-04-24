@@ -64,7 +64,7 @@ namespace BetterSecondBotShared.bottypes
             ConsoleLog.Info("Build: " + version);
         }
 
-        public void Start()
+        public virtual void Start()
         {
             Client = new GridClient();
             Client.Settings.LOG_RESENDS = false;
