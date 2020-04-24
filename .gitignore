@@ -21,3 +21,4 @@ Publish/
 secondbotr5.json
 CLI/settings.env
 CLI/Dockerfile
+libremetaverse-core/.gitignore
