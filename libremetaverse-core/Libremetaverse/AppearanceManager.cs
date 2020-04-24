@@ -1234,7 +1234,7 @@ namespace OpenMetaverse
                         WearableData_index++;
                     }
                 }
-                /* hacky multi layers
+                // hacky multi layers
                 foreach(WearableType T in multiattached)
                 {
                     int index = 0;
@@ -1250,7 +1250,6 @@ namespace OpenMetaverse
                         index++;
                     }
                 }
-                */
 
             }
             AgentIsNowWearingPacket wearing = new AgentIsNowWearingPacket
@@ -1269,7 +1268,6 @@ namespace OpenMetaverse
                 blockindex++;
             }
             Client.Network.SendPacket(wearing);
-
         }
 
         /// <summary>
@@ -2396,7 +2394,7 @@ namespace OpenMetaverse
             if (e.Simulator == Client.Network.CurrentSim && Client.Settings.SEND_AGENT_APPEARANCE)
             {
                 // Update appearance each time we enter a new sim and capabilities have been retrieved
-                Client.Appearance.RequestSetAppearance();
+                Client.Appearance.SendAgentIsNowWearing();
             }
         }
 
