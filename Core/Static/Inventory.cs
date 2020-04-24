@@ -35,7 +35,7 @@ namespace BSB.Static
         {
             List<string> entrys = new List<string>();
             entrys.Add("folderinventory=" + folder.ToString() + "");
-            List<InventoryBase> contents = bot.GetClient.Inventory.FolderContents(folder, bot.GetClient.Self.AgentID, true, true, InventorySortOrder.ByDate, 40 * 1000);
+            List<InventoryBase> contents = bot.GetClient.Inventory.FolderContents(folder, bot.GetClient.Self.AgentID, true, true, InventorySortOrder.ByDate, 40 * 1000,true);
             if (contents != null)
             {
                 if (contents.Count > 0)
@@ -66,21 +66,24 @@ namespace BSB.Static
             List<InventoryBase> T = bot.GetClient.Inventory.Store.GetContents(folder);
             foreach (InventoryBase R in T)
             {
-                if (as_csv == false)
+                if (R.GetType() == typeof(InventoryFolder))
                 {
-                    reply.Append("" + Spaces(level) + "|- " + R.Name + " [" + R.UUID.ToString() + "]\n\r");
+                    if (as_csv == false)
+                    {
+                        reply.Append("" + Spaces(level) + "|- " + R.Name + " [" + R.UUID.ToString() + "]\n\r");
+                    }
+                    else
+                    {
+                        reply.Append(addon);
+                        reply.Append(R.Name);
+                        reply.Append("###");
+                        reply.Append(level.ToString());
+                        reply.Append("###");
+                        reply.Append(R.UUID.ToString());
+                        addon = ",";
+                    }
+                    DoMapFolder(bot, level + 1, (InventoryFolder)R, as_csv, addon, reply);
                 }
-                else
-                {
-                    reply.Append(addon);
-                    reply.Append(R.Name);
-                    reply.Append("###");
-                    reply.Append(level.ToString());
-                    reply.Append("###");
-                    reply.Append(R.UUID.ToString());
-                    addon = ",";
-                }
-                DoMapFolder(bot, level + 1, (InventoryFolder)R, as_csv, addon, reply);
             }
         }
         public static string Spaces(int counter)

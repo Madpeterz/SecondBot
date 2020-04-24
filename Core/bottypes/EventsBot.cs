@@ -10,6 +10,41 @@ namespace BSB.bottypes
 {
     public abstract class VoidEventBot : AnimationsBot
     {
+        protected long delay_appearence_update = 0;
+
+        public override string GetStatus()
+        {
+            if (Client != null)
+            {
+                if (Client.Network != null)
+                {
+                    if (Client.Network.Connected)
+                    {
+                        if (Client.Network.CurrentSim != null)
+                        {
+                            if (delay_appearence_update == 0)
+                            {
+                                delay_appearence_update = helpers.UnixTimeNow() + 5;
+                            }
+                            else if (delay_appearence_update > 0)
+                            {
+                                long dif = delay_appearence_update - helpers.UnixTimeNow();
+                                if (dif <= 0)
+                                {
+                                    delay_appearence_update = -1;
+                                    if(Client.Appearance.RequestSetAppearance() == "retry")
+                                    {
+                                        delay_appearence_update = helpers.UnixTimeNow() + 5;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return "Rendering: "+ delay_appearence_update.ToString()+" "+base.GetStatus();
+        }
+
         protected override void AfterBotLoginHandler()
         {
             base.AfterBotLoginHandler();
@@ -17,7 +52,7 @@ namespace BSB.bottypes
             {
                 Client.Network.RegisterCallback(PacketType.SetFollowCamProperties, SetFollowCamPropertiesPacketHandler);
             }
-
+            delay_appearence_update = 0; // reset Appearance helper
         }
 
         protected void SetFollowCamPropertiesPacketHandler(object sender, PacketReceivedEventArgs e)
@@ -128,15 +163,10 @@ namespace BSB.bottypes
                                 Client.Groups.RequestCurrentGroups();
                             }
                         }
-                        if (Client.Network.CurrentSim != null)
-                        {
-                            return "Sim: " + Client.Network.CurrentSim.Name + " " + GetSimPositionAsString() + "";
-                        }
-                        return "Sim: Not on sim";
                     }
                 }
             }
-            return "";
+            return base.GetStatus();
         }
         protected string login_status = "Waiting to login";
         protected override void LoginHandler(object o, LoginProgressEventArgs e)
