@@ -43,6 +43,7 @@ namespace BSB.Static
                     StringBuilder B = new StringBuilder();
                     foreach (InventoryBase item in contents)
                     {
+                        B.Append("|||");
                         B.Append(item.Name);
                         B.Append("###");
                         B.Append(item.UUID.ToString());
