@@ -18,7 +18,7 @@ namespace BSB.Commands.Chat
             {
                 if (UUID.TryParse(args[0], out UUID target_av) == true)
                 {
-                    bot.GetClient.Self.InstantMessage(target_av, args[1]);
+                    bot.sendIM(target_av, args[1]);
                     return true;
                 }
                 else
