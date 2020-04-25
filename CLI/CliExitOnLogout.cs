@@ -36,7 +36,7 @@ namespace BetterSecondBot
                         Bot.LastStatusMessage = NewStatusMessage;
                         ConsoleLog.Status(Bot.LastStatusMessage);
                     }
-                    Thread.Sleep(5000);
+                    Thread.Sleep(1000);
                 }
                 Bot.GetClient.Network.Logout();
             }

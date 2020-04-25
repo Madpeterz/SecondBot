@@ -27,7 +27,7 @@ namespace BetterSecondBot
                     last_cnc_status = NewStatusMessage;
                     ConsoleLog.Status(last_cnc_status);
                 }
-                Thread.Sleep(5000);
+                Thread.Sleep(1000);
             }
             ConsoleLog.Status("Shutting down now");
             if (my_http_server.GetBot != null)

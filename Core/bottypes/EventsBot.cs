@@ -24,7 +24,7 @@ namespace BSB.bottypes
                         {
                             if (delay_appearence_update == 0)
                             {
-                                delay_appearence_update = helpers.UnixTimeNow() + 5;
+                                delay_appearence_update = helpers.UnixTimeNow();
                             }
                             else if (delay_appearence_update > 0)
                             {
@@ -34,7 +34,7 @@ namespace BSB.bottypes
                                     delay_appearence_update = -1;
                                     if(Client.Appearance.RequestSetAppearance() == "retry")
                                     {
-                                        delay_appearence_update = helpers.UnixTimeNow() + 5;
+                                        delay_appearence_update = helpers.UnixTimeNow() + 1;
                                     }
                                 }
                             }
@@ -42,7 +42,7 @@ namespace BSB.bottypes
                     }
                 }
             }
-            return "Rendering: "+ delay_appearence_update.ToString()+" "+base.GetStatus();
+            return base.GetStatus();
         }
 
         protected override void AfterBotLoginHandler()

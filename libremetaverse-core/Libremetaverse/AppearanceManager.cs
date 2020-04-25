@@ -459,29 +459,43 @@ namespace OpenMetaverse
         {
             try
             {
-                KeyValuePair<string,List < InventoryBase >> reply = Client.Inventory.FolderContents_replyed(GetCOF().UUID, Client.Self.AgentID, true, true, InventorySortOrder.ByDate, 40 * 1000, false);
-                if (reply.Key == "ok")
+                if (Client != null)
                 {
-                    List<InventoryBase> contents = reply.Value;
-                    List<InventoryItem> wareables = new List<InventoryItem>();
-                    if (contents != null)
+                    if (Client.Self != null)
                     {
-                        foreach (InventoryBase item in contents)
+                        if (Client.Self.AgentID != null)
                         {
-                            if ((item is InventoryWearable) || (item is InventoryObject))
+                            InventoryFolder cof = GetCOF();
+                            if (cof != null)
                             {
-                                wareables.Add((InventoryItem)item);
+                                KeyValuePair<string, List<InventoryBase>> reply = Client.Inventory.FolderContents_replyed(cof.UUID, Client.Self.AgentID, true, true, InventorySortOrder.ByDate, 40 * 1000, false);
+                                if (reply.Key == "ok")
+                                {
+                                    List<InventoryBase> contents = reply.Value;
+                                    List<InventoryItem> wareables = new List<InventoryItem>();
+                                    if (contents != null)
+                                    {
+                                        foreach (InventoryBase item in contents)
+                                        {
+                                            if ((item is InventoryWearable) || (item is InventoryObject))
+                                            {
+                                                wareables.Add((InventoryItem)item);
+                                            }
+                                        }
+                                        Client.Appearance.ReplaceOutfit(wareables, false);
+                                    }
+                                }
+                                return reply.Key;
                             }
                         }
-                        Client.Appearance.ReplaceOutfit(wareables, false);
                     }
                 }
-                return reply.Key;
             }
             catch
             {
-                return "fail";
+                
             }
+            return "retry";
         }
 
         /// <summary>
