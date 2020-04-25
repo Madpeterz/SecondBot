@@ -50,6 +50,19 @@ namespace BSB.bottypes
             {
                 if (localchat == false)
                 {
+                    if(avatar == true)
+                    {
+                        if(myconfig.RelayImToAvatar != UUID.Zero.ToString())
+                        {
+                            if (myconfig.RelayImToAvatar.Length == UUID.Zero.ToString().Length)
+                            {
+                                if(UUID.TryParse(myconfig.RelayImToAvatar,out UUID targetav) == true)
+                                {
+                                    Client.Self.InstantMessage(targetav, "Relay-> "+sender_name+": " + message + "");
+                                }
+                            }
+                        }
+                    }
                     if (avatar == false)
                     {
                         bool signed_command = false;
