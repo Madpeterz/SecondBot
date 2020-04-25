@@ -39,6 +39,10 @@ namespace BSB.bottypes
             }
             return commands.ToArray();
         }
+        public virtual void sendIM(UUID avatar,string message)
+        {
+            Client.Self.InstantMessage(avatar, message);
+        }
 
         public Commands.CoreCommandsInterface GetCommandsInterface { get { return CommandsInterface; } }
         protected Commands.CoreCommandsInterface CommandsInterface;
