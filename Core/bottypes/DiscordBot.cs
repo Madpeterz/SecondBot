@@ -430,14 +430,6 @@ namespace BSB.bottypes
                                         {
                                             status = CommandsInterface.Call(command);
                                         }
-                                        if (status == true)
-                                        {
-                                            _ = SendMessageToChannelAsync("interface", "Command running: " + message.Content + "", "bot", UUID.Zero, myconfig.userName, "bot");
-                                        }
-                                        else
-                                        {
-                                            _ = SendMessageToChannelAsync("interface", "Command rejected: " + message.Content + "", "bot", UUID.Zero, myconfig.userName, "bot");
-                                        }
                                     }
                                     else
                                     {
@@ -551,6 +543,31 @@ namespace BSB.bottypes
         {
             base.BotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
             await DiscordBotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
+        }
+
+        public override void CommandHistoryAdd(string command, string arg, bool status)
+        {
+            base.CommandHistoryAdd(command, arg, status);
+            if (status == true)
+            {
+                _ = SendMessageToChannelAsync("interface", "Command running: " + command + " ["+arg+"]", "bot", UUID.Zero, myconfig.userName, "bot");
+            }
+            else
+            {
+                _ = SendMessageToChannelAsync("interface", "Command rejected: " + command + " [" + arg + "]", "bot", UUID.Zero, myconfig.userName, "bot");
+            }
+        }
+
+        public async override void sendIM(UUID avatar, string message)
+        {
+            base.sendIM(avatar, message);
+            if(AvatarKey2Name.ContainsKey(avatar) == true)
+            {
+                if (DiscordClientConnected == true)
+                {
+                    await DiscordIMMessage(avatar, AvatarKey2Name[avatar], message).ConfigureAwait(false);
+                }
+            }
         }
 
         protected async Task DiscordBotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar, bool group, UUID group_uuid, bool localchat, bool fromme)
