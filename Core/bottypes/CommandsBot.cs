@@ -34,7 +34,7 @@ namespace BSB.bottypes
             int loop = 0;
             while((loop < CommandHistory.Count) && (loop < amount))
             {
-                commands.Add(CommandHistory.Keys.ElementAt(CommandHistory.Count - loop));
+                commands.Add(CommandHistory.Keys.ElementAt(CommandHistory.Count - loop - 1));
                 loop++;
             }
             return commands.ToArray();
