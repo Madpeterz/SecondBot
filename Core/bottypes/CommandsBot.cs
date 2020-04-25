@@ -11,6 +11,35 @@ namespace BSB.bottypes
 {
     public abstract class CommandsBot : AVstorageBot
     {
+        Dictionary<string, long> CommandHistory = new Dictionary<string, long>();
+        protected int commandid = 1;
+        public void CommandHistoryAdd(string command, string arg, bool status)
+        {
+            string message = "(" + commandid.ToString() + "): " + status.ToString() + " -> " + command + " [" + arg + "]";
+            CommandHistory.Add(message, helpers.UnixTimeNow());
+            if(CommandHistory.Count() > myconfig.MaxCommandHistory)
+            {
+                CommandHistory.Remove(CommandHistory.ElementAt(0).Key);
+            }
+            if (myconfig.CommandsToConsole == true)
+            {
+                ConsoleLog.Info(message);
+            }
+            commandid++;
+            if (commandid >= myconfig.MaxCommandHistory) commandid = 1;
+        }
+        public string[] GetLastCommands(int amount=10)
+        {
+            List<string> commands = new List<string>();
+            int loop = 0;
+            while((loop < CommandHistory.Count) && (loop < amount))
+            {
+                commands.Add(CommandHistory.Keys.ElementAt(CommandHistory.Count - loop));
+                loop++;
+            }
+            return commands.ToArray();
+        }
+
         public Commands.CoreCommandsInterface GetCommandsInterface { get { return CommandsInterface; } }
         protected Commands.CoreCommandsInterface CommandsInterface;
         public CommandsBot()

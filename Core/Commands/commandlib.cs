@@ -204,11 +204,12 @@ namespace BSB.Commands
         {
             return Call(command, "");
         }
-        public bool Call(string command,string arg)
+
+        protected bool CallCommand(string command, string arg)
         {
             command = command.ToLowerInvariant();
             CoreCommand cmd = (CoreCommand)GetCommand(command);
-            if(cmd != null)
+            if (cmd != null)
             {
                 cmd.Setup(bot);
                 if ((cmd.ArgTypes.Contains("Avatar") == true) || (cmd.ArgTypes.Contains("Smart") == true))
@@ -252,6 +253,13 @@ namespace BSB.Commands
                 }
                 return false;
             }
+            
+        }
+        public bool Call(string command, string arg)
+        {
+            bool result = CallCommand(command, arg);
+            bot.CommandHistoryAdd(command, arg, result);
+            return result;
         }
     }
     public abstract class CoreCommand : API_interface
