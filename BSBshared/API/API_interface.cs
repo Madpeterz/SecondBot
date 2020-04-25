@@ -48,7 +48,9 @@ namespace BetterSecondBotShared.API
                                 worknamespace = worknamespace.Replace("BSB.Commands.", "");
                                 worknamespace = worknamespace.Replace("BSB.RLV.", "");
                                 worknamespace = worknamespace.Replace("BetterSecondBot.HttpServer.View.", "");
+                                worknamespace = worknamespace.Replace("BetterSecondBot.HttpServer.view.", "");
                                 worknamespace = worknamespace.Replace("BetterSecondBot.HttpServer.Control.", "");
+                                worknamespace = worknamespace.Replace("BetterSecondBot.HttpServer.control.", "");
                                 worknamespace = worknamespace.Replace("CMD_", "");
                                 subtype_map.Add(D.CommandName, D.GetType());
                                 subtype_workspace_map.Add(D.CommandName, worknamespace);
