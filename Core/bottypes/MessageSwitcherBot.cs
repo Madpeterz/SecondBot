@@ -52,13 +52,16 @@ namespace BSB.bottypes
                 {
                     if(avatar == true)
                     {
-                        if(myconfig.RelayImToAvatar != UUID.Zero.ToString())
+                        if (myconfig.RelayImToAvatar != null)
                         {
-                            if (myconfig.RelayImToAvatar.Length == UUID.Zero.ToString().Length)
+                            if (myconfig.RelayImToAvatar != UUID.Zero.ToString())
                             {
-                                if(UUID.TryParse(myconfig.RelayImToAvatar,out UUID targetav) == true)
+                                if (myconfig.RelayImToAvatar.Length == UUID.Zero.ToString().Length)
                                 {
-                                    Client.Self.InstantMessage(targetav, "Relay-> "+sender_name+": " + message + "");
+                                    if (UUID.TryParse(myconfig.RelayImToAvatar, out UUID targetav) == true)
+                                    {
+                                        Client.Self.InstantMessage(targetav, "Relay-> " + sender_name + ": " + message + "");
+                                    }
                                 }
                             }
                         }
