@@ -25,6 +25,9 @@ namespace BetterSecondBotShared.Json
         public ulong DiscordServerID { get; set; }
         public int DiscordServerImHistoryHours { get; set; }
         public string DefaultSitUUID { get; set; }
+        public bool CommandsToConsole { get; set; }
+        public int MaxCommandHistory { get; set; }
+        public string RelayImToAvatar { get; set; }
     }
 
 }

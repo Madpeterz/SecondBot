@@ -43,6 +43,9 @@ ENV DiscordClientToken=''
 ENV DiscordServerID=''
 ENV DiscordServerImHistoryHours=''
 ENV DefaultSitUUID='00000000-0000-0000-0000-000000000000'
+ENV CommandsToConsole='False'
+ENV MaxCommandHistory='250'
+ENV RelayImToAvatar='00000000-0000-0000-0000-000000000000'
 
 EXPOSE 8080
 ENV ASPNETCORE_URLS http://+:8080

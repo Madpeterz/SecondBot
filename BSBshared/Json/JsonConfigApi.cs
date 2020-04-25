@@ -34,6 +34,9 @@ namespace BetterSecondBotShared.Json
                 case "discordclienttoken": { return "DiscordFull"; }
                 case "discordserverid": { return "DiscordFull"; }
                 case "discordserverimhistoryhours": { return "DiscordFull"; }
+                case "commandstoconsole": { return "Options"; }
+                case "maxcommandhistory": { return "Options"; }
+                case "relayimtoavatar": { return "Options"; }
                 default: { return "Unknown"; }
             }
         }
@@ -61,6 +64,9 @@ namespace BetterSecondBotShared.Json
                 case "discordclienttoken": { return "What is the bots client token"; }
                 case "discordserverid": { return "What is the Discord server id we should be using"; }
                 case "discordserverimhistoryhours": { return "How long to keep history messages in Group/IM chats in hours"; }
+                case "commandstoconsole": { return "Should the bot log commands to the console window"; }
+                case "maxcommandhistory": { return "How many commands should the bots command history be"; }
+                case "relayimtoavatar": { return "The UUID to relay avatar IMs to [Any invaild UUID to disable like \"none\"]"; }
                 default: { return "None given"; }
             }
         }
@@ -107,6 +113,9 @@ namespace BetterSecondBotShared.Json
                 case "discordserverid": { return new[] { "1234567890" }; }
                 case "discordserverimhistoryhours": { return new[] { "24" }; }
                 case "defaultsituuid": { return new[] { "\"" + OpenMetaverse.UUID.Zero + "\"" }; }
+                case "commandstoconsole": { return new[] { "False" }; }
+                case "maxcommandhistory": { return new[] { "250" }; }
+                case "relayimtoavatar": { return new[] { "\"" + OpenMetaverse.UUID.Zero + "\"" }; }
                 default: { return new string[] { }; }
             }
         }
