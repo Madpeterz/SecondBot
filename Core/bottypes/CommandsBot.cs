@@ -13,7 +13,7 @@ namespace BSB.bottypes
     {
         Dictionary<string, long> CommandHistory = new Dictionary<string, long>();
         protected int commandid = 1;
-        public void CommandHistoryAdd(string command, string arg, bool status)
+        public virtual void CommandHistoryAdd(string command, string arg, bool status)
         {
             string message = "(" + commandid.ToString() + "): " + status.ToString() + " -> " + command + " [" + arg + "]";
             CommandHistory.Add(message, helpers.UnixTimeNow());
@@ -96,6 +96,11 @@ namespace BSB.bottypes
             }
         }
 
+        protected virtual void CallCommandLib(string command, string arg)
+        {
+            CommandsInterface.Call(command, arg);
+        }
+
         protected override void AfterBotLoginHandler()
         {
             base.AfterBotLoginHandler();
@@ -115,13 +120,12 @@ namespace BSB.bottypes
                     string hashcheck = helpers.GetSHA1(raw);
                     if (hashcheck == signing_code)
                     {
-                        // signed commands
-                        CommandsInterface.Call(command, arg);
+                        CallCommandLib(command, arg);
                     }
                 }
                 else if (from_master == true)
                 {
-                    CommandsInterface.Call(command, arg);
+                    CallCommandLib(command, arg);
                 }
             }
         }
