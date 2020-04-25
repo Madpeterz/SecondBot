@@ -14,7 +14,6 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav">
                 <a href="[[SUBFOLDER]]Core.html" class="nav-item nav-link [[CoreActive]]">Main commands [Core]</a>
-                <a href="[[SUBFOLDER]]CLI.html" class="nav-item nav-link [[CLIActive]]">Command Line [Parameters]</a>
                 <a href="[[SUBFOLDER]]JSON.html" class="nav-item nav-link [[JSONActive]]">JSON [Bot Config file]</a>
                 <a href="[[SUBFOLDER]]RLVapi.html" class="nav-item nav-link [[RLVapiActive]]">Restrained Love API [RLV]</a>
                 <a href="[[SUBFOLDER]]HTTPget.html" class="nav-item nav-link [[HTTPgetActive]]">Get [HTTP]</a>
