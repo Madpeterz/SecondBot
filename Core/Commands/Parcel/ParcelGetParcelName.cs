@@ -8,7 +8,7 @@ using OpenMetaverse;
 namespace BSB.Commands.CMD_Parcel
 {
 
-    public class ParcelGetParcelName : CoreCommand
+    public class GetParcelName : CoreCommand
     {
         public override string[] ArgTypes { get { return new[] { "Smart"}; } }
         public override string[] ArgHints { get { return new[] { "Smart reply [Channel|Avatar|http url]" }; } }
