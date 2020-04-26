@@ -13,9 +13,31 @@ namespace BSB.Commands.Self
         public override string Helpfile { get { return "Makes the bot turn to face [ARG 1] and point at them (if found)"; } }
         public override bool CallFunction(string[] args)
         {
-            if (UUID.TryParse(bot, out UUID testavatar) == true)
+            if (UUID.TryParse(bot.FindAvatarName2Key(bot.OwnerName), out UUID owner) == true)
             {
+                string reply = "";
+                int counter = 0;
+                string addon = "";
+                foreach (string a in bot.GetCommandsInterface.GetCommandsList())
+                {
+                    reply += addon;
+                    reply += a;
+                    counter++;
+                    if (counter == 5)
+                    {
+                        reply += "\n";
+                        addon = "";
+                        counter = 0;
+                    }
+                    else
+                    {
+                        addon = " , ";
+                    }
+                }
 
+                bot.sendIM(owner, reply);
+
+                return true;
             }
             else
             {
