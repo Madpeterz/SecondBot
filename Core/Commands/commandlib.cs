@@ -212,9 +212,14 @@ namespace BSB.Commands
             if (cmd != null)
             {
                 cmd.Setup(bot, caller);
+                string[] args = new string[] { };
+                if (helpers.notempty(arg) == true)
+                {
+                    args = arg.Split(new string[] { "~#~" }, StringSplitOptions.None);
+                }
                 if ((cmd.ArgTypes.Contains("Avatar") == true) || (cmd.ArgTypes.Contains("Smart") == true))
                 {
-                    string[] args = arg.Split(new string[] { "~#~" }, StringSplitOptions.None);
+
                     if (cmd.MinArgs <= args.Length)
                     {
                         pending_avatar_lookup pending = new pending_avatar_lookup(this, cmd, args);
@@ -241,7 +246,7 @@ namespace BSB.Commands
                 }
                 else
                 {
-                    return cmd.CallFunction(arg.Split(new string[] { "~#~" }, StringSplitOptions.None));
+                    return cmd.CallFunction(args);
                 }
             }
             else
@@ -253,7 +258,6 @@ namespace BSB.Commands
                 }
                 return false;
             }
-            
         }
         public bool Call(string command, string arg,UUID caller)
         {
