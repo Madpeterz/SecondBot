@@ -39,6 +39,20 @@ namespace BSB
             flagnames.Remove("None");
             return flagnames.ToArray();
         }
+
+        public static Dictionary<string, string> get_media_list()
+        {
+            Dictionary<string, string> flags = new Dictionary<string, string>();
+            flags.Add("MediaAutoScale", "Bool (True|False)");
+            flags.Add("MediaLoop", "Bool (True|False)");
+            flags.Add("MediaID", "UUID (Texture)");
+            flags.Add("MediaURL", "String");
+            flags.Add("MediaDesc", "String");
+            flags.Add("MediaHeight", "Int (256 to 1024)");
+            flags.Add("MediaWidth", "Int (256 to 1024)");
+            flags.Add("MediaType", "String [\"IMG-PNG\",\"IMG-JPG\",\"VID-MP4\",\"VID-AVI\" or \"Custom-MIME_TYPE_CODE\"]");
+            return flags;
+        }
         public static Dictionary<string, ParcelFlags> get_flags_list()
         {
             Dictionary<string, ParcelFlags> flags = new Dictionary<string, ParcelFlags>();
