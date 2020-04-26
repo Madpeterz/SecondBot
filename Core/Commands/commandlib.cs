@@ -269,9 +269,13 @@ namespace BSB.Commands
         {
             bot = setBot;
         }
+        public virtual void Callback(string[] args, EventArgs e,bool status)
+        {
+            bot.CommandHistoryAdd("Callback finished-> " + this.GetType().Name, String.Join(",", args), status);
+        }
         public virtual void Callback(string[] args, EventArgs e)
         {
-
+            bot.CommandHistoryAdd("Callback finished-> " + this.GetType().Name, String.Join(",", args), true);
         }
         public virtual bool CallFunction(string[] args)
         {
