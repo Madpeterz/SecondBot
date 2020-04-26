@@ -9,6 +9,9 @@ namespace BSB.bottypes
 {
     public abstract class AVstorageBot : AtHome
     {
+        protected UUID master_uuid = UUID.Zero;
+        public UUID getMaster_uuid { get { return master_uuid; } }
+
         protected Dictionary<string, long> AvatarStorageLastUsed = new Dictionary<string, long>();
         protected Dictionary<string, UUID> AvatarName2Key = new Dictionary<string, UUID>();
         protected Dictionary<UUID, string> AvatarKey2Name = new Dictionary<UUID, string>();
@@ -137,10 +140,13 @@ namespace BSB.bottypes
             }
             foreach(string purge in PurgeAvatars)
             {
-                AvatarStorageLastUsed.Remove(purge);
-                UUID avuuid = AvatarName2Key[purge];
-                AvatarName2Key.Remove(purge);
-                AvatarKey2Name.Remove(avuuid);
+                if (purge != myconfig.master)
+                {
+                    AvatarStorageLastUsed.Remove(purge);
+                    UUID avuuid = AvatarName2Key[purge];
+                    AvatarName2Key.Remove(purge);
+                    AvatarKey2Name.Remove(avuuid);
+                }
             }
         }
 
@@ -151,6 +157,10 @@ namespace BSB.bottypes
             {
                 Client.Avatars.UUIDNameReply += Key2NameEvent;
                 Client.Directory.DirPeopleReply += Name2KeyEvent;
+                if(helpers.notempty(myconfig.master) == true)
+                {
+                    FindAvatarName2Key(myconfig.master);
+                }
             }
         }
 
@@ -185,6 +195,13 @@ namespace BSB.bottypes
                     if (PendingAvatarFinds_viauuid.ContainsKey(av_uuid) == true)
                     {
                         PendingAvatarFinds_viauuid.Remove(av_uuid);
+                    }
+                }
+                if (helpers.notempty(myconfig.master) == true)
+                {
+                    if(myconfig.master == av_name)
+                    {
+                        master_uuid = av_uuid;
                     }
                 }
             }
