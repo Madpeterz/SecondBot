@@ -17,9 +17,9 @@ namespace BSB.Commands.Self
             {
               
                 StringBuilder sb = new StringBuilder();
-                sb.Append(bot.GetCommandsInterface.GetCommandHelp("IM"));
-                sb.Append(bot.GetCommandsInterface.GetCommandHelp("SAY"));
-                sb.Append(bot.GetCommandsInterface.GetCommandHelp("BOTSIT"));
+                sb.Append(bot.GetCommandsInterface.GetCommandHelp("Im"));
+                sb.Append(bot.GetCommandsInterface.GetCommandHelp("Say"));
+                sb.Append(bot.GetCommandsInterface.GetCommandHelp("BotSit"));
                 sb.Append("Type: 'morehelp' for a full list of commands");
                 bot.sendIM(bot.getMaster_uuid, sb.ToString());
 
