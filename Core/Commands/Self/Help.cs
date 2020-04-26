@@ -17,13 +17,14 @@ namespace BSB.Commands.Self
             {
               
                 StringBuilder sb = new StringBuilder();
+                sb.Append("Second Bot - Basic Command List\n\n");
                 sb.Append(bot.GetCommandsInterface.GetCommandHelp("im"));
                 sb.Append("\n\n");
                 sb.Append(bot.GetCommandsInterface.GetCommandHelp("say"));
                 sb.Append("\n\n");
                 sb.Append(bot.GetCommandsInterface.GetCommandHelp("botsit"));
                 sb.Append("\n\n");
-                sb.Append("\nType: 'morehelp' for a full list of commands");
+                sb.Append("\nType: 'morehelp' for a full list of commands\n");
                 sb.Replace("<br/>", "\n");
                 bot.sendIM(bot.getMaster_uuid, sb.ToString());
 
@@ -43,27 +44,19 @@ namespace BSB.Commands.Self
         {
             if (bot.getMaster_uuid != UUID.Zero)
             {
-                string reply = "";
-                int counter = 0;
-                string addon = "";
+
+
+                StringBuilder reply = new StringBuilder();
+                reply.Append("Second Bot - Full Command List\n\n");
                 foreach (string a in bot.GetCommandsInterface.GetCommandsList())
                 {
-                    reply += addon;
-                    reply += a;
-                    counter++;
-                    if (counter == 5)
-                    {
-                        reply += "\n";
-                        addon = "";
-                        counter = 0;
-                    }
-                    else
-                    {
-                        addon = " , ";
-                    }
+                    reply.Append(a);
+                    reply.Append("\n");
+                    reply.Append(bot.GetCommandsInterface.GetCommandHelp(a));
+                    reply.Append("\n\n");
                 }
 
-                bot.sendIM(bot.getMaster_uuid, reply);
+                bot.sendIM(bot.getMaster_uuid, reply.ToString());
 
                 return true;
             }
