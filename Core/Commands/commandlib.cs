@@ -285,13 +285,27 @@ namespace BSB.Commands
         }
         public virtual bool CallFunction(string[] args)
         {
-            if (args.Length < MinArgs)
+            if (helpers.notempty(args) == true)
             {
-                return Failed("Incorrect number of args");
+                if (args.Length < MinArgs)
+                {
+                    return Failed("Incorrect number of args");
+                }
+                else
+                {
+                    return true;
+                }
             }
             else
             {
-                return true;
+                if(MinArgs == 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return Failed("Incorrect number of args");
+                }
             }
         }
         public bool Failed(string why_failed)
