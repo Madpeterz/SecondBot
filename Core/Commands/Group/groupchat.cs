@@ -54,6 +54,11 @@ namespace BSB.Commands.Group
             if (UUID.TryParse(args[0], out UUID targetgroup) == true)
             {
                 bot.GetClient.Self.InstantMessageGroup(targetgroup, args[1]);
+                base.Callback(args, e);
+            }
+            else
+            {
+                base.Callback(args, e,false);
             }
         }
     }

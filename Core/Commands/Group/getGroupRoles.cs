@@ -56,6 +56,7 @@ namespace BSB.Commands.Group
                 }
             }
             bot.GetCommandsInterface.SmartCommandReply(args[0], reply, CommandName);
+            base.Callback(args, e);
         }
     }
 }

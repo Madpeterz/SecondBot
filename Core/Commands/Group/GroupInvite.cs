@@ -37,13 +37,27 @@ namespace BSB.Commands.Group
                         if (reply.Members.ContainsKey(target_avatar) == false)
                         {
                             ForRealGroupInvite(args, target_group, target_avatar);
+                            base.Callback(args, e);
+                        }
+                        else
+                        {
+                            base.Callback(args, e, false);
                         }
                     }
                     else
                     {
                         ConsoleLog.Crit("Callback sent for the wrong group as part of group invite!");
+                        base.Callback(args, e, false);
                     }
                 }
+                else
+                {
+                    base.Callback(args, e, false);
+                }
+            }
+            else
+            {
+                base.Callback(args, e, false);
             }
         }
         public override bool CallFunction(string[] args)
