@@ -39,7 +39,7 @@ namespace BSB.Commands.Self
     public class MoreHelp : CoreCommand
     {
      
-        public override string Helpfile { get { return "A Full list of supported commands"; } }
+        public override string Helpfile { get { return "Generates a notecard of all supported commands"; } }
         public override bool CallFunction(string[] args)
         {
             if (bot.getMaster_uuid != UUID.Zero)
@@ -55,7 +55,16 @@ namespace BSB.Commands.Self
                     reply.Append(bot.GetCommandsInterface.GetCommandHelp(a));
                     reply.Append("\n\n");
                 }
-
+                reply.Replace("<br/>", "\n");
+                reply.Replace("</table>", "");
+                reply.Replace("</td><td>", "\n");
+                reply.Replace("</tr><tr>", "\n");
+                reply.Replace("</td>", "");
+                reply.Replace("<td>", "");
+                reply.Replace("</tr>", "");
+                reply.Replace("<table border='1'><tr>", "");
+                reply.Replace("<hr/>", " ");
+               
                 bot.SendNotecard("SecondBot - All Commands", reply.ToString(), bot.getMaster_uuid);
 
                 return true;
