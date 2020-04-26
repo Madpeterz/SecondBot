@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using OpenMetaverse;
+using BetterSecondBotShared.Static;
 
 namespace BSB.Commands.Chat
 {
@@ -18,8 +19,15 @@ namespace BSB.Commands.Chat
             {
                 if (UUID.TryParse(args[0], out UUID target_av) == true)
                 {
-                    bot.sendIM(target_av, args[1]);
-                    return true;
+                    if (helpers.notempty(args[1]) == true)
+                    {
+                        bot.sendIM(target_av, args[1]);
+                        return true;
+                    }
+                    else
+                    {
+                        return Failed("Arg 2 is empty");
+                    }
                 }
                 else
                 {
