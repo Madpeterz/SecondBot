@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenMetaverse;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,7 +11,7 @@ namespace BSB.RLV.Sitting
         {
             if (args[0] == "force")
             {
-                return bot.GetCommandsInterface.Call("stand", "");
+                return bot.GetCommandsInterface.Call("stand", "", UUID.Zero);
             }
             else if ((args[0] == "y") || (args[0] == "n"))
             {
