@@ -239,7 +239,11 @@ namespace BSB.bottypes
         public override void KillMePlease()
         {
             base.KillMePlease();
-            _ = DiscordKillMePlease();
+            if(DiscordClient != null)
+            {
+                _ = DiscordKillMePlease();
+            }
+            
         }
 
         protected void DiscordGetNewChannelProperies(TextChannelProperties C,string channelname,string channeltopic,string catname)

@@ -11,7 +11,7 @@ namespace BSB.Commands.Self
     {
         public override string[] ArgTypes { get { return new[] { "Mixed" }; } }
         public override string[] ArgHints { get { return new[] { "Text \"ground\" or a object UUID" }; } }
-        public override string Helpfile { get { return "Makes the bot sit on the ground or on a object if it can see it"; } }
+        public override string Helpfile { get { return "Makes the bot sit on the ground or on a object if it can see it<br/>Example: BOTSIT|||" + UUID.Zero; } }
         public override int MinArgs { get { return 1; } }
         public override bool CallFunction(string[] args)
         {
