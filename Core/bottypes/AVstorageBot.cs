@@ -135,17 +135,26 @@ namespace BSB.bottypes
                 long dif = now - entry.Value;
                 if(dif > max_db_storage_age)
                 {
-                    PurgeAvatars.Add(entry.Key);
+                    if (PurgeAvatars.Contains(entry.Key) == false)
+                    {
+                        PurgeAvatars.Add(entry.Key);
+                    }
                 }
             }
             foreach(string purge in PurgeAvatars)
             {
                 if (purge != myconfig.master)
                 {
-                    AvatarStorageLastUsed.Remove(purge);
-                    UUID avuuid = AvatarName2Key[purge];
-                    AvatarName2Key.Remove(purge);
-                    AvatarKey2Name.Remove(avuuid);
+                    if (AvatarStorageLastUsed.ContainsKey(purge) == true)
+                    {
+                        if(AvatarName2Key.ContainsKey(purge) == true)
+                        {
+                            AvatarStorageLastUsed.Remove(purge);
+                            UUID avuuid = AvatarName2Key[purge];
+                            AvatarName2Key.Remove(purge);
+                            AvatarKey2Name.Remove(avuuid);
+                        }
+                    }
                 }
             }
         }
@@ -185,16 +194,19 @@ namespace BSB.bottypes
             {
                 if (AvatarStorageLastUsed.ContainsKey(av_name) == false)
                 {
-                    AvatarName2Key.Add(av_name, av_uuid);
-                    AvatarKey2Name.Add(av_uuid, av_name);
-                    AvatarStorageLastUsed.Add(av_name, helpers.UnixTimeNow());
-                    if (PendingAvatarFinds_vianame.ContainsKey(av_name) == true)
+                    if (av_uuid != UUID.Zero)
                     {
-                        PendingAvatarFinds_vianame.Remove(av_name);
-                    }
-                    if (PendingAvatarFinds_viauuid.ContainsKey(av_uuid) == true)
-                    {
-                        PendingAvatarFinds_viauuid.Remove(av_uuid);
+                        AvatarName2Key.Add(av_name, av_uuid);
+                        AvatarKey2Name.Add(av_uuid, av_name);
+                        AvatarStorageLastUsed.Add(av_name, helpers.UnixTimeNow());
+                        if (PendingAvatarFinds_vianame.ContainsKey(av_name) == true)
+                        {
+                            PendingAvatarFinds_vianame.Remove(av_name);
+                        }
+                        if (PendingAvatarFinds_viauuid.ContainsKey(av_uuid) == true)
+                        {
+                            PendingAvatarFinds_viauuid.Remove(av_uuid);
+                        }
                     }
                 }
                 if (helpers.notempty(myconfig.master) == true)
