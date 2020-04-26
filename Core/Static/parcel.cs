@@ -26,7 +26,10 @@ namespace BSB
                 }
                 else
                 {
-                    has_perm = false;
+                    if(bot.GetClient.Network.CurrentSim.IsEstateManager == false)
+                    {
+                        has_perm = false;
+                    }
                 }
             }
             return has_perm;
