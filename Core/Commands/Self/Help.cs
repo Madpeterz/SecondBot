@@ -56,7 +56,7 @@ namespace BSB.Commands.Self
                     reply.Append("\n\n");
                 }
 
-                bot.sendIM(bot.getMaster_uuid, reply.ToString());
+                bot.SendNotecard("SecondBot - All Commands", reply.ToString(), bot.getMaster_uuid);
 
                 return true;
             }
