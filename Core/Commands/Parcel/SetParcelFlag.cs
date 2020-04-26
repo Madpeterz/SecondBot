@@ -61,22 +61,22 @@ namespace BSB.Commands.CMD_Parcel
                 {
                     int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
                     Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-                    if (p.OwnerID != bot.GetClient.Self.AgentID)
+                    if (parcel_static.has_parcel_perm(p, bot) == true)
                     {
-                        if (p.IsGroupOwned)
+                        foreach (KeyValuePair<string, bool> cfg in setflags)
                         {
-                            bot.GetClient.Groups.ActivateGroup(p.GroupID);
+                            if (flags.ContainsKey(cfg.Key) == true)
+                            {
+                                Dosetflag(flags[cfg.Key], p, cfg.Value);
+                            }
                         }
+                        p.Update(bot.GetClient.Network.CurrentSim, false);
+                        return true;
                     }
-                    foreach (KeyValuePair<string, bool> cfg in setflags)
+                    else
                     {
-                        if (flags.ContainsKey(cfg.Key) == true)
-                        {
-                            Dosetflag(flags[cfg.Key], p, cfg.Value);
-                        }
+                        return Failed("Incorrect perms to control parcel");
                     }
-                    p.Update(bot.GetClient.Network.CurrentSim, false);
-                    return true;
                 }
                 else
                 {
