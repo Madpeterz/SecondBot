@@ -1,12 +1,37 @@
-﻿using OpenMetaverse;
+﻿using BSB.bottypes;
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace BSB
 {
-    public class parcel_static
+    public static class parcel_static
     {
+        public static bool has_parcel_perm(Parcel P, CommandsBot bot)
+        {
+            bool has_perm = true;
+            if (P.OwnerID != bot.GetClient.Self.AgentID)
+            {
+                if (P.IsGroupOwned)
+                {
+                    if (bot.MyGroups.ContainsKey(P.GroupID) == true)
+                    {
+                        bot.GetClient.Groups.ActivateGroup(P.GroupID);
+                    }
+                    else
+                    {
+                        has_perm = false;
+                    }
+                }
+                else
+                {
+                    has_perm = false;
+                }
+            }
+            return has_perm;
+
+        }
         public static string[] get_flag_names()
         {
             System.Type enumType = typeof(ParcelFlags);
