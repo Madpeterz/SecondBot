@@ -13,7 +13,7 @@ namespace BSB.Commands.CMD_Parcel
         public override string[] ArgTypes { get { return new[] { "Smart"}; } }
         public override string[] ArgHints { get { return new[] { "Smart reply [Channel|Avatar|http url]" }; } }
         public override int MinArgs { get { return 1; } }
-        public override string Helpfile { get { return "Updates the current parcels name"; } }
+        public override string Helpfile { get { return "Fetchs the current parcels name and sends it to the smart reply target on [ARG 1]"; } }
 
         public override bool CallFunction(string[] args)
         {
