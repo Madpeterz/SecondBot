@@ -89,7 +89,7 @@ namespace BSB.bottypes
                     }
                     else if (myconfig.master == sender_name)
                     {
-                        List<string> bits = message.Split(new[] { "|||" }, StringSplitOptions.None).ToList();
+                        List<string> bits = message.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
                         if (bits.Count == 1)
                         {
                             bits.Add("");
