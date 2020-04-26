@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenMetaverse;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -17,7 +18,7 @@ namespace BetterSecondBot.HttpServer.Control.Interface
             {
                 if (ArgsCheck(args) == true)
                 {
-                    if (bot.GetCommandsInterface.Call(args[0], args[1]) == true)
+                    if (bot.GetCommandsInterface.Call(args[0], args[1], UUID.Zero) == true)
                     {
                         return new string[] { "OK" };
                     }

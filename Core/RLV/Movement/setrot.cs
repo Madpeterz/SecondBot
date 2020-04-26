@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using OpenMetaverse;
 
 namespace BSB.RLV.Movement
 {
@@ -13,7 +14,7 @@ namespace BSB.RLV.Movement
             {
                 if (args[1] == "force")
                 {
-                    return bot.GetCommandsInterface.Call("rotateto", args[0]);
+                    return bot.GetCommandsInterface.Call("rotateto", args[0], UUID.Zero);
                 }
                 return Failed("magic word force is required [dont ask me]");
             }
