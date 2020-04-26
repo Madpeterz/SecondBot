@@ -41,22 +41,15 @@ namespace BSB.Commands.CMD_Parcel
         {
             if (base.CallFunction(args) == true)
             {
-                if (UUID.TryParse(args[0], out UUID objectUUID) == true)
+                int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
+                if (bot.CreateAwaitEventReply("parcelobjectowners", this, args) == true)
                 {
-                    int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                    if (bot.CreateAwaitEventReply("parcelobjectowners", this, args) == true)
-                    {
-                        bot.GetClient.Parcels.RequestObjectOwners(bot.GetClient.Network.CurrentSim, localid);
-                        return true;
-                    }
-                    else
-                    {
-                        return Failed("Unable to await reply");
-                    }
+                    bot.GetClient.Parcels.RequestObjectOwners(bot.GetClient.Network.CurrentSim, localid);
+                    return true;
                 }
                 else
                 {
-                    return Failed("Invaild object UUID");
+                    return Failed("Unable to await reply");
                 }
             }
             return false;
