@@ -18,6 +18,7 @@ namespace BSB.bottypes
                 Client.Groups.GroupRoleDataReply += GroupRolesData;
                 Client.Self.GroupChatJoined += GroupchatJoinHandler;
                 Client.Groups.GroupMembersReply += GroupMembersReplyHandler;
+                Client.Parcels.ParcelObjectOwnersReply += ObjectOwnersHandler;
             }
         }
         protected override void GroupMembersReplyHandler(object sender, GroupMembersReplyEventArgs e)
@@ -88,6 +89,27 @@ namespace BSB.bottypes
                     await_event_ages.Remove(eventid);
                     await_event_idtolistener.Remove(eventid);
                     await_events["groupchatjoin"].Remove(eventid);
+                }
+            }
+        }
+        protected virtual void ObjectOwnersHandler(object sender, ParcelObjectOwnersReplyEventArgs e)
+        {
+            if (await_events.ContainsKey("parcelobjectowners") == true)
+            {
+                List<string> PurgeAwaiters = new List<string>();
+                foreach (KeyValuePair<string, KeyValuePair<CoreCommand, string[]>> await_reply in await_events["parcelobjectowners"])
+                {
+                    if (UUID.TryParse(await_reply.Value.Value[0], out UUID test_group) == true)
+                    {
+                        PurgeAwaiters.Add(await_reply.Key);
+                        await_reply.Value.Key.Callback(await_reply.Value.Value, e);
+                    }
+                }
+                foreach (string eventid in PurgeAwaiters)
+                {
+                    await_event_ages.Remove(eventid);
+                    await_event_idtolistener.Remove(eventid);
+                    await_events["parcelobjectowners"].Remove(eventid);
                 }
             }
         }
