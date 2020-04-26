@@ -202,16 +202,16 @@ namespace BSB.Commands
         protected List<string> suppress_warnings = new List<string>();
         public bool Call(string command)
         {
-            return Call(command, "");
+            return Call(command, "",UUID.Zero);
         }
 
-        protected bool CallCommand(string command, string arg)
+        protected bool CallCommand(string command, string arg, UUID caller)
         {
             command = command.ToLowerInvariant();
             CoreCommand cmd = (CoreCommand)GetCommand(command);
             if (cmd != null)
             {
-                cmd.Setup(bot);
+                cmd.Setup(bot, caller);
                 if ((cmd.ArgTypes.Contains("Avatar") == true) || (cmd.ArgTypes.Contains("Smart") == true))
                 {
                     string[] args = arg.Split(new string[] { "~#~" }, StringSplitOptions.None);
@@ -255,9 +255,9 @@ namespace BSB.Commands
             }
             
         }
-        public bool Call(string command, string arg)
+        public bool Call(string command, string arg,UUID caller)
         {
-            bool result = CallCommand(command, arg);
+            bool result = CallCommand(command, arg, caller);
             bot.CommandHistoryAdd(command, arg, result);
             return result;
         }
@@ -265,9 +265,15 @@ namespace BSB.Commands
     public abstract class CoreCommand : API_interface
     {
         protected CommandsBot bot = null;
-        public void Setup(CommandsBot setBot)
+
+        /// <summary>
+        /// The UUID of the object/Avatar that called this function, you should still test if its not UUID zero and is a avatar
+        /// </summary>
+        protected UUID caller = UUID.Zero;
+        public void Setup(CommandsBot setBot,UUID setCaller)
         {
             bot = setBot;
+            caller = setCaller;
         }
         public virtual void Callback(string[] args, EventArgs e,bool status)
         {

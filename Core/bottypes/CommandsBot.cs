@@ -96,9 +96,9 @@ namespace BSB.bottypes
             }
         }
 
-        protected virtual void CallCommandLib(string command, string arg)
+        protected virtual void CallCommandLib(string command, string arg, UUID caller)
         {
-            CommandsInterface.Call(command, arg);
+            CommandsInterface.Call(command, arg, caller);
         }
 
         protected override void AfterBotLoginHandler()
@@ -120,12 +120,12 @@ namespace BSB.bottypes
                     string hashcheck = helpers.GetSHA1(raw);
                     if (hashcheck == signing_code)
                     {
-                        CallCommandLib(command, arg);
+                        CallCommandLib(command, arg, fromUUID);
                     }
                 }
                 else if (from_master == true)
                 {
-                    CallCommandLib(command, arg);
+                    CallCommandLib(command, arg, fromUUID);
                 }
             }
         }

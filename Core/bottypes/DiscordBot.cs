@@ -424,7 +424,7 @@ namespace BSB.bottypes
                                         bool status = false;
                                         if (bits.Length == 2)
                                         {
-                                            status = CommandsInterface.Call(command, bits[1]);
+                                            status = CommandsInterface.Call(command, bits[1],UUID.Zero);
                                         }
                                         else
                                         {
@@ -500,11 +500,11 @@ namespace BSB.bottypes
                                                 }
                                                 Noticetitle = Noticetitle.Replace("!notice ", "");
                                                 Noticetitle = Noticetitle.Trim();
-                                                CommandsInterface.Call("GroupNotice", ""+ group.ToString()+"~#~" + Noticetitle + "~#~" + Noticemessage);
+                                                CommandsInterface.Call("GroupNotice", ""+ group.ToString()+"~#~" + Noticetitle + "~#~" + Noticemessage,UUID.Zero);
                                             }
                                             else
                                             {
-                                                CommandsInterface.Call("Groupchat", "" + group.ToString() + "~#~" + "[" + message.Author.Username + "]->" + message.Content);
+                                                CommandsInterface.Call("Groupchat", "" + group.ToString() + "~#~" + "[" + message.Author.Username + "]->" + message.Content, UUID.Zero);
                                             }
                                             await message.DeleteAsync();
                                         }
