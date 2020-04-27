@@ -55,21 +55,28 @@ namespace BSB.Commands.CMD_Parcel
                 if (get_flags.Count > 0)
                 {
                     int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                    Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-                    StringBuilder reply = new StringBuilder();
-                    string addon = "";
-                    foreach (string cfg in get_flags)
+                    if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                     {
-                        if (flags.ContainsKey(cfg) == true)
+                        Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
+                        StringBuilder reply = new StringBuilder();
+                        string addon = "";
+                        foreach (string cfg in get_flags)
                         {
-                            reply.Append(addon);
-                            reply.Append(cfg);
-                            reply.Append("=");
-                            reply.Append(p.Flags.HasFlag(flags[cfg]).ToString());
-                            if(addon != ",") addon = ",";
+                            if (flags.ContainsKey(cfg) == true)
+                            {
+                                reply.Append(addon);
+                                reply.Append(cfg);
+                                reply.Append("=");
+                                reply.Append(p.Flags.HasFlag(flags[cfg]).ToString());
+                                if (addon != ",") addon = ",";
+                            }
                         }
+                        return bot.GetCommandsInterface.SmartCommandReply(target, reply.ToString(), CommandName);
                     }
-                    return bot.GetCommandsInterface.SmartCommandReply(target, reply.ToString(), CommandName);
+                    else
+                    {
+                        Failed("Enhance your carm");
+                    }
                 }
                 else
                 {
