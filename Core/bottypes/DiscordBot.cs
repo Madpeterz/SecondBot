@@ -549,17 +549,11 @@ namespace BSB.bottypes
             await DiscordBotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
         }
 
-        public override void CommandHistoryAdd(string command, string arg, bool status)
+        public override string CommandHistoryAdd(string command, string arg, bool status,string WhyFailed)
         {
-            base.CommandHistoryAdd(command, arg, status);
-            if (status == true)
-            {
-                _ = SendMessageToChannelAsync("interface", "Command running: " + command + " ["+arg+"]", "bot", UUID.Zero, myconfig.userName, "bot");
-            }
-            else
-            {
-                _ = SendMessageToChannelAsync("interface", "Command rejected: " + command + " [" + arg + "]", "bot", UUID.Zero, myconfig.userName, "bot");
-            }
+            string output = base.CommandHistoryAdd(command, arg, status, WhyFailed);
+            _ = SendMessageToChannelAsync("interface", output, "bot", UUID.Zero, myconfig.userName, "bot");
+            return output;
         }
 
         public async override void sendIM(UUID avatar, string message)

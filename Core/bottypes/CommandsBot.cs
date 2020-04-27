@@ -11,22 +11,45 @@ namespace BSB.bottypes
 {
     public abstract class CommandsBot : AVstorageBot
     {
-        Dictionary<string, long> CommandHistory = new Dictionary<string, long>();
+        List<string> CommandHistory = new List<string>();
         protected int commandid = 1;
-        public virtual void CommandHistoryAdd(string command, string arg, bool status)
+        public virtual string CommandHistoryAdd(string command, string arg, bool status,string infomessage)
         {
-            string message = "(" + commandid.ToString() + "): " + status.ToString() + " -> " + command + " [" + arg + "]";
-            CommandHistory.Add(message, helpers.UnixTimeNow());
-            if(CommandHistory.Count() > myconfig.MaxCommandHistory)
+            string message = "";
+            if (infomessage != "--")
             {
-                CommandHistory.Remove(CommandHistory.ElementAt(0).Key);
+                StringBuilder sb = new StringBuilder();
+                sb.Append(commandid.ToString());
+                sb.Append(" - ");
+                sb.Append(command);
+                sb.Append(" / [" + arg + "]");
+                if (status == false)
+                {
+                    sb.Append(" (FAILED) ");
+                }
+                else
+                {
+                    sb.Append(" (OK) ");
+                }
+                if (helpers.notempty(infomessage) == true)
+                {
+                    sb.Append("[Info: ");
+                    sb.Append(infomessage);
+                    sb.Append("]");
+                }
+                CommandHistory.Add(sb.ToString());
+                if (CommandHistory.Count() > myconfig.MaxCommandHistory)
+                {
+                    CommandHistory.RemoveAt(0);
+                }
+                if (myconfig.CommandsToConsole == true)
+                {
+                    ConsoleLog.Info(sb.ToString());
+                }
+                commandid++;
+                if (commandid >= myconfig.MaxCommandHistory) commandid = 1;
             }
-            if (myconfig.CommandsToConsole == true)
-            {
-                ConsoleLog.Info(message);
-            }
-            commandid++;
-            if (commandid >= myconfig.MaxCommandHistory) commandid = 1;
+            return message;
         }
         public string[] GetLastCommands(int amount=10)
         {
@@ -34,7 +57,7 @@ namespace BSB.bottypes
             int loop = 0;
             while((loop < CommandHistory.Count) && (loop < amount))
             {
-                commands.Add(CommandHistory.Keys.ElementAt(CommandHistory.Count - loop - 1));
+                commands.Add(CommandHistory.ElementAt(CommandHistory.Count - loop - 1));
                 loop++;
             }
             return commands.ToArray();

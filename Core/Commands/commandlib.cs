@@ -19,9 +19,10 @@ namespace BSB.Commands
             Command = set_cmd;
             args = set_args.ToList();
         }
-        public bool Callnow()
+        public KeyValuePair<bool,string> Callnow()
         {
-            return Command.CallFunction(args.ToArray());
+            bool result = Command.CallFunction(args.ToArray());
+            return new KeyValuePair<bool, string>(result, Command.GetInfoBlob);
         }
         public bool needs_lookup()
         {
@@ -205,7 +206,7 @@ namespace BSB.Commands
             return Call(command, "",UUID.Zero);
         }
 
-        protected bool CallCommand(string command, string arg, UUID caller)
+        protected KeyValuePair<bool,string> CallCommand(string command, string arg, UUID caller)
         {
             command = command.ToLowerInvariant();
             CoreCommand cmd = (CoreCommand)GetCommand(command);
@@ -219,7 +220,6 @@ namespace BSB.Commands
                 }
                 if ((cmd.ArgTypes.Contains("Avatar") == true) || (cmd.ArgTypes.Contains("Smart") == true))
                 {
-
                     if (cmd.MinArgs <= args.Length)
                     {
                         pending_avatar_lookup pending = new pending_avatar_lookup(this, cmd, args);
@@ -232,7 +232,7 @@ namespace BSB.Commands
                             {
                                 next_lookup_id = 0;
                             }
-                            return true;
+                            return new KeyValuePair<bool, string>(true,"Lookup underway");
                         }
                         else
                         {
@@ -241,12 +241,13 @@ namespace BSB.Commands
                     }
                     else
                     {
-                        return false;
+                        return new KeyValuePair<bool, string>(false, "Required args count not sent! expected: "+ cmd.MinArgs.ToString()+" but got "+ args.Length.ToString()+ "");
                     }
                 }
                 else
                 {
-                    return cmd.CallFunction(args);
+                    bool result = cmd.CallFunction(args);
+                    return new KeyValuePair<bool, string>(result, cmd.GetInfoBlob);
                 }
             }
             else
@@ -254,16 +255,16 @@ namespace BSB.Commands
                 if (suppress_warnings.Contains(command) == false)
                 {
                     suppress_warnings.Add(command);
-                    ConsoleLog.Debug("[CMD/Failed] " + command + " : I have no fucking idea what you are talking about");
+                    return new KeyValuePair<bool, string>(false, "unknown");
                 }
-                return false;
             }
+            return new KeyValuePair<bool, string>(false, "--");
         }
         public bool Call(string command, string arg,UUID caller)
         {
-            bool result = CallCommand(command, arg, caller);
-            bot.CommandHistoryAdd(command, arg, result);
-            return result;
+            KeyValuePair<bool, string> result = CallCommand(command, arg, caller);
+            bot.CommandHistoryAdd(command, arg, result.Key,result.Value);
+            return result.Key;
         }
     }
     public abstract class CoreCommand : API_interface
@@ -281,11 +282,11 @@ namespace BSB.Commands
         }
         public virtual void Callback(string[] args, EventArgs e,bool status)
         {
-            bot.CommandHistoryAdd("Callback finished-> " + this.GetType().Name, String.Join(",", args), status);
+            bot.CommandHistoryAdd("Callback finished-> " + this.GetType().Name, String.Join(",", args), status, GetInfoBlob);
         }
         public virtual void Callback(string[] args, EventArgs e)
         {
-            bot.CommandHistoryAdd("Callback finished-> " + this.GetType().Name, String.Join(",", args), true);
+            bot.CommandHistoryAdd("Callback finished-> " + this.GetType().Name, String.Join(",", args), true, GetInfoBlob);
         }
         public virtual bool CallFunction(string[] args)
         {
@@ -314,7 +315,7 @@ namespace BSB.Commands
         }
         public bool Failed(string why_failed)
         {
-            ConsoleLog.Warn("[CMD/Failed] " + CommandName + ": " + why_failed);
+            InfoBlob = why_failed;
             return false;
         }
     }
