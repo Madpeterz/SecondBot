@@ -75,7 +75,7 @@ namespace BSB.Commands.CMD_Parcel
                     }
                     else
                     {
-                        Failed("Enhance your carm");
+                        Failed("Enhance your calm");
                     }
                 }
                 else
