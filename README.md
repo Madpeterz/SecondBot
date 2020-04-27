@@ -12,7 +12,7 @@ Secondbot is a CommandLine based bot for SecondLife based on [LibreMetaverse](ht
 
 Status
 ---------------
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/56870fb7ed744ebcbac88fe5b77e2086)](https://www.codacy.com/manual/madpeter/SecondBot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Madpeterz/SecondBot&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8626581e3b6e41e9b07838c027242877)](https://www.codacy.com/manual/madpeter/SecondBot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Madpeterz/SecondBot&amp;utm_campaign=Badge_Grade)
 
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3765/badge)](https://bestpractices.coreinfrastructure.org/projects/3765)
 
