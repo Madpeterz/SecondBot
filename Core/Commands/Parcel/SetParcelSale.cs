@@ -26,7 +26,7 @@ namespace BSB.Commands.CMD_Parcel
                 {
                     if (int.TryParse(args[0], out int price) == true)
                     {
-                        if (price >= 0)
+                        if (price >= 1)
                         {
                             if (price <= 99999)
                             {
@@ -43,7 +43,7 @@ namespace BSB.Commands.CMD_Parcel
                         }
                         else
                         {
-                            return Failed("Price must be 0 or more");
+                            return Failed("Price must be 1 or more");
                         }
                     }
                     else
