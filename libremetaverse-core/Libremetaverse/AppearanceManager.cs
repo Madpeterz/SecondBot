@@ -2024,7 +2024,7 @@ namespace OpenMetaverse
             if (COF == null)
             {
 
-                OSDMap request = new OSDMap(1) { ["cof_version"] = COF.Version };
+                OSDMap request = new OSDMap(1) { ["cof_version"] = 1 };
 
                 string msg = "Setting server side baking failed";
 
