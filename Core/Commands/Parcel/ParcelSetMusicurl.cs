@@ -9,34 +9,53 @@ namespace BSB.Commands.CMD_Parcel
     class ParcelSetMusicURL : CoreCommand
     {
         public override string[] ArgTypes { get { return new[] { "String" }; } }
-        public override string[] ArgHints { get { return new[] { "A vaild url or \"clear\"" }; } }
-        public override int MinArgs { get { return 1; } }
+        public override string[] ArgHints { get { return new[] { "A vaild url" }; } }
         public override string Helpfile { get { return "Updates the current parcels music url"; } }
 
         public override bool CallFunction(string[] args)
         {
-            if (base.CallFunction(args) == true)
+            int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
+            Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
+            if (parcel_static.has_parcel_perm(p, bot) == true)
             {
-                int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-                if (parcel_static.has_parcel_perm(p, bot) == true)
+                if (args.Length == 0)
                 {
-                    if(args[0] == "clear")
+                    if (p.MusicURL != "")
                     {
                         p.MusicURL = "";
+                        p.Update(bot.GetClient.Network.CurrentSim, false);
+                        return true;
                     }
-                    else if(args[0].StartsWith("http") == true)
+                    else
                     {
-                        p.MusicURL = args[0];
+                        return Failed("No change made");
                     }
-                    p.Update(bot.GetClient.Network.CurrentSim, false);
                 }
                 else
                 {
-                    return Failed("Do not have expected perms for this parcel!");
+                    if (args[0].StartsWith("http") == true)
+                    {
+                        if (p.MusicURL != args[0])
+                        {
+                            p.MusicURL = args[0];
+                            p.Update(bot.GetClient.Network.CurrentSim, false);
+                            return true;
+                        }
+                        else
+                        {
+                            return Failed("No change made");
+                        }
+                    }
+                    else
+                    {
+                        return Failed("Invaild url");
+                    }
                 }
             }
-            return false;
+            else
+            {
+                return Failed("Required parcel perms missing!");
+            }
         }
     }
 }
