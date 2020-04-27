@@ -23,7 +23,7 @@ namespace BSB.Commands.CMD_Parcel
                 Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
                 if(parcel_static.has_parcel_perm(p,bot) == true)
                 {
-                    bot.GetClient.Parcels.ReturnObjects(bot.GetClient.Network.CurrentSim, localid, ObjectReturnType.None, owner_uuids);
+                    bot.GetClient.Parcels.ReturnObjects(bot.GetClient.Network.CurrentSim, localid, ObjectReturnType.List, owner_uuids);
                     base.Callback(args, e, true);
                 }
                 else
