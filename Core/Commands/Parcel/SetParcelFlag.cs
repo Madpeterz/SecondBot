@@ -17,18 +17,7 @@ namespace BSB.Commands.CMD_Parcel
         public override string Helpfile { get { return "Sets the parcel flags of the parcel the bot is currently standing on<br/>" +
                     "Example:AllowFly=False~#~AllowDamage=True<br/>" + helpers.create_dirty_table(parcel_static.get_flag_names()) +"<br/>"; } }
 
-        private void Dosetflag(ParcelFlags F, Parcel p, bool set)
-        {
-            ConsoleLog.Warn("Setting flag: " + F.ToString() + " To " + set.ToString() + " at " + p.Name + "");
-            if (p.Flags.HasFlag(F))
-            {
-                p.Flags -= F;
-            }
-            if (set == true)
-            {
-                p.Flags |= F;
-            }
-        }
+
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)
@@ -74,7 +63,7 @@ namespace BSB.Commands.CMD_Parcel
                         {
                             if (flags.ContainsKey(cfg.Key) == true)
                             {
-                                Dosetflag(flags[cfg.Key], p, cfg.Value);
+                                parcel_static.ParcelSetFlag(flags[cfg.Key], p, cfg.Value);
                             }
                         }
                         p.Update(bot.GetClient.Network.CurrentSim, false);
