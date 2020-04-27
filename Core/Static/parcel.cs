@@ -8,6 +8,17 @@ namespace BSB
 {
     public static class parcel_static
     {
+        public static void ParcelSetFlag(ParcelFlags F, Parcel p, bool set)
+        {
+            if (p.Flags.HasFlag(F))
+            {
+                p.Flags -= F;
+            }
+            if (set == true)
+            {
+                p.Flags |= F;
+            }
+        }
         public static bool has_parcel_perm(Parcel P, CommandsBot bot)
         {
             bool has_perm = true;
