@@ -40,21 +40,28 @@ namespace BSB.Commands.CMD_Parcel
                 Dictionary<string, bool> setflags = new Dictionary<string, bool>();
                 foreach (string a in args)
                 {
-                    string[] parts = a.Split('=');
-                    if (flags.ContainsKey(parts[0]) == true)
+                    string[] parts = a.Split('=',StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 2)
                     {
-                        if (acceptablewords.Contains(parts[1]))
+                        if (flags.ContainsKey(parts[0]) == true)
                         {
-                            setflags.Add(parts[0], Convert.ToBoolean(parts[1]));
+                            if (acceptablewords.Contains(parts[1]))
+                            {
+                                setflags.Add(parts[0], Convert.ToBoolean(parts[1]));
+                            }
+                            else
+                            {
+                                ConsoleLog.Crit("Unable to set flag " + parts[0] + " to : " + parts[1] + "");
+                            }
                         }
                         else
                         {
-                            ConsoleLog.Crit("Unable to set flag " + parts[0] + " to : " + parts[1] + "");
+                            ConsoleLog.Warn("Flag: " + parts[0] + " is unknown");
                         }
                     }
                     else
                     {
-                        ConsoleLog.Warn("Flag: " + parts[0] + " is unknown");
+                        ConsoleLog.Warn("Flag: " + a + " missing = True|False");
                     }
                 }
                 if (setflags.Count > 0)
