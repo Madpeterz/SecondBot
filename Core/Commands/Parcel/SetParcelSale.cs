@@ -10,8 +10,8 @@ namespace BSB.Commands.CMD_Parcel
 
     public class SetParcelSale : CoreCommand
     {
-        public override string[] ArgTypes { get { return new[] { "Number" }; } }
-        public override string[] ArgHints { get { return new[] { "L$ amount to mark the parcel for sale as" }; } }
+        public override string[] ArgTypes { get { return new[] { "Number","Avatar" }; } }
+        public override string[] ArgHints { get { return new[] { "L$ amount to mark the parcel for sale as (Range: 1 to 99999 unless [ARG 2] is set)", "Avatar who can buy the land (If set allows you to set the sell price to zero)" }; } }
         public override int MinArgs { get { return 1; } }
 
         public override string Helpfile { get { return "Sets the current parcel for sale for L$[ARG 1] (Also marks the parcel for sale)"; } }
@@ -26,11 +26,21 @@ namespace BSB.Commands.CMD_Parcel
                 {
                     if (int.TryParse(args[0], out int price) == true)
                     {
-                        if (price >= 1)
+                        UUID target_buyer = UUID.Zero;
+                        int low_limit = 1;
+                        if(args.Length == 2)
+                        {
+                            if(UUID.TryParse(args[1],out target_buyer) == true)
+                            {
+                                low_limit = 0;
+                            }
+                        }
+                        if (price >= low_limit)
                         {
                             if (price <= 99999)
                             {
                                 p.SalePrice = price;
+                                p.AuthBuyerID = target_buyer;
                                 parcel_static.ParcelSetFlag(ParcelFlags.ForSale, p, true);
                                 parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, p, false);
                                 p.Update(bot.GetClient.Network.CurrentSim, false);
@@ -43,7 +53,7 @@ namespace BSB.Commands.CMD_Parcel
                         }
                         else
                         {
-                            return Failed("Price must be 1 or more");
+                            return Failed("Price must be "+ low_limit.ToString()+" or more");
                         }
                     }
                     else
