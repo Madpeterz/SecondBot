@@ -14,7 +14,7 @@ namespace BSB.Commands.CMD_Parcel
         public override string[] ArgHints { get { return new[] { "L$ amount to mark the parcel for sale as" }; } }
         public override int MinArgs { get { return 1; } }
 
-        public override string Helpfile { get { return "Sets the current parcel for sale for L$[ARG 1] "; } }
+        public override string Helpfile { get { return "Sets the current parcel for sale for L$[ARG 1] (Also marks the parcel for sale)"; } }
 
         public override bool CallFunction(string[] args)
         {
@@ -26,11 +26,13 @@ namespace BSB.Commands.CMD_Parcel
                 {
                     if (int.TryParse(args[0], out int price) == true)
                     {
-                        if (price >= 1)
+                        if (price >= 0)
                         {
                             if (price <= 99999)
                             {
                                 p.SalePrice = price;
+                                parcel_static.ParcelSetFlag(ParcelFlags.ForSale, p, true);
+                                parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, p, false);
                                 p.Update(bot.GetClient.Network.CurrentSim, false);
                                 return true;
                             }
@@ -41,7 +43,7 @@ namespace BSB.Commands.CMD_Parcel
                         }
                         else
                         {
-                            return Failed("Price must be 1 or more");
+                            return Failed("Price must be 0 or more");
                         }
                     }
                     else
