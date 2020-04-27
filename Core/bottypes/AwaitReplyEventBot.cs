@@ -99,11 +99,8 @@ namespace BSB.bottypes
                 List<string> PurgeAwaiters = new List<string>();
                 foreach (KeyValuePair<string, KeyValuePair<CoreCommand, string[]>> await_reply in await_events["parcelobjectowners"])
                 {
-                    if (UUID.TryParse(await_reply.Value.Value[0], out UUID test_group) == true)
-                    {
-                        PurgeAwaiters.Add(await_reply.Key);
-                        await_reply.Value.Key.Callback(await_reply.Value.Value, e);
-                    }
+                    PurgeAwaiters.Add(await_reply.Key);
+                    await_reply.Value.Key.Callback(await_reply.Value.Value, e);
                 }
                 foreach (string eventid in PurgeAwaiters)
                 {
