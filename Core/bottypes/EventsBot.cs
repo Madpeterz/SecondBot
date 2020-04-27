@@ -179,9 +179,9 @@ namespace BSB.bottypes
             else if(e.Status == LoginStatus.Failed)
             {
                 login_status = "Logged out";
+                login_auto_logout = true;
                 if (e.FailReason == "presence")
                 {
-                    login_auto_logout = true;
                     login_status = "Logged out <Clear AV>";
                 }
             }
