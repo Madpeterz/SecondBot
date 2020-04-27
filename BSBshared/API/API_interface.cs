@@ -14,6 +14,9 @@ namespace BetterSecondBotShared.API
         public virtual string Helpfile { get { return "No help given"; } }
         public virtual string[] ArgTypes { get { return new string[] { }; } }
         public virtual string[] ArgHints { get { return new string[] { }; } }
+
+        protected string InfoBlob = "";
+        public string GetInfoBlob { get { return InfoBlob; } }
     }
 
     public class API_supported_interface
