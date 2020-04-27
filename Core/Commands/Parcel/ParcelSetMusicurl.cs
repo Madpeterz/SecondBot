@@ -9,7 +9,7 @@ namespace BSB.Commands.CMD_Parcel
     class ParcelSetMusicURL : CoreCommand
     {
         public override string[] ArgTypes { get { return new[] { "String" }; } }
-        public override string[] ArgHints { get { return new[] { "The url" }; } }
+        public override string[] ArgHints { get { return new[] { "A vaild url or \"clear\"" }; } }
         public override int MinArgs { get { return 1; } }
         public override string Helpfile { get { return "Updates the current parcels music url"; } }
 
@@ -21,7 +21,14 @@ namespace BSB.Commands.CMD_Parcel
                 Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
                 if (parcel_static.has_parcel_perm(p, bot) == true)
                 {
-                    p.MusicURL = args[0];
+                    if(args[0] == "clear")
+                    {
+                        p.MusicURL = "";
+                    }
+                    else if(args[0].StartsWith("http") == true)
+                    {
+                        p.MusicURL = args[0];
+                    }
                     p.Update(bot.GetClient.Network.CurrentSim, false);
                 }
                 else
