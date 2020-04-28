@@ -23,15 +23,22 @@ namespace BSB.Commands.CMD_Parcel
                 if (UUID.TryParse(args[0], out UUID groupuuid) == true)
                 {
                     int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                    Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-                    if (parcel_static.has_parcel_perm(p, bot) == true)
+                    if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                     {
-                        bot.GetClient.Parcels.DeedToGroup(bot.GetClient.Network.CurrentSim, localid, groupuuid);
-                        return true;
+                        Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
+                        if (parcel_static.has_parcel_perm(p, bot) == true)
+                        {
+                            bot.GetClient.Parcels.DeedToGroup(bot.GetClient.Network.CurrentSim, localid, groupuuid);
+                            return true;
+                        }
+                        else
+                        {
+                            return Failed("Incorrect perms to control parcel");
+                        }
                     }
                     else
                     {
-                        return Failed("Incorrect perms to control parcel");
+                        return Failed("Unable to find parcel in memory, please wait and try again");
                     }
                 }
                 else
