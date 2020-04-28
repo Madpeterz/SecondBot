@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
 using OpenMetaverse;
@@ -28,6 +29,9 @@ namespace BSB.Commands.CMD_Parcel
                         Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
                         if (parcel_static.has_parcel_perm(p, bot) == true)
                         {
+                            p.GroupID = groupuuid;
+                            p.Update(bot.GetClient.Network.CurrentSim, false);
+                            Thread.Sleep(1000);
                             bot.GetClient.Parcels.DeedToGroup(bot.GetClient.Network.CurrentSim, localid, groupuuid);
                             return true;
                         }
