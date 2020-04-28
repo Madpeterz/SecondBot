@@ -38,14 +38,21 @@ namespace BSB.Commands.CMD_Parcel
                 if (bot.GetCommandsInterface.SmartCommandReply(args[0], "Vaildate", CommandName, true) == true)
                 {
                     int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                    if (bot.CreateAwaitEventReply("parcelobjectowners", this, args) == true)
+                    if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                     {
-                        bot.GetClient.Parcels.RequestObjectOwners(bot.GetClient.Network.CurrentSim, localid);
-                        return true;
+                        if (bot.CreateAwaitEventReply("parcelobjectowners", this, args) == true)
+                        {
+                            bot.GetClient.Parcels.RequestObjectOwners(bot.GetClient.Network.CurrentSim, localid);
+                            return true;
+                        }
+                        else
+                        {
+                            return Failed("Unable to await reply");
+                        }
                     }
                     else
                     {
-                        return Failed("Unable to await reply");
+                        return Failed("Unable to find parcel in memory, please wait and try again");
                     }
                 }
                 else

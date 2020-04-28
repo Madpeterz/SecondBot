@@ -17,15 +17,22 @@ namespace BSB.Commands.CMD_Parcel
             if (base.CallFunction(args) == true)
             {
                 int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-                if (parcel_static.has_parcel_perm(p, bot) == true)
+                if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                 {
-                    bot.GetClient.Parcels.ReleaseParcel(bot.GetClient.Network.CurrentSim, localid);
-                    return true;
+                    Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
+                    if (parcel_static.has_parcel_perm(p, bot) == true)
+                    {
+                        bot.GetClient.Parcels.ReleaseParcel(bot.GetClient.Network.CurrentSim, localid);
+                        return true;
+                    }
+                    else
+                    {
+                        return Failed("Incorrect perms to control parcel");
+                    }
                 }
                 else
                 {
-                    return Failed("Incorrect perms to control parcel");
+                    return Failed("Unable to find parcel in memory, please wait and try again");
                 }
             }
             return false;

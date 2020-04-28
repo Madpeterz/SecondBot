@@ -15,29 +15,16 @@ namespace BSB.Commands.CMD_Parcel
         public override bool CallFunction(string[] args)
         {
             int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-            Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-            if (parcel_static.has_parcel_perm(p, bot) == true)
+            if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
             {
-                if (args.Length == 0)
+                Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
+                if (parcel_static.has_parcel_perm(p, bot) == true)
                 {
-                    if (p.MusicURL != "")
+                    if (args.Length == 0)
                     {
-                        p.MusicURL = "";
-                        p.Update(bot.GetClient.Network.CurrentSim, false);
-                        return true;
-                    }
-                    else
-                    {
-                        return Failed("No change made");
-                    }
-                }
-                else
-                {
-                    if (args[0].StartsWith("http") == true)
-                    {
-                        if (p.MusicURL != args[0])
+                        if (p.MusicURL != "")
                         {
-                            p.MusicURL = args[0];
+                            p.MusicURL = "";
                             p.Update(bot.GetClient.Network.CurrentSim, false);
                             return true;
                         }
@@ -48,13 +35,33 @@ namespace BSB.Commands.CMD_Parcel
                     }
                     else
                     {
-                        return Failed("Invaild url");
+                        if (args[0].StartsWith("http") == true)
+                        {
+                            if (p.MusicURL != args[0])
+                            {
+                                p.MusicURL = args[0];
+                                p.Update(bot.GetClient.Network.CurrentSim, false);
+                                return true;
+                            }
+                            else
+                            {
+                                return Failed("No change made");
+                            }
+                        }
+                        else
+                        {
+                            return Failed("Invaild url");
+                        }
                     }
+                }
+                else
+                {
+                    return Failed("Required parcel perms missing!");
                 }
             }
             else
             {
-                return Failed("Required parcel perms missing!");
+                return Failed("Unable to find parcel in memory, please wait and try again");
             }
         }
     }

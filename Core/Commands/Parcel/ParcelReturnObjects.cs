@@ -21,10 +21,17 @@ namespace BSB.Commands.CMD_Parcel
             {
                 int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
                 Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-                if(parcel_static.has_parcel_perm(p,bot) == true)
+                if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                 {
-                    bot.GetClient.Parcels.ReturnObjects(bot.GetClient.Network.CurrentSim, localid, ObjectReturnType.List, owner_uuids);
-                    base.Callback(args, e, true);
+                    if (parcel_static.has_parcel_perm(p, bot) == true)
+                    {
+                        bot.GetClient.Parcels.ReturnObjects(bot.GetClient.Network.CurrentSim, localid, ObjectReturnType.List, owner_uuids);
+                        base.Callback(args, e, true);
+                    }
+                    else
+                    {
+                        base.Callback(args, e, false);
+                    }
                 }
                 else
                 {
@@ -42,14 +49,21 @@ namespace BSB.Commands.CMD_Parcel
             if (base.CallFunction(args) == true)
             {
                 int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                if (bot.CreateAwaitEventReply("parcelobjectowners", this, args) == true)
+                if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                 {
-                    bot.GetClient.Parcels.RequestObjectOwners(bot.GetClient.Network.CurrentSim, localid);
-                    return true;
+                    if (bot.CreateAwaitEventReply("parcelobjectowners", this, args) == true)
+                    {
+                        bot.GetClient.Parcels.RequestObjectOwners(bot.GetClient.Network.CurrentSim, localid);
+                        return true;
+                    }
+                    else
+                    {
+                        return Failed("Unable to await reply");
+                    }
                 }
                 else
                 {
-                    return Failed("Unable to await reply");
+                    return Failed("Unable to find parcel in memory, please wait and try again");
                 }
             }
             return false;

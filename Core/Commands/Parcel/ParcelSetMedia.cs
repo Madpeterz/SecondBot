@@ -18,163 +18,170 @@ namespace BSB.Commands.CMD_Parcel
             if (base.CallFunction(args) == true)
             {
                 int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-                if(parcel_static.has_parcel_perm(p,bot) == true)
+                if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                 {
-                    bool all_flags_ok = true;
-                    string why_failed = "";
-                    int loop = 1;
-                    foreach (string A in args)
+                    Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
+                    if (parcel_static.has_parcel_perm(p, bot) == true)
                     {
-                        bool format_failed = false;
-                        string[] bits = A.Split('=');
-                        if (bits.Length == 2)
+                        bool all_flags_ok = true;
+                        string why_failed = "";
+                        int loop = 1;
+                        foreach (string A in args)
                         {
-                            switch (bits[0])
+                            bool format_failed = false;
+                            string[] bits = A.Split('=');
+                            if (bits.Length == 2)
                             {
-                                case "MediaType":
-                                    {
-                                        if (bits[1] == "IMG-PNG")
+                                switch (bits[0])
+                                {
+                                    case "MediaType":
                                         {
-                                            p.Media.MediaType = "image/png";
-                                        }
-                                        else if (bits[1] == "IMG-JPG")
-                                        {
-                                            p.Media.MediaType = "image/jpeg";
-                                        }
-                                        else if (bits[1] == "VID-MP4")
-                                        {
-                                            p.Media.MediaType = "video/mp4";
-                                        }
-                                        else if (bits[1] == "VID-AVI")
-                                        {
-                                            p.Media.MediaType = "video/x-msvideo";
-                                        }
-                                        else if(bits[1].StartsWith("Custom-") == true)
-                                        {
-                                            string mime = bits[1];
-                                            mime = mime.Replace("Custom-", "");
-                                            p.Media.MediaType = mime;
-                                        }
-                                        else
-                                        {
-                                            format_failed = true;
-                                        }
-                                        break;
-                                    }
-                                case "MediaWidth":
-                                case "MediaHeight":
-                                    {
-                                        if (int.TryParse(bits[1], out int size) == true)
-                                        {
-                                            if ((size >= 256) || (size <= 1024))
+                                            if (bits[1] == "IMG-PNG")
                                             {
-                                                if (bits[0] == "MediaHeight")
+                                                p.Media.MediaType = "image/png";
+                                            }
+                                            else if (bits[1] == "IMG-JPG")
+                                            {
+                                                p.Media.MediaType = "image/jpeg";
+                                            }
+                                            else if (bits[1] == "VID-MP4")
+                                            {
+                                                p.Media.MediaType = "video/mp4";
+                                            }
+                                            else if (bits[1] == "VID-AVI")
+                                            {
+                                                p.Media.MediaType = "video/x-msvideo";
+                                            }
+                                            else if (bits[1].StartsWith("Custom-") == true)
+                                            {
+                                                string mime = bits[1];
+                                                mime = mime.Replace("Custom-", "");
+                                                p.Media.MediaType = mime;
+                                            }
+                                            else
+                                            {
+                                                format_failed = true;
+                                            }
+                                            break;
+                                        }
+                                    case "MediaWidth":
+                                    case "MediaHeight":
+                                        {
+                                            if (int.TryParse(bits[1], out int size) == true)
+                                            {
+                                                if ((size >= 256) || (size <= 1024))
                                                 {
-                                                    p.Media.MediaHeight = size;
-                                                }
-                                                else if (bits[0] == "MediaWidth")
-                                                {
-                                                    p.Media.MediaWidth = size;
+                                                    if (bits[0] == "MediaHeight")
+                                                    {
+                                                        p.Media.MediaHeight = size;
+                                                    }
+                                                    else if (bits[0] == "MediaWidth")
+                                                    {
+                                                        p.Media.MediaWidth = size;
+                                                    }
+                                                    else
+                                                    {
+                                                        format_failed = true; // not sure how this happened
+                                                    }
                                                 }
                                                 else
                                                 {
-                                                    format_failed = true; // not sure how this happened
+                                                    format_failed = true;
                                                 }
                                             }
                                             else
                                             {
                                                 format_failed = true;
                                             }
+                                            break;
                                         }
-                                        else
+                                    case "MediaID":
                                         {
-                                            format_failed = true;
+                                            if (UUID.TryParse(bits[1], out UUID texture) == true)
+                                            {
+                                                p.Media.MediaID = texture;
+                                            }
+                                            else
+                                            {
+                                                format_failed = true;
+                                            }
+                                            break;
                                         }
-                                        break;
-                                    }
-                                case "MediaID":
-                                    {
-                                        if (UUID.TryParse(bits[1], out UUID texture) == true)
+                                    case "MediaURL":
                                         {
-                                            p.Media.MediaID = texture;
+                                            p.Media.MediaURL = bits[1];
+                                            break;
                                         }
-                                        else
+                                    case "MediaDesc":
                                         {
-                                            format_failed = true;
+                                            p.Media.MediaDesc = bits[1];
+                                            break;
                                         }
-                                        break;
-                                    }
-                                case "MediaURL":
-                                    {
-                                        p.Media.MediaURL = bits[1];
-                                        break;
-                                    }
-                                case "MediaDesc":
-                                    {
-                                        p.Media.MediaDesc = bits[1];
-                                        break;
-                                    }
-                                case "MediaAutoScale":
-                                    {
-                                        if(bool.TryParse(bits[1],out bool output) == true)
+                                    case "MediaAutoScale":
                                         {
-                                            p.Media.MediaAutoScale = output;
+                                            if (bool.TryParse(bits[1], out bool output) == true)
+                                            {
+                                                p.Media.MediaAutoScale = output;
+                                            }
+                                            else
+                                            {
+                                                format_failed = true;
+                                            }
+                                            break;
                                         }
-                                        else
+                                    case "MediaLoop":
                                         {
-                                            format_failed = true;
+                                            if (bool.TryParse(bits[1], out bool output) == true)
+                                            {
+                                                p.Media.MediaLoop = output;
+                                            }
+                                            else
+                                            {
+                                                format_failed = true;
+                                            }
+                                            break;
                                         }
-                                        break;
-                                    }
-                                case "MediaLoop":
-                                    {
-                                        if (bool.TryParse(bits[1], out bool output) == true)
+                                    default:
                                         {
-                                            p.Media.MediaLoop = output;
+                                            why_failed = "Arg:" + loop.ToString() + " is not a supported media option!";
+                                            all_flags_ok = false;
+                                            break;
                                         }
-                                        else
-                                        {
-                                            format_failed = true;
-                                        }
-                                        break;
-                                    }
-                                default:
-                                    {
-                                        why_failed = "Arg:" + loop.ToString() + " is not a supported media option!";
-                                        all_flags_ok = false;
-                                        break;
-                                    }
+                                }
                             }
+                            else
+                            {
+                                format_failed = true;
+                            }
+                            if (format_failed == true)
+                            {
+                                why_failed = "Arg:" + loop.ToString() + " Not formated correctly";
+                                all_flags_ok = false;
+                            }
+                            if (all_flags_ok == false)
+                            {
+                                break;
+                            }
+                            loop++;
+                        }
+                        if (all_flags_ok == true)
+                        {
+                            p.Update(bot.GetClient.Network.CurrentSim, false);
+                            return true;
                         }
                         else
                         {
-                            format_failed = true;
+                            return Failed(why_failed);
                         }
-                        if(format_failed == true)
-                        {
-                            why_failed = "Arg:" + loop.ToString() + " Not formated correctly";
-                            all_flags_ok = false;
-                        }
-                        if (all_flags_ok == false)
-                        {
-                            break;
-                        }
-                        loop++;
-                    }
-                    if(all_flags_ok == true)
-                    {
-                        p.Update(bot.GetClient.Network.CurrentSim, false);
-                        return true;
                     }
                     else
                     {
-                        return Failed(why_failed);
+                        return Failed("Do not have expected perms for this parcel!");
                     }
                 }
                 else
                 {
-                    return Failed("Do not have expected perms for this parcel!");
+                    return Failed("Unable to find parcel in memory, please wait and try again");
                 }
             }
             return false;

@@ -20,7 +20,14 @@ namespace BSB.Commands.CMD_Parcel
             if (base.CallFunction(args) == true)
             {
                 int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                return bot.GetCommandsInterface.SmartCommandReply(args[0], bot.GetClient.Network.CurrentSim.Parcels[localid].Name, CommandName);
+                if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
+                {
+                    return bot.GetCommandsInterface.SmartCommandReply(args[0], bot.GetClient.Network.CurrentSim.Parcels[localid].Name, CommandName);
+                }
+                else
+                {
+                    return Failed("Unable to find parcel in memory, please wait and try again");
+                }
             }
             return false;
         }

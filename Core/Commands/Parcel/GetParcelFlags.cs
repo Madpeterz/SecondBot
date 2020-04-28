@@ -75,7 +75,7 @@ namespace BSB.Commands.CMD_Parcel
                     }
                     else
                     {
-                        Failed("Enhance your calm");
+                        return Failed("Unable to find parcel in memory, please wait and try again");
                     }
                 }
                 else

@@ -69,52 +69,59 @@ namespace BSB.Commands.CMD_Parcel
             if (base.CallFunction(args) == true)
             {
                 int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-                if (parcel_static.has_parcel_perm(p, bot) == true)
+                if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                 {
-                    if (int.TryParse(args[0], out int price) == true)
+                    Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
+                    if (parcel_static.has_parcel_perm(p, bot) == true)
                     {
-                        if (price >= 1)
+                        if (int.TryParse(args[0], out int price) == true)
                         {
-                            if (price <= 99999)
+                            if (price >= 1)
                             {
-                                bot.GetClient.Parcels.ReleaseParcel(bot.GetClient.Network.CurrentSim, localid);
-                                p.AuthBuyerID = bot.GetClient.Self.AgentID;
-                                p.SalePrice = 0;
-                                parcel_static.ParcelSetFlag(ParcelFlags.ForSale, p, true);
-                                parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, p, false);
-                                p.Update(bot.GetClient.Network.CurrentSim, false);
-                                Thread.Sleep(200);
-                                bot.GetClient.Parcels.Buy(bot.GetClient.Network.CurrentSim, localid, false, UUID.Zero, false, p.Area, 0);
-                                Thread.Sleep(1000);
-                                if (bot.CreateAwaitEventReply("parcelobjectowners", this, args) == true)
+                                if (price <= 99999)
                                 {
-                                    bot.GetClient.Parcels.RequestObjectOwners(bot.GetClient.Network.CurrentSim, localid);
-                                    return true;
+                                    bot.GetClient.Parcels.ReleaseParcel(bot.GetClient.Network.CurrentSim, localid);
+                                    p.AuthBuyerID = bot.GetClient.Self.AgentID;
+                                    p.SalePrice = 0;
+                                    parcel_static.ParcelSetFlag(ParcelFlags.ForSale, p, true);
+                                    parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, p, false);
+                                    p.Update(bot.GetClient.Network.CurrentSim, false);
+                                    Thread.Sleep(200);
+                                    bot.GetClient.Parcels.Buy(bot.GetClient.Network.CurrentSim, localid, false, UUID.Zero, false, p.Area, 0);
+                                    Thread.Sleep(1000);
+                                    if (bot.CreateAwaitEventReply("parcelobjectowners", this, args) == true)
+                                    {
+                                        bot.GetClient.Parcels.RequestObjectOwners(bot.GetClient.Network.CurrentSim, localid);
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        return Failed("Unable to send request for parcel object owners");
+                                    }
                                 }
                                 else
                                 {
-                                    return Failed("Unable to send request for parcel object owners");
+                                    return Failed("Price must be 99999 or less");
                                 }
                             }
                             else
                             {
-                                return Failed("Price must be 99999 or less");
+                                return Failed("Price must be 1 or more");
                             }
                         }
                         else
                         {
-                            return Failed("Price must be 1 or more");
+                            return Failed("Unable to process price");
                         }
                     }
                     else
                     {
-                        return Failed("Unable to process price");
+                        return Failed("Incorrect perms to control parcel");
                     }
                 }
                 else
                 {
-                    return Failed("Incorrect perms to control parcel");
+                    return Failed("Unable to find parcel in memory, please wait and try again");
                 }
             }
             return false;

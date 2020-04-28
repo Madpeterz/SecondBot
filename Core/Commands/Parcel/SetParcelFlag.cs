@@ -56,22 +56,29 @@ namespace BSB.Commands.CMD_Parcel
                 if (setflags.Count > 0)
                 {
                     int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                    Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-                    if (parcel_static.has_parcel_perm(p, bot) == true)
+                    if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                     {
-                        foreach (KeyValuePair<string, bool> cfg in setflags)
+                        Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
+                        if (parcel_static.has_parcel_perm(p, bot) == true)
                         {
-                            if (flags.ContainsKey(cfg.Key) == true)
+                            foreach (KeyValuePair<string, bool> cfg in setflags)
                             {
-                                parcel_static.ParcelSetFlag(flags[cfg.Key], p, cfg.Value);
+                                if (flags.ContainsKey(cfg.Key) == true)
+                                {
+                                    parcel_static.ParcelSetFlag(flags[cfg.Key], p, cfg.Value);
+                                }
                             }
+                            p.Update(bot.GetClient.Network.CurrentSim, false);
+                            return true;
                         }
-                        p.Update(bot.GetClient.Network.CurrentSim, false);
-                        return true;
+                        else
+                        {
+                            return Failed("Incorrect perms to control parcel");
+                        }
                     }
                     else
                     {
-                        return Failed("Incorrect perms to control parcel");
+                        return Failed("Unable to find parcel in memory, please wait and try again");
                     }
                 }
                 else
