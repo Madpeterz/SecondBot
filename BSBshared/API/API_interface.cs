@@ -11,7 +11,7 @@ namespace BetterSecondBotShared.API
     {
         public string CommandName { get { return GetType().Name.ToLowerInvariant(); } }
 
-        protected int min_required_args = 0;
+        protected int min_required_args;
         public int Min_Required_args { get { return min_required_args; } }
         public virtual string Helpfile { get { return "No help given"; } }
         public virtual string[] ArgTypes { get { return new string[] { }; } }

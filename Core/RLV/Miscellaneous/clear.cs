@@ -11,7 +11,6 @@ namespace BSB.RLV.Miscellaneous
         {
             if(args.Length == 1)
             {
-                string target = args[0];
                 bot.Clearrule(false, caller_uuid);
                 bot.Clearrule(true, caller_uuid);
             }

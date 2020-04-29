@@ -66,12 +66,12 @@ namespace BetterSecondBot.WikiMake
             sb.Replace("[[AREA]]", "Home");
             sb.Replace("[[SUBFOLDER]]", "files/");
             sb.Replace("[[RETURNROOT]]", "");
-            sb = MenuActive(sb, "Home");
+            sb = DebugModeCreateWiki.MenuActive(sb, "Home");
             sb.Append(html_footer);
             return sb.ToString();
         }
 
-        protected StringBuilder MenuActive(StringBuilder index,string area)
+        protected static StringBuilder MenuActive(StringBuilder index,string area)
         {
             Dictionary<string, string> active_swaps = new Dictionary<string, string>
             {
@@ -192,7 +192,7 @@ namespace BetterSecondBot.WikiMake
                 sb.Replace("[[AREA]]", area);
                 sb.Replace("[[SUBFOLDER]]", "");
                 sb.Replace("[[RETURNROOT]]", "../");
-                sb = MenuActive(sb, area);
+                sb = DebugModeCreateWiki.MenuActive(sb, area);
                 string target_file = "" + area + "" + workspace + "" + c + ".html";
                 io.writefile(target_file, sb.ToString());
             }
@@ -235,7 +235,7 @@ namespace BetterSecondBot.WikiMake
                 sb.Replace("[[WORKSPACE]]", workspace);
                 sb.Replace("[[AREA]]", area);
                 sb.Append(html_footer);
-                sb = MenuActive(sb, area);
+                sb = DebugModeCreateWiki.MenuActive(sb, area);
                 string target_file = "" + area + "" + workspace + ".html";
                 io.writefile(target_file, sb.ToString());
             }
@@ -276,7 +276,7 @@ namespace BetterSecondBot.WikiMake
             sb.Replace("[[RETURNROOT]]", "../");
             sb.Replace("[[AREA]]", area);
             sb.Append(html_footer);
-            sb = MenuActive(sb, area);
+            sb = DebugModeCreateWiki.MenuActive(sb, area);
             io.writefile(""+ area+".html", sb.ToString());
         }
         protected void InterfaceWiki(string area,API_supported_interface shared_interface, bool track_commands = false)

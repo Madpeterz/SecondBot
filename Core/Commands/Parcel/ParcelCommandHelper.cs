@@ -78,6 +78,7 @@ namespace BSB.Commands
     public abstract class ParcelCommand_CheckParcel : CoreCommand
     {
         protected OpenMetaverse.Parcel targetparcel;
+        public OpenMetaverse.Parcel GetTargetParcel { get { return targetparcel; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

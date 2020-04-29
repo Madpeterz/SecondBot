@@ -27,19 +27,9 @@ namespace BSB.Commands.StreamAdmin
                 IRestResponse endpoint_checks = client.Post(request);
                 if (endpoint_checks.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    notecardendpoint server_reply = new notecardendpoint();
-                    bool server_reply_ok = true;
-
                     try
                     {
-                        server_reply = JsonConvert.DeserializeObject<notecardendpoint>(endpoint_checks.Content);
-                    }
-                    catch
-                    {
-                        server_reply_ok = false;
-                    }
-                    if (server_reply_ok == true)
-                    {
+                        notecardendpoint server_reply = JsonConvert.DeserializeObject<notecardendpoint>(endpoint_checks.Content);
                         if (server_reply.status == true)
                         {
                             if (server_reply.NotecardTitle.Length > 3)
@@ -53,14 +43,14 @@ namespace BSB.Commands.StreamAdmin
                         }
                         return Failed(server_reply.message);
                     }
-                    else
+                    catch (Exception e)
                     {
-                        return Failed("FetchNextNotecard - HTTP error: " + endpoint_checks.StatusCode.ToString() + " " + endpoint_checks.Content + "");
+                        return Failed("Error: "+e.Message+"");
                     }
                 }
                 else
                 {
-                    return Failed("FetchNextNotecard - HTTP error DataObject broken Status:"+ endpoint_checks.StatusCode.ToString()+" @ "+ attempt_endpoint+"");
+                    return Failed("HTTP error DataObject broken Status:"+ endpoint_checks.StatusCode.ToString()+" @ "+ attempt_endpoint+"");
                 }
             }
             return false;

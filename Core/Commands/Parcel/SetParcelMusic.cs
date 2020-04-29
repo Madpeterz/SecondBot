@@ -1,4 +1,5 @@
 ﻿using BetterSecondBotShared.Static;
+using BSB.bottypes;
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
@@ -12,28 +13,19 @@ namespace BSB.Commands.CMD_Parcel
         public override string[] ArgHints { get { return new[] { "A vaild url" }; } }
         public override string Helpfile { get { return "Updates the current parcels music url"; } }
 
-        protected bool set_parcel_music(string url)
-        {
-            if (targetparcel.MusicURL != url)
-            {
-                targetparcel.MusicURL = url;
-                targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
-            }
-            return true;
-        }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)
             {
                 if (args.Length == 0)
                 {
-                    return set_parcel_music("");
+                    return parcel_static.set_parcel_music(bot,targetparcel,"");
                 }
                 else
                 {
                     if (args[0].StartsWith("http") == true)
                     {
-                        return set_parcel_music(args[0]);
+                        return parcel_static.set_parcel_music(bot, targetparcel, args[0]);
                     }
                     else
                     {

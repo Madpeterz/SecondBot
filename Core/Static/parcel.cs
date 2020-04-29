@@ -8,6 +8,15 @@ namespace BSB
 {
     public static class parcel_static
     {
+        public static bool set_parcel_music(CommandsBot bot, Parcel p, string url)
+        {
+            if (p.MusicURL != url)
+            {
+                p.MusicURL = url;
+                p.Update(bot.GetClient.Network.CurrentSim, false);
+            }
+            return true;
+        }
         public static void ParcelSetFlag(ParcelFlags F, Parcel p, bool set)
         {
             if (p.Flags.HasFlag(F))
@@ -70,11 +79,9 @@ namespace BSB
         public static Dictionary<string, ParcelFlags> get_flags_list()
         {
             Dictionary<string, ParcelFlags> flags = new Dictionary<string, ParcelFlags>();
-
-            System.Type enumType = typeof(ParcelFlags);
-            System.Type enumUnderlyingType = System.Enum.GetUnderlyingType(enumType);
-            System.Array enumValues = System.Enum.GetValues(enumType);
-            System.Array enumNames = System.Enum.GetNames(enumType);
+            Type enumType = typeof(ParcelFlags);
+            Array enumValues = Enum.GetValues(enumType);
+            Array enumNames = Enum.GetNames(enumType);
             for (int i = 0; i < enumValues.Length; i++)
             {
                 object value = enumValues.GetValue(i);
