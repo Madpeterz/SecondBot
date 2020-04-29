@@ -27,6 +27,11 @@ namespace BetterSecondBotShared.bottypes
 
         public bool KillMe { get { return killMe; } }
 
+        protected bool teleported;
+        public void SetTeleported()
+        {
+            teleported = true;
+        }
 
         protected Dictionary<UUID, Group> mygroups = new Dictionary<UUID, Group>();
 
@@ -162,6 +167,7 @@ namespace BetterSecondBotShared.bottypes
             if (FromAgentName == myconfig.master)
             {
                 ResetAnimations();
+                SetTeleported();
                 Client.Self.TeleportLureRespond(FromAgentID, IMSessionID, true);
             }
         }

@@ -290,6 +290,8 @@ namespace BSB.bottypes
         protected Dictionary<string, long> await_event_ages = new Dictionary<string, long>();
         protected Dictionary<string, string> await_event_idtolistener = new Dictionary<string, string>();
         protected int next_await_id = 1;
+
+
         public bool CreateAwaitEventReply(string event_listener, CoreCommand command, string[] args)
         {
             string eventid = "" + event_listener + "" + next_await_id.ToString() + "";

@@ -134,7 +134,8 @@ namespace BSB.bottypes
         protected int last_tested_home_id = -1;
         protected long last_tp_attempt_unixtime;
         protected bool after_login_fired;
-        protected bool teleported;
+
+        
         protected long last_reconnect_attempt;
         protected bool reconnect_mode;
         protected string last_attempted_teleport_region = "";
@@ -185,10 +186,7 @@ namespace BSB.bottypes
             AfterLoginSitDown = false;
         }
 
-        public void SetTeleported()
-        {
-            teleported = true;
-        }
+
 
         protected void AvoidSim(string simname)
         {
