@@ -7,11 +7,10 @@ using OpenMetaverse;
 
 namespace BSB.Commands.CMD_Parcel
 {
-    public class GetParcelFlags : CoreCommand
+    public class GetParcelFlags : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Smart", "String" }; } }
         public override string[] ArgHints { get { return new[] { "Smart reply [Channel|Avatar|http url]", "[Repeatable] flag name" }; } }
-        public override int MinArgs { get { return 1; } }
         public override string Helpfile { get { return "Returns the value of the parcel flags (At the parcel on the bot is currently on)<br/>" +
                     "requested on [ARG 2+] via [ARG 1] smart reply target<br/>" +
                     "If you request multiple Flags they are split with CSV<br/>You can also get all the flags skipping [ARG 2]<br/><br/>" +

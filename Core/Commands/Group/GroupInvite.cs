@@ -6,12 +6,11 @@ using BetterSecondBotShared.logs;
 
 namespace BSB.Commands.Group
 {
-    public class GroupInvite : CoreCommand
+    public class GroupInvite : CoreCommand_2arg
     {
         public override string[] ArgTypes { get { return new[] { "UUID", "Avatar", "UUID" }; } }
         public override string[] ArgHints { get { return new[] { "GROUP", "Avatar [UUID or Firstname Lastname]", "Role" }; } }
         public override string Helpfile { get { return "Invites the avatar [ARG 2] to the Group [ARG 1] {optional with the Role [ARG 3]} otherwise to role Everyone"; } }
-        public override int MinArgs { get { return 2; } }
 
         protected void ForRealGroupInvite(string[] args,UUID group,UUID avatar)
         {

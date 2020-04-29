@@ -5,13 +5,7 @@ using System.Text;
 
 namespace BSB.Commands.Group
 {
-    public abstract class CoreGroupCommand_SmartReply : CoreCommand
-    {
-        public override string[] ArgTypes { get { return new[] { "Smart" }; } }
-        public override string[] ArgHints { get { return new[] { "Mixed [Channel|Avatar uuid|Avatar name|http url]"}; } }
-        public override int MinArgs { get { return 1; } }
-    }
-    public abstract class CoreGroupCommand_SmartReply_auto : CoreGroupCommand_SmartReply
+    public abstract class CoreGroupCommand_SmartReply_auto : CoreCommand_SmartReply_1arg
     {
         protected virtual string RunFunction()
         {
@@ -27,11 +21,10 @@ namespace BSB.Commands.Group
         }
     }
 
-    public abstract class CoreGroupCommand_SmartReply_Group : CoreCommand
+    public abstract class CoreGroupCommand_SmartReply_Group : CoreCommand_2arg
     {
         public override string[] ArgTypes { get { return new[] { "Mixed", "UUID" }; } }
         public override string[] ArgHints { get { return new[] { "Smart reply [Channel|IM uuid|http url]", "Group" }; } }
-        public override int MinArgs { get { return 2; } }
     }
 
     public abstract class CoreGroupCommand_SmartReply_Group_auto : CoreGroupCommand_SmartReply_Group

@@ -6,12 +6,11 @@ using OpenMetaverse;
 
 namespace BSB.Commands.Chat
 {
-    class Say : CoreCommand
+    class Say : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Mixed","Text" }; } }
         public override string[] ArgHints { get { return new[] { "Message or channel","Message" }; } }
         public override string Helpfile { get { return "Makes the bot talk via chat<br/>Example: say|||Hello<br/>Example: say|||12~#~Goodbye"; } }
-        public override int MinArgs { get { return 1; } }
         public override bool CallFunction(string[] args)
         {
             if(base.CallFunction(args) == true)

@@ -82,7 +82,7 @@ namespace BetterSecondBot.HttpServer
         }
         protected bool ArgsCheck(string[] args)
         {
-            if (args.Length >= MinArgs)
+            if (args.Length >= Min_Required_args)
             {
                 return true;
             }

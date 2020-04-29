@@ -5,9 +5,8 @@ using OpenMetaverse;
 
 namespace BSB.RLV.Movement
 {
-    public class SetRot : RLV_command
+    public class SetRot : RLV_command_2arg
     {
-        public override int MinArgs { get { return 2; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

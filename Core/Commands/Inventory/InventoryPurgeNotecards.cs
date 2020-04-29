@@ -11,7 +11,6 @@ namespace BSB.Commands.Inventory
     public class InventoryPurgeNotecards : CoreCommand
     {
         public override string Helpfile { get { return "Searchs the notecards folder for notecards, any older than 31 days are deleted.<br/>Depending on the number of notecards this might require multiple calls!"; } }
-        public override int MinArgs { get { return 0; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

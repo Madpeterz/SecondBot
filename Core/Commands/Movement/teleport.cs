@@ -7,7 +7,7 @@ using OpenMetaverse;
 
 namespace BSB.Commands.Movement
 {
-    public class Teleport : CoreCommand
+    public class Teleport : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Mixed" }; } }
         public override string[] ArgHints { get { return new[] { "SLurl<br/>Region<br/>X/Y/Z<br/>Region/X/Y/Z" }; } }
@@ -18,7 +18,6 @@ namespace BSB.Commands.Movement
                     "Region/X/Y/Z: Teleports to the given region and trys to goto X/Y/Z if no teleport hub (or has access)"; 
             } }
 
-        public override int MinArgs { get { return 1; } }
         public override bool CallFunction(string[] args)
         {
             if(base.CallFunction(args) == true)

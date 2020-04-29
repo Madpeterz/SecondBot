@@ -5,12 +5,11 @@ using System.Text;
 
 namespace BSB.Commands.Dialogs
 {
-    class DialogResponce : CoreCommand
+    class DialogResponce : CoreCommand_2arg
     {
         public override string[] ArgTypes { get { return new[] { "Number","Text" }; } }
         public override string[] ArgHints { get { return new[] { "DialogID","Button to click" }; } }
         public override string Helpfile { get { return "Makes the bot interact with the dialog [ARG 1] with the button [ARG 2]"; } }
-        public override int MinArgs { get { return 2; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

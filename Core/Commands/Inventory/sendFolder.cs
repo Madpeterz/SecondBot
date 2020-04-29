@@ -6,12 +6,11 @@ using System.Text;
 
 namespace BSB.Commands.Inventory
 {
-    public class SendFolder : CoreCommand
+    public class SendFolder : CoreCommand_2arg
     {
         public override string[] ArgTypes { get { return new[] { "Avatar","UUID" }; } }
         public override string[] ArgHints { get { return new[] { "Avatar [UUID or Firstname Lastname]", "FOLDER" }; } }
         public override string Helpfile { get { return "Sends a folder [ARG 2] to an avatar [ARG 1]"; } }
-        public override int MinArgs { get { return 2; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

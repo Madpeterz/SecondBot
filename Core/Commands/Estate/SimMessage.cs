@@ -7,11 +7,10 @@ using OpenMetaverse;
 
 namespace BSB.Commands.Estate
 {
-    public class SimMessage : CoreCommand
+    public class SimMessage : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Text" }; } }
         public override string[] ArgHints { get { return new[] { "Message to send" }; } }
-        public override int MinArgs { get { return 1; } }
         public override string Helpfile { get { return "Sends the message [ARG 1] to the current sim"; } }
 
         public override bool CallFunction(string[] args)

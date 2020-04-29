@@ -8,7 +8,7 @@ using BetterSecondBotShared.Static;
 
 namespace BSB.Commands.Inventory
 {
-    public class InventoryFolders : CoreCommand
+    public class InventoryFolders : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Smart" }; } }
         public override string[] ArgHints { get { return new[] { "Smart reply target: Channel,Avatar,HTTP url" }; } }
@@ -18,7 +18,6 @@ namespace BSB.Commands.Inventory
                     "Formated as follows<br>" +
                     "entry,entry...<br/>" +
                     "Where entry is formated foldername###level###UUID"; } }
-        public override int MinArgs { get { return 1; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

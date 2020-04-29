@@ -7,12 +7,11 @@ using OpenMetaverse;
 
 namespace BSB.Commands.Inventory
 {
-    public class Attach : CoreCommand
+    public class Attach : CoreCommand_2arg
     {
         public override string[] ArgTypes { get { return new[] { "Text", "Text" }; } }
         public override string[] ArgHints { get { return new[] { "Sub folder", "Item name" }; } }
         public override string Helpfile { get { return "Attachs a item found inside the attachments / [ARG1] folder<br/>that matchs the item name [ARG2]"; } }
-        public override int MinArgs { get { return 2; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

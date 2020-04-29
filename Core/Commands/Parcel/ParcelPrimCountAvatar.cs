@@ -5,11 +5,10 @@ using System.Text;
 
 namespace BSB.Commands.CMD_Parcel
 {
-    class ParcelPrimCountAvatar : CoreCommand
+    class ParcelPrimCountAvatar : CoreCommand_2arg
     {
         public override string[] ArgTypes { get { return new[] { "Smart","Avatar" }; } }
         public override string[] ArgHints { get { return new[] { "Smart reply target: Channel,Avatar,HTTP url","the avatar (UUID or Firstname Lastname) we want the count of back" }; } }
-        public override int MinArgs { get { return 2; } }
         public override string Helpfile { get { return "Returns the number of prims owned by the selected avatar on the current parcel as follows: DATA=SIMNAME,PARCELID,AVATAR UUID,COUNT"; } }
 
         public override void Callback(string[] args, EventArgs e)

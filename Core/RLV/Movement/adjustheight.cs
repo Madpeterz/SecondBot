@@ -4,9 +4,8 @@ using System.Text;
 
 namespace BSB.RLV.Movement
 {
-    public class AdjustHeight : RLV_command
+    public class AdjustHeight : RLV_command_3arg
     {
-        public override int MinArgs { get { return 3; } }
         public override bool CallFunction(string[] args)
         {
             int distance_pelvis_to_foot_in_meters = 0;

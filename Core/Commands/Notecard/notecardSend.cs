@@ -6,14 +6,13 @@ using OpenMetaverse;
 
 namespace BSB.Commands.Notecard
 {
-    class NotecardSend : CoreCommand
+    class NotecardSend : CoreCommand_2arg
     {
         public override string[] ArgTypes { get { return new[] { "Avatar","Text","Text" }; } }
         public override string[] ArgHints { get { return new[] { "Avatar [UUID or Firstname Lastname]", "Collection","Notecard name" }; } }
         public override string Helpfile { get { return "Creats and send a notecard to [ARG 1]<br/>" +
                     " using the collection [ARG 2] as the content <br/>" +
                     " Optional: You can name the notecard using [ARG 3]"; } }
-        public override int MinArgs { get { return 2; } }
 
         public override bool CallFunction(string[] args)
         {

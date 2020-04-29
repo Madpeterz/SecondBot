@@ -7,12 +7,11 @@ using OpenMetaverse;
 
 namespace BSB.Commands.Self
 { 
-    public class PointAt : CoreCommand
+    public class PointAt : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Avatar" }; } }
         public override string[] ArgHints { get { return new[] { "Avatar [UUID or Firstname Lastname]" }; } }
         public override string Helpfile { get { return "Makes the bot turn to face [ARG 1] and point at them (if found)"; } }
-        public override int MinArgs { get { return 1; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

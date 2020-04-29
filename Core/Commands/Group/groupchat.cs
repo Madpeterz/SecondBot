@@ -5,12 +5,11 @@ using System.Text;
 
 namespace BSB.Commands.Group
 {
-    class Groupchat : CoreCommand
+    class Groupchat : CoreCommand_2arg
     {
         public override string[] ArgTypes { get { return new[] { "UUID","TEXT" }; } }
         public override string[] ArgHints { get { return new[] { "Group","Message" }; } }
         public override string Helpfile { get { return "Sends a message [ARG 2] to the group [ARG 1]"; } }
-        public override int MinArgs { get { return 2; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

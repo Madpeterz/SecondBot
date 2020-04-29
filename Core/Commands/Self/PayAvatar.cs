@@ -7,12 +7,11 @@ using OpenMetaverse;
 
 namespace BSB.Commands.Self
 {
-    public class PayAvatar : CoreCommand
+    public class PayAvatar : CoreCommand_2arg
     {
         public override string[] ArgTypes { get { return new[] { "Avatar", "Number" }; } }
         public override string[] ArgHints { get { return new[] { "Avatar [UUID or Firstname Lastname]", "Amount to pay"}; } }
         public override string Helpfile { get { return "Makes the bot pay a avatar"; } }
-        public override int MinArgs { get { return 2; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

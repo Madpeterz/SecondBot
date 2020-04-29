@@ -5,11 +5,10 @@ using System.Text;
 
 namespace BSB.Commands.CMD_Parcel
 {
-    class ParcelPrimCountTotal : CoreCommand
+    class ParcelPrimCountTotal : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Smart" }; } }
         public override string[] ArgHints { get { return new[] { "Smart reply target: Channel,Avatar,HTTP url" }; } }
-        public override int MinArgs { get { return 1; } }
         public override string Helpfile { get { return "Returns the total number of prims on the current parcel as follows: DATA=SIMNAME,PARCELID,COUNT"; } }
 
         public override void Callback(string[] args, EventArgs e)

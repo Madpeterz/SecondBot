@@ -6,11 +6,10 @@ using System.Text;
 
 namespace BSB.Commands.CMD_Parcel
 {
-    class ParcelSetMedia : ParcelCommand_RequirePerms
+    class ParcelSetMedia : ParcelCommand_RequirePerms_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Flag [Repeatable]" }; } }
         public override string[] ArgHints { get { return new[] { "See flags table" }; } }
-        public override int MinArgs { get { return 1; } }
         public override string Helpfile { get { return "Supports updating one or multiple media options for the current parcel<br/>Example: ParcelSetMedia|||MediaURL=http://google.com~#~MediaDesc=Google.com website<br/>Flags: " + helpers.create_dirty_table(parcel_static.get_flag_names()) + "<br/>"; } }
 
         public override bool CallFunction(string[] args)

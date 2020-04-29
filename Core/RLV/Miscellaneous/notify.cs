@@ -4,9 +4,8 @@ using System.Text;
 
 namespace BSB.RLV.Miscellaneous
 {
-    public class Notify : RLV_command
+    public class Notify : RLV_command_2arg
     {
-        public override int MinArgs { get { return 2; } }
         public override bool CallFunction(string[] args)
         {
             _ = int.TryParse(args[0], out int channel);

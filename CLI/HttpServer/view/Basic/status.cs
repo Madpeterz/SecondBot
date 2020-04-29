@@ -6,8 +6,6 @@ namespace BetterSecondBot.HttpServer.View.Basic
 {
     public class Status : HTTP_commands_get
     {
-        public override int MinArgs { get { return 0; } }
-
         public override string Helpfile { get { return "returns the status of the bot"; } }
 
         public override string[] CallFunction(string[] args)

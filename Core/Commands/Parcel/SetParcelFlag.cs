@@ -8,11 +8,10 @@ using OpenMetaverse;
 namespace BSB.Commands.CMD_Parcel
 {
 
-    public class SetParcelFlag : CoreCommand
+    public class SetParcelFlag : ParcelCommand_RequirePerms_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Text=True|False" }; } }
         public override string[] ArgHints { get { return new[] { "[Repeatable] flag args" }; } }
-        public override int MinArgs { get { return 1; } }
 
         public override string Helpfile { get { return "Sets the parcel flags of the parcel the bot is currently standing on<br/>" +
                     "Example:AllowFly=False~#~AllowDamage=True<br/>" + helpers.create_dirty_table(parcel_static.get_flag_names()) +"<br/>"; } }

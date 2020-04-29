@@ -9,12 +9,11 @@ using Newtonsoft.Json;
 
 namespace BSB.Commands.StreamAdmin
 {
-    public class FetchNextNotecard : CoreCommand
+    public class FetchNextNotecard : CoreCommand_2arg
     {
         public override string[] ArgTypes { get { return new[] { "TEXT","TEXT" }; } }
         public override string[] ArgHints { get { return new[] { "Server endpoint","Server endpoint code" }; } }
         public override string Helpfile { get { return "[StreamAdmin]\nThis command is part of the streamadmin commands set\n No end user support will be given."; } }
-        public override int MinArgs { get { return 2; } }
         public override bool CallFunction(string[] args)
         {
             if(base.CallFunction(args) == true)

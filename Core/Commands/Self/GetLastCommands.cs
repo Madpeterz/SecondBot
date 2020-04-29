@@ -4,18 +4,9 @@ using System.Text;
 
 namespace BSB.Commands.Self
 {
-    public class GetLastCommands : CoreCommand
+    public class GetLastCommands : CoreCommand_SmartReply_1arg
     {
-        public override string[] ArgTypes { get { return new[] { "Mixed" }; } }
-        public override string[] ArgHints { get { return new[] { "Smart reply [Channel|Avatar|http url]", }; } }
-        public override int MinArgs { get { return 1; } }
-        public override string Helpfile
-        {
-            get
-            {
-                return "";
-            }
-        }
+        public override string Helpfile { get { return "Gets the last 5 commands issued to the bot and returns them via the smart target"; } }
 
         public override bool CallFunction(string[] args)
         {

@@ -9,20 +9,17 @@ using OpenMetaverse;
 namespace BSB.Commands.CMD_Parcel
 {
 
-    public class ParcelCleanAndSell : CoreCommand
+    public class ParcelCleanAndSell : ParcelCommand_RequirePerms_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Number" }; } }
         public override string[] ArgHints { get { return new[] { "L$ amount to mark the parcel for sale as" }; } }
-        public override int MinArgs { get { return 1; } }
 
         public override string Helpfile { get { return "Sets the current parcel for sale for L$[ARG 1] (Also marks the parcel for sale)"; } }
 
         public override void Callback(string[] args, EventArgs e)
         {
             bool cleanup_ok = true;
-            int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-            Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-            if (parcel_static.has_parcel_perm(p, bot) == true)
+            if (base.CallFunction(args) == true)
             {
                 ParcelObjectOwnersReplyEventArgs ObjectOwners = (ParcelObjectOwnersReplyEventArgs)e;
                 List<UUID> owner_uuids = new List<UUID>();
@@ -32,25 +29,18 @@ namespace BSB.Commands.CMD_Parcel
                 }
                 if (owner_uuids.Count > 0)
                 {
-                    if (parcel_static.has_parcel_perm(p, bot) == true)
-                    {
-                        bot.GetClient.Parcels.ReturnObjects(bot.GetClient.Network.CurrentSim, localid, ObjectReturnType.List, owner_uuids);
-                    }
-                    else
-                    {
-                        cleanup_ok = false;
-                    }
+                    bot.GetClient.Parcels.ReturnObjects(bot.GetClient.Network.CurrentSim, targetparcel.LocalID, ObjectReturnType.List, owner_uuids);
                 }
                 if (cleanup_ok == true)
                 {
                     int.TryParse(args[0], out int price);
-                    bot.GetClient.Parcels.ReleaseParcel(bot.GetClient.Network.CurrentSim, localid);
-                    p.SalePrice = price;
-                    p.AuthBuyerID = UUID.Zero;
-                    p.OwnerID = UUID.Zero;
-                    parcel_static.ParcelSetFlag(ParcelFlags.ForSale, p, true);
-                    parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, p, false);
-                    p.Update(bot.GetClient.Network.CurrentSim, false);
+                    bot.GetClient.Parcels.ReleaseParcel(bot.GetClient.Network.CurrentSim, targetparcel.LocalID);
+                    targetparcel.SalePrice = price;
+                    targetparcel.AuthBuyerID = UUID.Zero;
+                    targetparcel.OwnerID = UUID.Zero;
+                    parcel_static.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
+                    parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
+                    targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
                     base.Callback(args, e, true);
                 }
                 else
@@ -68,60 +58,44 @@ namespace BSB.Commands.CMD_Parcel
         {
             if (base.CallFunction(args) == true)
             {
-                int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
+                if (int.TryParse(args[0], out int price) == true)
                 {
-                    Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-                    if (parcel_static.has_parcel_perm(p, bot) == true)
+                    if (price >= 1)
                     {
-                        if (int.TryParse(args[0], out int price) == true)
+                        if (price <= 99999)
                         {
-                            if (price >= 1)
+                            bot.GetClient.Parcels.ReleaseParcel(bot.GetClient.Network.CurrentSim, targetparcel.LocalID);
+                            targetparcel.AuthBuyerID = bot.GetClient.Self.AgentID;
+                            targetparcel.SalePrice = 0;
+                            parcel_static.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
+                            parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
+                            targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+                            Thread.Sleep(200);
+                            bot.GetClient.Parcels.Buy(bot.GetClient.Network.CurrentSim, targetparcel.LocalID, false, UUID.Zero, false, targetparcel.Area, 0);
+                            Thread.Sleep(1000);
+                            if (bot.CreateAwaitEventReply("parcelobjectowners", this, args) == true)
                             {
-                                if (price <= 99999)
-                                {
-                                    bot.GetClient.Parcels.ReleaseParcel(bot.GetClient.Network.CurrentSim, localid);
-                                    p.AuthBuyerID = bot.GetClient.Self.AgentID;
-                                    p.SalePrice = 0;
-                                    parcel_static.ParcelSetFlag(ParcelFlags.ForSale, p, true);
-                                    parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, p, false);
-                                    p.Update(bot.GetClient.Network.CurrentSim, false);
-                                    Thread.Sleep(200);
-                                    bot.GetClient.Parcels.Buy(bot.GetClient.Network.CurrentSim, localid, false, UUID.Zero, false, p.Area, 0);
-                                    Thread.Sleep(1000);
-                                    if (bot.CreateAwaitEventReply("parcelobjectowners", this, args) == true)
-                                    {
-                                        bot.GetClient.Parcels.RequestObjectOwners(bot.GetClient.Network.CurrentSim, localid);
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        return Failed("Unable to send request for parcel object owners");
-                                    }
-                                }
-                                else
-                                {
-                                    return Failed("Price must be 99999 or less");
-                                }
+                                bot.GetClient.Parcels.RequestObjectOwners(bot.GetClient.Network.CurrentSim, targetparcel.LocalID);
+                                return true;
                             }
                             else
                             {
-                                return Failed("Price must be 1 or more");
+                                return Failed("Unable to send request for parcel object owners");
                             }
                         }
                         else
                         {
-                            return Failed("Unable to process price");
+                            return Failed("Price must be 99999 or less");
                         }
                     }
                     else
                     {
-                        return Failed("Incorrect perms to control parcel");
+                        return Failed("Price must be 1 or more");
                     }
                 }
                 else
                 {
-                    return Failed("Unable to find parcel in memory, please wait and try again");
+                    return Failed("Unable to process price");
                 }
             }
             return false;

@@ -6,12 +6,11 @@ using System.Text;
 
 namespace BSB.Commands.Group
 {
-    class Groupnotice : CoreCommand
+    class Groupnotice : CoreCommand_2arg
     {
         public override string[] ArgTypes { get { return new[] { "UUID", "TEXT","TEXT" }; } }
         public override string[] ArgHints { get { return new[] { "Group", "Message/Title", "Message" }; } }
         public override string Helpfile { get { return "Sends a group notice to [ARG 1] with the message [ARG 2]<hr/>if given 3 Args: Sends a group notice to [ARG 1] with the title [ARG 2] and the message [ARG 3]"; } }
-        public override int MinArgs { get { return 2; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

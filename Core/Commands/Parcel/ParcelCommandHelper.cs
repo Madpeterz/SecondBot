@@ -6,12 +6,11 @@ using System.Text;
 
 namespace BSB.Commands
 {
-    public abstract class ParcelCommand_RequirePerms_1arg_Group : ParcelCommand_RequirePerms
+    public abstract class ParcelCommand_RequirePerms_1arg_Group : ParcelCommand_RequirePerms_1arg
     {
         protected UUID groupuuid = UUID.Zero;
         public override string[] ArgTypes { get { return new[] { "UUID" }; } }
         public override string[] ArgHints { get { return new[] { "Group UUID" }; } }
-        public override int MinArgs { get { return 1; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)
@@ -31,6 +30,17 @@ namespace BSB.Commands
             }
         }
     }
+
+    public abstract class ParcelCommand_RequirePerms_1arg : ParcelCommand_RequirePerms
+    {
+        protected new int min_required_args = 1;
+    }
+
+    public abstract class ParcelCommand_CheckParcel_1arg : ParcelCommand_CheckParcel
+    {
+        protected new int min_required_args = 1;
+    }
+
     public abstract class ParcelCommand_RequirePerms : ParcelCommand_CheckParcel
     {
         public override bool CallFunction(string[] args)
@@ -59,11 +69,10 @@ namespace BSB.Commands
             }
         }
     }
-    public abstract class ParcelCommand_CheckParcel_1arg_smart : ParcelCommand_CheckParcel
+    public abstract class ParcelCommand_CheckParcel_1arg_smart : ParcelCommand_CheckParcel_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Smart" }; } }
         public override string[] ArgHints { get { return new[] { "Smart reply [Channel|Avatar|http url]" }; } }
-        public override int MinArgs { get { return 1; } }
     }
 
     public abstract class ParcelCommand_CheckParcel : CoreCommand

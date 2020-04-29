@@ -9,7 +9,7 @@ using BetterSecondBotShared.Static;
 namespace BSB.Commands.Inventory
 {
 
-    public class InventoryContents : CoreCommand
+    public class InventoryContents : CoreCommand_2arg
     {
         public override string[] ArgTypes { get { return new[] { "Smart","UUID" }; } }
         public override string[] ArgHints { get { return new[] { "Smart reply target: Channel,Avatar,HTTP","Folder" }; } }
@@ -18,7 +18,6 @@ namespace BSB.Commands.Inventory
                     "Arg 1 *Anything else*<br/>as csv packed as follows folderinventory=UUID~|~entry~|~entry..." +
                     "entry is formated as follows: itemname###uuid###type<br/>" +
                     "sent to smart reply target"; } }
-        public override int MinArgs { get { return 2; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

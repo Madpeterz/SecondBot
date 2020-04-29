@@ -85,7 +85,7 @@ namespace BSB.Commands
         public CommandsBot GetBot { get { return bot; } }
 
         protected long giveup_waiting_for_lookup = 240;
-        protected int next_lookup_id = 0;
+        protected int next_lookup_id;
         protected Dictionary<int, pending_avatar_lookup> commands_pending_avatar_lookups = new Dictionary<int, pending_avatar_lookup>();
         protected Dictionary<int, long> commands_pending_avatar_lookups_ages = new Dictionary<int, long>();
 
@@ -223,7 +223,7 @@ namespace BSB.Commands
                 }
                 if ((cmd.ArgTypes.Contains("Avatar") == true) || (cmd.ArgTypes.Contains("Smart") == true))
                 {
-                    if (cmd.MinArgs <= args.Length)
+                    if (cmd.Min_Required_args <= args.Length)
                     {
                         pending_avatar_lookup pending = new pending_avatar_lookup(this, cmd, args);
                         if (pending.needs_lookup() == true)
@@ -244,7 +244,7 @@ namespace BSB.Commands
                     }
                     else
                     {
-                        return new KeyValuePair<bool, string>(false, "Required args count not sent! expected: "+ cmd.MinArgs.ToString()+" but got "+ args.Length.ToString()+ "");
+                        return new KeyValuePair<bool, string>(false, "Required args count not sent! expected: "+ cmd.Min_Required_args.ToString()+" but got "+ args.Length.ToString()+ "");
                     }
                 }
                 else
@@ -270,9 +270,32 @@ namespace BSB.Commands
             return result.Key;
         }
     }
+
+    public abstract class CoreCommand_1arg : CoreCommand
+    {
+        protected new int min_required_args = 1;
+    }
+    public abstract class CoreCommand_2arg : CoreCommand
+    {
+        protected new int min_required_args = 2;
+    }
+    public abstract class CoreCommand_3arg : CoreCommand
+    {
+        protected new int min_required_args = 3;
+    }
+    public abstract class CoreCommand_4arg : CoreCommand
+    {
+        protected new int min_required_args = 4;
+    }
+    public abstract class CoreCommand_SmartReply_1arg : CoreCommand_1arg
+    {
+        public override string[] ArgTypes { get { return new[] { "Smart" }; } }
+        public override string[] ArgHints { get { return new[] { "Mixed [Channel|Avatar uuid|Avatar name|http url]" }; } }
+    }
+
     public abstract class CoreCommand : API_interface
     {
-        protected CommandsBot bot = null;
+        protected CommandsBot bot;
 
         /// <summary>
         /// The UUID of the object/Avatar that called this function, you should still test if its not UUID zero and is a avatar
@@ -295,7 +318,7 @@ namespace BSB.Commands
         {
             if (helpers.notempty(args) == true)
             {
-                if (args.Length < MinArgs)
+                if (args.Length < Min_Required_args)
                 {
                     return Failed("Incorrect number of args");
                 }
@@ -306,7 +329,7 @@ namespace BSB.Commands
             }
             else
             {
-                if(MinArgs == 0)
+                if(Min_Required_args == 0)
                 {
                     return true;
                 }

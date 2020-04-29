@@ -5,12 +5,11 @@ using System.Text;
 
 namespace BSB.Commands.Dialogs
 {
-    class DialogRelay : CoreCommand
+    class DialogRelay : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Smart" }; } }
         public override string[] ArgHints { get { return new[] { "Channel (Any number),Avatar UUID,Avatar name,HTTPurl<br/>Clear" }; } }
         public override string Helpfile { get { return "Updates the relay target (you can have 1 of each type)<br/>Clear will disable them all"; } }
-        public override int MinArgs { get { return 1; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

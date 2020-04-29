@@ -4,12 +4,11 @@ using System.Text;
 using OpenMetaverse;
 namespace BSB.Commands.Movement
 {
-    public class RotateTo : CoreCommand
+    public class RotateTo : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Number" }; } }
         public override string[] ArgHints { get { return new[] { "0 to 360" }; } }
         public override string Helpfile { get { return "Rotates the avatar to face a rotation from north in Degrees"; } }
-        public override int MinArgs { get { return 1; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

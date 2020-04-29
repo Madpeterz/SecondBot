@@ -8,11 +8,10 @@ using OpenMetaverse;
 namespace BSB.Commands.CMD_Parcel
 {
 
-    public class SetParcelSale : ParcelCommand_RequirePerms
+    public class SetParcelSale : ParcelCommand_RequirePerms_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Number","Avatar" }; } }
         public override string[] ArgHints { get { return new[] { "L$ amount to mark the parcel for sale as (Range: 1 to 99999 unless [ARG 2] is set)", "Avatar who can buy the land (If set allows you to set the sell price to zero)" }; } }
-        public override int MinArgs { get { return 1; } }
 
         public override string Helpfile { get { return "Sets the current parcel for sale for L$[ARG 1] (Also marks the parcel for sale)"; } }
 

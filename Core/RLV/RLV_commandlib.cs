@@ -35,7 +35,7 @@ namespace BSB.RLV
             RLV_command cmd = (RLV_command)GetCommand(command);
             if (cmd != null)
             {
-                if (args.Length >= cmd.MinArgs)
+                if (args.Length >= cmd.Min_Required_args)
                 {
                     cmd.Setup(bot, last_caller_uuid, last_caller_name);
                     return cmd.CallFunction(args);
@@ -58,13 +58,25 @@ namespace BSB.RLV
     }
     public abstract class RLV_command_1arg : RLV_command
     {
-        public override int MinArgs { get { return 1; } }
+        protected new int min_required_args = 1;
+    }
+    public abstract class RLV_command_2arg : RLV_command
+    {
+        protected new int min_required_args = 2;
+    }
+    public abstract class RLV_command_3arg : RLV_command
+    {
+        protected new int min_required_args = 3;
+    }
+    public abstract class RLV_command_4arg : RLV_command
+    {
+        protected new int min_required_args = 4;
     }
     public abstract class RLV_command : API_interface
     {
         public override string Helpfile { get { return "[Class helpfile] an RLV_command."; } }
         public virtual string SetFlagName { get { return CommandName.ToLowerInvariant(); } }
-        protected RLVbot bot = null;
+        protected RLVbot bot;
         protected UUID caller_uuid = UUID.Zero;
         protected string caller_name = "";
 
@@ -106,12 +118,12 @@ namespace BSB.RLV
             return Failed("[RLV/Debug] arg only accepts y/n or add/rem for control signaling [Sig: " + signal+" Arg: "+arg+"]");
         }
     }
-    public abstract class RLV_1arg_force : RLV_command
+    public abstract class RLV_1arg_force : RLV_command_1arg
     {
         public override string Helpfile { get { return "[Class helpfile] Requires you send =force at the end of the command..."; } }
         public override string[] ArgTypes { get { return new[] { "TEXT" }; } }
         public override string[] ArgHints { get { return new[] { "The word force"}; } }
-        public override int MinArgs { get { return 1; } }
+
         public override bool CallFunction(string[] args)
         {
             if (args.Length > 0)
@@ -129,15 +141,14 @@ namespace BSB.RLV
 
     public abstract class RLV_UUID_flag_4arg_yn : RLV_UUID_flag_optional_arg_yn
     {
-        public override int MinArgs { get { return 4; } }
+        protected new int min_required_args = 4;
         public override string Helpfile { get { return "[Class helpfile] RLV / 4arg"; } }
         public override string[] ArgTypes { get { return new[] { "Unknown", "Unknown", "Unknown", "Unknown" }; } }
         public override string[] ArgHints { get { return new[] { "Unknown", "Unknown", "Unknown", "Unknown" }; } }
     }
 
-    public abstract class RLV_UUID_flag_optional_arg_yn : RLV_command
+    public abstract class RLV_UUID_flag_optional_arg_yn : RLV_command_1arg
     {
-        public override int MinArgs { get { return 1; } }
         public override string Helpfile { get { return "[Class helpfile] RLV / UUID_flag_optional_arg_yn"; } }
         public override string[] ArgTypes { get { return new[] { "Unknown", "Unknown"}; } }
         public override string[] ArgHints { get { return new[] { "Unknown", "Unknown" }; } }
@@ -156,9 +167,8 @@ namespace BSB.RLV
         }
     }
 
-    public abstract class RLV_UUID_flag_yn : RLV_command
+    public abstract class RLV_UUID_flag_yn : RLV_command_1arg
     {
-        public override int MinArgs { get { return 1; } }
         public override string Helpfile { get { return "[Class helpfile] RLV / UUID_flag_yn "; } }
         public override string[] ArgTypes { get { return new[] { "Unknown", "Unknown" }; } }
         public override string[] ArgHints { get { return new[] { "Unknown", "Unknown" }; } }
@@ -171,10 +181,9 @@ namespace BSB.RLV
             return Failed("[RLV/WARN] RLV_UUID_flag_yn invaild number of args");
         }
     }
-    public abstract class RLV_UUID_flag_get : RLV_command
+    public abstract class RLV_UUID_flag_get : RLV_command_1arg
     {
         public abstract string LookupFlag { get; }
-        public override int MinArgs { get { return 1; } }
         public override string Helpfile { get { return "[Class helpfile]<br/>Gets the flag value "+LookupFlag+" and returns it on channel [ARG 1]"; } }
         public override string[] ArgTypes { get { return new[] { "Number"}; } }
         public override string[] ArgHints { get { return new[] { "Channel" }; } }
@@ -202,9 +211,8 @@ namespace BSB.RLV
             return Failed("[RLV/WARN] RLV_UUID_flag_get invaild number of args");
         }
     }
-    public abstract class RLV_UUID_flag_arg_yn : RLV_command
+    public abstract class RLV_UUID_flag_arg_yn : RLV_command_2arg
     {
-        public override int MinArgs { get { return 2; } }
         public override string Helpfile { get { return "[Class helpfile]<br/> RLV / UUID_flag_arg_yn<br/>When clearing please set [ARG 1] to Anything<br/>Flags are tracked per object"; } }
         public override string[] ArgTypes { get { return new[] { "Mixed", "Flag" }; } }
         public override string[] ArgHints { get { return new[] { "The arg value you are setting", "[Y/N] or [Rem/Add]" }; } }

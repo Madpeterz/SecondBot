@@ -5,12 +5,11 @@ using System.Text;
 
 namespace BSB.Commands.CMD_Parcel
 {
-    public class ParcelEject : CoreCommand
+    public class ParcelEject : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Avatar", "True|False" }; } }
         public override string[] ArgHints { get { return new[] { "Avatar [UUID or Firstname Lastname]", "Also Ban" }; } }
         public override string Helpfile { get { return "Ejects an avatar [ARG 1] from a parcel<br/>You can also ban them at the same time if you wish"; } }
-        public override int MinArgs { get { return 1; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)

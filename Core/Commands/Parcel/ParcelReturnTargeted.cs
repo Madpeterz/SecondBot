@@ -5,11 +5,10 @@ using System.Text;
 
 namespace BSB.Commands.CMD_Parcel
 {
-    class ParcelReturnTargeted : ParcelCommand_RequirePerms
+    class ParcelReturnTargeted : ParcelCommand_RequirePerms_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Avatar" }; } }
         public override string[] ArgHints { get { return new[] { "Avatar [UUID or Firstname Lastname]" }; } }
-        public override int MinArgs { get { return 1; } }
         public override string Helpfile { get { return "Returns all objects from the current parcel for the selected avatar"; } }
 
         public override bool CallFunction(string[] args)

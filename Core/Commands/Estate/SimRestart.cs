@@ -7,11 +7,10 @@ using OpenMetaverse;
 
 namespace BSB.Commands.Estate
 {
-    public class SimRestart : CoreCommand
+    public class SimRestart : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "True|False","Number" }; } }
         public override string[] ArgHints { get { return new[] { "Restart mode: True=Restart sim,False=Cancel restart","delay in secs to restart (Min 30 - max 240) defaults to 60 if not given" }; } }
-        public override int MinArgs { get { return 1; } }
         public override string Helpfile { get { return "Sends the message [ARG 1] to the current sim"; } }
 
         public override bool CallFunction(string[] args)
