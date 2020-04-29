@@ -8,7 +8,6 @@ namespace BSB.Commands.Group
     public class GetGroupRoles : CoreGroupCommand_SmartReply_Group
     {
         public override string Helpfile { get { return "Returns group=UUID@@@rolename=UUID,rolename=UUID ... "; } }
-
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)
@@ -42,20 +41,23 @@ namespace BSB.Commands.Group
         public override void Callback(string[] args, EventArgs e)
         {
             GroupRolesDataReplyEventArgs rolesData = (GroupRolesDataReplyEventArgs)e;
-            string reply = "group=" + args[1] + "@@@";
+            StringBuilder reply = new StringBuilder();
+            reply.Append("group=");
+            reply.Append(args[1]);
+            reply.Append("@@@");
             string addon = "";
             foreach(KeyValuePair<UUID,GroupRole> data in rolesData.Roles)
             {
                 if (data.Key != UUID.Zero)
                 {
-                    reply += addon;
-                    reply += data.Value.Name;
-                    reply += "=";
-                    reply += data.Key.ToString();
+                    reply.Append(addon);
                     addon = ",";
+                    reply.Append(data.Value.Name);
+                    reply.Append("=");
+                    reply.Append(data.Key.ToString());
                 }
             }
-            bot.GetCommandsInterface.SmartCommandReply(args[0], reply, CommandName);
+            bot.GetCommandsInterface.SmartCommandReply(args[0], reply.ToString(), CommandName);
             base.Callback(args, e);
         }
     }

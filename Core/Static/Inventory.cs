@@ -88,13 +88,13 @@ namespace BSB.Static
         }
         public static string Spaces(int counter)
         {
-            string reply = "";
+            StringBuilder reply = new StringBuilder();
             while (counter > 0)
             {
-                reply += "      ";
+                reply.Append("      ");
                 counter--;
             }
-            return reply;
+            return reply.ToString();
         }
     }
 }

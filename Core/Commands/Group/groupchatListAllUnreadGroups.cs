@@ -11,15 +11,15 @@ namespace BSB.Commands.Group
 
         protected override string RunFunction()
         {
-            string reply = "";
+            StringBuilder reply = new StringBuilder();
             string addon = "";
             foreach (UUID group in bot.UnreadGroupchatGroups())
             {
-                reply += addon;
-                reply += group;
+                reply.Append(addon);
                 addon = ",";
+                reply.Append(group);
             }
-            return reply;
+            return reply.ToString();
         }
     }
 }

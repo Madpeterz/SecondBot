@@ -368,32 +368,29 @@ namespace BSB.bottypes
                             {
                                 await CleanDiscordChannel(Chan, 0, true);
                             }
+                            StringBuilder output = new StringBuilder();
                             if (Chan.Name == "interface")
                             {
                                 if (message.Content.StartsWith("!"))
                                 {
                                     if (message.Content == "!commands")
                                     {
-                                        string reply = "";
                                         int counter = 0;
                                         string addon = "";
                                         foreach(string a in CommandsInterface.GetCommandsList())
                                         {
-                                            reply += addon;
-                                            reply += a;
+                                            output.Append(addon);
+                                            addon = " , ";
+                                            output.Append(a);
                                             counter++;
                                             if (counter == 5)
                                             {
-                                                reply += "\n";
+                                                output.Append("\n");
                                                 addon = "";
                                                 counter = 0;
                                             }
-                                            else
-                                            {
-                                                addon = " , ";
-                                            }
                                         }
-                                        _ = SendMessageToChannelAsync("interface", reply, "bot", UUID.Zero, myconfig.userName, "bot");
+                                        _ = SendMessageToChannelAsync("interface", output.ToString(), "bot", UUID.Zero, myconfig.userName, "bot");
                                     }
                                     else if (message.Content.StartsWith("!help") == true)
                                     {
@@ -401,18 +398,33 @@ namespace BSB.bottypes
                                         if (bits.Length == 2)
                                         {
                                             string command = bits[1].ToLowerInvariant();
+                                            
                                             if (CommandsInterface.GetCommandsList().Contains(command) == true)
                                             {
-                                                _ = SendMessageToChannelAsync("interface", "\n=========================\nCommand: " + command + "\n" +
-                                                    "Workspace: " + CommandsInterface.GetCommandWorkspace(command) + "\n" +
-                                                    "Min args: " + CommandsInterface.GetCommandArgs(command).ToString() + "\n" +
-                                                    "Arg types" + String.Join(",", CommandsInterface.GetCommandArgTypes(command)) + "\n" +
-                                                    "\n" +
-                                                    "About: " + CommandsInterface.GetCommandHelp(command) + "", "bot", UUID.Zero, myconfig.userName, "bot");
+                                                
+                                                output.Append("\n=========================\nCommand:");
+                                                output.Append(command);
+                                                output.Append("\n");
+                                                output.Append("Workspace: ");
+                                                output.Append(CommandsInterface.GetCommandWorkspace(command));
+                                                output.Append("\n");
+                                                output.Append("Min args: ");
+                                                output.Append(CommandsInterface.GetCommandArgs(command).ToString());
+                                                output.Append("\n");
+                                                output.Append("Arg types: ");
+                                                output.Append(String.Join(",", CommandsInterface.GetCommandArgTypes(command)));
+                                                output.Append("\n");
+                                                output.Append("\n");
+                                                output.Append("About: ");
+                                                output.Append(CommandsInterface.GetCommandHelp(command));
+                                                _ = SendMessageToChannelAsync("interface",output.ToString(), "bot", UUID.Zero, myconfig.userName, "bot");
                                             }
                                             else
                                             {
-                                                _ = SendMessageToChannelAsync("interface", "Unable to find command: " + command + " please use !commands for a full list", "bot", UUID.Zero, myconfig.userName, "bot");
+                                                output.Append("Unable to find command: ");
+                                                output.Append(command);
+                                                output.Append(" please use !commands for a full list");
+                                                _ = SendMessageToChannelAsync("interface", output.ToString(), "bot", UUID.Zero, myconfig.userName, "bot");
                                             }
                                         }
                                         else
@@ -422,7 +434,9 @@ namespace BSB.bottypes
                                     }
                                     else if (message.Content != "!clear")
                                     {
-                                        _ = SendMessageToChannelAsync("interface", "Unknown request: " + message.Content + "", "bot", UUID.Zero, myconfig.userName, "bot");
+                                        output.Append("Unknown request: ");
+                                        output.Append(message.Content);
+                                        _ = SendMessageToChannelAsync("interface",output.ToString(), "bot", UUID.Zero, myconfig.userName, "bot");
                                     }
                                 }
                                 else
@@ -431,19 +445,21 @@ namespace BSB.bottypes
                                     string command = bits[0].ToLowerInvariant();
                                     if (CommandsInterface.GetCommandsList().Contains(command) == true)
                                     {
-                                        bool status = false;
                                         if (bits.Length == 2)
                                         {
-                                            status = CommandsInterface.Call(command, bits[1],UUID.Zero);
+                                            _ = CommandsInterface.Call(command, bits[1],UUID.Zero);
                                         }
                                         else
                                         {
-                                            status = CommandsInterface.Call(command);
+                                            _ = CommandsInterface.Call(command);
                                         }
                                     }
                                     else
                                     {
-                                        _ = SendMessageToChannelAsync("interface", "Unable to find command: " + command + " please use !commands for a full list", "bot", UUID.Zero, myconfig.userName, "bot");
+                                        output.Append("Unable to find command: ");
+                                        output.Append(command);
+                                        output.Append(" please use !commands for a full list");
+                                        _ = SendMessageToChannelAsync("interface", output.ToString(), "bot", UUID.Zero, myconfig.userName, "bot");
                                     }
                                 }
                             }

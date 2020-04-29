@@ -125,14 +125,13 @@ namespace BetterSecondBot.WikiMake
                 string[] arg_hints = shared_interface.GetCommandArgHints(c);
                 if(area == "Core")
                 {
-                    string example_call = "Example: [[COMMAND]]";
-                    string preaddon = "|||";
+                    StringBuilder ExampleCall = new StringBuilder();
+                    ExampleCall.Append("Example: [[COMMAND]]");
+                    ExampleCall.Append("|||");
                     string addon = "";
                     while (loop < minargs)
                     {
-                        example_call += preaddon;
-                        example_call += addon;
-                        preaddon = "";
+                        ExampleCall.Append(addon);
                         addon = "~#~";
                         string hint_value = "";
                         if (arg_hints.Length > loop)
@@ -148,16 +147,16 @@ namespace BetterSecondBot.WikiMake
                         }
                         if (hint_value != "")
                         {
-                            example_call += hint_value;
+                            ExampleCall.Append(hint_value);
                         }
                         else
                         {
-                            example_call += "Not sure";
+                            ExampleCall.Append("?");
                             ConsoleLog.Debug("[WikiMake] " + area + " Command " + c + " missing some required hint values");
                         }
                         loop++;
                     }
-                    sb.Append(example_call);
+                    sb.Append(ExampleCall.ToString());
                     sb.Append("<hr style='border-top: 1px dashed #dcdcdc;'>");
                 }
                 sb.Append("[[HELP]]");

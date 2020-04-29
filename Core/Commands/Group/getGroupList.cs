@@ -10,17 +10,17 @@ namespace BSB.Commands.Group
         public override string Helpfile { get { return "Returns a csv of known groups NAME=UUID,NAME=UUID... "; } }
         protected override string RunFunction()
         {
-            string reply = "";
+            StringBuilder reply = new StringBuilder();
             string addon = "";
             foreach (KeyValuePair<UUID, OpenMetaverse.Group> groupdata in bot.MyGroups)
             {
-                reply += addon;
-                reply += groupdata.Value.Name;
-                reply += "=";
-                reply += groupdata.Key;
+                reply.Append(addon);
                 addon = ",";
+                reply.Append(groupdata.Value.Name);
+                reply.Append("=");
+                reply.Append(groupdata.Key);
             }
-            return reply;
+            return reply.ToString();
         }
     }
 }
