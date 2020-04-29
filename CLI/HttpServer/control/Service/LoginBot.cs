@@ -18,7 +18,7 @@ namespace BetterSecondBot.HttpServer.Control.CNC
                     httpserver.NewBot();
                     httpserver.GetBot.Setup(httpserver.GetConfig, AssemblyInfo.GetGitHash());
                     httpserver.GetBot.Start();
-                    return new string[] { "OK","Starting bot now" };
+                    return new [] { "OK","Starting bot now" };
                 }
                 return Failed("Unable to Login the bot (it might already be running)");
             }

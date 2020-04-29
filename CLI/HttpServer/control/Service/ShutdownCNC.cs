@@ -14,7 +14,7 @@ namespace BetterSecondBot.HttpServer.Control.CNC
             if (httpserver.HTTPCnCmode == true)
             {
                 httpserver.ShutdownHTTP = true;
-                return new string[] { "OK", "Shutting down" };
+                return new [] { "OK", "Shutting down" };
             }
             return Failed("Not running as CNC");
         }
