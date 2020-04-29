@@ -11,7 +11,7 @@ namespace BetterSecondBotShared.bottypes
 {
     public abstract class BasicBot
     {
-        public BasicBot()
+        protected BasicBot()
         {
             LastStatusMessage = "No status";
         }
@@ -39,9 +39,6 @@ namespace BetterSecondBotShared.bottypes
 
         protected GridClient Client;
         public GridClient GetClient { get { return Client; } }
-
-
-
         public virtual void KillMePlease()
         {
             killMe = true;

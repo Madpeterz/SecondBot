@@ -14,8 +14,8 @@ namespace BSB.bottypes
 {
     public abstract class DialogsBot : DiscordBot
     {
-        protected bool TrackDialogs = false;
-        protected int RelayDialogsToChannel = 0;
+        protected bool TrackDialogs;
+        protected int RelayDialogsToChannel;
         protected UUID RelayDialogsToAvatar = UUID.Zero;
         protected string RelayDialogsToHttp = "";
 

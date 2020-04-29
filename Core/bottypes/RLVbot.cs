@@ -10,8 +10,8 @@ namespace BSB.bottypes
     public abstract class RLVbot : RLVbotHelper
     {
         // normal bot stuff 
-        protected bool allow_RLV = false;
-        protected RLV.RLVcontrol RLVinterface = null;
+        protected bool allow_RLV;
+        protected RLV.RLVcontrol RLVinterface;
         public RLV.RLVcontrol GetRLVinterface { get { return RLVinterface; } }
 
         public override void Setup(JsonConfig config, string Version)
@@ -232,9 +232,9 @@ namespace BSB.bottypes
         #region Flags
         // Flags 
         protected bool recvchat_channel_zero_lock = true;
-        protected bool sendchannel_lock = false;
-        protected bool recvemote_lock = false;
-        protected bool sendim_lock = false;
+        protected bool sendchannel_lock;
+        protected bool recvemote_lock;
+        protected bool sendim_lock;
         public void SetLock(string name, bool status)
         {
             if (name == "sendim_lock") { sendim_lock = status; }

@@ -10,7 +10,7 @@ namespace BSB.bottypes
 {
     public abstract class VoidEventBot : AnimationsBot
     {
-        protected long delay_appearence_update = 0;
+        protected long delay_appearence_update;
 
         public override string GetStatus()
         {
@@ -65,8 +65,8 @@ namespace BSB.bottypes
     public class EventsBot : VoidEventBot
     {
         protected List<string> accept_animation_request_from_users = new List<string>();
-        protected bool login_auto_logout = false;
-        protected long delay_group_fetch = 0;
+        protected bool login_auto_logout;
+        protected long delay_group_fetch;
         protected Dictionary<UUID, KeyValuePair<long, List<UUID>>> group_members_storage = new Dictionary<UUID, KeyValuePair<long, List<UUID>>>();
         protected virtual void GroupMembersReplyHandler(object sender, GroupMembersReplyEventArgs e)
         {
@@ -284,7 +284,7 @@ namespace BSB.bottypes
             }
         }
 
-        protected long last_cleanup = 0;
+        protected long last_cleanup;
 
         protected Dictionary<string, Dictionary<string, KeyValuePair<CoreCommand, string[]>>> await_events = new Dictionary<string, Dictionary<string, KeyValuePair<CoreCommand, string[]>>>();
         protected Dictionary<string, long> await_event_ages = new Dictionary<string, long>();

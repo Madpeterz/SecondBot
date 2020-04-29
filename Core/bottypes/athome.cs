@@ -142,7 +142,7 @@ namespace BSB.bottypes
         protected Dictionary<string, long> avoid_sims = new Dictionary<string, long>();
         protected bool SimShutdownAvoid;
         protected bool auto_logout_login_recover;
-        protected bool AfterLoginSitDown = false;
+        protected bool AfterLoginSitDown;
 
         protected void ChangeSim(object sender,SimChangedEventArgs e)
         {
