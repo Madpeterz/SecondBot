@@ -82,6 +82,7 @@ namespace BSB.RLV
         {
             return Failed("Function not overridden");
         }
+
         public bool Failed(string why_failed)
         {
             ConsoleLog.Warn("[RLVapi/Failed] " + CommandName + ": " + why_failed);
@@ -115,7 +116,10 @@ namespace BSB.RLV
         {
             if (args.Length > 0)
             {
-                if (args[0] == "force") return true;
+                if (args[0] == "force")
+                {
+                    return true;
+                }
                 return Failed("Magic word force is missing");
             }
             return Failed("[RLV/WARN] RLV_1arg_force invaild number of args");

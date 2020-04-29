@@ -53,8 +53,14 @@ namespace BSB.RLV.Blacklist
                             }
                         }
                     }
-                    if (sendim == "") sendim = "#";
-                    if (recvim == "") recvim = "#";
+                    if (sendim == "")
+                    {
+                        sendim = "#";
+                    }
+                    if (recvim == "")
+                    {
+                        recvim = "#";
+                    }
                     bot.GetClient.Self.Chat("" + sendim + "," + recvim + "", channel, OpenMetaverse.ChatType.Normal);
                     return true;
                 }

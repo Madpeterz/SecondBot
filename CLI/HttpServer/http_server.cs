@@ -136,7 +136,10 @@ namespace BetterSecondBot.HttpServer
                     foreach(string B in pairs)
                     {
                         string[] bits = B.Split('=', StringSplitOptions.RemoveEmptyEntries);
-                        if(bits.Length == 2) post_args.Add(bits[0].Trim(), bits[1].Trim());
+                        if (bits.Length == 2)
+                        {
+                            post_args.Add(bits[0].Trim(), bits[1].Trim());
+                        }
                     }
                     if (post_args.ContainsKey("command") == true)
                     {

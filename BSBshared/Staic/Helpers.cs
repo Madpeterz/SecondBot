@@ -150,13 +150,13 @@ namespace BetterSecondBotShared.Static
         {
             if (V != null)
             {
-                if (V.Length > 0) return true;
-                else return false;
+                if (V.Length > 0)
+                {
+                    return true;
+                }
             }
-            else
-            {
-                return false;
-            }
+            return false;
+
         }
         public static bool notempty(string[] V)
         {
@@ -164,10 +164,7 @@ namespace BetterSecondBotShared.Static
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
     }
 }

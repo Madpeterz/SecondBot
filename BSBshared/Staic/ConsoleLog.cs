@@ -38,10 +38,16 @@ namespace BetterSecondBotShared.logs
             var date = DateTime.Now;
             StringBuilder n = new StringBuilder();
             n.Append("[");
-            if(date.Hour < 10) n.Append("0");
+            if (date.Hour < 10)
+            {
+                n.Append("0");
+            }
             n.Append(date.Hour.ToString());
             n.Append(":");
-            if (date.Minute < 10) n.Append("0");
+            if (date.Minute < 10)
+            {
+                n.Append("0");
+            }
             n.Append(date.Minute.ToString());
             n.Append("] ");
             switch (Level)

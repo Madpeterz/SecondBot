@@ -11,6 +11,10 @@ namespace BSB.bottypes
 {
     public abstract class CommandsBot : AVstorageBot
     {
+        protected CommandsBot()
+        {
+            CommandsInterface = new Commands.CoreCommandsInterface(this);
+        }
         List<string> CommandHistory = new List<string>();
         protected int commandid = 1;
         public virtual string CommandHistoryAdd(string command, string arg, bool status,string infomessage)
@@ -51,7 +55,12 @@ namespace BSB.bottypes
             }
             return message;
         }
-        public string[] GetLastCommands(int amount=10)
+
+        public string[] GetLastCommands()
+        {
+            return GetLastCommands(10);
+        }
+        public string[] GetLastCommands(int amount)
         {
             List<string> commands = new List<string>();
             int loop = 0;
@@ -69,10 +78,7 @@ namespace BSB.bottypes
 
         public Commands.CoreCommandsInterface GetCommandsInterface { get { return CommandsInterface; } }
         protected Commands.CoreCommandsInterface CommandsInterface;
-        public CommandsBot()
-        {
-            CommandsInterface = new Commands.CoreCommandsInterface(this);
-        }
+
         protected Dictionary<string, string> notecards_content = new Dictionary<string, string>();
         protected Dictionary<UUID, long> group_invite_lockout_timer = new Dictionary<UUID, long>();
         protected long last_cleanup_commands;

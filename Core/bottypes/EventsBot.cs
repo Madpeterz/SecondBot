@@ -67,8 +67,7 @@ namespace BSB.bottypes
         protected List<string> accept_animation_request_from_users = new List<string>();
         protected bool login_auto_logout = false;
         protected long delay_group_fetch = 0;
-
-        Dictionary<UUID, KeyValuePair<long, List<UUID>>> group_members_storage = new Dictionary<UUID, KeyValuePair<long, List<UUID>>>();
+        protected Dictionary<UUID, KeyValuePair<long, List<UUID>>> group_members_storage = new Dictionary<UUID, KeyValuePair<long, List<UUID>>>();
         protected virtual void GroupMembersReplyHandler(object sender, GroupMembersReplyEventArgs e)
         {
         }
@@ -136,7 +135,7 @@ namespace BSB.bottypes
 
         protected override void BotStartHandler()
         {
-            Client.Network.LoginProgress += new EventHandler<LoginProgressEventArgs>(LoginHandler);
+            Client.Network.LoginProgress += LoginHandler;
         }
 
         public override string GetStatus()

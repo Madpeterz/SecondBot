@@ -191,18 +191,22 @@ namespace BSB.bottypes
             }
         }
 
-        protected bool inbox(float expected, float current, float drift)
+        protected static bool inbox(float expected, float current, float drift)
         {
             return inbox(expected, current, drift, true);
         }
-        protected bool inbox(float expected,float current, float drift, bool current_value)
+        protected static bool inbox(float expected,float current, float drift, bool current_value)
         {
-            if (current > (expected + drift)) return false;
-            else if (current < (expected - drift)) return false;
-            else return current_value;
+            if (current > (expected + drift))
+            {
+                return false;
+            }
+            else if (current < (expected - drift))
+            {
+                return false;
+            }
+            return current_value;
         }
-
-
 
         public bool IsSimHome(string simname)
         {

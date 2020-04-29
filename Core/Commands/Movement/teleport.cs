@@ -48,7 +48,10 @@ namespace BSB.Commands.Movement
                         float.TryParse(tp_args[offset + 1], out posY);
                         float.TryParse(tp_args[offset + 2], out posZ);
                     }
-                    else if (tp_args.Length == 2) ok = false;
+                    else if (tp_args.Length == 2)
+                    {
+                        ok = false;
+                    }
                     if (ok == true)
                     {
                         bot.SetTeleported();

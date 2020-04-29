@@ -7,8 +7,8 @@ namespace BetterSecondBot.HttpServer.Control.Interface
 {
     public class CoreCMD : HTTP_commands_post
     {
-        public override string[] ArgTypes { get { return new string[] { "Text","Text" }; } }
-        public override string[] ArgHints { get { return new string[] { "Command","Args (~#~ split)" }; } }
+        public override string[] ArgTypes { get { return new [] { "Text","Text" }; } }
+        public override string[] ArgHints { get { return new [] { "Command","Args (~#~ split)" }; } }
         public override string Helpfile { get { return "Calls the Commands interface via HTTP (returns OK if not rejected)"; } }
         public override int MinArgs { get { return 2; } }
 

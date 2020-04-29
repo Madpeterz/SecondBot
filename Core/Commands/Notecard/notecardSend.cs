@@ -27,7 +27,10 @@ namespace BSB.Commands.Notecard
                     {
                         bot.ClearNotecardStorage(args[1]);
                         string notecard_name = "New notecard for " + args[0] + " " + helpers.UnixTimeNow().ToString() + "";
-                        if (args.Length == 3) notecard_name = args[2] + " " + helpers.UnixTimeNow().ToString() + "";
+                        if (args.Length == 3)
+                        {
+                            notecard_name = args[2] + " " + helpers.UnixTimeNow().ToString() + "";
+                        }
                         return bot.SendNotecard(notecard_name, content, target);
                     }
                     else

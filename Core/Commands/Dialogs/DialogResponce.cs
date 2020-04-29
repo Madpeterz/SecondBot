@@ -19,7 +19,10 @@ namespace BSB.Commands.Dialogs
                 {
                     return bot.DialogReply(dialogid, args[1]);
                 }
-                else return Failed("Invaild dialog id");
+                else
+                {
+                    return Failed("Invaild dialog id");
+                }
             }
             return false;
         }
