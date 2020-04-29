@@ -151,7 +151,7 @@ namespace BSB.bottypes
 
         protected async Task<ITextChannel> FindTextChannel(string channelname, ICategoryChannel cat, UUID sender, string sendername, string TopicType)
         {
-            await WaitForUnlock();
+            await WaitForUnlock().ConfigureAwait(false);
             channelname = channelname.ToLowerInvariant();
             channelname = String.Concat(channelname.Where(char.IsLetterOrDigit));
             DiscordLock = true;
@@ -170,7 +170,7 @@ namespace BSB.bottypes
             }
             if(result == null)
             {
-                result = await CreateChannel(channelname, TopicType, sender.ToString());
+                result = await CreateChannel(channelname, TopicType, sender.ToString()).ConfigureAwait(false);
             }
             else
             {
@@ -552,7 +552,7 @@ namespace BSB.bottypes
         protected async override void BotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar, bool group, UUID group_uuid, bool localchat, bool fromme)
         {
             base.BotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
-            await DiscordBotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
+            await DiscordBotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme).ConfigureAwait(false);
         }
 
         public override string CommandHistoryAdd(string command, string arg, bool status,string WhyFailed)

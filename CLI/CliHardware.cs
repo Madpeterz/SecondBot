@@ -70,7 +70,10 @@ namespace BetterSecondBot
                     io.WriteJsonConfig(MakeJsonConfig.GetDefault(), json_file);
                 }
             }
-            else ConsoleLog.Crit("you must select a .json file for config! example \"BetterSecondBot.exe mybot\" will use the mybot.json file!");
+            else
+            {
+                ConsoleLog.Crit("you must select a .json file for config! example \"BetterSecondBot.exe mybot\" will use the mybot.json file!");
+            }
             if(ok_to_try_start == true)
             {
                 Config = MakeJsonConfig.http_config_check(Config);

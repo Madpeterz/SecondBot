@@ -71,7 +71,7 @@ namespace BetterSecondBotShared.Static
                 bool default_value_found = false;
                 foreach (string a in testingfor)
                 {
-                    if (Testing.GetCommandArgTypes(a).First() == Testing.GetProp(test, a))
+                    if (Testing.GetCommandArgTypes(a).First() == MakeJsonConfig.GetProp(test, a))
                     {
                         ConsoleLog.Warn("" + a + " is currently set to the default");
                         default_value_found = true;

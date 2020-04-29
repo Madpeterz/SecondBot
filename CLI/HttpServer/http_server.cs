@@ -183,7 +183,7 @@ namespace BetterSecondBot.HttpServer
         {
             get_controler = new HTTPCommandsInterfaceGet(Bot,this);
             post_controler = new HTTPCommandsInterfacePost(Bot,this);
-            Thread t = new Thread(delegate (object unused)
+            Thread t = new Thread(delegate (object _)
             {
                 listener = new HttpListener();
                 listener.Prefixes.Add(url);

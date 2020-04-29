@@ -173,7 +173,10 @@ namespace BSB.Commands
                         { "unixtime", helpers.UnixTimeNow().ToString() }
                     };
 
-                    if (command != "") values.Add("command", command);
+                    if (command != "")
+                    {
+                        values.Add("command", command);
+                    }
                     var content = new FormUrlEncodedContent(values);
                     try
                     {
@@ -216,7 +219,7 @@ namespace BSB.Commands
                 string[] args = new string[] { };
                 if (helpers.notempty(arg) == true)
                 {
-                    args = arg.Split(new string[] { "~#~" }, StringSplitOptions.None);
+                    args = arg.Split(new [] { "~#~" }, StringSplitOptions.None);
                 }
                 if ((cmd.ArgTypes.Contains("Avatar") == true) || (cmd.ArgTypes.Contains("Smart") == true))
                 {

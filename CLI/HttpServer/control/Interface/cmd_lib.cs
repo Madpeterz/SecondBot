@@ -20,7 +20,7 @@ namespace BetterSecondBot.HttpServer.Control.Interface
                 {
                     if (bot.GetCommandsInterface.Call(args[0], args[1], UUID.Zero) == true)
                     {
-                        return new string[] { "OK" };
+                        return new [] { "OK" };
                     }
                     else
                     {

@@ -68,10 +68,7 @@ namespace BSB.Commands.CMD_Parcel
                                 reply.Append(cfg);
                                 reply.Append("=");
                                 reply.Append(p.Flags.HasFlag(flags[cfg]).ToString());
-                                if (addon != ",")
-                                {
-                                    addon = ",";
-                                }
+                                addon = ",";
                             }
                         }
                         return bot.GetCommandsInterface.SmartCommandReply(target, reply.ToString(), CommandName);

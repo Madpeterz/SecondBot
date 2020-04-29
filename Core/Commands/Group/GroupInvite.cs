@@ -21,8 +21,14 @@ namespace BSB.Commands.Group
                 UUID.TryParse(args[2], out target_role);
             }
             List<UUID> invite_roles = new List<UUID>();
-            if (target_role != UUID.Zero) invite_roles.Add(target_role);
-            else invite_roles.Add(UUID.Zero);
+            if (target_role != UUID.Zero)
+            {
+                invite_roles.Add(target_role);
+            }
+            else
+            {
+                invite_roles.Add(UUID.Zero);
+            }
             bot.GetClient.Groups.Invite(group, invite_roles, avatar);
         }
         public override void Callback(string[] args, EventArgs e)

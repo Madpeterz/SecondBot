@@ -99,7 +99,12 @@ namespace BSB.bottypes
         protected bool permissive_mode = true;
         protected UUID permissive_mode_set_by = UUID.Zero;
         public UUID Getpermissive_mode_set_by { get { return permissive_mode_set_by; } }
-        public void SetPermissiveMode(UUID caller, bool status = false)
+
+        public void SetPermissiveMode(UUID caller)
+        {
+            SetPermissiveMode(caller, false);
+        }
+        public void SetPermissiveMode(UUID caller, bool status)
         {
             bool allow = true;
             if((permissive_mode == false) && (caller != permissive_mode_set_by))
@@ -243,7 +248,13 @@ namespace BSB.bottypes
         // Notify
         protected Dictionary<string, List<int>> Notify = new Dictionary<string, List<int>>();
         public Dictionary<string, List<int>> Getnotify { get { return Notify; } }
-        public void NotifyUpdate(bool Add, string word,int channel = -1)
+
+        public void NotifyUpdate(bool Add, string word)
+        {
+            NotifyUpdate(Add, word, -1);
+        }
+
+        public void NotifyUpdate(bool Add, string word,int channel)
         {
             lock (Notify)
             {

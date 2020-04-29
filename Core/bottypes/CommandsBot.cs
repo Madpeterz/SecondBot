@@ -15,7 +15,7 @@ namespace BSB.bottypes
         {
             CommandsInterface = new Commands.CoreCommandsInterface(this);
         }
-        List<string> CommandHistory = new List<string>();
+        protected List<string> CommandHistory = new List<string>();
         protected int commandid = 1;
         public virtual string CommandHistoryAdd(string command, string arg, bool status,string infomessage)
         {
@@ -51,7 +51,10 @@ namespace BSB.bottypes
                     ConsoleLog.Info(sb.ToString());
                 }
                 commandid++;
-                if (commandid >= myconfig.MaxCommandHistory) commandid = 1;
+                if (commandid >= myconfig.MaxCommandHistory)
+                {
+                    commandid = 1;
+                }
             }
             return message;
         }

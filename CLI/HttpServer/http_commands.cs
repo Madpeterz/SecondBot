@@ -91,7 +91,7 @@ namespace BetterSecondBot.HttpServer
         protected string[] Failed(string why_failed)
         {
             ConsoleLog.Warn("HTTP: " + CommandName + " [Failed]: " + why_failed);
-            return new string[] {"Failed",why_failed};
+            return new [] {"Failed",why_failed};
         }
     }
 

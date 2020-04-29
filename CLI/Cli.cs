@@ -6,7 +6,7 @@ using BetterSecondBotShared.Static;
 using BetterSecondBotShared.logs;
 namespace BetterSecondBot
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {

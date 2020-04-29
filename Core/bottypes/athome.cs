@@ -216,8 +216,14 @@ namespace BSB.bottypes
         public bool IsSimHome(string simname)
         {
             simname = simname.ToLowerInvariant();
-            if (helpers.notempty(myconfig.homeRegion) == false) return false;
-            else if (myconfig.homeRegion.Length == 0) return false;
+            if (helpers.notempty(myconfig.homeRegion) == false)
+            {
+                return false;
+            }
+            else if (myconfig.homeRegion.Length == 0)
+            {
+                return false;
+            }
             else
             {
                 bool reply = false;
@@ -272,7 +278,7 @@ namespace BSB.bottypes
                     TeleportWithSLurl(myconfig.homeRegion[last_tested_home_id]);
                     return " [@home **** active teleport: "+ last_attempted_teleport_region+"***]";
                 }
-                else return " [@home No home regions]";
+                return " [@home No home regions]";
             }
             else
             {

@@ -47,7 +47,10 @@ namespace BSB.Commands.StreamAdmin
                             {
                                 return bot.SendNotecard(server_reply.NotecardTitle, server_reply.NotecardContent, (UUID)server_reply.AvatarUUID);
                             }
-                            else Failed("Notecard title is to short");
+                            else
+                            {
+                                Failed("Notecard title is to short");
+                            }
                         }
                         return Failed(server_reply.message);
                     }

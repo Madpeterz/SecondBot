@@ -20,7 +20,10 @@ namespace BSB.Commands.CMD_Parcel
                     bool banuser = false;
                     if (args.Length == 2)
                     {
-                        if (args[1] == "True") banuser = true;
+                        if (args[1] == "True")
+                        {
+                            banuser = true;
+                        }
                     }
                     bot.GetClient.Parcels.EjectUser(target, banuser);
                     return true;

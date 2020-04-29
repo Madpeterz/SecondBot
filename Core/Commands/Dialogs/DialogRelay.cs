@@ -29,7 +29,10 @@ namespace BSB.Commands.Dialogs
                     {
                         bot.SetRelayDialogsChannel(channel);
                     }
-                    else return Failed("Not a vaild option");
+                    else
+                    {
+                        return Failed("Not a vaild option");
+                    }
                     return true;
                 }
                 else

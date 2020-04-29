@@ -38,7 +38,10 @@ namespace BSB.bottypes
                 }
                 if (AvatarStorageLastUsed.Count > 0)
                 {
-                    if (reply != "") reply += " , ";
+                    if (reply != "")
+                    {
+                        reply += " , ";
+                    }
                     reply += AvatarStorageLastUsed.Count.ToString() + " loaded";
                 }
                 if (reply != "")

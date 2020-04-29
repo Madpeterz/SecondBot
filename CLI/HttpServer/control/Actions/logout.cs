@@ -15,12 +15,12 @@ namespace BetterSecondBot.HttpServer.Control.Actions
                 if (httpserver.HTTPCnCmode == true)
                 {
                     httpserver.KillBot();
-                    return new string[] { "OK", "Bot Shutting down" };
+                    return new [] { "OK", "Bot Shutting down" };
                 }
                 else
                 {
                     bot.KillMePlease();
-                    return new string[] { "OK", "I dont want to go" };
+                    return new [] { "OK", "I dont want to go" };
                 }
             }
             else

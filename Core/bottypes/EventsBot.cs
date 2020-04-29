@@ -311,15 +311,9 @@ namespace BSB.bottypes
                         await_event_idtolistener.Add(eventid, event_listener);
                         return true;
                     }
-                    else return false;
                 }
-                return false;
             }
-            else return false;
+            return false;
         }
-
-
     }
-
-
 }

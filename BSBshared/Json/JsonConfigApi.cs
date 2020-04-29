@@ -124,7 +124,7 @@ namespace BetterSecondBotShared.Json
             return 1;
         }
 
-        public string GetProp(JsonConfig reply, string arg)
+        public static string GetProp(JsonConfig reply, string arg)
         {
             return reply.GetType().GetProperty(arg, BindingFlags.Public | BindingFlags.Instance).GetValue(reply).ToString();
         }
