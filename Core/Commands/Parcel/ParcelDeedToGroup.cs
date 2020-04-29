@@ -1,54 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using BetterSecondBotShared.logs;
-using BetterSecondBotShared.Static;
+﻿using System.Threading;
 using OpenMetaverse;
 
 namespace BSB.Commands.CMD_Parcel
 {
-
-    public class ParcelDeedToGroup : CoreCommand
+    public class ParcelDeedToGroup : ParcelCommand_RequirePerms_1arg_Group
     {
-        public override string[] ArgTypes { get { return new[] { "UUID" }; } }
-        public override string[] ArgHints { get { return new[] { "Group UUID" }; } }
-        public override int MinArgs { get { return 1; } }
-
         public override string Helpfile { get { return "transfers the current parcel ownership to a group"; } }
 
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)
             {
-                if (UUID.TryParse(args[0], out UUID groupuuid) == true)
-                {
-                    int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                    if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
-                    {
-                        Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-                        if (parcel_static.has_parcel_perm(p, bot) == true)
-                        {
-                            p.GroupID = groupuuid;
-                            p.Update(bot.GetClient.Network.CurrentSim, false);
-                            Thread.Sleep(1000);
-                            bot.GetClient.Parcels.DeedToGroup(bot.GetClient.Network.CurrentSim, localid, groupuuid);
-                            return true;
-                        }
-                        else
-                        {
-                            return Failed("Incorrect perms to control parcel");
-                        }
-                    }
-                    else
-                    {
-                        return Failed("Unable to find parcel in memory, please wait and try again");
-                    }
-                }
-                else
-                {
-                    return Failed("Unable to process group uuid");
-                }
+                targetparcel.GroupID = groupuuid;
+                targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+                Thread.Sleep(1000);
+                bot.GetClient.Parcels.DeedToGroup(bot.GetClient.Network.CurrentSim, targetparcel.LocalID, groupuuid);
+                return true;
             }
             return false;
         }
