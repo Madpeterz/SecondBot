@@ -198,7 +198,13 @@ namespace BSB.bottypes
                     {
                         if (helpers.notempty(myconfig.discordGroupTarget) == true)
                         {
-                            discord_group_relay = true;
+                            if (UUID.TryParse(myconfig.discordGroupTarget, out UUID targetgroup) == true)
+                            {
+                                if (targetgroup != UUID.Zero)
+                                {
+                                    discord_group_relay = true;
+                                }
+                            }
                         }
                     }
                 }
