@@ -87,14 +87,21 @@ namespace BSB.bottypes
                 {
                     if (UUID.TryParse(myconfig.DefaultSitUUID, out UUID arg_is_uuid) == true)
                     {
-                        if (AfterLoginSitDown == false)
+                        if (arg_is_uuid != UUID.Zero)
                         {
-                            addon = " [@home HomeSim ~ Attempting to sit down]";
-                            Client.Self.RequestSit(arg_is_uuid, Vector3.Zero);
+                            if (AfterLoginSitDown == false)
+                            {
+                                addon = " [@home HomeSim ~ Attempting to sit down]";
+                                Client.Self.RequestSit(arg_is_uuid, Vector3.Zero);
+                            }
+                            else
+                            {
+                                addon = " [@home HomeSim ~ Auto sit disabled :: use: \"resetathome\" to clear]";
+                            }
                         }
                         else
                         {
-                            addon = " [@home HomeSim ~ Auto sit disabled :: use: \"resetathome\" to clear]";
+                            addon = " [@home HomeSim]";
                         }
                     }
                     else
@@ -256,7 +263,7 @@ namespace BSB.bottypes
         {
             if (panic_mode == false)
             {
-                if (myconfig.homeRegion.Length > 1)
+                if (myconfig.homeRegion.Length > 0)
                 {
                     last_tp_attempt_unixtime = helpers.UnixTimeNow();
                     last_tested_home_id++;
