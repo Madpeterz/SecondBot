@@ -74,6 +74,10 @@ namespace BetterSecondBotShared.bottypes
             Client.Settings.ALWAYS_REQUEST_OBJECTS = true;
             Client.Settings.AVATAR_TRACKING = true;
             List<string> bits = myconfig.userName.Split(' ').ToList();
+            if(myconfig.AtHomeSimPosMaxRange < 1)
+            {
+                myconfig.AtHomeSimPosMaxRange = 10;
+            }
             LoginParams Lp = new LoginParams(Client, bits[0], bits[1], myconfig.password, "BetterSecondBot", "BetterSecondBot "+version);
             if (reconnect == false)
             {

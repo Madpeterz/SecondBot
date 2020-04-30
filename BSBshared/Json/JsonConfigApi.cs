@@ -18,8 +18,6 @@ namespace BetterSecondBotShared.Json
                 case "username": { return "Required"; }
                 case "password": { return "Required"; }
                 case "master": { return "Required"; }
-                case "homeregion": { return "AtHome"; }
-                case "defaultsituuid": { return "AtHome"; }
                 case "discordgrouptarget": { return "DiscordRelay"; }
                 case "discord": { return "DiscordRelay"; }
                 case "allowrlv": { return "RLV"; }
@@ -37,9 +35,13 @@ namespace BetterSecondBotShared.Json
                 case "commandstoconsole": { return "Options"; }
                 case "maxcommandhistory": { return "Options"; }
                 case "relayimtoavatar": { return "Options"; }
+                case "homeregion": { return "AtHome"; }
+                case "defaultsituuid": { return "AtHome"; }
+                case "athomesimonly": { return "AtHome"; }
+                case "athomesimposmaxrange": { return "AtHome"; }
                 default: { return "Unknown"; }
             }
-        }
+    }
         public override string GetCommandHelp(string cmd)
         {
             cmd = cmd.ToLowerInvariant();
@@ -67,6 +69,8 @@ namespace BetterSecondBotShared.Json
                 case "commandstoconsole": { return "Should the bot log commands to the console window"; }
                 case "maxcommandhistory": { return "How many commands should the bots command history be"; }
                 case "relayimtoavatar": { return "The UUID to relay avatar IMs to [Any invaild UUID to disable like \"none\"]"; }
+                case "athomesimonly": { return "Should the @Home system only care if the sim name is correct (use false to use max distance checks)"; }
+                case "athomesimposmaxrange": { return "How far away from the location in homeregion can the bot be before teleporting"; }
                 default: { return "None given"; }
             }
         }
@@ -87,6 +91,7 @@ namespace BetterSecondBotShared.Json
             else if (valuetype.Name == "Boolean") { return new[] { "True|False" }; }
             else if (valuetype.Name == "String[]") { return new[] { "Collection" }; }
             else if (valuetype.Name == "UInt64") { return new[] { "BigNumber" }; }
+            else if (valuetype.Name == "Single") { return new[] { "Float" }; }
             return new[] { "Unknown" };
         }
         public override string[] GetCommandArgHints(string cmd)
@@ -116,6 +121,8 @@ namespace BetterSecondBotShared.Json
                 case "commandstoconsole": { return new[] { "False" }; }
                 case "maxcommandhistory": { return new[] { "250" }; }
                 case "relayimtoavatar": { return new[] { "\"" + OpenMetaverse.UUID.Zero + "\"" }; }
+                case "athomesimonly": { return new[] { "False" }; }
+                case "athomesimposmaxrange": { return new[] { "10.0" }; }
                 default: { return new string[] { }; }
             }
         }
@@ -167,6 +174,13 @@ namespace BetterSecondBotShared.Json
                             else if (arg_type == "BigNumber")
                             {
                                 if (ulong.TryParse(arg_value_default, out ulong result) == true)
+                                {
+                                    prop.SetValue(reply, result, null);
+                                }
+                            }
+                            else if(arg_type == "Float")
+                            {
+                                if (float.TryParse(arg_value_default, out float result) == true)
                                 {
                                     prop.SetValue(reply, result, null);
                                 }
@@ -294,6 +308,14 @@ namespace BetterSecondBotShared.Json
                             else if (arg_type == "BigNumber")
                             {
                                 if (ulong.TryParse(arg_value_default, out ulong result) == true)
+                                {
+                                    prop.SetValue(reply, result, null);
+                                }
+                            }
+
+                            else if (arg_type == "Float")
+                            {
+                                if (float.TryParse(arg_value_default, out float result) == true)
                                 {
                                     prop.SetValue(reply, result, null);
                                 }

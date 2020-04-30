@@ -22,32 +22,47 @@ RUN dotnet publish "BetterSecondBot.csproj" -c DockerBuild -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
 ENV BotRunningInDocker='REQUIRED'
-ENV userName=''
-ENV password=''
-ENV master='Madpeter Zond'
-ENV code='DontTellAnyoneThis'
-ENV discord=''
-ENV discordGroupTarget=''
-ENV allowRLV=''
-ENV homeRegion=''
-ENV EnableHttp=''
-ENV Httpport=''
-ENV Httpkey=''
-ENV HttpRequireSigned=''
-ENV HttpHost=''
-ENV HttpAsCnC=''
-ENV DiscordFullServer=''
-ENV DiscordClientToken=''
-ENV DiscordServerID=''
-ENV DiscordServerImHistoryHours=''
+EXPOSE 8080
+ENV ASPNETCORE_URLS http://+:8080
+
+
+# --- Update your settings ---
+
+# Required
+ENV string userName=''
+ENV string password=''
+ENV string master=''
+ENV string code=''
+
+# Mixed 
+ENV allowRLV='False'
 ENV DefaultSitUUID='00000000-0000-0000-0000-000000000000'
-ENV CommandsToConsole='False'
+ENV CommandsToConsole='True'
 ENV MaxCommandHistory='250'
 ENV RelayImToAvatar='00000000-0000-0000-0000-000000000000'
 
-EXPOSE 8080
-ENV ASPNETCORE_URLS http://+:8080
+# Discord
+ENV discordWebhookURL=''
+ENV discordGroupTarget='00000000-0000-0000-0000-000000000000'
+ENV DiscordFullServer='False'
+ENV DiscordClientToken=''
+ENV DiscordServerID=''
+ENV DiscordServerImHistoryHours='24'
+
+# @home
+ENV homeRegion=''
+ENV AtHomeSimOnly='False'
+ENV AtHomeSimPosMaxRange='10.0'
+
+# HTTPinterface
+ENV EnableHttp='False'
+ENV Httpport='8080'
+ENV Httpkey=''
+ENV HttpRequireSigned='True'
+ENV HttpHost='http://localhost'
+ENV HttpAsCnC='False'
+
+# --- End of settings ---
 
 ENTRYPOINT ["dotnet", "BetterSecondBot.dll"]

@@ -231,25 +231,31 @@ namespace BSB.bottypes
                 {
                     if (sl_url.ToLowerInvariant().Contains(simname) == true)
                     {
-                        bool inrange = true;
-                        string[] bits = helpers.ParseSLurl(sl_url);
-                        if (helpers.notempty(bits) == true)
+                        if (myconfig.AtHomeSimOnly == false)
                         {
-                            if (bits.Length == 4)
+                            bool inrange = true;
+                            string[] bits = helpers.ParseSLurl(sl_url);
+                            if (helpers.notempty(bits) == true)
                             {
-                                if (GetClient.Self.SittingOn == 0)
+                                if (bits.Length == 4)
                                 {
-                                    float.TryParse(bits[1], out float posX);
-                                    float.TryParse(bits[2], out float posY);
-                                    float.TryParse(bits[3], out float posZ);
-                                    float drift_range = 10;
-                                    inrange = inbox(Client.Self.SimPosition.X, posX, drift_range, inrange);
-                                    inrange = inbox(Client.Self.SimPosition.Y, posY, drift_range, inrange);
-                                    inrange = inbox(Client.Self.SimPosition.Z, posZ, drift_range, inrange);
+                                    if (GetClient.Self.SittingOn == 0)
+                                    {
+                                        float.TryParse(bits[1], out float posX);
+                                        float.TryParse(bits[2], out float posY);
+                                        float.TryParse(bits[3], out float posZ);
+                                        inrange = inbox(Client.Self.SimPosition.X, posX, myconfig.AtHomeSimPosMaxRange, inrange);
+                                        inrange = inbox(Client.Self.SimPosition.Y, posY, myconfig.AtHomeSimPosMaxRange, inrange);
+                                        inrange = inbox(Client.Self.SimPosition.Z, posZ, myconfig.AtHomeSimPosMaxRange, inrange);
+                                    }
                                 }
                             }
+                            reply = inrange;
                         }
-                        reply = inrange;
+                        else
+                        {
+                            reply = true;
+                        }
                         break;
                     }
                 }
