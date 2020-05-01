@@ -21,7 +21,7 @@ namespace BSB.Commands.script
 
                 if(attempt_endpoint.Contains("https://github.com/"))
                 {
-                    attempt_endpoint.Replace("https://github.com/", "https://raw.githubusercontent.com/");
+                    attempt_endpoint = attempt_endpoint.Replace("https://github.com/", "https://raw.githubusercontent.com/");
                 }
 
                 var client = new RestClient(attempt_endpoint);
