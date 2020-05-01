@@ -8,9 +8,6 @@ WORKDIR /src
 COPY ["CLI/BetterSecondBot.csproj", "CLI/"]
 COPY ["Core/BSB.csproj", "Core/"]
 COPY ["BSBshared/BSBshared.csproj", "BSBshared/"]
-COPY ["libremetaverse-core/Libremetaversetypes/LibreMetaverse.Types.csproj", "libremetaverse-core/Libremetaversetypes/"]
-COPY ["libremetaverse-core/Libremetaverse/LibreMetaverse.csproj", "libremetaverse-core/Libremetaverse/"]
-COPY ["libremetaverse-core/Libremetaverse.structureddata/LibreMetaverse.StructuredData.csproj", "libremetaverse-core/Libremetaverse.structureddata/"]
 RUN dotnet restore "CLI/BetterSecondBot.csproj"
 COPY . .
 WORKDIR "/src/CLI"
@@ -22,18 +19,14 @@ RUN dotnet publish "BetterSecondBot.csproj" -c DockerBuild -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENV BotRunningInDocker='REQUIRED'
-EXPOSE 8080
-ENV ASPNETCORE_URLS http://+:8080
-
 
 # --- Update your settings ---
 
 # Required
-ENV string userName=''
-ENV string password=''
-ENV string master=''
-ENV string code=''
+ENV userName=''
+ENV password=''
+ENV master=''
+ENV code=''
 
 # Mixed 
 ENV allowRLV='False'
@@ -64,5 +57,9 @@ ENV HttpHost='http://localhost'
 ENV HttpAsCnC='False'
 
 # --- End of settings ---
+
+ENV BotRunningInDocker='REQUIRED'
+EXPOSE 8080
+ENV ASPNETCORE_URLS http://+:8080
 
 ENTRYPOINT ["dotnet", "BetterSecondBot.dll"]
