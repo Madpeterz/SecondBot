@@ -22,6 +22,33 @@ namespace BetterSecondBotShared.Static
     }
     public static class helpers
     {
+        public static bool inrange(float current,float min,float max)
+        {
+            if(current <= max)
+            {
+                if(current >= min)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public static bool inbox(float expected, float current, float drift)
+        {
+            return distance_check(expected, current, drift, true);
+        }
+        public static bool distance_check(float expected, float current, float drift, bool current_value)
+        {
+            if (current > (expected + drift))
+            {
+                return false;
+            }
+            else if (current < (expected - drift))
+            {
+                return false;
+            }
+            return current_value;
+        }
         public static string GetSHA1(string text)
         {
             SHA1 hash = SHA1CryptoServiceProvider.Create();
