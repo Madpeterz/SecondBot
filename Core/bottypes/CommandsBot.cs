@@ -82,6 +82,7 @@ namespace BSB.bottypes
         public Commands.CoreCommandsInterface GetCommandsInterface { get { return CommandsInterface; } }
         protected Commands.CoreCommandsInterface CommandsInterface;
 
+        protected Dictionary<string, string> Scripts_content = new Dictionary<string, string>();
         protected Dictionary<string, string> notecards_content = new Dictionary<string, string>();
         protected Dictionary<UUID, long> group_invite_lockout_timer = new Dictionary<UUID, long>();
         protected long last_cleanup_commands;
@@ -248,6 +249,94 @@ namespace BSB.bottypes
                     else
                     {
                         ConsoleLog.Warn("Unable to find default notecards folder");
+                        returnstatus = false;
+                    }
+                }
+            );
+            return returnstatus;
+        }
+        public void ScriptAddContent(string target_Script_storage_id, string content)
+        {
+            ScriptAddContent(target_Script_storage_id, content, true, "\n\r");
+        }
+        public void ScriptAddContent(string target_Script_storage_id, string content, bool add_newline)
+        {
+            ScriptAddContent(target_Script_storage_id, content, add_newline, "\n\r");
+        }
+        public void ScriptAddContent(string target_Script_storage_id, string content, bool add_newline, string newlinevalue)
+        {
+            if (Scripts_content.ContainsKey(target_Script_storage_id) == false)
+            {
+                Scripts_content.Add(target_Script_storage_id, "");
+            }
+            if (add_newline == true)
+            {
+                content = "" + newlinevalue + "" + content;
+            }
+            Scripts_content[target_Script_storage_id] = Scripts_content[target_Script_storage_id] + "" + content;
+        }
+        public string GetScriptContent(string target_Script_storage_id)
+        {
+            if (Scripts_content.ContainsKey(target_Script_storage_id) == true)
+            {
+                return Scripts_content[target_Script_storage_id];
+            }
+            return null;
+        }
+
+        public void ClearScriptStorage(string target_Script_storage_id)
+        {
+            if (Scripts_content.ContainsKey(target_Script_storage_id) == true)
+            {
+                Scripts_content.Remove(target_Script_storage_id);
+            }
+        }
+
+        public bool SendScript(string name, string content, UUID sendToUUID)
+        {
+            bool returnstatus = true;
+            name = name + " " + DateTime.Now;
+            Client.Inventory.RequestCreateItem(
+                Client.Inventory.FindFolderForType(AssetType.LSLText),
+                name,
+                name + " Created via SecondBot Script API",
+                AssetType.LSLText,
+                UUID.Random(),
+                InventoryType.LSL,
+                PermissionMask.All,
+                (bool Success, InventoryItem item) =>
+                {
+                    if (Success)
+                    {
+                        AssetScriptText empty = new AssetScriptText { Source = "\n" };
+                        empty.Encode();
+                        Client.Inventory.RequestUpdateScriptAgentInventory(new byte[] { }, item.UUID, true,
+                        (bool uploadSuccess, string uploadStatus, bool compileSuccess, List<string> compileMessages, UUID itemID, UUID assetID) =>
+                        {
+                            if (uploadSuccess)
+                            {
+                                empty.AssetData = Encoding.ASCII.GetBytes(content);
+                                Client.Inventory.RequestUpdateScriptAgentInventory(empty.AssetData, itemID,true,
+                                (bool finaluploadSuccess, string finaluploadStatus, bool finalcompileSuccess, List<string> finalcompileMessages, UUID finalitemID, UUID finalassetID) =>
+                                {
+                                    if (finalcompileSuccess == false)
+                                    {
+                                        ConsoleLog.Warn("Script failed to compile, sending anyway.");
+                                    }
+                                    Client.Inventory.GiveItem(finalitemID, name, AssetType.LSLText, sendToUUID, false);
+
+                                });
+                            }
+                            else
+                            {
+                                ConsoleLog.Crit("The fuck empty success Script create");
+                                returnstatus = false;
+                            }
+                        });
+                    }
+                    else
+                    {
+                        ConsoleLog.Warn("Unable to find default Scripts folder");
                         returnstatus = false;
                     }
                 }
