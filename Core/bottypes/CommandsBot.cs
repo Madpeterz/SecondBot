@@ -295,11 +295,11 @@ namespace BSB.bottypes
         public bool SendScript(string name, string content, UUID sendToUUID)
         {
             bool returnstatus = true;
-            name = name + " " + DateTime.Now;
+            
             Client.Inventory.RequestCreateItem(
                 Client.Inventory.FindFolderForType(AssetType.LSLText),
                 name,
-                name + " Created via SecondBot Script API",
+                name,
                 AssetType.LSLText,
                 UUID.Random(),
                 InventoryType.LSL,
