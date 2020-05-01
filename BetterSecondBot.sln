@@ -8,12 +8,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetterSecondBot", "CLI\Bett
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSBshared", "BSBshared\BSBshared.csproj", "{42075C8C-8055-4178-8C12-AE97DAFE8484}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse", "libremetaverse-core\Libremetaverse\LibreMetaverse.csproj", "{4AD32FB5-F8E9-4BFF-9F37-293D28929322}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse.StructuredData", "libremetaverse-core\Libremetaverse.structureddata\LibreMetaverse.StructuredData.csproj", "{9A317423-2218-4E91-86CD-588A19396387}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse.Types", "libremetaverse-core\Libremetaversetypes\LibreMetaverse.Types.csproj", "{C416FB6E-CBA0-4482-8317-5547D8950247}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -39,24 +33,6 @@ Global
 		{42075C8C-8055-4178-8C12-AE97DAFE8484}.DockerBuild|x64.Build.0 = DockerBuild|x64
 		{42075C8C-8055-4178-8C12-AE97DAFE8484}.Release|x64.ActiveCfg = Release|x64
 		{42075C8C-8055-4178-8C12-AE97DAFE8484}.Release|x64.Build.0 = Release|x64
-		{4AD32FB5-F8E9-4BFF-9F37-293D28929322}.Debug|x64.ActiveCfg = Debug|x64
-		{4AD32FB5-F8E9-4BFF-9F37-293D28929322}.Debug|x64.Build.0 = Debug|x64
-		{4AD32FB5-F8E9-4BFF-9F37-293D28929322}.DockerBuild|x64.ActiveCfg = DockerBuild|x64
-		{4AD32FB5-F8E9-4BFF-9F37-293D28929322}.DockerBuild|x64.Build.0 = DockerBuild|x64
-		{4AD32FB5-F8E9-4BFF-9F37-293D28929322}.Release|x64.ActiveCfg = Release|x64
-		{4AD32FB5-F8E9-4BFF-9F37-293D28929322}.Release|x64.Build.0 = Release|x64
-		{9A317423-2218-4E91-86CD-588A19396387}.Debug|x64.ActiveCfg = Debug|x64
-		{9A317423-2218-4E91-86CD-588A19396387}.Debug|x64.Build.0 = Debug|x64
-		{9A317423-2218-4E91-86CD-588A19396387}.DockerBuild|x64.ActiveCfg = DockerBuild|x64
-		{9A317423-2218-4E91-86CD-588A19396387}.DockerBuild|x64.Build.0 = DockerBuild|x64
-		{9A317423-2218-4E91-86CD-588A19396387}.Release|x64.ActiveCfg = Release|x64
-		{9A317423-2218-4E91-86CD-588A19396387}.Release|x64.Build.0 = Release|x64
-		{C416FB6E-CBA0-4482-8317-5547D8950247}.Debug|x64.ActiveCfg = Debug|x64
-		{C416FB6E-CBA0-4482-8317-5547D8950247}.Debug|x64.Build.0 = Debug|x64
-		{C416FB6E-CBA0-4482-8317-5547D8950247}.DockerBuild|x64.ActiveCfg = DockerBuild|x64
-		{C416FB6E-CBA0-4482-8317-5547D8950247}.DockerBuild|x64.Build.0 = DockerBuild|x64
-		{C416FB6E-CBA0-4482-8317-5547D8950247}.Release|x64.ActiveCfg = Release|x64
-		{C416FB6E-CBA0-4482-8317-5547D8950247}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

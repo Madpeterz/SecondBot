@@ -23,8 +23,11 @@
     <None Remove="WikiMake\wiki_header.txt" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.10" />
-    <PackageReference Include="MSBuildGitHash" Version="1.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
+    <PackageReference Include="MSBuildGitHash" Version="2.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="WikiMake\wiki_footer.txt" />
