@@ -58,19 +58,19 @@ namespace BSB.RLV
     }
     public abstract class RLV_command_1arg : RLV_command
     {
-        protected new int min_required_args = 1;
+        public override int Min_Required_args { get { return 1; } }
     }
     public abstract class RLV_command_2arg : RLV_command
     {
-        protected new int min_required_args = 2;
+        public override int Min_Required_args { get { return 2; } }
     }
     public abstract class RLV_command_3arg : RLV_command
     {
-        protected new int min_required_args = 3;
+        public override int Min_Required_args { get { return 3; } }
     }
     public abstract class RLV_command_4arg : RLV_command
     {
-        protected new int min_required_args = 4;
+        public override int Min_Required_args { get { return 4; } }
     }
     public abstract class RLV_command : API_interface
     {
@@ -141,7 +141,7 @@ namespace BSB.RLV
 
     public abstract class RLV_UUID_flag_4arg_yn : RLV_UUID_flag_optional_arg_yn
     {
-        protected new int min_required_args = 4;
+        public override int Min_Required_args { get { return 4; } }
         public override string Helpfile { get { return "[Class helpfile] RLV / 4arg"; } }
         public override string[] ArgTypes { get { return new[] { "Unknown", "Unknown", "Unknown", "Unknown" }; } }
         public override string[] ArgHints { get { return new[] { "Unknown", "Unknown", "Unknown", "Unknown" }; } }

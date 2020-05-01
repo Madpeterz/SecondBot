@@ -11,7 +11,7 @@ namespace BetterSecondBot.HttpServer.Control.Interface
         public override string[] ArgHints { get { return new [] { "Command","Args (~#~ split)" }; } }
         public override string Helpfile { get { return "Calls the Commands interface via HTTP (returns OK if not rejected)"; } }
 
-        protected new int min_required_args = 2;
+        public override int Min_Required_args { get { return 2; } }
 
         public override string[] CallFunction(string[] args)
         {

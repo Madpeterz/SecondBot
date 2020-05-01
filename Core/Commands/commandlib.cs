@@ -273,19 +273,19 @@ namespace BSB.Commands
 
     public abstract class CoreCommand_1arg : CoreCommand
     {
-        protected new int min_required_args = 1;
+        public override int Min_Required_args { get { return 1; } }
     }
     public abstract class CoreCommand_2arg : CoreCommand
     {
-        protected new int min_required_args = 2;
+        public override int Min_Required_args { get { return 2; } }
     }
     public abstract class CoreCommand_3arg : CoreCommand
     {
-        protected new int min_required_args = 3;
+        public override int Min_Required_args { get { return 3; } }
     }
     public abstract class CoreCommand_4arg : CoreCommand
     {
-        protected new int min_required_args = 4;
+        public override int Min_Required_args { get { return 4; } }
     }
     public abstract class CoreCommand_SmartReply_1arg : CoreCommand_1arg
     {

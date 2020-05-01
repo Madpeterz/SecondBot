@@ -33,12 +33,12 @@ namespace BSB.Commands
 
     public abstract class ParcelCommand_RequirePerms_1arg : ParcelCommand_RequirePerms
     {
-        protected new int min_required_args = 1;
+        public override int Min_Required_args { get { return 1; } }
     }
 
     public abstract class ParcelCommand_CheckParcel_1arg : ParcelCommand_CheckParcel
     {
-        protected new int min_required_args = 1;
+        public override int Min_Required_args { get { return 1; } }
     }
 
     public abstract class ParcelCommand_RequirePerms : ParcelCommand_CheckParcel
