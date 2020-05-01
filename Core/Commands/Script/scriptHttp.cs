@@ -38,7 +38,7 @@ namespace BSB.Commands.script
                             {
                                 if (UUID.TryParse(args[1], out UUID Avatar))
                                 {
-                                    return bot.SendScript(attempt_endpoint.Split('/').LastOrDefault(), endpoint_checks.Content, Avatar);
+                                    return bot.SendScript(attempt_endpoint.Split('/').LastOrDefault().Replace("%20", " "), endpoint_checks.Content, Avatar);
                                 }
                                 else
                                 {
