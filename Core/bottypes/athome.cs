@@ -11,6 +11,18 @@ namespace BSB.bottypes
 {
     public abstract class AtHome : MessageSwitcherBot
     {
+        public void TempUpdateAtHomeSimOnly(bool status)
+        {
+            myconfig.AtHomeSimOnly = status;
+        }
+        public void TempUpdateAtHomeSimRange(float range)
+        {
+            if (range < 3)
+            {
+                range = 3;
+            }
+            myconfig.AtHomeSimPosMaxRange = range;
+        }
         protected string LoggedOutNextAction()
         {
             string addon = "";
