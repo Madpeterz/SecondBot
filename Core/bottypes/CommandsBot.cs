@@ -299,7 +299,6 @@ namespace BSB.bottypes
         public bool SendScript(string name, string content, UUID sendToUUID)
         {
             bool returnstatus = true;
-            
             Client.Inventory.RequestCreateItem(
                 Client.Inventory.FindFolderForType(AssetType.LSLText),
                 name,
