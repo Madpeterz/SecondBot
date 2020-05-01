@@ -66,35 +66,45 @@ namespace BSB.bottypes
                             }
                         }
                     }
+                    string signing_code = "";
+                    string[] input = message.Split(new[] { "@@@" }, StringSplitOptions.RemoveEmptyEntries);
+                    if (input.Count() == 2)
+                    {
+                        message = input[0];
+                        signing_code = input[1];
+                    }
+                    List<string> bits = message.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                    if (bits.Count == 1)
+                    {
+                        bits.Add("");
+                    }
+                    string arg_signed_with = "~#~";
+                    if (bits.Count > 2)
+                    {
+                        arg_signed_with = "|||";
+                        List<string> newbits = new List<string>();
+                        newbits.Add(bits[0]);
+                        StringBuilder B = new StringBuilder();
+                        int loop = 1;
+                        string addon = "";
+                        while (loop < bits.Count)
+                        {
+                            B.Append(addon);
+                            B.Append(bits[loop]);
+                            addon = arg_signed_with;
+                            loop++;
+                        }
+                        newbits.Add(B.ToString());
+                        bits = newbits;
+                    }
                     if (avatar == false)
                     {
-                        bool signed_command = false;
-                        string signing_code = "";
-                        string[] input = message.Split(new[] { "@@@" }, StringSplitOptions.None);
-                        if (input.Count() == 2)
-                        {
-                            signed_command = true;
-                            message = input[0];
-                            signing_code = input[1];
-                        }
-                        List<string> bits = message.Split(new[] { "|||" }, StringSplitOptions.None).ToList();
-                        if (bits.Count == 1)
-                        {
-                            bits.Add("");
-                        }
-                        if (signed_command == true)
-                        {
-                            CoreCommandLib(sender_uuid, false, bits.ElementAt(0), bits.ElementAt(1), signing_code);
-                        }
+                        CoreCommandLib(sender_uuid, false, bits.ElementAt(0), bits.ElementAt(1), signing_code, arg_signed_with);
                     }
                     else if (myconfig.master == sender_name)
                     {
-                        List<string> bits = message.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                        if (bits.Count == 1)
-                        {
-                            bits.Add("");
-                        }
-                        CoreCommandLib(sender_uuid, true, bits.ElementAt(0), bits.ElementAt(1));
+                        signing_code = "";
+                        CoreCommandLib(sender_uuid, true, bits.ElementAt(0), bits.ElementAt(1), "", arg_signed_with);
                     }
                 }
             }

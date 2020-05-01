@@ -206,10 +206,24 @@ namespace BSB.Commands
         protected List<string> suppress_warnings = new List<string>();
         public bool Call(string command)
         {
-            return Call(command, "",UUID.Zero);
+            return Call(command, "");
+        }
+        public bool Call(string command, string arg)
+        {
+            return Call(command, arg, UUID.Zero);
+        }
+        public bool Call(string command, string arg, UUID caller)
+        {
+            return Call(command, arg, caller, "~#~");
+        }
+        public bool Call(string command, string arg, UUID caller, string split_args_on)
+        {
+            KeyValuePair<bool, string> result = CallCommand(command, arg, caller, split_args_on);
+            bot.CommandHistoryAdd(command, arg, result.Key, result.Value);
+            return result.Key;
         }
 
-        protected KeyValuePair<bool,string> CallCommand(string command, string arg, UUID caller)
+        protected KeyValuePair<bool,string> CallCommand(string command, string arg, UUID caller, string split_args_on)
         {
             command = command.ToLowerInvariant();
             CoreCommand cmd = (CoreCommand)GetCommand(command);
@@ -219,7 +233,7 @@ namespace BSB.Commands
                 string[] args = new string[] { };
                 if (helpers.notempty(arg) == true)
                 {
-                    args = arg.Split(new [] { "~#~" }, StringSplitOptions.None);
+                    args = arg.Split(new[] { split_args_on }, StringSplitOptions.RemoveEmptyEntries);
                 }
                 if ((cmd.ArgTypes.Contains("Avatar") == true) || (cmd.ArgTypes.Contains("Smart") == true))
                 {
@@ -262,12 +276,6 @@ namespace BSB.Commands
                 }
             }
             return new KeyValuePair<bool, string>(false, "--");
-        }
-        public bool Call(string command, string arg,UUID caller)
-        {
-            KeyValuePair<bool, string> result = CallCommand(command, arg, caller);
-            bot.CommandHistoryAdd(command, arg, result.Key,result.Value);
-            return result.Key;
         }
     }
 

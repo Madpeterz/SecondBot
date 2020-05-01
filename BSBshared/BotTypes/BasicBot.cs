@@ -183,7 +183,12 @@ namespace BetterSecondBotShared.bottypes
             CoreCommandLib(fromUUID, from_master, command, arg, "");
         }
 
-        protected virtual void CoreCommandLib(UUID fromUUID,bool from_master,string command,string arg,string signing_code)
+        protected virtual void CoreCommandLib(UUID fromUUID, bool from_master, string command, string arg, string signing_code)
+        {
+            CoreCommandLib(fromUUID, from_master, command, arg, signing_code, "~#~");
+        }
+
+        protected virtual void CoreCommandLib(UUID fromUUID,bool from_master,string command,string arg,string signing_code,string signed_with)
         {
             ConsoleLog.Debug("CoreCommandLib proc not overridden");
         }

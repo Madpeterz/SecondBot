@@ -131,7 +131,11 @@ namespace BSB.bottypes
 
         protected virtual void CallCommandLib(string command, string arg, UUID caller)
         {
-            CommandsInterface.Call(command, arg, caller);
+            CallCommandLib(command, arg, caller, "~#~");
+        }
+        protected virtual void CallCommandLib(string command, string arg, UUID caller,string signed_with)
+        {
+            CommandsInterface.Call(command, arg, caller, signed_with);
         }
 
         protected override void AfterBotLoginHandler()
@@ -143,7 +147,7 @@ namespace BSB.bottypes
             }
         }
 
-        protected override void CoreCommandLib(UUID fromUUID, bool from_master, string command, string arg, string signing_code)
+        protected override void CoreCommandLib(UUID fromUUID, bool from_master, string command, string arg, string signing_code, string signed_with)
         {
             if (CommandsInterface != null)
             {
@@ -153,12 +157,12 @@ namespace BSB.bottypes
                     string hashcheck = helpers.GetSHA1(raw);
                     if (hashcheck == signing_code)
                     {
-                        CallCommandLib(command, arg, fromUUID);
+                        CallCommandLib(command, arg, fromUUID, signed_with);
                     }
                 }
                 else if (from_master == true)
                 {
-                    CallCommandLib(command, arg, fromUUID);
+                    CallCommandLib(command, arg, fromUUID, signed_with);
                 }
             }
         }
