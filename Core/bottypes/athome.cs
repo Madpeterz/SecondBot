@@ -208,22 +208,7 @@ namespace BSB.bottypes
             }
         }
 
-        protected static bool inbox(float expected, float current, float drift)
-        {
-            return inbox(expected, current, drift, true);
-        }
-        protected static bool inbox(float expected,float current, float drift, bool current_value)
-        {
-            if (current > (expected + drift))
-            {
-                return false;
-            }
-            else if (current < (expected - drift))
-            {
-                return false;
-            }
-            return current_value;
-        }
+
 
         public bool IsSimHome(string simname)
         {
@@ -256,9 +241,9 @@ namespace BSB.bottypes
                                         float.TryParse(bits[1], out float posX);
                                         float.TryParse(bits[2], out float posY);
                                         float.TryParse(bits[3], out float posZ);
-                                        inrange = inbox(Client.Self.SimPosition.X, posX, myconfig.AtHomeSimPosMaxRange, inrange);
-                                        inrange = inbox(Client.Self.SimPosition.Y, posY, myconfig.AtHomeSimPosMaxRange, inrange);
-                                        inrange = inbox(Client.Self.SimPosition.Z, posZ, myconfig.AtHomeSimPosMaxRange, inrange);
+                                        inrange = helpers.distance_check(Client.Self.SimPosition.X, posX, myconfig.AtHomeSimPosMaxRange, inrange);
+                                        inrange = helpers.distance_check(Client.Self.SimPosition.Y, posY, myconfig.AtHomeSimPosMaxRange, inrange);
+                                        inrange = helpers.distance_check(Client.Self.SimPosition.Z, posZ, myconfig.AtHomeSimPosMaxRange, inrange);
                                     }
                                 }
                             }
