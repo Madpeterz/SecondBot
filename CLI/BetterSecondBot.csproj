@@ -2,6 +2,9 @@
   <PropertyGroup>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadataCommand Remove="GitDescription"/>
+  </ItemGroup>
   <PropertyGroup>
     <MSBuildGitHashCommand>git describe --long --always</MSBuildGitHashCommand>
     <MSBuildGitHashValidate>False</MSBuildGitHashValidate>
