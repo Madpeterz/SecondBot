@@ -19,7 +19,14 @@ namespace BSB.Commands.script
             {
                 string attempt_endpoint = args[0];
 
-                if(attempt_endpoint.Contains("https://github.com/"))
+                Uri uriResult;
+                bool urlValid = Uri.TryCreate(attempt_endpoint, UriKind.Absolute, out uriResult)
+                    && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                if(urlValid == false)
+                {
+                    return Failed("Url >" + attempt_endpoint + "< is not a valid URL");
+                }
+                if (attempt_endpoint.Contains("https://github.com/"))
                 {
                     attempt_endpoint = attempt_endpoint.Replace("https://github.com/", "https://raw.githubusercontent.com/");
                 }
