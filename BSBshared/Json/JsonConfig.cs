@@ -39,6 +39,7 @@ namespace BetterSecondBotShared.Json
         public bool HttpRequireSigned { get; set; }
         public string HttpHost { get; set; }
         public bool HttpAsCnC { get; set; }
+        public string HttpPublicUrlBase { get; set; }
     }
 
 }

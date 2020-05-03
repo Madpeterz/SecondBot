@@ -24,6 +24,7 @@ namespace BetterSecondBotShared.Json
                 case "allowrlv": { return "RLV"; }
                 case "code": { return "Required"; }
                 case "enablehttp": { return "HTTP"; }
+                case "httppublicurlbase": { return "HTTP"; }
                 case "httpport": { return "HTTP"; }
                 case "httpkey": { return "HTTP"; }
                 case "httprequiresigned": { return "HTTP"; }
@@ -58,6 +59,7 @@ namespace BetterSecondBotShared.Json
                 case "allowrlv": { return "Enable RLV commands interface for the bot"; }
                 case "code": { return "A known secret between your secondlife scripts and the bot<br/>Used to support IM commands"; }
                 case "enablehttp": { return "Enable the HTTP interface (using the HTTP settings)"; }
+                case "httppublicurlbase": { return "what is the public url base for the http interface"; }
                 case "httpport": { return "What port the HTTP interface should be on<br/> Example: 8080"; }
                 case "httpkey": { return "A known secret between used for HTTP calls<br/>Example: \"DontUseThis\""; }
                 case "httprequiresigned": { return "Force HTTP calls to be Signed with a hash (Not yet KnownCommand)"; }
@@ -109,6 +111,7 @@ namespace BetterSecondBotShared.Json
                 case "allowrlv": { return new[] { "False" }; }
                 case "code": { return new[] { "\"DontTellAnyoneThis\"" }; }
                 case "enablehttp": { return new[] { "false" }; }
+                case "httppublicurlbase": { return new[] { "\"http://bot.domain.com\"" }; }
                 case "httpport": { return new[] { "8080" }; }
                 case "httpkey": { return new[] { "\"ThisIsAKeyYo\"" }; }
                 case "httprequiresigned": { return new[] { "false" }; }
