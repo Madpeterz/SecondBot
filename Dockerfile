@@ -53,7 +53,6 @@ ENV EnableHttp='False'
 ENV HttpPublicUrlBase='http://localhost'
 ENV Httpport='8080'
 ENV Httpkey=''
-ENV HttpRequireSigned='True'
 ENV HttpHost='http://localhost'
 ENV HttpAsCnC='False'
 
