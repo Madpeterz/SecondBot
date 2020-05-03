@@ -63,6 +63,7 @@ namespace BetterSecondBotShared.Static
             if (url != null)
             {
                 url = url.Replace("http://maps.secondlife.com/secondlife/", "");
+                url = url.Replace("%20", " ");
                 string[] bits = url.Split('/');
                 if (bits.Length == 4)
                 {
