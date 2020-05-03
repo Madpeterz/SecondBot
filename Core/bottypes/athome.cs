@@ -121,7 +121,7 @@ namespace BSB.bottypes
                         addon = " [@home HomeSim]";
                     }
                 }
-                else if (dif <= 20)
+                else if (dif <= 10)
                 {
                     addon = " [@home W4>Cooldown]";
                 }
