@@ -27,7 +27,6 @@ namespace BetterSecondBotShared.Json
                 case "httppublicurlbase": { return "HTTP"; }
                 case "httpport": { return "HTTP"; }
                 case "httpkey": { return "HTTP"; }
-                case "httprequiresigned": { return "HTTP"; }
                 case "httphost": { return "HTTP"; }
                 case "httpascnc": { return "HTTP"; }
                 case "discordfullserver": { return "DiscordFull"; }
@@ -62,7 +61,6 @@ namespace BetterSecondBotShared.Json
                 case "httppublicurlbase": { return "what is the public url base for the http interface"; }
                 case "httpport": { return "What port the HTTP interface should be on<br/> Example: 8080"; }
                 case "httpkey": { return "A known secret between used for HTTP calls<br/>Example: \"DontUseThis\""; }
-                case "httprequiresigned": { return "Force HTTP calls to be Signed with a hash (Not yet KnownCommand)"; }
                 case "httphost": { return "The URL to listen for HTTP connections on"; }
                 case "httpascnc": { return "Switchs the software into command and control mode"; }
                 case "discordfullserver": { return "Should we switch to a full server control discord link"; }
@@ -114,7 +112,6 @@ namespace BetterSecondBotShared.Json
                 case "httppublicurlbase": { return new[] { "\"http://bot.domain.com\"" }; }
                 case "httpport": { return new[] { "8080" }; }
                 case "httpkey": { return new[] { "\"ThisIsAKeyYo\"" }; }
-                case "httprequiresigned": { return new[] { "false" }; }
                 case "httphost": { return new[] { "\"http://localhost\"" }; }
                 case "httpascnc": { return new[] { "false" }; }
                 case "discordfullserver": { return new[] { "false" }; }
