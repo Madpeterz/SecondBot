@@ -29,7 +29,7 @@ namespace BetterSecondBot.HttpServer
             if (cmd != null)
             {
                 cmd.Setup(bot,httpserver);
-                return cmd.CallFunction(arg.Split(new[] { "~#~" }, StringSplitOptions.None));
+                return cmd.CallFunction(arg.Split(new[] { "|||" }, StringSplitOptions.None));
             }
             else
             {
