@@ -7,6 +7,7 @@ using BSB.bottypes;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -100,26 +101,19 @@ namespace BetterSecondBot.HttpServer
                 HttpListenerRequest req = ctx.Request;
                 HttpListenerResponse resp = ctx.Response;
                 string test = req.Url.AbsolutePath.Substring(1);
-                string[] http_args = test.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                test = test.Replace(Config.HttpPublicUrlBase, "");
+                List<string> http_args = test.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
                 byte[] data = Encoding.UTF8.GetBytes("totaly fucked");
                 resp.StatusCode = 404;
                 if (req.HttpMethod == "GET")
                 {
                     resp.StatusCode = 200;
                     string command = "status";
-                    string arg = "";
-                    if (helpers.notempty(http_args) == true)
+                    if (http_args.Count > 0)
                     {
-                        if (http_args.Length >= 1)
-                        {
-                            command = http_args[0];
-                        }
-                        if (http_args.Length == 2)
-                        {
-                            arg = http_args[1];
-                        }
+                        command = http_args.Last();
                     }
-                    string content = String.Join("{@}", get_controler.Call(command, arg));
+                    string content = String.Join("{@}", get_controler.Call(command, ""));
                     data = Encoding.UTF8.GetBytes(content);
                 }
                 else if (req.HttpMethod == "POST")
