@@ -25,7 +25,6 @@ namespace BetterSecondBot.HttpServer
         protected HTTPCommandsInterfaceGet get_controler;
         protected HTTPCommandsInterfacePost post_controler;
         protected string url = "";
-        protected bool require_signed_commands;
         public bool ShutdownHTTP { get; set; }
         public bool HTTPCnCmode { get; set; }
 
@@ -68,7 +67,6 @@ namespace BetterSecondBot.HttpServer
         protected void start_http_server(JsonConfig setConfig, SecondBot LinkBot)
         {
             Config = setConfig;
-            require_signed_commands = Config.HttpRequireSigned;
             Bot = LinkBot;
             int port = Math.Abs(Config.Httpport);
             if (Config.Httpkey.Length < 12)
@@ -95,7 +93,7 @@ namespace BetterSecondBot.HttpServer
 
         protected async Task HandleIncomingConnections()
         {
-            while(Bot.KillMe == false)
+            while (Bot.KillMe == false)
             {
                 HttpListenerContext ctx = await listener.GetContextAsync();
                 HttpListenerRequest req = ctx.Request;
@@ -118,16 +116,15 @@ namespace BetterSecondBot.HttpServer
                 }
                 else if (req.HttpMethod == "POST")
                 {
-                    
                     string text;
-                    using (var reader = new StreamReader(req.InputStream,req.ContentEncoding))
+                    using (var reader = new StreamReader(req.InputStream, req.ContentEncoding))
                     {
                         text = reader.ReadToEnd();
                     }
                     //"command = logout & args = &passkey = Kp83VZaEhcy"
                     string[] pairs = text.Split('&', StringSplitOptions.RemoveEmptyEntries);
                     Dictionary<string, string> post_args = new Dictionary<string, string>();
-                    foreach(string B in pairs)
+                    foreach (string B in pairs)
                     {
                         string[] bits = B.Split('=', StringSplitOptions.RemoveEmptyEntries);
                         if (bits.Length == 2)
@@ -135,42 +132,61 @@ namespace BetterSecondBot.HttpServer
                             post_args.Add(bits[0].Trim(), bits[1].Trim());
                         }
                     }
+
+                    bool format_ok = true;
+                    bool accept_request = false;
+                    string why_request_failed = "Bad signing request";
+
+                    string command = "";
+                    string arg = "";
+                    string signing_code = "";
+                    resp.StatusCode = 200;
                     if (post_args.ContainsKey("command") == true)
                     {
-                        if (post_args.ContainsKey("passkey") == true)
+                        command = post_args["command"];
+                        if (post_args.ContainsKey("args") == true)
                         {
-                            if (Config.Httpkey == post_args["passkey"])
+                            arg = post_args["args"];
+                        }
+                        if (post_args.ContainsKey("code") == true)
+                        {
+                            signing_code = post_args["code"];
+                            if (format_ok == true)
                             {
-                                string command = post_args["command"];
-                                resp.StatusCode = 200;
-                                string arg = "";
-                                if (post_args.ContainsKey("args") == true)
+                                string raw = "" + command + "" + arg + "" + Config.Httpkey + "";
+                                string hashcheck = helpers.GetSHA1(raw);
+                                if (hashcheck == signing_code)
                                 {
-                                    arg = post_args["args"];
+                                    accept_request = true;
                                 }
-                                data = Encoding.UTF8.GetBytes(String.Join("###", post_controler.Call(command, arg)));
-                            }
-                            else
-                            {
-                                data = Encoding.UTF8.GetBytes("totaly fucked");
                             }
                         }
                         else
                         {
-                            data = Encoding.UTF8.GetBytes("post request missing command");
+                            why_request_failed = "Post missing arg value";
+                            format_ok = false;
                         }
                     }
                     else
                     {
-                        data = Encoding.UTF8.GetBytes("post request missing command");
+                        why_request_failed = "Post missing command value";
+                        format_ok = false;
                     }
+                    if (accept_request == true)
+                    {
+                        data = Encoding.UTF8.GetBytes(String.Join("###", post_controler.Call(command, arg)));
+                    }
+                    else
+                    {
+                        resp.StatusCode = 417;
+                        data = Encoding.UTF8.GetBytes(why_request_failed);
+                    }
+                    resp.ContentType = "text/html";
+                    resp.ContentEncoding = Encoding.UTF8;
+                    resp.ContentLength64 = data.LongLength;
+                    await resp.OutputStream.WriteAsync(data, 0, data.Length);
+                    resp.Close();
                 }
-                
-                resp.ContentType = "text/html";
-                resp.ContentEncoding = Encoding.UTF8;
-                resp.ContentLength64 = data.LongLength;
-                await resp.OutputStream.WriteAsync(data, 0, data.Length);
-                resp.Close();
             }
         }
         protected void open_http_service()
