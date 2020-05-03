@@ -1,5 +1,6 @@
 ﻿using BetterSecondBotShared.API;
 using BetterSecondBotShared.logs;
+using BetterSecondBotShared.Static;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -107,21 +108,21 @@ namespace BetterSecondBotShared.Json
                 case "discord": { return new[] { "\"https://discordapp.com/api/webhooks/XXXX/YYYY\"" }; }
                 case "allowrlv": { return new[] { "False" }; }
                 case "code": { return new[] { "\"DontTellAnyoneThis\"" }; }
-                case "enablehttp": { return new[] { "False" }; }
+                case "enablehttp": { return new[] { "false" }; }
                 case "httpport": { return new[] { "8080" }; }
                 case "httpkey": { return new[] { "\"ThisIsAKeyYo\"" }; }
-                case "httprequiresigned": { return new[] { "False" }; }
+                case "httprequiresigned": { return new[] { "false" }; }
                 case "httphost": { return new[] { "\"http://localhost\"" }; }
-                case "httpascnc": { return new[] { "False" }; }
-                case "discordfullserver": { return new[] { "False" }; }
+                case "httpascnc": { return new[] { "false" }; }
+                case "discordfullserver": { return new[] { "false" }; }
                 case "discordclienttoken": { return new[] { "https://discordapp.com/developers/ Bot" }; }
                 case "discordserverid": { return new[] { "1234567890" }; }
                 case "discordserverimhistoryhours": { return new[] { "24" }; }
                 case "defaultsituuid": { return new[] { "\"" + OpenMetaverse.UUID.Zero + "\"" }; }
-                case "commandstoconsole": { return new[] { "False" }; }
+                case "commandstoconsole": { return new[] { "false" }; }
                 case "maxcommandhistory": { return new[] { "250" }; }
                 case "relayimtoavatar": { return new[] { "\"" + OpenMetaverse.UUID.Zero + "\"" }; }
-                case "athomesimonly": { return new[] { "False" }; }
+                case "athomesimonly": { return new[] { "false" }; }
                 case "athomesimposmaxrange": { return new[] { "10.0" }; }
                 default: { return new string[] { }; }
             }
@@ -210,20 +211,38 @@ namespace BetterSecondBotShared.Json
 
         public static JsonConfig http_config_check(JsonConfig jsonConfig)
         {
-            if ((jsonConfig.Httpkey != null) && (jsonConfig.HttpHost != null))
+            if (helpers.notempty(jsonConfig.Httpkey) == true)
             {
-                if ((jsonConfig.Httpport < 80) || (jsonConfig.Httpkey.Length < 12) || (jsonConfig.HttpHost.StartsWith("http") == false))
+                if (helpers.notempty(jsonConfig.HttpHost) == true)
                 {
+                    jsonConfig.EnableHttp = false;
+                    if (jsonConfig.Httpkey.Length < 12)
+                    {
+                        ConsoleLog.Warn("Http disabled: Httpkey length must be 12 or more");
+                    }
+                    else if (jsonConfig.Httpport < 81)
+                    {
+                        ConsoleLog.Warn("Http disabled: Httpport range below protected range - Given: (" + jsonConfig.Httpport + ")");
+                    }
+                    else if ((jsonConfig.HttpHost != "docker") && (jsonConfig.HttpHost.StartsWith("http") == false))
+                    {
+                        ConsoleLog.Warn("Http disabled: HttpHost must be vaild: http://XXXXXX or \"docker\" - Given: ("+jsonConfig.HttpHost+")");
+                    }
+                    else
+                    {
+                        jsonConfig.EnableHttp = true;
+                    }
+                }
+                else
+                {
+                    ConsoleLog.Warn("Http disabled: HttpHost is null");
                     jsonConfig.EnableHttp = false;
                 }
             }
             else
             {
+                ConsoleLog.Warn("Http disabled: Httpkey is null");
                 jsonConfig.EnableHttp = false;
-            }
-            if (jsonConfig.EnableHttp == false)
-            {
-                jsonConfig.HttpAsCnC = false;
             }
             return jsonConfig;
         }

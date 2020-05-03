@@ -185,12 +185,25 @@ namespace BetterSecondBot.HttpServer
             post_controler = new HTTPCommandsInterfacePost(Bot,this);
             Thread t = new Thread(delegate (object _)
             {
-                listener = new HttpListener();
-                listener.Prefixes.Add(url);
-                listener.Start();
-                ConsoleLog.Status("Listening for connections on " + url + "");
-                Task listenTask = HandleIncomingConnections();
-                listenTask.GetAwaiter().GetResult();
+                bool ok = true;
+                try
+                {
+                    listener = new HttpListener();
+                    listener.Prefixes.Add(url);
+                    listener.Start();
+                }
+                catch (Exception e)
+                {
+                    ok = false;
+                    ConsoleLog.Crit("Unable to setup http service: "+e.Message+"");
+                    ConsoleLog.Crit("if running on windows please check: https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/configuring-http-and-https?redirectedfrom=MSDN");
+                }
+                if (ok == true)
+                {
+                    ConsoleLog.Status("Listening for connections on " + url + "");
+                    Task listenTask = HandleIncomingConnections();
+                    listenTask.GetAwaiter().GetResult();
+                }
                 listener.Close();
             })
             {
