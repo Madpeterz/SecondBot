@@ -4,7 +4,7 @@ using System.Text;
 using OpenMetaverse;
 namespace BSB.Commands.Movement
 {
-    public class Fly : CoreCommand_1arg
+    public class BotFly : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "True|False" }; } }
         public override string[] ArgHints { get { return new[] { "Should the bot be flying" }; } }
