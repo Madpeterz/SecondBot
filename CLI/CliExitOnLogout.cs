@@ -24,9 +24,8 @@ namespace BetterSecondBot
                 Bot.Start();
                 if (Config.EnableHttp == true)
                 {
-                    http_server my_http_server = null;
-                    my_http_server = new http_server();
-                    my_http_server.start_http_server(Bot,Config);
+                    SecondBotHttpServer my_http_server = new SecondBotHttpServer();
+                    my_http_server.StartHttpServer(Bot,Config);
                 }
                 while (Bot.KillMe == false)
                 {

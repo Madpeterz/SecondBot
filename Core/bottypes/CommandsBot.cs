@@ -74,7 +74,7 @@ namespace BSB.bottypes
             }
             return commands.ToArray();
         }
-        public virtual void sendIM(UUID avatar,string message)
+        public virtual void SendIM(UUID avatar,string message)
         {
             Client.Self.InstantMessage(avatar, message);
         }

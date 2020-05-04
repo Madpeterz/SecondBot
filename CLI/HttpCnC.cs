@@ -10,14 +10,14 @@ namespace BetterSecondBot
 {
     class HttpCnC
     {
-        protected http_server my_http_server;
+        protected SecondBotHttpServer my_http_server;
         public HttpCnC(JsonConfig BotConfig)
         {
             ConsoleLog.Status("Mode: HTTP C&C");
-            my_http_server = new http_server();
+            my_http_server = new SecondBotHttpServer();
             my_http_server.HTTPCnCmode = true;
             my_http_server.ShutdownHTTP = false;
-            my_http_server.start_http_server(BotConfig);
+            my_http_server.StartHttpServer(BotConfig);
             string last_cnc_status = "";
             while (my_http_server.ShutdownHTTP == false)
             {

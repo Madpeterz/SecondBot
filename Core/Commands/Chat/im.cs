@@ -20,7 +20,7 @@ namespace BSB.Commands.Chat
                 {
                     if (helpers.notempty(args[1]) == true)
                     {
-                        bot.sendIM(target_av, args[1]);
+                        bot.SendIM(target_av, args[1]);
                         return true;
                     }
                     else

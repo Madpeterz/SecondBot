@@ -14,9 +14,9 @@ namespace BetterSecondBot.HttpServer
     public abstract class HTTPCommandsInterface : API_supported_interface
     {
         protected SecondBot bot;
-        protected http_server httpserver;
+        protected SecondBotHttpServer httpserver;
 
-        protected HTTPCommandsInterface(SecondBot linktobot, http_server sethttpserver)
+        protected HTTPCommandsInterface(SecondBot linktobot, SecondBotHttpServer sethttpserver)
         {
             bot = linktobot;
             httpserver = sethttpserver;
@@ -40,7 +40,7 @@ namespace BetterSecondBot.HttpServer
     }
     public class HTTPCommandsInterfaceGet : HTTPCommandsInterface
     {
-        public HTTPCommandsInterfaceGet(SecondBot linktobot, http_server sethttpserver) : base(linktobot, sethttpserver) 
+        public HTTPCommandsInterfaceGet(SecondBot linktobot, SecondBotHttpServer sethttpserver) : base(linktobot, sethttpserver) 
         {
             API_type = typeof(HTTP_commands_get);
             LoadCommandsList();
@@ -48,7 +48,7 @@ namespace BetterSecondBot.HttpServer
     }
     public class HTTPCommandsInterfacePost : HTTPCommandsInterface
     {
-        public HTTPCommandsInterfacePost(SecondBot linktobot, http_server sethttpserver) : base(linktobot, sethttpserver) 
+        public HTTPCommandsInterfacePost(SecondBot linktobot, SecondBotHttpServer sethttpserver) : base(linktobot, sethttpserver) 
         {
             API_type = typeof(HTTP_commands_post);
             LoadCommandsList();
@@ -66,8 +66,8 @@ namespace BetterSecondBot.HttpServer
     public abstract class HTTP_commands : API_interface
     {
         protected SecondBot bot;
-        protected http_server httpserver;
-        public void Setup(SecondBot setBot,http_server Sethttpserver)
+        protected SecondBotHttpServer httpserver;
+        public void Setup(SecondBot setBot,SecondBotHttpServer Sethttpserver)
         {
             bot = setBot;
             httpserver = Sethttpserver;

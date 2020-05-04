@@ -26,7 +26,7 @@ namespace BSB.Commands.Self
                 sb.Append("\n\n");
                 sb.Append("\nType: 'morehelp' for a full list of commands\n");
                 sb.Replace("<br/>", "\n");
-                bot.sendIM(bot.getMaster_uuid, sb.ToString());
+                bot.SendIM(bot.getMaster_uuid, sb.ToString());
 
                 return true;
             }
