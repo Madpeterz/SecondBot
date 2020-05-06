@@ -40,7 +40,9 @@ namespace BetterSecondBotShared.Json
                 case "defaultsituuid": { return "AtHome"; }
                 case "athomesimonly": { return "AtHome"; }
                 case "athomesimposmaxrange": { return "AtHome"; }
+                case "allowfunds": { return "security"; }
                 default: { return "Unknown"; }
+
             }
     }
         public override string GetCommandHelp(string cmd)
@@ -72,6 +74,7 @@ namespace BetterSecondBotShared.Json
                 case "relayimtoavatar": { return "The UUID to relay avatar IMs to [Any invaild UUID to disable like \"none\"]"; }
                 case "athomesimonly": { return "Should the @Home system only care if the sim name is correct (use false to use max distance checks)"; }
                 case "athomesimposmaxrange": { return "How far away from the location in homeregion can the bot be before teleporting"; }
+                case "allowfunds": { return "Allow the bot to transfer L$ to avatars / objects and display its L$ balance via command/web gui"; }
                 default: { return "None given"; }
             }
         }
@@ -124,6 +127,7 @@ namespace BetterSecondBotShared.Json
                 case "relayimtoavatar": { return new[] { "\"" + OpenMetaverse.UUID.Zero + "\"" }; }
                 case "athomesimonly": { return new[] { "false" }; }
                 case "athomesimposmaxrange": { return new[] { "10.0" }; }
+                case "allowfunds": { return new[] { "true" }; }
                 default: { return new string[] { }; }
             }
         }

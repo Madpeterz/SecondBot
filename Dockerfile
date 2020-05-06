@@ -28,6 +28,9 @@ ENV password=''
 ENV master=''
 ENV code=''
 
+# Security
+ENV AllowFunds='True'
+
 # Mixed
 ENV allowRLV='False'
 ENV DefaultSitUUID='00000000-0000-0000-0000-000000000000'

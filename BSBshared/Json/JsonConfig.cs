@@ -12,6 +12,9 @@ namespace BetterSecondBotShared.Json
         public string master { get; set; }
         public string code { get; set; }
 
+        // Security
+        public bool AllowFunds { get; set; }
+
         // Mixed 
         public bool allowRLV { get; set; }
         public string DefaultSitUUID { get; set; }
