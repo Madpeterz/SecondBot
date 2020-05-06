@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using OpenMetaverse;
 
 namespace BSB.Commands.CMD_Parcel
 {

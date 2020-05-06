@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Linq;
 using OpenMetaverse;
-
 
 namespace BSB.Commands.Inventory
 {

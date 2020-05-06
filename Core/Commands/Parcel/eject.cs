@@ -1,7 +1,4 @@
 ﻿using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BSB.Commands.CMD_Parcel
 {

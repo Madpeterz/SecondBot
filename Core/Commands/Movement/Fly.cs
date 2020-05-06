@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using OpenMetaverse;
-namespace BSB.Commands.Movement
+﻿namespace BSB.Commands.Movement
 {
     public class BotFly : CoreCommand_1arg
     {

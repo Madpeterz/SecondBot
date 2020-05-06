@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using OpenMetaverse;
-
-namespace BSB.Commands.Notecard
+﻿namespace BSB.Commands.Notecard
 {
     class NotecardAdd : CoreCommand_2arg
     {

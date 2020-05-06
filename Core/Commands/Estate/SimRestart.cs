@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BetterSecondBotShared.logs;
-using BetterSecondBotShared.Static;
-using OpenMetaverse;
-
-namespace BSB.Commands.Estate
+﻿namespace BSB.Commands.Estate
 {
     public class SimRestart : CoreCommand_1arg
     {

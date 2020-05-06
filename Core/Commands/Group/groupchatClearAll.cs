@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BSB.Commands.Group
+﻿namespace BSB.Commands.Group
 {
     class GroupchatClearAll : CoreCommand
     {

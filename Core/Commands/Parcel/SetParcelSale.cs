@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BetterSecondBotShared.logs;
-using BetterSecondBotShared.Static;
-using OpenMetaverse;
+﻿using OpenMetaverse;
 
 namespace BSB.Commands.CMD_Parcel
 {
-
     public class SetParcelSale : ParcelCommand_RequirePerms_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Number","Avatar" }; } }

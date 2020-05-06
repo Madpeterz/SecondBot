@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BSB.Commands.Dialogs
+﻿namespace BSB.Commands.Dialogs
 {
     class DialogTrack : CoreCommand_1arg
     {

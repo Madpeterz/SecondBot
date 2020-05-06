@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using OpenMetaverse;
 using BetterSecondBotShared.Static;
 namespace BSB.Commands.Movement

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using OpenMetaverse;
-
-
-namespace BSB.Commands.Home
+﻿namespace BSB.Commands.Home
 {
     public class ResetAtHome : CoreCommand
     {

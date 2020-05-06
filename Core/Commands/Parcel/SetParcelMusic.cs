@@ -1,11 +1,4 @@
-﻿using BetterSecondBotShared.Static;
-using BSB.bottypes;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BSB.Commands.CMD_Parcel
+﻿namespace BSB.Commands.CMD_Parcel
 {
     class SetParcelMusic : ParcelCommand_RequirePerms
     {

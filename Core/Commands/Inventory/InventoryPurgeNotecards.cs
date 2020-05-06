@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using OpenMetaverse;
-using BSB.Static;
-using BetterSecondBotShared.Static;
 
 namespace BSB.Commands.Inventory
 {

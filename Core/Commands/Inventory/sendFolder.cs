@@ -1,8 +1,5 @@
 ﻿using BSB.Static;
 using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BSB.Commands.Inventory
 {

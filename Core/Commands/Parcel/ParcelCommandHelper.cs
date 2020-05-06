@@ -1,8 +1,4 @@
-﻿using BSB.Commands;
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using OpenMetaverse;
 
 namespace BSB.Commands
 {

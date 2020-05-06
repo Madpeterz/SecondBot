@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using OpenMetaverse;
-
-namespace BSB.Commands.Self
+﻿namespace BSB.Commands.Self
 {
     class BotVersion : CoreCommand_SmartReply_1arg
     {

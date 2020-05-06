@@ -1,9 +1,4 @@
-﻿using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BSB.Commands.Dialogs
+﻿namespace BSB.Commands.Dialogs
 {
     class DialogResponce : CoreCommand_2arg
     {

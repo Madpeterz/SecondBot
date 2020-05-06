@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using OpenMetaverse;
-
-
-namespace BSB.Commands.Self
+﻿namespace BSB.Commands.Self
 {
     public class AddToAllowAnimations : CoreCommand_1arg
     {
