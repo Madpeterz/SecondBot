@@ -16,19 +16,23 @@ namespace BSB.Commands.Self
         {
             if (base.CallFunction(args) == true)
             {
-                if (UUID.TryParse(args[0], out UUID avataruuid) == true)
+                if (bot.GetAllowFunds == true)
                 {
-                    if (int.TryParse(args[1], out int amount) == true)
+                    if (UUID.TryParse(args[0], out UUID avataruuid) == true)
                     {
-                        if (amount > 0)
+                        if (int.TryParse(args[1], out int amount) == true)
                         {
-                            bot.GetClient.Self.GiveAvatarMoney(avataruuid, amount);
-                            return true;
+                            if (amount > 0)
+                            {
+                                bot.GetClient.Self.GiveAvatarMoney(avataruuid, amount);
+                                return true;
+                            }
                         }
+                        return Failed("Invaild amount");
                     }
-                    return Failed("Invaild amount");
+                    return Failed("Invaild avatar UUID");
                 }
-                return Failed("Invaild avatar UUID");
+                return Failed("Transfer funds to avatars disabled");
             }
             return false;
         }
