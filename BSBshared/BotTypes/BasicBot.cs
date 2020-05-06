@@ -23,6 +23,7 @@ namespace BetterSecondBotShared.bottypes
         public string MyVersion { get { return version; } }
         public string Name { get { return myconfig.userName; } }
         public string OwnerName { get { return myconfig.master; } }
+        public bool GetAllowFunds { get { return myconfig.AllowFunds; } }
         public string LastStatusMessage { get; set; }
 
         public bool KillMe { get { return killMe; } }
