@@ -38,8 +38,8 @@ namespace BetterSecondBotShared.Json
                 case "relayimtoavatar": { return "Options"; }
                 case "homeregion": { return "AtHome"; }
                 case "defaultsituuid": { return "AtHome"; }
-                case "athomesimonly": { return "AtHome"; }
-                case "athomesimposmaxrange": { return "AtHome"; }
+                case "athomelocktopos": { return "AtHome"; }
+                case "athomelocktoposmaxrange": { return "AtHome"; }
                 case "allowfunds": { return "security"; }
                 case "onstartlinkupwithmaster": { return "Options"; }
                 default: { return "Unknown"; }
@@ -73,8 +73,8 @@ namespace BetterSecondBotShared.Json
                 case "commandstoconsole": { return "Should the bot log commands to the console window"; }
                 case "maxcommandhistory": { return "How many commands should the bots command history be"; }
                 case "relayimtoavatar": { return "The UUID to relay avatar IMs to [Any invaild UUID to disable like \"none\"]"; }
-                case "athomesimonly": { return "Should the @Home system only care if the sim name is correct (use false to use max distance checks)"; }
-                case "athomesimposmaxrange": { return "How far away from the location in homeregion can the bot be before teleporting"; }
+                case "athomelocktopos": { return "When set to true the @home system will attempt to teleport the bot back to the home pos if it leaves athomelocktopos maxrange"; }
+                case "athomelocktoposmaxrange": { return "How far away from the location in homeregion can the bot be before teleporting"; }
                 case "allowfunds": { return "Allow the bot to transfer L$ to avatars / objects and display its L$ balance via command/web gui"; }
                 case "onstartlinkupwithmaster": { return "After the bot logs in should it send the master a friend request, IM them and request teleport"; }
                 default: { return "None given"; }
@@ -127,8 +127,8 @@ namespace BetterSecondBotShared.Json
                 case "commandstoconsole": { return new[] { "false" }; }
                 case "maxcommandhistory": { return new[] { "250" }; }
                 case "relayimtoavatar": { return new[] { "\"" + OpenMetaverse.UUID.Zero + "\"" }; }
-                case "athomesimonly": { return new[] { "false" }; }
-                case "athomesimposmaxrange": { return new[] { "10.0" }; }
+                case "athomelocktopos": { return new[] { "false" }; }
+                case "athomelocktoposmaxrange": { return new[] { "10.0" }; }
                 case "allowfunds": { return new[] { "true" }; }
                 case "onstartlinkupwithmaster": { return new[] { "true" }; }
                 default: { return new string[] { }; }

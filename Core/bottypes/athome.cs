@@ -11,7 +11,7 @@ namespace BSB.bottypes
     {
         public void TempUpdateAtHomeSimOnly(bool status)
         {
-            myconfig.AtHomeSimOnly = status;
+            myconfig.AtHomeLockToPos = !status;
         }
         public void TempUpdateAtHomeSimRange(float range)
         {
@@ -19,7 +19,7 @@ namespace BSB.bottypes
             {
                 range = 3;
             }
-            myconfig.AtHomeSimPosMaxRange = range;
+            myconfig.AtHomeLockToPosMaxRange = range;
         }
         protected string LoggedOutNextAction()
         {
@@ -226,7 +226,7 @@ namespace BSB.bottypes
                 {
                     if (sl_url.ToLowerInvariant().Contains(simname) == true)
                     {
-                        if (myconfig.AtHomeSimOnly == false)
+                        if (myconfig.AtHomeLockToPos == true)
                         {
                             bool inrange = true;
                             string[] bits = helpers.ParseSLurl(sl_url);
@@ -239,9 +239,9 @@ namespace BSB.bottypes
                                         float.TryParse(bits[1], out float posX);
                                         float.TryParse(bits[2], out float posY);
                                         float.TryParse(bits[3], out float posZ);
-                                        inrange = helpers.distance_check(Client.Self.SimPosition.X, posX, myconfig.AtHomeSimPosMaxRange, inrange);
-                                        inrange = helpers.distance_check(Client.Self.SimPosition.Y, posY, myconfig.AtHomeSimPosMaxRange, inrange);
-                                        inrange = helpers.distance_check(Client.Self.SimPosition.Z, posZ, myconfig.AtHomeSimPosMaxRange, inrange);
+                                        inrange = helpers.distance_check(Client.Self.SimPosition.X, posX, myconfig.AtHomeLockToPosMaxRange, inrange);
+                                        inrange = helpers.distance_check(Client.Self.SimPosition.Y, posY, myconfig.AtHomeLockToPosMaxRange, inrange);
+                                        inrange = helpers.distance_check(Client.Self.SimPosition.Z, posZ, myconfig.AtHomeLockToPosMaxRange, inrange);
                                     }
                                 }
                             }

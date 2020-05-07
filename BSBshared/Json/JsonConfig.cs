@@ -34,8 +34,8 @@ namespace BetterSecondBotShared.Json
 
         // @home
         public string[] homeRegion { get; set; }
-        public bool AtHomeSimOnly { get; set; }
-        public float AtHomeSimPosMaxRange { get; set; }
+        public bool AtHomeLockToPos { get; set; }
+        public float AtHomeLockToPosMaxRange { get; set; }
         public string DefaultSitUUID { get; set; }
 
         // HTTP interface
