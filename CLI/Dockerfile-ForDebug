@@ -57,7 +57,6 @@ ENV HttpPublicUrlBase=''
 ENV Httpport='8080'
 ENV Httpkey=''
 ENV HttpHost='http://localhost'
-ENV HttpAsCnC='False'
 
 # --- End of settings ---
 

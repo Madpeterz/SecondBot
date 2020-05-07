@@ -20,7 +20,7 @@ namespace BetterSecondBotShared.Json
                 case "password": { return "Required"; }
                 case "master": { return "Required"; }
                 case "discordgrouptarget": { return "DiscordRelay"; }
-                case "discord": { return "DiscordRelay"; }
+                case "discordwebhookurl": { return "DiscordRelay"; }
                 case "allowrlv": { return "RLV"; }
                 case "code": { return "Required"; }
                 case "enablehttp": { return "HTTP"; }
@@ -28,7 +28,6 @@ namespace BetterSecondBotShared.Json
                 case "httpport": { return "HTTP"; }
                 case "httpkey": { return "HTTP"; }
                 case "httphost": { return "HTTP"; }
-                case "httpascnc": { return "HTTP"; }
                 case "discordfullserver": { return "DiscordFull"; }
                 case "discordclienttoken": { return "DiscordFull"; }
                 case "discordserverid": { return "DiscordFull"; }
@@ -43,7 +42,6 @@ namespace BetterSecondBotShared.Json
                 case "allowfunds": { return "security"; }
                 case "onstartlinkupwithmaster": { return "Options"; }
                 default: { return "Unknown"; }
-
             }
     }
         public override string GetCommandHelp(string cmd)
@@ -57,7 +55,7 @@ namespace BetterSecondBotShared.Json
                 case "defaultsituuid": { return "The UUID to sit on when at home region [Any invaild UUID to disable like \"none\"]"; }
                 case "homeregion": { return "An array of SLurl strings to teleport to to avoid a sim shutdown"; }
                 case "discordgrouptarget": { return "The target group UUID to relay group chat from, leave empty for all groups"; }
-                case "discord": { return "A vaild discord hook URL to relay group chat onto<br/>leave as \"\" to disable"; }
+                case "discordwebhookurl": { return "A vaild discord hook URL to relay group chat onto<br/>leave as \"\" to disable"; }
                 case "allowrlv": { return "Enable RLV commands interface for the bot"; }
                 case "code": { return "A known secret between your secondlife scripts and the bot<br/>Used to support IM commands"; }
                 case "enablehttp": { return "Enable the HTTP interface (using the HTTP settings)"; }
@@ -65,7 +63,6 @@ namespace BetterSecondBotShared.Json
                 case "httpport": { return "What port the HTTP interface should be on<br/> Example: 8080"; }
                 case "httpkey": { return "A known secret between used for HTTP calls<br/>Example: \"DontUseThis\""; }
                 case "httphost": { return "The URL to listen for HTTP connections on"; }
-                case "httpascnc": { return "Switchs the software into command and control mode"; }
                 case "discordfullserver": { return "Should we switch to a full server control discord link"; }
                 case "discordclienttoken": { return "What is the bots client token"; }
                 case "discordserverid": { return "What is the Discord server id we should be using"; }
@@ -110,7 +107,7 @@ namespace BetterSecondBotShared.Json
                 case "master": { return new[] { "\"Madpeter Zond\"" }; }
                 case "homeregion": { return new[] { "[\"SLurl1\",\"SLurl2\"]" }; }
                 case "discordgrouptarget": { return new[] { "\"" + OpenMetaverse.UUID.Zero + "\"" }; }
-                case "discord": { return new[] { "\"https://discordapp.com/api/webhooks/XXXX/YYYY\"" }; }
+                case "discordwebhookurl": { return new[] { "\"https://discordapp.com/api/webhooks/XXXX/YYYY\"" }; }
                 case "allowrlv": { return new[] { "False" }; }
                 case "code": { return new[] { "\"DontTellAnyoneThis\"" }; }
                 case "enablehttp": { return new[] { "false" }; }
@@ -118,7 +115,6 @@ namespace BetterSecondBotShared.Json
                 case "httpport": { return new[] { "8080" }; }
                 case "httpkey": { return new[] { "\"ThisIsAKeyYo\"" }; }
                 case "httphost": { return new[] { "\"http://localhost\"" }; }
-                case "httpascnc": { return new[] { "false" }; }
                 case "discordfullserver": { return new[] { "false" }; }
                 case "discordclienttoken": { return new[] { "https://discordapp.com/developers/ Bot" }; }
                 case "discordserverid": { return new[] { "1234567890" }; }
