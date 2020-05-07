@@ -17,14 +17,7 @@ namespace BetterSecondBot
             ConsoleLog.Status("-> Getting config from Docker");
             JsonConfig Config = MakeJsonConfig.FromENV();
             Config = MakeJsonConfig.http_config_check(Config);
-            if (Config.HttpAsCnC == true)
-            {
-                new HttpCnC(Config);
-            }
-            else
-            {
-                new CliExitOnLogout(Config);
-            }
+            new CliExitOnLogout(Config);
         }
     }
 }

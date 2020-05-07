@@ -77,14 +77,7 @@ namespace BetterSecondBot
             if(ok_to_try_start == true)
             {
                 Config = MakeJsonConfig.http_config_check(Config);
-                if (Config.HttpAsCnC == true)
-                {
-                    new HttpCnC(Config);
-                }
-                else
-                {
-                    new CliExitOnLogout(Config);
-                }
+                new CliExitOnLogout(Config);
             }
         }
     }
