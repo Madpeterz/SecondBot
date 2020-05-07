@@ -33,29 +33,22 @@ namespace BSB.Commands.CMD_Parcel
         {
             if (base.CallFunction(args) == true)
             {
-                if (bot.GetCommandsInterface.SmartCommandReply(args[0], "Vaildate", CommandName, true) == true)
+                int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
+                if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                 {
-                    int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                    if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
+                    if (bot.CreateAwaitEventReply("parcelobjectowners", this, args) == true)
                     {
-                        if (bot.CreateAwaitEventReply("parcelobjectowners", this, args) == true)
-                        {
-                            bot.GetClient.Parcels.RequestObjectOwners(bot.GetClient.Network.CurrentSim, localid);
-                            return true;
-                        }
-                        else
-                        {
-                            return Failed("Unable to await reply");
-                        }
+                        bot.GetClient.Parcels.RequestObjectOwners(bot.GetClient.Network.CurrentSim, localid);
+                        return true;
                     }
                     else
                     {
-                        return Failed("Unable to find parcel in memory, please wait and try again");
+                        return Failed("Unable to await reply");
                     }
                 }
                 else
                 {
-                    return Failed("Arg 1 is not a vaild smart target");
+                    return Failed("Unable to find parcel in memory, please wait and try again");
                 }
             }
             return false;

@@ -14,20 +14,13 @@ namespace BSB.Commands.Group
             {
                 if (UUID.TryParse(args[1], out _) == true)
                 {
-                    if (bot.GetCommandsInterface.SmartCommandReply(args[0], "Vaildate", CommandName, true) == true)
+                    if (bot.CreateAwaitEventReply("grouproles", this, args) == true)
                     {
-                        if (bot.CreateAwaitEventReply("grouproles", this, args) == true)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return Failed("Unable to await reply");
-                        }
+                        return true;
                     }
                     else
                     {
-                        return Failed("Smart reply [ARG 1] is not vaild");
+                        return Failed("Unable to await reply");
                     }
                 }
                 else
