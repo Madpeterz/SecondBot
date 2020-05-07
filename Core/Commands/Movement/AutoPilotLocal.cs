@@ -1,6 +1,9 @@
 ﻿using System;
 using OpenMetaverse;
 using BetterSecondBotShared.Static;
+using System.Runtime.CompilerServices;
+using System.Threading;
+
 namespace BSB.Commands.Movement
 {
     public class AutoPilotLocal : CoreCommand_1arg
@@ -63,6 +66,8 @@ namespace BSB.Commands.Movement
                         {
                             if (helpers.inrange(z, 0, 5000) == true)
                             {
+                                bot.GetClient.Self.Movement.TurnToward(new Vector3(x,y,z), true);
+                                Thread.Sleep(500);
                                 bot.GetClient.Self.AutoPilotLocal(x, y, z);
                                 return true;
                             }
