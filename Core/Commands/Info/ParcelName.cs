@@ -1,6 +1,6 @@
-﻿namespace BSB.Commands.CMD_Parcel
+﻿namespace BSB.Commands.Info
 {
-    public class GetParcelName : ParcelCommand_CheckParcel_1arg_smart
+    public class ParcelName : ParcelCommand_CheckParcel_1arg_smart
     {
         public override string Helpfile { get { return "Fetchs the current parcels name and sends it to the smart reply target on [ARG 1]"; } }
 
