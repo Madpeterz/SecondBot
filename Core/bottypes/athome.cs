@@ -33,114 +33,43 @@ namespace BSB.bottypes
                 teleported = false;
                 reconnect_mode = true;
                 last_reconnect_attempt = helpers.UnixTimeNow();
-                addon = " [@home Connection lost - switching to recovery mode]";
+                addon = " [Connection lost - switching to recovery mode]";
             }
             else if ((login_auto_logout == false) && (reconnect_mode == false) && (after_login_fired == false))
             {
-                addon = " [@home " + login_status + "]";
+                addon = " [" + login_status + "]";
             }
             else if ((login_auto_logout == false) && (reconnect_mode == true) && (dif > 120))
             {
-                addon = " [@home Attempting reconnect]";
+                addon = " [@Attempting reconnect]";
                 last_reconnect_attempt = helpers.UnixTimeNow();
                 reconnect = true;
                 Start();
             }
             else if ((login_auto_logout == false) && (reconnect_mode == true) && (dif <= 120))
             {
-                addon = " [@home W4>Reconnect attempt timer]";
+                addon = " [W4>Reconnect attempt timer]";
             }
             else if ((login_auto_logout == true) && (auto_logout_login_recover == false))
             {
                 auto_logout_login_recover = true;
                 last_reconnect_attempt = helpers.UnixTimeNow();
-                addon = " [@home W4>" + login_status + " (10 secs)]";
+                addon = " [W4>" + login_status + " (10 secs)]";
             }
             else if ((login_auto_logout == true) && (auto_logout_login_recover == true) && (dif >= 10))
             {
                 login_auto_logout = false;
                 auto_logout_login_recover = false;
                 last_reconnect_attempt = helpers.UnixTimeNow();
-                addon = " [@home restarting first login]";
+                addon = " [Restarting first login]";
                 Start();
             }
             else
             {
-                addon = " [@home "+ login_status+"]";
+                addon = " [" + login_status + "]";
             }
             return addon;
         }
-        protected string LoggedInNextAction()
-        {
-            string addon = "";
-            if (Client.Self.SittingOn > 0)
-            {
-                AfterLoginSitDown = true;
-                addon = " [@home Sit-override]";
-            }
-            else
-            {
-                long dif = helpers.UnixTimeNow() - last_tp_attempt_unixtime;
-                if (teleported == true)
-                {
-                    addon = " [@home disabled ~ Teleported :: use: \"resetathome\" to clear]";
-                }
-                else if (Client.Network.CurrentSim == null)
-                {
-                    addon = " [@home " + login_status + "]";
-                }
-                else if (after_login_fired == false)
-                {
-                    addon = " [@home " + login_status + "]";
-                }
-                else if (IsSimHome(Client.Network.CurrentSim.Name) == true)
-                {
-                    if (UUID.TryParse(myconfig.DefaultSitUUID, out UUID arg_is_uuid) == true)
-                    {
-                        if (arg_is_uuid != UUID.Zero)
-                        {
-                            if (AfterLoginSitDown == false)
-                            {
-                                addon = " [@home HomeSim ~ Attempting to sit down]";
-                                Client.Self.RequestSit(arg_is_uuid, Vector3.Zero);
-                            }
-                            else
-                            {
-                                addon = " [@home HomeSim ~ Auto sit disabled :: use: \"resetathome\" to clear]";
-                            }
-                        }
-                        else
-                        {
-                            addon = " [@home HomeSim]";
-                        }
-                    }
-                    else
-                    {
-                        addon = " [@home HomeSim]";
-                    }
-                }
-                else if (dif <= 10)
-                {
-                    addon = " [@home W4>Cooldown]";
-                }
-                else if (myconfig.homeRegion.Length == 0)
-                {
-                    addon = " [@home No home regions]";
-                }
-                else if (Client.Network.CurrentSim.Name == last_attempted_teleport_region)
-                {
-                    addon = " [@home Teleported to a known sim]";
-                    last_attempted_teleport_region = "";
-                }
-                else
-                {
-                    addon = GotoNextHomeRegion();
-                }
-            }
-            return addon;
-        }
-                                        
-   
         protected int last_tested_home_id = -1;
         protected long last_tp_attempt_unixtime;
         protected bool after_login_fired;
@@ -152,7 +81,6 @@ namespace BSB.bottypes
         protected Dictionary<string, long> avoid_sims = new Dictionary<string, long>();
         protected bool SimShutdownAvoid;
         protected bool auto_logout_login_recover;
-        protected bool AfterLoginSitDown;
 
         protected void ChangeSim(object sender,SimChangedEventArgs e)
         {
@@ -162,6 +90,13 @@ namespace BSB.bottypes
                 {
                     SetTeleported();
                 }
+                else
+                {
+                    if (UUID.TryParse(myconfig.DefaultSitUUID, out UUID sit_UUID) == true)
+                    {
+                        Client.Self.RequestSit(sit_UUID, Vector3.Zero);
+                    }
+                }
             }
             else
             {
@@ -169,7 +104,6 @@ namespace BSB.bottypes
                 {
                     ConsoleLog.Status("Avoided sim shutdown will attempt to go home in 4 mins");
                     SimShutdownAvoid = false;
-                    last_tp_attempt_unixtime = helpers.UnixTimeNow() + 240;
                 }
             }
         }
@@ -193,7 +127,6 @@ namespace BSB.bottypes
             last_tp_attempt_unixtime = 0;
             teleported = false;
             reconnect_mode = true;
-            AfterLoginSitDown = false;
         }
 
 
@@ -317,7 +250,7 @@ namespace BSB.bottypes
         {
             if (Client.Network.Connected == true)
             {
-                return base.GetStatus() + LoggedInNextAction();
+                return base.GetStatus();
             }
             else
             {
@@ -334,13 +267,16 @@ namespace BSB.bottypes
                 last_tested_home_id = -1;
                 after_login_fired = false;
                 teleported = false;
-                AfterLoginSitDown = false;
                 reconnect_mode = false;
             }
             else
             {
                 Client.Self.AlertMessage += AlertEvent;
                 Client.Network.SimChanged += ChangeSim;
+            }
+            if (UUID.TryParse(myconfig.DefaultSitUUID, out UUID sit_UUID) == true)
+            {
+                Client.Self.RequestSit(sit_UUID, Vector3.Zero);
             }
             after_login_fired = true;
         }
