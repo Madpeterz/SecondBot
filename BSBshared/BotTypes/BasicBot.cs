@@ -44,13 +44,13 @@ namespace BetterSecondBotShared.bottypes
         {
             killMe = true;
         }
-        public virtual void Setup(JsonConfig config,string Version)
+        public virtual void Setup(JsonConfig config, string Version)
         {
             version = Version;
             myconfig = config;
-            if(myconfig.code.Length < 8)
+            if (myconfig.code.Length < 8)
             {
-                myconfig.code = helpers.GetSHA1("" + myconfig.userName + "" + myconfig.password + ""+ helpers.UnixTimeNow().ToString()+"").Substring(0, 8);
+                myconfig.code = helpers.GetSHA1("" + myconfig.userName + "" + myconfig.password + "" + helpers.UnixTimeNow().ToString() + "").Substring(0, 8);
                 ConsoleLog.Warn("Given code is not acceptable (min length 8)");
             }
             List<string> bits = myconfig.userName.Split(' ').ToList();
@@ -75,11 +75,11 @@ namespace BetterSecondBotShared.bottypes
             Client.Settings.ALWAYS_REQUEST_OBJECTS = true;
             Client.Settings.AVATAR_TRACKING = true;
             List<string> bits = myconfig.userName.Split(' ').ToList();
-            if(myconfig.AtHomeSimPosMaxRange < 1)
+            if (myconfig.AtHomeSimPosMaxRange < 1)
             {
                 myconfig.AtHomeSimPosMaxRange = 10;
             }
-            LoginParams Lp = new LoginParams(Client, bits[0], bits[1], myconfig.password, "BetterSecondBot", "BetterSecondBot "+version);
+            LoginParams Lp = new LoginParams(Client, bits[0], bits[1], myconfig.password, "BetterSecondBot", "BetterSecondBot " + version);
             if (reconnect == false)
             {
                 BotStartHandler();
@@ -93,7 +93,7 @@ namespace BetterSecondBotShared.bottypes
 
         protected string GetSimPositionAsString()
         {
-            if(Client.Network.Connected == true)
+            if (Client.Network.Connected == true)
             {
                 if (Client.Network.CurrentSim != null)
                 {
@@ -116,7 +116,7 @@ namespace BetterSecondBotShared.bottypes
                     {
                         if (Client.Network.CurrentSim != null)
                         {
-                            return "Sim: " + Client.Network.CurrentSim.Name + " "+GetSimPositionAsString()+"";
+                            return "Sim: " + Client.Network.CurrentSim.Name + " " + GetSimPositionAsString() + "";
                         }
                         return "Sim: Not on sim";
                     }
@@ -148,9 +148,9 @@ namespace BetterSecondBotShared.bottypes
                 Client.Groups.RequestCurrentGroups(); // reload my groups to include the new group
             }
         }
-        protected virtual void FriendshipOffer(UUID IMSessionID,string FromAgentName,UUID FromAgentID)
+        protected virtual void FriendshipOffer(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
-            if(FromAgentName == myconfig.master)
+            if (FromAgentName == myconfig.master)
             {
                 Client.Friends.AcceptFriendship(FromAgentID, IMSessionID);
             }
