@@ -13,6 +13,8 @@ namespace BSB.Commands
 {
     public class pending_avatar_lookup
     {
+        public CoreCommand GetCommand { get { return Command; } }
+        public List<string> Getargs { get { return args; } }
         public pending_avatar_lookup(CoreCommandsInterface set_master,CoreCommand set_cmd,string[] set_args)
         {
             Master = set_master;
@@ -116,7 +118,8 @@ namespace BSB.Commands
             }
             foreach(int a in call_indexs)
             {
-                commands_pending_avatar_lookups[a].Callnow();
+                KeyValuePair<bool, string> result = commands_pending_avatar_lookups[a].Callnow();
+                bot.CommandHistoryAdd(commands_pending_avatar_lookups[a].GetCommand.CommandName, String.Join("~#~", commands_pending_avatar_lookups[a].Getargs), result.Key, result.Value);
                 commands_pending_avatar_lookups_ages.Remove(a);
                 commands_pending_avatar_lookups.Remove(a);
             }
