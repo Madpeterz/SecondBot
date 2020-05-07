@@ -3,7 +3,7 @@ using System.Linq;
 using OpenMetaverse;
 using RestSharp;
 
-namespace BSB.Commands.script
+namespace BSB.Commands.Script
 {
     public class ScriptHttp : CoreCommand_2arg
     {
