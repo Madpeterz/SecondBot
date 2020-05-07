@@ -228,8 +228,14 @@ namespace BSB.bottypes
                 Client.Self.IM += MessageHandler;
                 Client.Groups.CurrentGroups += GroupsHandler;
                 Client.Self.ScriptQuestion += PermissionsHandler;
+                Client.Friends.FriendshipResponse += FriendshipResponse;
                 delay_group_fetch = helpers.UnixTimeNow() + 10;
             }
+        }
+
+        protected virtual void FriendshipResponse(object o, FriendshipResponseEventArgs E)
+        {
+
         }
 
         protected override void PermissionsHandler(object sender, ScriptQuestionEventArgs e)

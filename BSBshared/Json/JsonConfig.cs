@@ -15,13 +15,15 @@ namespace BetterSecondBotShared.Json
         // Security
         public bool AllowFunds { get; set; }
 
-        // Mixed 
+        // Settings
         public bool allowRLV { get; set; }
-        public string DefaultSitUUID { get; set; }
+        public bool OnStartLinkupWithMaster { get; set; }
+
+        // Mixed 
         public bool CommandsToConsole { get; set; }
         public int MaxCommandHistory { get; set; }
         public string RelayImToAvatar { get; set; }
-
+        
         // Discord
         public string discordWebhookURL { get; set; }
         public string discordGroupTarget { get; set; }
@@ -34,6 +36,7 @@ namespace BetterSecondBotShared.Json
         public string[] homeRegion { get; set; }
         public bool AtHomeSimOnly { get; set; }
         public float AtHomeSimPosMaxRange { get; set; }
+        public string DefaultSitUUID { get; set; }
 
         // HTTP interface
         public bool EnableHttp { get; set; }
