@@ -99,7 +99,10 @@ namespace BetterSecondBot.HttpServer
                 HttpListenerRequest req = ctx.Request;
                 HttpListenerResponse resp = ctx.Response;
                 string test = req.Url.AbsolutePath.Substring(1);
-                test = test.Replace(Config.HttpPublicUrlBase, "");
+                if (helpers.notempty(Config.HttpPublicUrlBase) == true)
+                {
+                    test = test.Replace(Config.HttpPublicUrlBase, "");
+                }
                 List<string> http_args = test.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
                 byte[] data;
                 resp.StatusCode = 200;
