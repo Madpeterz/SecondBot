@@ -5,10 +5,10 @@ using System.Text;
 
 namespace BSB.Commands.Group
 {
-    class GroupActiveGroup : CoreCommand_2arg
+    class GroupActiveGroup : CoreCommand_1arg
     {
         public override string[] ArgTypes { get { return new[] { "Group"}; } }
-        public override string[] ArgHints { get { return new[] { "Group UUID or name" }; } }
+        public override string[] ArgHints { get { return new[] { "Group UUID or Name" }; } }
         public override string Helpfile { get { return "Sets the selected group to the active group"; } }
         public override bool CallFunction(string[] args)
         {
@@ -33,6 +33,7 @@ namespace BSB.Commands.Group
                 if (group_uuid != UUID.Zero)
                 {
                     bot.GetClient.Groups.ActivateGroup(group_uuid);
+                    return true;
                 }
             }
             return false;
