@@ -135,13 +135,9 @@ namespace BSB.Commands
 
         public bool SmartCommandReply(string target, string output)
         {
-            return SmartCommandReply(target, output, "", false);
+            return SmartCommandReply(target, output, "");
         }
         public bool SmartCommandReply(string target, string output, string command)
-        {
-            return SmartCommandReply(target, output, command, false);
-        }
-        public bool SmartCommandReply(string target,string output,string command,bool vaildate_only)
         {
             string mode = "CHAT";
             UUID target_avatar = UUID.Zero;
@@ -158,52 +154,42 @@ namespace BSB.Commands
             {
                 int.TryParse(target, out target_channel);
             }
-            if (vaildate_only == false)
+
+            if (mode == "CHAT")
             {
-                if (mode == "CHAT")
-                {
-                    bot.GetClient.Self.Chat(output, target_channel, ChatType.Normal);
-                }
-                else if (mode == "IM")
-                {
-                    bot.GetClient.Self.InstantMessage(target_avatar, output);
-                }
-                else if (mode == "HTTP")
-                {
-                    Dictionary<string, string> values = new Dictionary<string, string>
+                bot.GetClient.Self.Chat(output, target_channel, ChatType.Normal);
+            }
+            else if (mode == "IM")
+            {
+                bot.GetClient.Self.InstantMessage(target_avatar, output);
+            }
+            else if (mode == "HTTP")
+            {
+                Dictionary<string, string> values = new Dictionary<string, string>
                     {
                         { "reply", output },
                         { "unixtime", helpers.UnixTimeNow().ToString() }
                     };
 
-                    if (command != "")
-                    {
-                        values.Add("command", command);
-                    }
-                    var content = new FormUrlEncodedContent(values);
-                    try
-                    {
-                        HTTPclient.PostAsync(target, content);
-                    }
-                    catch (Exception e)
-                    {
-                        ConsoleLog.Crit("[SmartReply] HTTP failed: " + e.Message + "");
-                    }
-                }
-                else
+                if (command != "")
                 {
-                    return false;
+                    values.Add("command", command);
                 }
-                return true;
+                var content = new FormUrlEncodedContent(values);
+                try
+                {
+                    HTTPclient.PostAsync(target, content);
+                }
+                catch (Exception e)
+                {
+                    ConsoleLog.Crit("[SmartReply] HTTP failed: " + e.Message + "");
+                }
             }
             else
             {
-                if ((mode == "CHAT") || (mode == "IM") || (mode == "HTTP"))
-                {
-                    return true;
-                }
                 return false;
             }
+            return true;
         }
 
         protected List<string> suppress_warnings = new List<string>();
