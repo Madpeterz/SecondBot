@@ -33,7 +33,6 @@ ENV AllowFunds='True'
 
 # Mixed
 ENV allowRLV='False'
-ENV DefaultSitUUID='00000000-0000-0000-0000-000000000000'
 ENV CommandsToConsole='True'
 ENV MaxCommandHistory='250'
 ENV RelayImToAvatar='00000000-0000-0000-0000-000000000000'
@@ -48,12 +47,13 @@ ENV DiscordServerImHistoryHours='24'
 
 # @home
 ENV homeRegion=''
-ENV AtHomeSimOnly='False'
-ENV AtHomeSimPosMaxRange='10.0'
+ENV AtHomeLockToPos='False'
+ENV AtHomeLockToPosMaxRange='10.0'
+ENV DefaultSitUUID='00000000-0000-0000-0000-000000000000'
 
 # HTTPinterface
 ENV EnableHttp='False'
-ENV HttpPublicUrlBase='http://localhost'
+ENV HttpPublicUrlBase=''
 ENV Httpport='8080'
 ENV Httpkey=''
 ENV HttpHost='http://localhost'
