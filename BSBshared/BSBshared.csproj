@@ -13,7 +13,7 @@
     <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LibreMetaverse-core" Version="1.0.0" />
+    <PackageReference Include="LibreMetaverse-core" Version="1.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 </Project>
