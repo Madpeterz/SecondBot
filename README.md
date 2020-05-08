@@ -8,7 +8,7 @@
 ```
 Secondbot
 ===============
-Secondbot is a CommandLine based bot for SecondLife based on [LibreMetaverse](https://bitbucket.org/streamadmin/libremetaverse-core/src/master/)
+Secondbot is a CommandLine based bot for SecondLife based on [libremetaverse-core](https://github.com/Madpeterz/libremetaverse-core)
 
 Status
 ---------------
