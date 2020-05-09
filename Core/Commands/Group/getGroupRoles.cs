@@ -12,10 +12,12 @@ namespace BSB.Commands.Group
         {
             if (base.CallFunction(args) == true)
             {
-                if (UUID.TryParse(args[1], out _) == true)
+                if (UUID.TryParse(args[1], out UUID group) == true)
                 {
                     if (bot.CreateAwaitEventReply("grouproles", this, args) == true)
                     {
+                        InfoBlob = "Requesting now";
+                        bot.GetClient.Groups.RequestGroupRoles(group);
                         return true;
                     }
                     else
