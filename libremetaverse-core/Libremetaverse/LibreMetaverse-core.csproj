@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Configurations>Debug;Release;DockerBuild</Configurations>
     <Platforms>x64</Platforms>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Description>.net core targeted version of the LibreMetaverse project</Description>
     <PackageProjectUrl>https://github.com/Madpeterz/libremetaverse-core</PackageProjectUrl>

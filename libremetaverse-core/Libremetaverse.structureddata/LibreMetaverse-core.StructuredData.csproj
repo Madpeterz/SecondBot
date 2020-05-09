@@ -6,7 +6,7 @@
     <Platforms>x64</Platforms>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Description>see LibreMetaverse-core</Description>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Version>1.0.3</Version>
     <PackageProjectUrl>https://github.com/Madpeterz/libremetaverse-core</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Madpeterz/libremetaverse-core</RepositoryUrl>
