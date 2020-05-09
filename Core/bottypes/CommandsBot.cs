@@ -46,9 +46,10 @@ namespace BSB.bottypes
                 {
                     CommandHistory.RemoveAt(0);
                 }
+                message = sb.ToString();
                 if (myconfig.CommandsToConsole == true)
                 {
-                    ConsoleLog.Info(sb.ToString());
+                    ConsoleLog.Info(message);
                 }
                 commandid++;
                 if (commandid >= myconfig.MaxCommandHistory)
