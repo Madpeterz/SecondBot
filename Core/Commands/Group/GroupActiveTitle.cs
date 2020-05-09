@@ -16,7 +16,7 @@ namespace BSB.Commands.Group
             {
                 if(UUID.TryParse(args[0],out UUID group_uuid) == true)
                 {
-                    if (UUID.TryParse(args[0], out UUID group_role) == true)
+                    if (UUID.TryParse(args[1], out UUID group_role) == true)
                     {
                         bot.GetClient.Groups.ActivateTitle(group_uuid, group_role);
                         return true;
