@@ -44,7 +44,10 @@ namespace BSB.bottypes
         public override string CommandHistoryAdd(string command, string arg, bool status, string WhyFailed)
         {
             string output = base.CommandHistoryAdd(command, arg, status, WhyFailed);
-            _ = SendMessageToChannelAsync("interface", output, "bot", UUID.Zero, "bot");
+            if (output != "")
+            {
+                _ = SendMessageToChannelAsync("interface", output, "bot", UUID.Zero, "bot");
+            }
             return output;
         }
         protected async Task DiscordBotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar, bool group, UUID group_uuid, bool localchat, bool fromme)
