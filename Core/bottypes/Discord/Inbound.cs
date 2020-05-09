@@ -86,13 +86,24 @@ namespace BSB.bottypes
                 string command = bits[0].ToLowerInvariant();
                 if (CommandsInterface.GetCommandsList().Contains(command) == true)
                 {
+                    bool process_status = false;
                     if (bits.Length == 2)
                     {
-                        _ = CommandsInterface.Call(command, bits[1], UUID.Zero);
+                        process_status = CommandsInterface.Call(command, bits[1], UUID.Zero);
                     }
                     else
                     {
-                        _ = CommandsInterface.Call(command);
+                        process_status = CommandsInterface.Call(command);
+                    }
+                    if (process_status == true)
+                    {
+                        var Tickmark = new Emoji("✅");
+                        await message.AddReactionAsync(Tickmark, RequestOptions.Default);
+                    }
+                    else
+                    {
+                        var Failed = new Emoji("❌");
+                        await message.AddReactionAsync(Failed, RequestOptions.Default);
                     }
                 }
                 else
@@ -129,6 +140,8 @@ namespace BSB.bottypes
                         else if (UUID.TryParse(bits[1], out UUID avatar) == true)
                         {
                             Client.Self.InstantMessage(avatar, "[" + message.Author.Username + "]->" + message.Content);
+                            var Tickmark = new Emoji("✅");
+                            await message.AddReactionAsync(Tickmark,RequestOptions.Default);
                         }
                     }
                 }
@@ -173,7 +186,8 @@ namespace BSB.bottypes
                             {
                                 CommandsInterface.Call("Groupchat", "" + group.ToString() + "~#~" + "[" + message.Author.Username + "]->" + message.Content, UUID.Zero);
                             }
-                            await message.DeleteAsync();
+                            var Tickmark = new Emoji("✅");
+                            await message.AddReactionAsync(Tickmark, RequestOptions.Default);
                         }
                     }
                 }
@@ -196,7 +210,6 @@ namespace BSB.bottypes
                         ITextChannel Chan = (ITextChannel)message.Channel;
                         if (Chan.CategoryId == catmap["bot"].Id)
                         {
-                            await message.DeleteAsync();
                             if (message.Content == "!clear")
                             {
                                 await CleanDiscordChannel(Chan, 0, true);
