@@ -145,7 +145,7 @@ namespace BetterSecondBotShared.bottypes
             {
                 GroupInvitationEventArgs G = new GroupInvitationEventArgs(e.Simulator, e.IM.FromAgentID, e.IM.FromAgentName, e.IM.Message);
                 Client.Self.GroupInviteRespond(G.AgentID, e.IM.IMSessionID, true);
-                Client.Groups.RequestCurrentGroups(); // reload my groups to include the new group
+                Client.Groups.RequestCurrentGroups();
             }
         }
         protected virtual void FriendshipOffer(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
