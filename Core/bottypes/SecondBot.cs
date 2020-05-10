@@ -26,17 +26,14 @@ namespace BSB.bottypes
             if ((masteruuid_ready == true) && (friendslist_ready == true) && (started_friendship_hug == false))
             {
                 started_friendship_hug = true;
-                if (myconfig.OnStartLinkupWithMaster == true)
+                if (Client.Friends.FriendList.ContainsKey(master_uuid) == false)
                 {
-                    if (Client.Friends.FriendList.ContainsKey(master_uuid) == false)
-                    {
-                        CommandsInterface.Call("IM", String.Join("~#~", new string[] { myconfig.master, "Hello master, I am sending you a friend request now!" }));
-                        CommandsInterface.Call("FriendRequest", myconfig.master, Client.Self.AgentID);
-                    }
-                    else
-                    {
-                        CommandsInterface.Call("FriendFullPerms", String.Join("~#~", new string[] { myconfig.master, "true" }), Client.Self.AgentID);
-                    }
+                    CommandsInterface.Call("IM", String.Join("~#~", new string[] { myconfig.master, "Hello master, I am sending you a friend request now!" }));
+                    CommandsInterface.Call("FriendRequest", myconfig.master, Client.Self.AgentID);
+                }
+                else
+                {
+                    CommandsInterface.Call("FriendFullPerms", String.Join("~#~", new string[] { myconfig.master, "true" }), Client.Self.AgentID);
                 }
             }
         }

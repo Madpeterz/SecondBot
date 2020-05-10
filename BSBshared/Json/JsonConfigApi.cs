@@ -40,7 +40,6 @@ namespace BetterSecondBotShared.Json
                 case "athomelocktopos": { return "AtHome"; }
                 case "athomelocktoposmaxrange": { return "AtHome"; }
                 case "allowfunds": { return "security"; }
-                case "onstartlinkupwithmaster": { return "Options"; }
                 default: { return "Unknown"; }
             }
     }
@@ -73,7 +72,6 @@ namespace BetterSecondBotShared.Json
                 case "athomelocktopos": { return "When set to true the @home system will attempt to teleport the bot back to the home pos if it leaves athomelocktopos maxrange"; }
                 case "athomelocktoposmaxrange": { return "How far away from the location in homeregion can the bot be before teleporting"; }
                 case "allowfunds": { return "Allow the bot to transfer L$ to avatars / objects and display its L$ balance via command/web gui"; }
-                case "onstartlinkupwithmaster": { return "After the bot logs in should it send the master a friend request, IM them and request teleport"; }
                 default: { return "None given"; }
             }
         }
@@ -126,7 +124,6 @@ namespace BetterSecondBotShared.Json
                 case "athomelocktopos": { return new[] { "false" }; }
                 case "athomelocktoposmaxrange": { return new[] { "10.0" }; }
                 case "allowfunds": { return new[] { "true" }; }
-                case "onstartlinkupwithmaster": { return new[] { "true" }; }
                 default: { return new string[] { }; }
             }
         }

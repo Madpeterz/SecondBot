@@ -17,7 +17,6 @@ namespace BetterSecondBotShared.Json
 
         // Settings
         public bool allowRLV { get; set; }
-        public bool OnStartLinkupWithMaster { get; set; }
 
         // Mixed 
         public bool CommandsToConsole { get; set; }
