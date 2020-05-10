@@ -234,6 +234,22 @@ namespace OpenMetaverse
     {
         #region Delegates
 
+        private EventHandler<FriendsReadyEventArgs> m_FriendsListReadyResponse;
+
+        protected virtual void OnfriendsListReady(FriendsReadyEventArgs e)
+        {
+            EventHandler<FriendsReadyEventArgs> handler = m_FriendsListReadyResponse;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        public event EventHandler<FriendsReadyEventArgs> friendsListReady
+        {
+            add { lock (m_FriendOfflineLock) { m_FriendsListReadyResponse += value; } }
+            remove { lock (m_FriendOfflineLock) { m_FriendsListReadyResponse -= value; } }
+        }
+
+
         /// <summary>The event subscribers. null if no subcribers</summary>
         private EventHandler<FriendInfoEventArgs> m_FriendOnline;
 
@@ -918,10 +934,35 @@ namespace OpenMetaverse
                         }
                     }
                 }
+                OnfriendsListReady(new FriendsReadyEventArgs(FriendList.Count));
             }
         }
+
+
+
     }
     #region EventArgs
+
+   
+    public class FriendsReadyEventArgs : EventArgs
+    {
+        private readonly int m_count;
+
+        /// <summary>Number of friends we have</summary>
+        public int Count { get { return m_count; } }
+        /// <summary>Get the name of the agent we requested a friendship with</summary>
+
+        /// <summary>
+        /// Construct a new instance of the FriendShipResponseEventArgs class
+        /// </summary>
+        /// <param name="Count">The ID of the agent we requested a friendship with</param>
+        /// <param name="agentName">The name of the agent we requested a friendship with</param>
+        /// <param name="accepted">true if the agent accepted our friendship offer</param>
+        public FriendsReadyEventArgs(int count)
+        {
+            this.m_count = count;
+        }
+    }
 
     /// <summary>Contains information on a member of our friends list</summary>
     public class FriendInfoEventArgs : EventArgs
