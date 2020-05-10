@@ -216,7 +216,12 @@ namespace BSB.bottypes
                 {
                     if(myconfig.master == av_name)
                     {
-                        master_uuid = av_uuid;
+                        if (master_uuid == UUID.Zero)
+                        {
+                            master_uuid = av_uuid;
+                            FoundMasterAvatar();
+                        }
+
                     }
                 }
             }
@@ -263,6 +268,11 @@ namespace BSB.bottypes
                 }
                 return "lookup";
             }
+        }
+
+        protected virtual void FoundMasterAvatar()
+        {
+
         }
     }
 }
