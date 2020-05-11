@@ -103,6 +103,10 @@ namespace BSB.bottypes
             {
                 display_topic = "Actions -> !clear";
             }
+            else if (channelname == "localchat")
+            {
+                display_topic = "Actions -> !clear";
+            }
             else if (sender_id == UUID.Zero.ToString())
             {
                 display_topic = "" + myconfig.userName + " #" + MyVersion + "";
@@ -115,7 +119,6 @@ namespace BSB.bottypes
             {
                 display_topic = "" + channeltopictype + ":" + sender_id + ": Actions -> !clear, !close";
             }
-
             IGuildChannel channel = await DiscordServer.CreateTextChannelAsync(channelname, X => DiscordGetNewChannelProperies(X, channelname, display_topic, channeltopictype.ToLowerInvariant()));
             ITextChannel Txtchan = await DiscordServer.GetTextChannelAsync(channel.Id);
             return Txtchan;
@@ -151,7 +154,7 @@ namespace BSB.bottypes
                 ICategoryChannel newcat = await DiscordServer.CreateCategoryAsync(A).ConfigureAwait(true);
                 catmap.Add(A, newcat);
             }
-            List<string> required_channels = new List<string>() { "status", "interface" };
+            List<string> required_channels = new List<string>() { "status", "interface","localchat" };
             IReadOnlyCollection<ITextChannel> found_chans = await DiscordServer.GetTextChannelsAsync(CacheMode.AllowDownload);
             List<string> GroupChannels = new List<string>();
             foreach (ITextChannel chan in found_chans)

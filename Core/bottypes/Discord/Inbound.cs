@@ -10,6 +10,11 @@ namespace BSB.bottypes
 {
     public abstract class DiscordBotInbound : DiscordBotRelay
     {
+        protected async Task<Task> InboundLocalchatMessage(SocketMessage message)
+        {
+            Client.Self.Chat("[" + message.Author.Username + "]->" + message.Content, 0, ChatType.Normal);
+            return await MarkMessage(message, "✅");
+        }
         protected async Task<Task> InboundInterfaceMessage(SocketMessage message)
         {
             StringBuilder output = new StringBuilder();
@@ -97,13 +102,11 @@ namespace BSB.bottypes
                     }
                     if (process_status == true)
                     {
-                        var Tickmark = new Emoji("✅");
-                        await message.AddReactionAsync(Tickmark, RequestOptions.Default);
+                        await MarkMessage(message, "✅");
                     }
                     else
                     {
-                        var Failed = new Emoji("❌");
-                        await message.AddReactionAsync(Failed, RequestOptions.Default);
+                        await MarkMessage(message, "❌");
                     }
                 }
                 else
@@ -140,8 +143,7 @@ namespace BSB.bottypes
                         else if (UUID.TryParse(bits[1], out UUID avatar) == true)
                         {
                             Client.Self.InstantMessage(avatar, "[" + message.Author.Username + "]->" + message.Content);
-                            var Tickmark = new Emoji("✅");
-                            await message.AddReactionAsync(Tickmark,RequestOptions.Default);
+                            await MarkMessage(message, "✅");
                         }
                     }
                 }
@@ -181,17 +183,24 @@ namespace BSB.bottypes
                                 Noticetitle = Noticetitle.Replace("!notice ", "");
                                 Noticetitle = Noticetitle.Trim();
                                 CommandsInterface.Call("GroupNotice", "" + group.ToString() + "~#~" + Noticetitle + "~#~" + Noticemessage, UUID.Zero);
+                                await MarkMessage(message, "✅");
                             }
                             else
                             {
                                 CommandsInterface.Call("Groupchat", "" + group.ToString() + "~#~" + "[" + message.Author.Username + "]->" + message.Content, UUID.Zero);
+                                await MarkMessage(message, "✅");
                             }
-                            var Tickmark = new Emoji("✅");
-                            await message.AddReactionAsync(Tickmark, RequestOptions.Default);
                         }
                     }
                 }
             }
+            return Task.CompletedTask;
+        }
+
+        protected async Task<Task> MarkMessage(SocketMessage message,string emote)
+        {
+            var Tickmark = new Emoji(emote);
+            await message.AddReactionAsync(Tickmark, RequestOptions.Default);
             return Task.CompletedTask;
         }
 
@@ -217,6 +226,10 @@ namespace BSB.bottypes
                             else if (Chan.Name == "interface")
                             {
                                 await InboundInterfaceMessage(message);
+                            }
+                            else if(Chan.Name == "localchat")
+                            {
+                                await InboundLocalchatMessage(message);
                             }
                         }
                         else if (Chan.CategoryId == catmap["im"].Id)

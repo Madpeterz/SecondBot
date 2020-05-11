@@ -90,6 +90,10 @@ namespace BSB.bottypes
                                 await DiscordIMMessage(sender_uuid, sender_name, message).ConfigureAwait(false);
                             }
                         }
+                        else
+                        {
+                            _ = SendMessageToChannelAsync("localchat", ""+sender_name+":"+message, "bot", UUID.Zero, "bot");
+                        }
                     }
                 }
             }
