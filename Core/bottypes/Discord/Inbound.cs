@@ -102,11 +102,11 @@ namespace BSB.bottypes
                     }
                     if (process_status == true)
                     {
-                        await MarkMessage(message, "✅");
+                        await MarkMessage(message, "✅").ConfigureAwait(false);
                     }
                     else
                     {
-                        await MarkMessage(message, "❌");
+                        await MarkMessage(message, "❌").ConfigureAwait(false);
                     }
                 }
                 else
@@ -164,7 +164,7 @@ namespace BSB.bottypes
                         {
                             if (message.Content == "!clear")
                             {
-                                await CleanDiscordChannel(Chan, 0, true);
+                                await CleanDiscordChannel(Chan, 0, true).ConfigureAwait(false);
                             }
                             else if (message.Content.StartsWith("!notice") == true)
                             {
@@ -212,7 +212,7 @@ namespace BSB.bottypes
                 {
                     if (Client.Network.Connected == false)
                     {
-                        await message.DeleteAsync();
+                        await message.DeleteAsync().ConfigureAwait(false);
                     }
                     else
                     {
@@ -221,24 +221,24 @@ namespace BSB.bottypes
                         {
                             if (message.Content == "!clear")
                             {
-                                await CleanDiscordChannel(Chan, 0, true);
+                                await CleanDiscordChannel(Chan, 0, true).ConfigureAwait(false);
                             }
                             else if (Chan.Name == "interface")
                             {
-                                await InboundInterfaceMessage(message);
+                                await InboundInterfaceMessage(message).ConfigureAwait(false);
                             }
                             else if(Chan.Name == "localchat")
                             {
-                                await InboundLocalchatMessage(message);
+                                await InboundLocalchatMessage(message).ConfigureAwait(false);
                             }
                         }
                         else if (Chan.CategoryId == catmap["im"].Id)
                         {
-                            await InboundImMessage(Chan, message);
+                            await InboundImMessage(Chan, message).ConfigureAwait(false);
                         }
                         else if (Chan.CategoryId == catmap["group"].Id)
                         {
-                            await InboundGroupImMessage(Chan, message);
+                            await InboundGroupImMessage(Chan, message).ConfigureAwait(false);
                         }
                     }
                 }
