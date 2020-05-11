@@ -79,6 +79,11 @@ namespace BetterSecondBotShared.logs
                         n.Append("Crit - ");
                         break;
                     }
+                default:
+                    {
+                        n.Append("Log - ");
+                        break;
+                    }
             }
             n.Append(message);
             Console.WriteLine(n.ToString());
