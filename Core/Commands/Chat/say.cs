@@ -21,8 +21,14 @@ namespace BSB.Commands.Chat
                     int.TryParse(args[0], out channel);
                     if (args.Count() == 3)
                     {
-                        if (args[2] == "Shout") ChatLevel = ChatType.Shout;
-                        else if (args[2] == "Whisper") ChatLevel = ChatType.Whisper;
+                        if (args[2] == "Shout")
+                        {
+                            ChatLevel = ChatType.Shout;
+                        }
+                        else if (args[2] == "Whisper")
+                        {
+                            ChatLevel = ChatType.Whisper;
+                        }
                     }
                 }
                 bot.GetClient.Self.Chat(message, channel, ChatLevel);
