@@ -2,6 +2,7 @@
 using OpenMetaverse;
 using BSB.Static;
 using BetterSecondBotShared.Static;
+using System.Collections.Generic;
 
 namespace BSB.Commands.Inventory
 {
@@ -21,13 +22,13 @@ namespace BSB.Commands.Inventory
             {
                 if (UUID.TryParse(args[1], out UUID targetfolder) == true)
                 {
-                    string[] content = HelperInventory.MapFolderInventory(bot, targetfolder);
                     if (UUID.TryParse(args[0], out UUID targetavatar) == true)
                     {
-                        string notecardname = "InventoryContents" + helpers.UnixTimeNow().ToString() + "";
-                        if (content != null)
+                        KeyValuePair<string,string> content = HelperInventory.MapFolderInventoryHumanReadable(bot, targetfolder);
+                        if (content.Value != null)
                         {
-                            bot.SendNotecard(notecardname, String.Join("\n\r", content), targetavatar);
+                            string notecardname = ""+content.Key+" Contents @" + helpers.UnixTimeNow().ToString() + "";
+                            bot.SendNotecard(notecardname, content.Value, targetavatar);
                         }
                         else
                         {
@@ -37,7 +38,7 @@ namespace BSB.Commands.Inventory
                     }
                     else
                     {
-                        return bot.GetCommandsInterface.SmartCommandReply(true, args[0], String.Join("~|~", content), CommandName);
+                        return bot.GetCommandsInterface.SmartCommandReply(true, args[0], HelperInventory.MapFolderInventoryJson(bot,targetfolder), CommandName);
                     }
                 }
                 else

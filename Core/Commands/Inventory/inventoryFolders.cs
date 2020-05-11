@@ -20,13 +20,13 @@ namespace BSB.Commands.Inventory
                 if (UUID.TryParse(args[0], out UUID targetavatar) == true)
                 {
                     bot.GetClient.Self.InstantMessage(targetavatar, "Building inventory folder map now [This might take a while]");
-                    string reply = HelperInventory.MapFolder(bot, false);
+                    string reply = HelperInventory.MapFolderHumanReadable(bot);
                     bot.SendNotecard("Inventory Folders", reply, targetavatar);
                     return true;
                 }
                 else
                 {
-                    string reply = HelperInventory.MapFolder(bot, true);
+                    string reply = HelperInventory.MapFolderJson(bot);
                     return bot.GetCommandsInterface.SmartCommandReply(true,args[0], reply, CommandName);
                 }
             }
