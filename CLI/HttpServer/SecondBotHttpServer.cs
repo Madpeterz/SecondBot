@@ -1,4 +1,5 @@
-﻿using BetterSecondBotShared.IO;
+﻿using BetterSecondBot.HttpWebUi;
+using BetterSecondBotShared.IO;
 using BetterSecondBotShared.Json;
 using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
@@ -22,8 +23,7 @@ namespace BetterSecondBot.HttpServer
         public SecondBot GetBot { get { return Bot; } }
         protected JsonConfig Config;
         public JsonConfig GetConfig { get { return Config; } }
-        protected HTTPCommandsInterfaceGet get_controler;
-        protected HTTPCommandsInterfacePost post_controler;
+        protected HTTPCommandsInterface post_controler;
         protected string url = "";
         public bool ShutdownHTTP { get; set; }
         public bool HTTPCnCmode { get; set; }
@@ -93,6 +93,7 @@ namespace BetterSecondBot.HttpServer
 
         protected async Task HandleIncomingConnections()
         {
+            webui myUI = new webui(Config,Bot);
             while (Bot.KillMe == false)
             {
                 HttpListenerContext ctx = await listener.GetContextAsync();
@@ -107,16 +108,11 @@ namespace BetterSecondBot.HttpServer
                 byte[] data;
                 resp.StatusCode = 200;
                 resp.ContentType = "text/html";
-                resp.ContentEncoding = Encoding.UTF8;
                 if (req.HttpMethod == "GET")
                 {
-                    string command = "status";
-                    if (http_args.Count > 0)
-                    {
-                        command = http_args.Last();
-                    }
-                    string content = String.Join("{@}", get_controler.Call(command, ""));
-                    data = Encoding.UTF8.GetBytes(content);
+                    KeyValuePair<string, byte[]> replydata = myUI.process(http_args, req.Cookies);
+                    resp.ContentType = replydata.Key;
+                    data = replydata.Value;
                     resp.ContentLength64 = data.LongLength;
                     await resp.OutputStream.WriteAsync(data, 0, data.Length);
                     resp.Close();
@@ -190,8 +186,7 @@ namespace BetterSecondBot.HttpServer
         }
         protected void OpenHttpService()
         {
-            get_controler = new HTTPCommandsInterfaceGet(Bot,this);
-            post_controler = new HTTPCommandsInterfacePost(Bot,this);
+            post_controler = new HTTPCommandsInterface(Bot,this);
             Thread t = new Thread(delegate (object _)
             {
                 bool ok = true;

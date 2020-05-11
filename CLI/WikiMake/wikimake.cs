@@ -2,11 +2,9 @@
 using BetterSecondBotShared.IO;
 using BetterSecondBotShared.Json;
 using BetterSecondBotShared.logs;
-using BSB;
+using BetterSecondBotShared.Static;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -21,25 +19,7 @@ namespace BetterSecondBot.WikiMake
         protected SimpleIO io;
         protected Dictionary<string,string> seen_command_names = new Dictionary<string, string>();
 
-        public static string ReadResourceFile(string filename)
-        {
-            try
-            {
-                var assembly = Assembly.GetExecutingAssembly();
-                string resourceName = assembly.GetManifestResourceNames().Single(str => str.EndsWith(filename));
-                string result = "";
-                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    result = reader.ReadToEnd();
-                }
-                return result;
-            }
-            catch (Exception e)
-            {
-                return e.Message;
-            }
-        }
+
         public string CreateRoot()
         {
             StringBuilder sb = new StringBuilder();
@@ -297,8 +277,8 @@ namespace BetterSecondBot.WikiMake
         {
             io = shareio;
             buildVersion = Version;
-            html_header = ReadResourceFile("wiki_header.txt");
-            html_footer = ReadResourceFile("wiki_footer.txt");
+            html_header = helpers.ReadResourceFile(Assembly.GetExecutingAssembly(), "wiki_header.txt");
+            html_footer = helpers.ReadResourceFile(Assembly.GetExecutingAssembly(), "wiki_footer.txt");
             io.ChangeRoot("wiki");
             io.ChangeRoot("wiki/files");
 
@@ -317,14 +297,8 @@ namespace BetterSecondBot.WikiMake
             api_reports.Add("RLVapi", new KeyValuePair<int, string>(RLVapi.ApiCommandsCount, "Basic"));
             InterfaceWiki("RLVapi", RLVapi, true);
 
-
-            // HTTP get
-            BetterSecondBot.HttpServer.HTTPCommandsInterfaceGet http_get = new BetterSecondBot.HttpServer.HTTPCommandsInterfaceGet(null,null);
-            api_reports.Add("HTTPget", new KeyValuePair<int, string>(http_get.ApiCommandsCount, "Limited"));
-            InterfaceWiki("HTTPget", http_get);
-
             // HTTP post
-            BetterSecondBot.HttpServer.HTTPCommandsInterfacePost http_post = new BetterSecondBot.HttpServer.HTTPCommandsInterfacePost(null,null);
+            BetterSecondBot.HttpServer.HTTPCommandsInterface http_post = new BetterSecondBot.HttpServer.HTTPCommandsInterface(null,null);
             api_reports.Add("HTTPpost", new KeyValuePair<int, string>(http_post.ApiCommandsCount, "Limited"));
             InterfaceWiki("HTTPpost", http_post);
 

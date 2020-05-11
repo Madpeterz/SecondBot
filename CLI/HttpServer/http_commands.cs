@@ -11,15 +11,17 @@ using BetterSecondBotShared.logs;
 
 namespace BetterSecondBot.HttpServer
 {
-    public abstract class HTTPCommandsInterface : API_supported_interface
+    public class HTTPCommandsInterface : API_supported_interface
     {
         protected SecondBot bot;
         protected SecondBotHttpServer httpserver;
 
-        protected HTTPCommandsInterface(SecondBot linktobot, SecondBotHttpServer sethttpserver)
+        public HTTPCommandsInterface(SecondBot linktobot, SecondBotHttpServer sethttpserver)
         {
             bot = linktobot;
             httpserver = sethttpserver;
+            API_type = typeof(HTTP_commands);
+            LoadCommandsList();
         }
 
         public string[] Call(string command, string arg)
@@ -37,30 +39,6 @@ namespace BetterSecondBot.HttpServer
                 return new[] { "Failed", "I have no fucking idea what you are talking about" };
             }
         }
-    }
-    public class HTTPCommandsInterfaceGet : HTTPCommandsInterface
-    {
-        public HTTPCommandsInterfaceGet(SecondBot linktobot, SecondBotHttpServer sethttpserver) : base(linktobot, sethttpserver) 
-        {
-            API_type = typeof(HTTP_commands_get);
-            LoadCommandsList();
-        } 
-    }
-    public class HTTPCommandsInterfacePost : HTTPCommandsInterface
-    {
-        public HTTPCommandsInterfacePost(SecondBot linktobot, SecondBotHttpServer sethttpserver) : base(linktobot, sethttpserver) 
-        {
-            API_type = typeof(HTTP_commands_post);
-            LoadCommandsList();
-        } 
-    }
-
-
-    public abstract class HTTP_commands_get : HTTP_commands
-    {
-    }
-    public abstract class HTTP_commands_post : HTTP_commands
-    {
     }
 
     public abstract class HTTP_commands : API_interface

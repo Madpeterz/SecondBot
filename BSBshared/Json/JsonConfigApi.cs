@@ -220,7 +220,7 @@ namespace BetterSecondBotShared.Json
                     {
                         ConsoleLog.Warn("Http disabled: Httpkey length must be 12 or more");
                     }
-                    else if (jsonConfig.Httpport < 81)
+                    else if (jsonConfig.Httpport < 80)
                     {
                         ConsoleLog.Warn("Http disabled: Httpport range below protected range - Given: (" + jsonConfig.Httpport + ")");
                     }

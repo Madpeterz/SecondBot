@@ -1,8 +1,11 @@
 ﻿using BetterSecondBotShared.Json;
 using BetterSecondBotShared.logs;
+using Microsoft.Extensions.ObjectPool;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -22,6 +25,54 @@ namespace BetterSecondBotShared.Static
     }
     public static class helpers
     {
+        //
+
+        public static byte[] ReadResourceFileBinary(Assembly targetenv, string filename)
+        {
+            try
+            {
+                byte[] dataset;
+                string[] files = targetenv.GetManifestResourceNames();
+                string resourceName = files.Single(str => str.EndsWith(filename));
+                using (Stream stream = targetenv.GetManifestResourceStream(resourceName))
+                using (BinaryReader br = new BinaryReader(stream))
+                {
+                    const int bufferSize = 4096;
+                    using (var ms = new MemoryStream())
+                    {
+                        byte[] buffer = new byte[bufferSize];
+                        int count;
+                        while ((count = br.Read(buffer, 0, buffer.Length)) != 0)
+                            ms.Write(buffer, 0, count);
+                        dataset = ms.ToArray();
+                    }
+                }
+                return dataset;
+            }
+            catch (Exception e)
+            {
+                return Encoding.UTF8.GetBytes(e.Message);
+            }
+        }
+        public static string ReadResourceFile(Assembly targetenv,string filename)
+        {
+            try
+            {
+                string[] files = targetenv.GetManifestResourceNames();
+                string resourceName = files.Single(str => str.EndsWith(filename));
+                string result = "";
+                using (Stream stream = targetenv.GetManifestResourceStream(resourceName))
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    result = reader.ReadToEnd();
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+        }
         public static bool inrange(float current,float min,float max)
         {
             if(current <= max)

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BetterSecondBot.HttpServer.Control.Actions
 {
-    public class Logout : HTTP_commands_post
+    public class Logout : HTTP_commands
     {
         public override string Helpfile { get { return "Makes the bot logout<br/> Returns OK,I dont want to go if accepted"; } }
 

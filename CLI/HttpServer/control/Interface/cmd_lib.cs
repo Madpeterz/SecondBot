@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BetterSecondBot.HttpServer.Control.Interface
 {
-    public class CoreCMD : HTTP_commands_post
+    public class CoreCMD : HTTP_commands
     {
         public override string[] ArgTypes { get { return new [] { "Text","Text" }; } }
         public override string[] ArgHints { get { return new [] { "Command","Args (~#~ split)" }; } }
