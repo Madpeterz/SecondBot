@@ -2,7 +2,7 @@
 <head>
     <title>[[html_title]] - [[html_title_after]]</title>
     [[html_cs_top]]
-    <link rel="icon" type="image/png" href="[[url_base]]theme/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" href="[[url_base]]theme/images/favicon.png">
     <link rel="stylesheet" type="text/css" href="[[url_base]]theme/css/site.css">
 </head>
 <body>
