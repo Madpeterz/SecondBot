@@ -164,9 +164,28 @@ namespace BetterSecondBotShared.bottypes
             }
         }
 
+        protected List<UUID> accept_next_teleport_from = new List<UUID>();
+        public void add_uuid_to_teleport_list(UUID avatar)
+        {
+            if (accept_next_teleport_from.Contains(avatar) == false)
+            {
+                accept_next_teleport_from.Add(avatar);
+            }
+        }
+
         protected virtual void RequestTeleport(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
+            bool allow = false;
             if (FromAgentName == myconfig.master)
+            {
+                allow = true;
+            }
+            else if(accept_next_teleport_from.Contains(FromAgentID) == true)
+            {
+                allow = true;
+                accept_next_teleport_from.Remove(FromAgentID);
+            }
+            if(allow == true)
             {
                 ResetAnimations();
                 SetTeleported();
