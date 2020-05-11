@@ -11,9 +11,9 @@ namespace BSB.bottypes
 {
     public class SecondBot : DialogsBot
     {
-        protected bool friendslist_ready = false;
-        protected bool masteruuid_ready = false;
-        protected bool started_friendship_hug = false;
+        protected bool friendslist_ready;
+        protected bool masteruuid_ready;
+        protected bool started_friendship_hug;
 
         protected virtual void friendsListReady(object sender,FriendsReadyEventArgs e)
         {
