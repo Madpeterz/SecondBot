@@ -3223,12 +3223,18 @@ namespace OpenMetaverse
         /// Request a teleport lure from another agent
         /// </summary>
         /// <param name="targetID"><seealso cref="UUID"/> of the avatar lure is being requested from</param>
-        /// <param name="sessionID">IM session <seealso cref="UUID"/></param>
         /// <param name="message">message to send with request</param>
-        public void SendTeleportLureRequest(UUID targetID, UUID sessionID, string message)
+        public void SendTeleportLureRequest(UUID targetID)
         {
-            InstantMessage(Name, targetID, message, sessionID, InstantMessageDialog.RequestLure,
-                InstantMessageOnline.Online, SimPosition, UUID.Zero, Utils.EmptyBytes);
+            SendTeleportLureRequest(targetID, "Hi there I would like to teleport to you");
+        }
+        public void SendTeleportLureRequest(UUID targetID, string message)
+        {
+            if (targetID != AgentID)
+            {
+                InstantMessage(Name, targetID, message, targetID, InstantMessageDialog.RequestLure,
+                    InstantMessageOnline.Online, SimPosition, UUID.Zero, Utils.EmptyBytes);
+            }
         }
 
         #endregion Teleporting
