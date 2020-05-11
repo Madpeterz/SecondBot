@@ -103,7 +103,6 @@ namespace BSB.bottypes
                     }
                     else if (myconfig.master == sender_name)
                     {
-                        signing_code = "";
                         CoreCommandLib(sender_uuid, true, bits.ElementAt(0), bits.ElementAt(1), "", arg_signed_with);
                     }
                 }
