@@ -14,7 +14,6 @@ namespace BSB.Commands.CMD_Parcel
 
         public override void Callback(string[] args, EventArgs e)
         {
-            bool cleanup_ok = true;
             if (base.CallFunction(args) == true)
             {
                 ParcelObjectOwnersReplyEventArgs ObjectOwners = (ParcelObjectOwnersReplyEventArgs)e;
@@ -27,22 +26,15 @@ namespace BSB.Commands.CMD_Parcel
                 {
                     bot.GetClient.Parcels.ReturnObjects(bot.GetClient.Network.CurrentSim, targetparcel.LocalID, ObjectReturnType.List, owner_uuids);
                 }
-                if (cleanup_ok == true)
-                {
-                    int.TryParse(args[0], out int price);
-                    bot.GetClient.Parcels.ReleaseParcel(bot.GetClient.Network.CurrentSim, targetparcel.LocalID);
-                    targetparcel.SalePrice = price;
-                    targetparcel.AuthBuyerID = UUID.Zero;
-                    targetparcel.OwnerID = UUID.Zero;
-                    parcel_static.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
-                    parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
-                    targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
-                    base.Callback(args, e, true);
-                }
-                else
-                {
-                    base.Callback(args, e, false);
-                }
+                int.TryParse(args[0], out int price);
+                bot.GetClient.Parcels.ReleaseParcel(bot.GetClient.Network.CurrentSim, targetparcel.LocalID);
+                targetparcel.SalePrice = price;
+                targetparcel.AuthBuyerID = UUID.Zero;
+                targetparcel.OwnerID = UUID.Zero;
+                parcel_static.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
+                parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
+                targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+                base.Callback(args, e, true);
             }
             else
             {
