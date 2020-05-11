@@ -1,4 +1,5 @@
 ﻿using OpenMetaverse;
+using System.Collections.Generic;
 
 namespace BSB.Commands.Group
 {
@@ -12,14 +13,15 @@ namespace BSB.Commands.Group
         {
             if (base.CallFunction(args) == true)
             {
-                return bot.GetCommandsInterface.SmartCommandReply(args[0], RunFunction(), CommandName);
+                return bot.GetCommandsInterface.SmartCommandReply(true, args[0], RunFunction(), CommandName, collection);
             }
-            return false;
+            return bot.GetCommandsInterface.SmartCommandReply(false, args[0], "", CommandName);
         }
     }
 
     public abstract class CoreGroupCommand_SmartReply_Group : CoreCommand_2arg
     {
+        protected Dictionary<string, string> collection = new Dictionary<string, string>();
         public override string[] ArgTypes { get { return new[] { "Mixed", "UUID" }; } }
         public override string[] ArgHints { get { return new[] { "Smart reply [Channel|IM uuid|http url]", "Group" }; } }
     }
@@ -38,7 +40,7 @@ namespace BSB.Commands.Group
                 {
                     if (bot.MyGroups.ContainsKey(targetgroup) == true)
                     {
-                        return bot.GetCommandsInterface.SmartCommandReply(args[0], RunFunction(targetgroup), CommandName);
+                        return bot.GetCommandsInterface.SmartCommandReply(true,args[0], RunFunction(targetgroup), CommandName);
                     }
                     else
                     {

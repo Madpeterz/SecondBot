@@ -9,7 +9,7 @@ namespace BSB.Commands.Info
         {
             if (base.CallFunction(args) == true)
             {
-                return bot.GetCommandsInterface.SmartCommandReply(args[0], helpers.UnixTimeNow().ToString(), CommandName);
+                return bot.GetCommandsInterface.SmartCommandReply(true,args[0], helpers.UnixTimeNow().ToString(), CommandName);
             }
             return false;
         }

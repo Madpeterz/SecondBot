@@ -56,20 +56,15 @@ namespace BSB.Commands.CMD_Parcel
                     if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                     {
                         Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
-                        StringBuilder reply = new StringBuilder();
-                        string addon = "";
+                        Dictionary<string, string> collection = new Dictionary<string, string>();
                         foreach (string cfg in get_flags)
                         {
                             if (flags.ContainsKey(cfg) == true)
                             {
-                                reply.Append(addon);
-                                reply.Append(cfg);
-                                reply.Append("=");
-                                reply.Append(p.Flags.HasFlag(flags[cfg]).ToString());
-                                addon = ",";
+                                collection.Add(cfg, p.Flags.HasFlag(flags[cfg]).ToString());
                             }
                         }
-                        return bot.GetCommandsInterface.SmartCommandReply(target, reply.ToString(), CommandName);
+                        return bot.GetCommandsInterface.SmartCommandReply(true,target, p.Name, CommandName, collection);
                     }
                     else
                     {

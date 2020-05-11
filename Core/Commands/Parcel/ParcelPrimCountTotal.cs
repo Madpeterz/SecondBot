@@ -4,10 +4,8 @@ using System.Text;
 
 namespace BSB.Commands.CMD_Parcel
 {
-    class ParcelPrimCountTotal : CoreCommand_1arg
+    class ParcelPrimCountTotal : CoreCommand_SmartReply_1arg
     {
-        public override string[] ArgTypes { get { return new[] { "Smart" }; } }
-        public override string[] ArgHints { get { return new[] { "Smart reply target: Channel,Avatar,HTTP url" }; } }
         public override string Helpfile { get { return "Returns the total number of prims on the current parcel as follows: DATA=SIMNAME,PARCELID,COUNT"; } }
 
         public override void Callback(string[] args, EventArgs e)
@@ -18,15 +16,11 @@ namespace BSB.Commands.CMD_Parcel
             {
                 total_count += owner.Count;
             }
-            StringBuilder reply = new StringBuilder();
             int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-            reply.Append("DATA=");
-            reply.Append(bot.GetClient.Network.CurrentSim.Name);
-            reply.Append(",");
-            reply.Append(localid.ToString());
-            reply.Append(",");
-            reply.Append(total_count.ToString());
-            base.Callback(args, e, bot.GetCommandsInterface.SmartCommandReply(args[0], reply.ToString(), CommandName));
+            collection.Add("sim", bot.GetClient.Network.CurrentSim.Name);
+            collection.Add("parcelid", localid.ToString());
+            collection.Add("count", total_count.ToString());
+            base.Callback(args, e, bot.GetCommandsInterface.SmartCommandReply(true,args[0], "ok", CommandName,collection));
         }
 
         public override bool CallFunction(string[] args)

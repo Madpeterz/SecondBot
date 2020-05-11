@@ -8,7 +8,7 @@
         {
             if (base.CallFunction(args) == true)
             {
-                return bot.GetCommandsInterface.SmartCommandReply(args[0], targetparcel.Name, CommandName);
+                return bot.GetCommandsInterface.SmartCommandReply(true,args[0], targetparcel.Name, CommandName);
             }
             return false;
         }

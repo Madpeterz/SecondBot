@@ -8,6 +8,7 @@ using BSB.bottypes;
 using BetterSecondBotShared.API;
 using BetterSecondBotShared.Static;
 using BetterSecondBotShared.logs;
+using Newtonsoft.Json;
 
 namespace BSB.Commands
 {
@@ -132,11 +133,13 @@ namespace BSB.Commands
         }
         protected HttpClient HTTPclient = new HttpClient();
 
-        public bool SmartCommandReply(string target, string output)
+
+        public bool SmartCommandReply(bool run_status, string target, string output, string command)
         {
-            return SmartCommandReply(target, output, "");
+            return SmartCommandReply(run_status, target, output, command, null);
         }
-        public bool SmartCommandReply(string target, string output, string command)
+
+        public bool SmartCommandReply(bool run_status, string target, string output, string command, Dictionary<string,string> collection)
         {
             string mode = "CHAT";
             UUID target_avatar = UUID.Zero;
@@ -151,12 +154,41 @@ namespace BSB.Commands
             }
             else
             {
-                int.TryParse(target, out target_channel);
+                if (int.TryParse(target, out target_channel) == false)
+                {
+                    run_status = false;
+                }
+            }
+
+            if (collection != null)
+            {
+                var reply_object = new CoreCommand_json_reply_wit_collection();
+                reply_object.status = run_status;
+                reply_object.command = command;
+                reply_object.output = output;
+                reply_object.collection = collection;
+                output = JsonConvert.SerializeObject(reply_object);
+            }
+            else
+            {
+                var reply_object = new CoreCommand_json_reply();
+                reply_object.status = run_status;
+                reply_object.command = command;
+                reply_object.output = output;
+                output = JsonConvert.SerializeObject(reply_object);
             }
 
             if (mode == "CHAT")
             {
-                bot.GetClient.Self.Chat(output, target_channel, ChatType.Normal);
+                if (target_channel >= 0)
+                {
+                    bot.GetClient.Self.Chat(output, target_channel, ChatType.Normal);
+                }
+                else
+                {
+                    run_status = false;
+                    ConsoleLog.Crit("[SmartReply] output Channel must be zero or higher");
+                }
             }
             else if (mode == "IM")
             {
@@ -167,13 +199,8 @@ namespace BSB.Commands
                 Dictionary<string, string> values = new Dictionary<string, string>
                     {
                         { "reply", output },
-                        { "unixtime", helpers.UnixTimeNow().ToString() }
                     };
 
-                if (command != "")
-                {
-                    values.Add("command", command);
-                }
                 var content = new FormUrlEncodedContent(values);
                 try
                 {
@@ -181,14 +208,16 @@ namespace BSB.Commands
                 }
                 catch (Exception e)
                 {
+                    run_status = false;
                     ConsoleLog.Crit("[SmartReply] HTTP failed: " + e.Message + "");
                 }
             }
             else
             {
+                ConsoleLog.Crit("[SmartReply] Unsupported output target");
                 return false;
             }
-            return true;
+            return run_status;
         }
 
         protected List<string> suppress_warnings = new List<string>();
@@ -266,6 +295,17 @@ namespace BSB.Commands
             return new KeyValuePair<bool, string>(false, "--");
         }
     }
+    class CoreCommand_json_reply_wit_collection : CoreCommand_json_reply
+    {
+        public Dictionary<string, string> collection = new Dictionary<string, string>();
+    }
+    class CoreCommand_json_reply
+    {
+        public bool status;
+        public string command;
+        public string output;
+    }
+
 
     public abstract class CoreCommand_1arg : CoreCommand
     {
@@ -283,11 +323,22 @@ namespace BSB.Commands
     {
         public override int Min_Required_args { get { return 4; } }
     }
+
     public abstract class CoreCommand_SmartReply_1arg : CoreCommand_1arg
     {
+        protected Dictionary<string, string> collection = new Dictionary<string, string>();
         public override string[] ArgTypes { get { return new[] { "Smart" }; } }
         public override string[] ArgHints { get { return new[] { "Mixed [Channel|Avatar uuid|Avatar name|http url]" }; } }
     }
+    public abstract class CoreCommand_SmartReply_2arg : CoreCommand_SmartReply_1arg
+    {
+        public override int Min_Required_args { get { return 2; } }
+    }
+    public abstract class CoreCommand_SmartReply_3arg : CoreCommand_SmartReply_1arg
+    {
+        public override int Min_Required_args { get { return 3; } }
+    }
+
 
     public abstract class CoreCommand : API_interface
     {

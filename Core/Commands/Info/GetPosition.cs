@@ -7,7 +7,7 @@
         {
             if (base.CallFunction(args) == true)
             {
-                return bot.GetCommandsInterface.SmartCommandReply(args[0], bot.GetClient.Self.RelativePosition.ToString(), CommandName);
+                return bot.GetCommandsInterface.SmartCommandReply(true,args[0], bot.GetClient.Self.RelativePosition.ToString(), CommandName);
             }
             return false;
         }

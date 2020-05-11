@@ -27,7 +27,7 @@ namespace BSB.Commands.Inventory
                 else
                 {
                     string reply = HelperInventory.MapFolder(bot, true);
-                    return bot.GetCommandsInterface.SmartCommandReply(args[0], reply, CommandName);
+                    return bot.GetCommandsInterface.SmartCommandReply(true,args[0], reply, CommandName);
                 }
             }
             return false;

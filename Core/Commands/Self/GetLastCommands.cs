@@ -10,7 +10,13 @@ namespace BSB.Commands.Self
         {
             if (base.CallFunction(args) == true)
             {
-                return bot.GetCommandsInterface.SmartCommandReply(args[0], String.Join(',',bot.GetLastCommands(5)), CommandName);
+                int entry = 1;
+                foreach(string a in bot.GetLastCommands(5))
+                {
+                    collection.Add(entry.ToString(), a);
+                    entry++;
+                }
+                return bot.GetCommandsInterface.SmartCommandReply(true,args[0], "last=5", CommandName,collection);
             }
             return false;
         }

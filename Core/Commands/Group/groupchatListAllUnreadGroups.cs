@@ -5,19 +5,17 @@ namespace BSB.Commands.Group
 {
     public class GroupchatListAllUnreadGroups : CoreGroupCommand_SmartReply_auto
     {
-        public override string Helpfile { get { return "Returns a csv of groups with unread messages: UUID,UUID... "; } }
+        public override string Helpfile { get { return "Returns what groups have unread messages "; } }
 
         protected override string RunFunction()
         {
-            StringBuilder reply = new StringBuilder();
-            string addon = "";
+            int entry = 1;
             foreach (UUID group in bot.UnreadGroupchatGroups())
             {
-                reply.Append(addon);
-                addon = ",";
-                reply.Append(group);
+                collection.Add(entry.ToString(),group.ToString());
+                entry++;
             }
-            return reply.ToString();
+            return "count="+collection.Count.ToString();
         }
     }
 }

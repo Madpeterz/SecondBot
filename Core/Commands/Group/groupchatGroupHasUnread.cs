@@ -8,7 +8,7 @@ namespace BSB.Commands.Group
 
         protected override string RunFunction(UUID targetgroup)
         {
-            return bot.GroupHasUnread(targetgroup).ToString();
+            return ""+targetgroup.ToString()+"=" + bot.GroupHasUnread(targetgroup).ToString();
         }
 
     }

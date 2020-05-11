@@ -9,11 +9,11 @@
             {
                 if (bot.GetAllowFunds == true)
                 {
-                    bool status = bot.GetCommandsInterface.SmartCommandReply(args[0], bot.GetClient.Self.Balance.ToString(), CommandName);
+                    bool status = bot.GetCommandsInterface.SmartCommandReply(true,args[0], bot.GetClient.Self.Balance.ToString(), CommandName);
                     bot.GetClient.Self.RequestBalance();
                     return status;
                 }
-                return bot.GetCommandsInterface.SmartCommandReply(args[0], "0", CommandName);
+                return bot.GetCommandsInterface.SmartCommandReply(false,args[0], "0", CommandName);
             }
             return false;
         }

@@ -37,7 +37,7 @@ namespace BSB.Commands.Inventory
                     }
                     else
                     {
-                        return bot.GetCommandsInterface.SmartCommandReply(args[0], String.Join("~|~", content), CommandName);
+                        return bot.GetCommandsInterface.SmartCommandReply(true, args[0], String.Join("~|~", content), CommandName);
                     }
                 }
                 else

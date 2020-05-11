@@ -7,20 +7,14 @@ namespace BSB.Commands.Group
 {
     public class GetGroupList : CoreGroupCommand_SmartReply_auto
     {
-        public override string Helpfile { get { return "Returns a csv of known groups NAME=UUID,NAME=UUID... "; } }
+        public override string Helpfile { get { return "Gets a list of groups Json encoded"; } }
         protected override string RunFunction()
         {
-            StringBuilder reply = new StringBuilder();
-            string addon = "";
             foreach (KeyValuePair<UUID, OpenMetaverse.Group> groupdata in bot.MyGroups)
             {
-                reply.Append(addon);
-                addon = ",";
-                reply.Append(groupdata.Value.Name);
-                reply.Append("=");
-                reply.Append(groupdata.Key);
+                collection.Add(groupdata.Value.Name, groupdata.Key.ToString());
             }
-            return reply.ToString();
+            return "grouplist=loaded";
         }
     }
 }

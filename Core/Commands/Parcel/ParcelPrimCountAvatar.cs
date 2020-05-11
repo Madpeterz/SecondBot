@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BSB.Commands.CMD_Parcel
 {
-    class ParcelPrimCountAvatar : CoreCommand_2arg
+    class ParcelPrimCountAvatar : CoreCommand_SmartReply_2arg
     {
         public override string[] ArgTypes { get { return new[] { "Smart","Avatar" }; } }
         public override string[] ArgHints { get { return new[] { "Smart reply target: Channel,Avatar,HTTP url","the avatar (UUID or Firstname Lastname) we want the count of back" }; } }
@@ -25,25 +25,18 @@ namespace BSB.Commands.CMD_Parcel
             {
                 if (UUID.TryParse(args[1], out UUID avatar) == true)
                 {
-                    StringBuilder reply = new StringBuilder();
                     int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
-                    reply.Append("DATA=");
-                    reply.Append(bot.GetClient.Network.CurrentSim.Name);
-                    reply.Append(",");
-                    reply.Append(localid.ToString());
-                    reply.Append(",");
-                    reply.Append(avatar.ToString());
-                    reply.Append(",");
+                    collection.Add("sim", bot.GetClient.Network.CurrentSim.Name);
                     if (owner_uuids.Contains(avatar) == true)
                     {
                         int owner_count = owner_counts[owner_uuids.IndexOf(avatar)];
-                        reply.Append(owner_count.ToString());
+                        collection.Add("count", owner_count.ToString());
                     }
                     else
                     {
-                        reply.Append("0");
+                        collection.Add("count", "0");
                     }
-                    base.Callback(args, e, bot.GetCommandsInterface.SmartCommandReply(args[0], reply.ToString(), CommandName));
+                    base.Callback(args, e, bot.GetCommandsInterface.SmartCommandReply(true,args[0], "avatar="+ avatar.ToString(), CommandName,collection));
                 }
                 else
                 {

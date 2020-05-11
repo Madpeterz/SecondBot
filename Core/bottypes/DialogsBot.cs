@@ -97,17 +97,17 @@ namespace BSB.bottypes
                 string DialogMessage = "NewDialog###" + dialogID.ToString() + "###"+ Dmess + "###" + String.Join("~|~",e.ButtonLabels) + "";
                 if (RelayDialogsToChannel != 0)
                 {
-                    CommandsInterface.SmartCommandReply(RelayDialogsToChannel.ToString(), DialogMessage,"NewDialogNotice");
+                    CommandsInterface.SmartCommandReply(true,RelayDialogsToChannel.ToString(), DialogMessage,"NewDialogNotice");
                 }
                 if(RelayDialogsToAvatar != UUID.Zero)
                 {
-                    CommandsInterface.SmartCommandReply(RelayDialogsToAvatar.ToString(), DialogMessage, "NewDialogNotice");
+                    CommandsInterface.SmartCommandReply(true, RelayDialogsToAvatar.ToString(), DialogMessage, "NewDialogNotice");
                 }
                 if(RelayDialogsToHttp != null)
                 {
                     if (RelayDialogsToHttp.StartsWith("http") == true)
                     {
-                        CommandsInterface.SmartCommandReply(RelayDialogsToAvatar.ToString(), DialogMessage, "NewDialogNotice");
+                        CommandsInterface.SmartCommandReply(true, RelayDialogsToAvatar.ToString(), DialogMessage, "NewDialogNotice");
                     }
                 }
             }
