@@ -60,7 +60,6 @@ namespace BSB.Commands
             bool has_required_lookups = false;
             foreach (int A in need_lookup_on_indexs)
             {
-                string value = args[A];
                 if(UUID.TryParse(args[A],out _) == false)
                 {
                     // not a uuid
