@@ -1,4 +1,6 @@
-﻿namespace BSB.Commands.Movement
+﻿using System.Threading;
+
+namespace BSB.Commands.Movement
 {
     public class BotFly : CoreCommand_1arg
     {
@@ -11,6 +13,12 @@
             {
                 if (bool.TryParse(args[0], out bool status) == true)
                 {
+                    if(status == false)
+                    {
+                        bot.GetClient.Self.Movement.Fly = true;
+                        bot.GetClient.Self.Movement.SendUpdate();
+                        Thread.Sleep(200);
+                    }
                     bot.GetClient.Self.Movement.Fly = status;
                     bot.GetClient.Self.Movement.SendUpdate();
                     return true;
