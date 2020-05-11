@@ -177,16 +177,12 @@ namespace BSB.bottypes
             }
             else if(e.Status == LoginStatus.Failed)
             {
-                login_status = "Logged out";
+                login_status = "Login failed";
                 login_auto_logout = true;
                 if (e.FailReason == "presence")
                 {
-                    login_status = "Logged out <Clear AV>";
+                    login_status = "Login failed <Clear AV>";
                 }
-            }
-            else if(e.Status == LoginStatus.Failed)
-            {
-                login_status = "Failed (Check username and password)";
             }
             else if(e.Status == LoginStatus.None)
             {
