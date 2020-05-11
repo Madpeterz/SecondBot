@@ -9,16 +9,8 @@ namespace BSB.RLV.Miscellaneous
     {
         public override bool CallFunction(string[] args)
         {
-            if(args.Length == 1)
-            {
-                bot.Clearrule(false, caller_uuid);
-                bot.Clearrule(true, caller_uuid);
-            }
-            else
-            {
-                bot.Clearrule(false, caller_uuid);
-                bot.Clearrule(true, caller_uuid);
-            }
+            bot.Clearrule(false, caller_uuid);
+            bot.Clearrule(true, caller_uuid);
             return true;
         }
     }
