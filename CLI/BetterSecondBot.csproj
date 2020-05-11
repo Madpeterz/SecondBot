@@ -26,7 +26,7 @@
     <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="HttpWebUi\theme\images\favicon-32x32.png" />
+    <None Remove="HttpWebUi\theme\images\favicon.png" />
     <None Remove="HttpWebUi\theme\images\logo.png" />
     <None Remove="HttpWebUi\theme\layout\cdn.css.layout" />
     <None Remove="HttpWebUi\theme\layout\cdn.js.layout" />
@@ -46,7 +46,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="HttpWebUi\theme\images\favicon-32x32.png" />
+    <EmbeddedResource Include="HttpWebUi\theme\images\favicon.png" />
     <EmbeddedResource Include="HttpWebUi\theme\images\logo.png" />
     <EmbeddedResource Include="HttpWebUi\theme\layout\cdn.css.layout" />
     <EmbeddedResource Include="HttpWebUi\theme\layout\cdn.js.layout" />
