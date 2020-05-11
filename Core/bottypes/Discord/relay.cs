@@ -7,14 +7,14 @@ namespace BSB.bottypes
 {
     public abstract class DiscordBotRelay : DiscordBotStatus
     {
-        public async override void SendIM(UUID avatar, string message)
+        public override void SendIM(UUID avatar, string message)
         {
             base.SendIM(avatar, message);
             if (AvatarKey2Name.ContainsKey(avatar) == true)
             {
                 if (DiscordClientConnected == true)
                 {
-                    await DiscordIMMessage(avatar, AvatarKey2Name[avatar], message).ConfigureAwait(false);
+                    _ = DiscordIMMessage(avatar, AvatarKey2Name[avatar], message);
                 }
             }
         }
@@ -50,7 +50,7 @@ namespace BSB.bottypes
             }
             return output;
         }
-        protected async Task DiscordBotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar, bool group, UUID group_uuid, bool localchat, bool fromme)
+        protected async Task<Task> DiscordBotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar, bool group, UUID group_uuid, bool localchat, bool fromme)
         {
             if (fromme == false)
             {
@@ -92,11 +92,12 @@ namespace BSB.bottypes
                         }
                         else
                         {
-                            _ = SendMessageToChannelAsync("localchat", ""+sender_name+":"+message, "bot", UUID.Zero, "bot");
+                            await SendMessageToChannelAsync("localchat", "" + sender_name + ":" + message, "bot", UUID.Zero, "bot").ConfigureAwait(false);
                         }
                     }
                 }
             }
+            return Task.CompletedTask;
         }
     }
 }
