@@ -96,7 +96,7 @@ namespace BetterSecondBot.HttpServer
             webui myUI = new webui(Config,Bot);
             while (Bot.KillMe == false)
             {
-                HttpListenerContext ctx = await listener.GetContextAsync();
+                HttpListenerContext ctx = await listener.GetContextAsync().ConfigureAwait(true);
                 HttpListenerRequest req = ctx.Request;
                 HttpListenerResponse resp = ctx.Response;
                 string test = req.Url.AbsolutePath.Substring(1);
@@ -110,12 +110,23 @@ namespace BetterSecondBot.HttpServer
                 resp.ContentType = "text/html";
                 if (req.HttpMethod == "GET")
                 {
-                    KeyValuePair<string, byte[]> replydata = myUI.process(http_args, req.Cookies);
-                    resp.ContentType = replydata.Key;
-                    data = replydata.Value;
-                    resp.ContentLength64 = data.LongLength;
-                    await resp.OutputStream.WriteAsync(data, 0, data.Length);
-                    resp.Close();
+                    KeyValuePair<string, byte[]> replydata = myUI.Get_Process(http_args, req.Cookies);
+                    if (replydata.Value != null)
+                    {
+                        resp.ContentType = replydata.Key;
+                        data = replydata.Value;
+                        resp.ContentLength64 = data.LongLength;
+                        await resp.OutputStream.WriteAsync(data, 0, data.Length).ConfigureAwait(true);
+                        resp.Close();
+                    }
+                    else
+                    {
+                        data = Encoding.UTF8.GetBytes("error with service");
+                        resp.ContentLength64 = data.LongLength;
+                        resp.ContentType = "text/html";
+                        await resp.OutputStream.WriteAsync(data, 0, data.Length).ConfigureAwait(true);
+                        resp.Close();
+                    }
                 }
                 else if (req.HttpMethod == "POST")
                 {
@@ -136,50 +147,62 @@ namespace BetterSecondBot.HttpServer
                         }
                     }
 
-                    bool accept_request = false;
-                    string why_request_failed = "Bad signing request";
-
-                    string command = "";
-                    string arg = "";
-                    string signing_code;
                     resp.StatusCode = 200;
-                    if (post_args.ContainsKey("command") == true)
+                    KeyValuePair<bool, string> UI_process = myUI.Post_process(http_args,post_args);
+                    if (UI_process.Key == false)
                     {
-                        command = post_args["command"];
-                        if (post_args.ContainsKey("args") == true)
+                        data = Encoding.UTF8.GetBytes(UI_process.Value);
+                        resp.ContentLength64 = data.LongLength;
+                        await resp.OutputStream.WriteAsync(data, 0, data.Length).ConfigureAwait(true);
+                    }
+                    else
+                    {
+                        bool accept_request = false;
+                        string why_request_failed = "Bad signing request";
+
+                        string command = "";
+                        string arg = "";
+                        string signing_code;
+
+                        if (post_args.ContainsKey("command") == true)
                         {
-                            arg = post_args["args"];
-                        }
-                        if (post_args.ContainsKey("code") == true)
-                        {
-                            signing_code = post_args["code"];
-                            string raw = "" + command + "" + arg + "" + Config.Httpkey + "";
-                            string hashcheck = helpers.GetSHA1(raw);
-                            if (hashcheck == signing_code)
+                            command = post_args["command"];
+                            if (post_args.ContainsKey("args") == true)
                             {
-                                accept_request = true;
+                                arg = post_args["args"];
+                            }
+                            if (post_args.ContainsKey("code") == true)
+                            {
+                                signing_code = post_args["code"];
+                                string raw = "" + command + "" + arg + "" + Config.Httpkey + "";
+                                string hashcheck = helpers.GetSHA1(raw);
+                                if (hashcheck == signing_code)
+                                {
+                                    accept_request = true;
+                                }
+                            }
+                            else
+                            {
+                                why_request_failed = "Post missing arg value";
                             }
                         }
                         else
                         {
-                            why_request_failed = "Post missing arg value";
+                            why_request_failed = "Post missing command value";
                         }
+                        if (accept_request == true)
+                        {
+                            data = Encoding.UTF8.GetBytes(String.Join("###", post_controler.Call(command, arg)));
+                        }
+                        else
+                        {
+                            resp.StatusCode = 417;
+                            data = Encoding.UTF8.GetBytes(why_request_failed);
+                        }
+                        resp.ContentLength64 = data.LongLength;
+                        await resp.OutputStream.WriteAsync(data, 0, data.Length);
                     }
-                    else
-                    {
-                        why_request_failed = "Post missing command value";
-                    }
-                    if (accept_request == true)
-                    {
-                        data = Encoding.UTF8.GetBytes(String.Join("###", post_controler.Call(command, arg)));
-                    }
-                    else
-                    {
-                        resp.StatusCode = 417;
-                        data = Encoding.UTF8.GetBytes(why_request_failed);
-                    }
-                    resp.ContentLength64 = data.LongLength;
-                    await resp.OutputStream.WriteAsync(data, 0, data.Length);
+                    
                     resp.Close();
                 }
             }
@@ -204,9 +227,16 @@ namespace BetterSecondBot.HttpServer
                 }
                 if (ok == true)
                 {
-                    ConsoleLog.Status("Listening for connections on " + url + "");
-                    Task listenTask = HandleIncomingConnections();
-                    listenTask.GetAwaiter().GetResult();
+                    try
+                    {
+                        ConsoleLog.Status("Listening for connections on " + url + "");
+                        Task listenTask = HandleIncomingConnections();
+                        listenTask.GetAwaiter().GetResult();
+                    }
+                    catch(Exception e)
+                    {
+                        ConsoleLog.Status("Http interface killed itself: "+e.ToString()+"");
+                    }
                 }
                 listener.Close();
             })
