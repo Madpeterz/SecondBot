@@ -24,7 +24,6 @@ namespace BSB.Commands.Inventory
                 }
                 if(NotecardFolder != null)
                 {
-                    DateTime Now = DateTime.Now;
                     List<UUID> purge_notecards = new List<UUID>();
                     List<InventoryBase> contents = bot.GetClient.Inventory.FolderContents(NotecardFolder.UUID, bot.GetClient.Self.AgentID, true, true, InventorySortOrder.ByDate, 40 * 1000);
                     foreach(InventoryBase C in contents)
