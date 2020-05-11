@@ -19,7 +19,22 @@ namespace BetterSecondBot.HttpWebUi
             bot = setbot;
             siteconfig = setconfig;
         }
-        public KeyValuePair<string,byte[]> process(List<string> args,CookieCollection cookies)
+        public KeyValuePair<bool, string> Post_process(List<string> args, Dictionary<string,string> post_args)
+        {
+            if(args != null)
+            {
+                if(args.Count == 1)
+                {
+                    if(args[0] == "ajax")
+                    {
+                        // webui only cares about ajax post requests
+
+                    }
+                }
+            }
+            return new KeyValuePair<bool, string>(false, "");
+        }
+        public KeyValuePair<string,byte[]> Get_Process(List<string> args,CookieCollection cookies)
         {
             Cookie logincookie = null;
             foreach(Cookie C in cookies)
@@ -54,7 +69,7 @@ namespace BetterSecondBot.HttpWebUi
                                 }
                             }
                         }
-                        return new KeyValuePair<string, byte[]>("text/html", Encoding.UTF8.GetBytes(""));
+                        return new KeyValuePair<string, byte[]>("text/html", null);
                     }
                 }
                 string layout = helpers.ReadResourceFile(Assembly.GetExecutingAssembly(), "full.layout");
@@ -71,7 +86,7 @@ namespace BetterSecondBot.HttpWebUi
             }
             else
             {
-                return new KeyValuePair<string, byte[]>("text/html", Encoding.UTF8.GetBytes(""));
+                return new KeyValuePair<string, byte[]>("text/html", null);
             }
         }
     }
