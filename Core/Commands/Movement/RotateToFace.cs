@@ -17,7 +17,7 @@ namespace BSB.Commands.Movement
                     {
                         return bot.GetClient.Self.Movement.TurnToward(bot.GetClient.Network.CurrentSim.AvatarPositions[avatar], true);
                     }
-                    else Failed("Unable to find avatar in local sim memory");
+                    Failed("Unable to find avatar in local sim memory");
                 }
                 return Failed("Unable to process avatar on arg 1");
             }
