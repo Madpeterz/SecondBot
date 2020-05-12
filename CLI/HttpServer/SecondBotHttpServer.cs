@@ -5,17 +5,25 @@ using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
 using BSB;
 using BSB.bottypes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace BetterSecondBot.HttpServer
 {
+    public class json_http_reply
+    {
+        public bool status;
+        public string message;
+        public string redirect;
+    }
     public class SecondBotHttpServer
     {
         protected HttpListener listener;
@@ -95,18 +103,20 @@ namespace BetterSecondBot.HttpServer
                 HttpListenerContext ctx = await listener.GetContextAsync().ConfigureAwait(true);
                 HttpListenerRequest req = ctx.Request;
                 HttpListenerResponse resp = ctx.Response;
+                resp.Cookies = req.Cookies;
                 string test = req.Url.AbsolutePath.Substring(1);
                 if (helpers.notempty(Config.Http_PublicUrl) == true)
                 {
                     test = test.Replace(Config.Http_PublicUrl, "");
                 }
+                json_http_reply reply = new json_http_reply();
                 List<string> http_args = test.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
                 byte[] data;
                 resp.StatusCode = 200;
                 resp.ContentType = "text/html";
                 if (req.HttpMethod == "GET")
                 {
-                    KeyValuePair<string, byte[]> replydata = myUI.Get_Process(http_args, req.Cookies);
+                    KeyValuePair<string, byte[]> replydata = myUI.Get_Process(req, resp, http_args);
                     if (replydata.Value != null)
                     {
                         resp.ContentType = replydata.Key;
@@ -142,16 +152,8 @@ namespace BetterSecondBot.HttpServer
                             post_args.Add(bits[0].Trim(), bits[1].Trim());
                         }
                     }
-
                     resp.StatusCode = 200;
-                    KeyValuePair<bool, string> UI_process = myUI.Post_process(http_args,post_args);
-                    if (UI_process.Key == false)
-                    {
-                        data = Encoding.UTF8.GetBytes(UI_process.Value);
-                        resp.ContentLength64 = data.LongLength;
-                        await resp.OutputStream.WriteAsync(data, 0, data.Length).ConfigureAwait(true);
-                    }
-                    else
+                    if (myUI.Post_process(reply, req, resp, http_args, post_args) == true)
                     {
                         bool accept_request = false;
                         string why_request_failed = "Bad signing request";
@@ -186,19 +188,24 @@ namespace BetterSecondBot.HttpServer
                         {
                             why_request_failed = "Post missing command value";
                         }
+                        reply.message = why_request_failed;
+                        reply.status = accept_request;
                         if (accept_request == true)
                         {
-                            data = Encoding.UTF8.GetBytes(String.Join("###", post_controler.Call(command, arg)));
+                            reply.message = String.Join("###", post_controler.Call(command, arg));
                         }
-                        else
-                        {
-                            resp.StatusCode = 417;
-                            data = Encoding.UTF8.GetBytes(why_request_failed);
-                        }
-                        resp.ContentLength64 = data.LongLength;
-                        await resp.OutputStream.WriteAsync(data, 0, data.Length);
                     }
-                    
+                    if(reply.redirect != "")
+                    {
+                        if(reply.redirect == "/")
+                        {
+                            reply.redirect = "";
+                        }
+                        reply.redirect = "" + Config.Http_PublicUrl + "" + reply.redirect + "";
+                    }
+                    data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(reply));
+                    resp.ContentLength64 = data.LongLength;
+                    await resp.OutputStream.WriteAsync(data, 0, data.Length).ConfigureAwait(true);
                     resp.Close();
                 }
             }

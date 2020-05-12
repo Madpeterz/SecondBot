@@ -30,7 +30,13 @@ $( document ).ready(function() {
                            }
                            if(jsondata.hasOwnProperty('redirect'))
                            {
-                               setTimeout(function(){ $(location).attr('href', jsondata.redirect) }, redirectdelay);
+                               if(jsondata.redirect != "")
+                               {
+                                   if(jsondata.redirect != null)
+                                   {
+                                    setTimeout(function(){ $(location).attr('href', jsondata.redirect) }, redirectdelay);
+                                    }
+                               }
                            }
                        }
                        else

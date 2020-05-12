@@ -27,7 +27,7 @@
                 </div>
                 <div class="row align-items-end">
                     <div class="col-5">
-                        <a href="[[url_base]]login/logout"><button type="button" class="btn btn-block btn-secondary btn-sml">Logout</button></a>
+                        <a href="[[url_base]]ajax/logout"><button type="button" class="btn btn-block btn-secondary btn-sml">Logout</button></a>
                     </div>
                 </div>
             </div>

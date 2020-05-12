@@ -4,7 +4,7 @@
         <form action="[[url_base]]ajax/login/start" method="post" class="ajax">
         <div class="row mt-1">
             <div class="col-8 offset-2">
-              <input name="password" class="form-control" type="password" placeholder="Please enter your auth code"/></div>
+              <input name="logincode" class="form-control" type="password" placeholder="Please enter your auth code"/></div>
         </div>
         <div class="row mt-4">
             <div class="col-12"><button class="btn btn-primary btn-block" type="submit">Login</button></div>
