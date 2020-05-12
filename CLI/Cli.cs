@@ -10,7 +10,7 @@ namespace BetterSecondBot
     {
         static void Main(string[] args)
         {
-            if (helpers.notempty(Environment.GetEnvironmentVariable("BotRunningInDocker")) == true)
+            if (helpers.notempty(Environment.GetEnvironmentVariable("Basic_BotUserName")) == true)
             {
                 new CliDocker();
             }

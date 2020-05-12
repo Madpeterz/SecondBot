@@ -21,9 +21,9 @@ namespace BetterSecondBotShared.bottypes
         protected string version = "NotSet V1.0.0.0";
         protected bool reconnect;
         public string MyVersion { get { return version; } }
-        public string Name { get { return myconfig.userName; } }
-        public string OwnerName { get { return myconfig.master; } }
-        public bool GetAllowFunds { get { return myconfig.AllowFunds; } }
+        public string Name { get { return myconfig.Basic_BotUserName; } }
+        public string OwnerName { get { return myconfig.Security_MasterUsername; } }
+        public bool GetAllowFunds { get { return myconfig.Setting_AllowFunds; } }
         public string LastStatusMessage { get; set; }
 
         public bool KillMe { get { return killMe; } }
@@ -48,23 +48,23 @@ namespace BetterSecondBotShared.bottypes
         {
             version = Version;
             myconfig = config;
-            if (myconfig.code.Length < 8)
+            if (myconfig.Security_SignedCommandkey.Length < 8)
             {
-                myconfig.code = helpers.GetSHA1("" + myconfig.userName + "" + myconfig.password + "" + helpers.UnixTimeNow().ToString() + "").Substring(0, 8);
+                myconfig.Security_SignedCommandkey = helpers.GetSHA1("" + myconfig.Basic_BotUserName + "" + myconfig.Basic_BotPassword + "" + helpers.UnixTimeNow().ToString() + "").Substring(0, 8);
                 ConsoleLog.Warn("Given code is not acceptable (min length 8)");
             }
-            List<string> bits = myconfig.userName.Split(' ').ToList();
+            List<string> bits = myconfig.Basic_BotUserName.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
             if (bits.Count == 1)
             {
                 bits.Add("Resident");
-                myconfig.userName = String.Join(' ', bits);
+                myconfig.Basic_BotUserName = String.Join(' ', bits);
             }
-            bits = myconfig.master.Split(new[] { " " }, StringSplitOptions.None).ToList();
+            bits = myconfig.Security_MasterUsername.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
             if (bits.Count == 1)
             {
                 bits.Add("Resident");
+                myconfig.Security_MasterUsername = String.Join(" ", bits);
             }
-            myconfig.master = String.Join(" ", bits);
             ConsoleLog.Info("Build: " + version);
         }
 
@@ -74,12 +74,8 @@ namespace BetterSecondBotShared.bottypes
             Client.Settings.LOG_RESENDS = false;
             Client.Settings.ALWAYS_REQUEST_OBJECTS = true;
             Client.Settings.AVATAR_TRACKING = true;
-            List<string> bits = myconfig.userName.Split(' ').ToList();
-            if (myconfig.AtHomeLockToPosMaxRange < 1)
-            {
-                myconfig.AtHomeLockToPosMaxRange = 10;
-            }
-            LoginParams Lp = new LoginParams(Client, bits[0], bits[1], myconfig.password, "BetterSecondBot", "BetterSecondBot " + version);
+            List<string> bits = myconfig.Basic_BotUserName.Split(' ').ToList();
+            LoginParams Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
             if (reconnect == false)
             {
                 BotStartHandler();
@@ -139,7 +135,7 @@ namespace BetterSecondBotShared.bottypes
 
         protected virtual void GroupInvite(InstantMessageEventArgs e)
         {
-            string[] stage1 = myconfig.master.ToLowerInvariant().Split(' ');
+            string[] stage1 = myconfig.Security_MasterUsername.ToLowerInvariant().Split(' ');
             string bad_master_name = String.Join('.', stage1);
             if (e.IM.FromAgentName == bad_master_name)
             {
@@ -150,7 +146,7 @@ namespace BetterSecondBotShared.bottypes
         }
         protected virtual void FriendshipOffer(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
-            if (FromAgentName == myconfig.master)
+            if (FromAgentName == myconfig.Security_MasterUsername)
             {
                 Client.Friends.AcceptFriendship(FromAgentID, IMSessionID);
             }
@@ -158,7 +154,7 @@ namespace BetterSecondBotShared.bottypes
 
         protected virtual void RequestLure(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
-            if (FromAgentName == myconfig.master)
+            if (FromAgentName == myconfig.Security_MasterUsername)
             {
                 Client.Self.SendTeleportLure(FromAgentID);
             }
@@ -176,7 +172,7 @@ namespace BetterSecondBotShared.bottypes
         protected virtual void RequestTeleport(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
             bool allow = false;
-            if (FromAgentName == myconfig.master)
+            if (FromAgentName == myconfig.Security_MasterUsername)
             {
                 allow = true;
             }

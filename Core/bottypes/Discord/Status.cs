@@ -19,7 +19,7 @@ namespace BSB.bottypes
         public override string GetStatus()
         {
             string reply = "";
-            if (myconfig.DiscordFullServer == true)
+            if (myconfig.DiscordFull_Enable == true)
             {
                 if (DiscordClientConnected == true)
                 {

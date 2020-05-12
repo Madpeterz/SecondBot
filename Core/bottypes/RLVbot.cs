@@ -19,8 +19,7 @@ namespace BSB.bottypes
             base.Setup(config, Version);
             if (reconnect == false)
             {
-                allow_RLV = myconfig.allowRLV;
-                if (allow_RLV == true)
+                if (myconfig.Setting_AllowRLV == true)
                 {
                     RLVinterface = new RLV.RLVcontrol(this);
                 }

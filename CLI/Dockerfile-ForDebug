@@ -25,46 +25,33 @@ COPY --from=publish /app/publish .
 
 # --- Update your settings ---
 
-# Required
-ENV userName=''
-ENV password=''
-ENV master=''
-ENV code=''
+ENV Basic_BotUserName=''
+ENV Basic_BotPassword=''
+ENV Basic_HomeRegions='http://maps.secondlife.com/secondlife/Viserion/50/140/23'
 
-# Security
-ENV AllowFunds='True'
+ENV Security_MasterUsername='Madpeter Zond'
+ENV Security_SignedCommandkey=''
+ENV Security_WebUIKey=''
 
-# Mixed 
-ENV allowRLV='False'
-ENV CommandsToConsole='True'
-ENV MaxCommandHistory='250'
-ENV RelayImToAvatar='00000000-0000-0000-0000-000000000000'
+ENV Setting_AllowRLV='false'
+ENV Setting_AllowFunds='false'
+ENV Setting_LogCommands='true'
+ENV Setting_RelayImToAvatarUUID=''
+ENV Setting_DefaultSit_UUID=''
 
-# Discord
-ENV discordWebhookURL=''
-ENV discordGroupTarget='00000000-0000-0000-0000-000000000000'
-ENV DiscordFullServer='False'
-ENV DiscordClientToken=''
-ENV DiscordServerID=''
-ENV DiscordServerImHistoryHours='24'
+ENV DiscordRelay_URL=''
+ENV DiscordRelay_GroupUUID=''
+ENV DiscordFull_Enable='true'
+ENV DiscordFull_Token=''
+ENV DiscordFull_ServerID=''
 
-# @home
-ENV homeRegion=''
-ENV AtHomeLockToPos='False'
-ENV AtHomeLockToPosMaxRange='10.0'
-ENV DefaultSitUUID='00000000-0000-0000-0000-000000000000'
-
-# HTTPinterface
-ENV EnableHttp='False'
-ENV HttpPublicUrlBase=''
-ENV Httpport='8080'
-ENV Httpkey=''
-ENV HttpHost='http://localhost'
+ENV Http_Enable='false'
+ENV Http_Port='80'
+ENV Http_Host='http://localhost:80'
+ENV Http_PublicUrl='http://localhost/'
+EXPOSE 80
+ENV ASPNETCORE_URLS http://+:80
 
 # --- End of settings ---
-
-ENV BotRunningInDocker='REQUIRED'
-EXPOSE 8080
-ENV ASPNETCORE_URLS http://+:8080
 
 ENTRYPOINT ["dotnet", "BetterSecondBot.dll"]

@@ -68,12 +68,8 @@ namespace BetterSecondBot.HttpServer
         {
             Config = setConfig;
             Bot = LinkBot;
-            int port = Math.Abs(Config.Httpport);
-            if (Config.Httpkey.Length < 12)
-            {
-                Config.Httpkey = helpers.GetSHA1("" + helpers.UnixTimeNow().ToString() + "" + new Random().Next(4, 9999).ToString()).Substring(0, 12);
-            }
-            if (Config.HttpHost == "docker")
+            int port = Math.Abs(Config.Http_Port);
+            if (Config.Http_Host == "docker")
             {
                 url = "http://*:" + port.ToString() + "/";
             }
@@ -100,9 +96,9 @@ namespace BetterSecondBot.HttpServer
                 HttpListenerRequest req = ctx.Request;
                 HttpListenerResponse resp = ctx.Response;
                 string test = req.Url.AbsolutePath.Substring(1);
-                if (helpers.notempty(Config.HttpPublicUrlBase) == true)
+                if (helpers.notempty(Config.Http_PublicUrl) == true)
                 {
-                    test = test.Replace(Config.HttpPublicUrlBase, "");
+                    test = test.Replace(Config.Http_PublicUrl, "");
                 }
                 List<string> http_args = test.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
                 byte[] data;
@@ -174,7 +170,7 @@ namespace BetterSecondBot.HttpServer
                             if (post_args.ContainsKey("code") == true)
                             {
                                 signing_code = post_args["code"];
-                                string raw = "" + command + "" + arg + "" + Config.Httpkey + "";
+                                string raw = "" + command + "" + arg + "" + Config.Security_SignedCommandkey + "";
                                 string hashcheck = helpers.GetSHA1(raw);
                                 if (hashcheck == signing_code)
                                 {

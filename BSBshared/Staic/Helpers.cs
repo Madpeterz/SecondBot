@@ -142,11 +142,11 @@ namespace BetterSecondBotShared.Static
         }
         public static bool botRequired(JsonConfig test)
         {
-            if (helpers.notempty(test.userName) && helpers.notempty(test.password) && helpers.notempty(test.master) && helpers.notempty(test.code))
+            if (helpers.notempty(test.Basic_BotUserName) && helpers.notempty(test.Basic_BotPassword) && helpers.notempty(test.Security_MasterUsername) && helpers.notempty(test.Security_SignedCommandkey))
             {
                 // required values are set
                 MakeJsonConfig Testing = new MakeJsonConfig();
-                string[] testingfor = new[] { "userName", "password", "code" };
+                string[] testingfor = new[] { "Basic_BotUserName", "Basic_BotPassword", "Security_SignedCommandkey", "Security_WebUIKey" };
                 bool default_value_found = false;
                 foreach (string a in testingfor)
                 {
@@ -159,28 +159,28 @@ namespace BetterSecondBotShared.Static
                 }
                 if (default_value_found == false)
                 {
-                    ConsoleLog.Status("User => " + test.userName);
-                    ConsoleLog.Status("Master => " + test.master);
+                    ConsoleLog.Status("User => " + test.Basic_BotUserName);
+                    ConsoleLog.Status("Master => " + test.Security_MasterUsername);
                 }
                 return !default_value_found;
             }
             else
             {
-                if (helpers.notempty(test.userName) == false)
+                if (helpers.notempty(test.Basic_BotUserName) == false)
                 {
-                    ConsoleLog.Warn("Username is null or empty");
+                    ConsoleLog.Warn("Basic_BotUserName is null or empty");
                 }
-                if (helpers.notempty(test.password) == false)
+                if (helpers.notempty(test.Basic_BotPassword) == false)
                 {
-                    ConsoleLog.Warn("Password is null or empty");
+                    ConsoleLog.Warn("Basic_BotPassword is null or empty");
                 }
-                if (helpers.notempty(test.master) == false)
+                if (helpers.notempty(test.Security_MasterUsername) == false)
                 {
-                    ConsoleLog.Warn("Master is null or empty");
+                    ConsoleLog.Warn("Security_MasterUsername is null or empty");
                 }
-                if (helpers.notempty(test.code) == false)
+                if (helpers.notempty(test.Security_SignedCommandkey) == false)
                 {
-                    ConsoleLog.Warn("Code is null or empty");
+                    ConsoleLog.Warn("Security_SignedCommandkey is null or empty");
                 }
                 return false;
             }

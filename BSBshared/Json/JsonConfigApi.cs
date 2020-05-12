@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml;
 
 namespace BetterSecondBotShared.Json
 {
@@ -13,67 +14,39 @@ namespace BetterSecondBotShared.Json
     {
         public override string GetCommandWorkspace(string cmd)
         {
-            cmd = cmd.ToLowerInvariant();
-            switch (cmd)
-            {
-                case "username": { return "Required"; }
-                case "password": { return "Required"; }
-                case "master": { return "Required"; }
-                case "discordgrouptarget": { return "DiscordRelay"; }
-                case "discordwebhookurl": { return "DiscordRelay"; }
-                case "allowrlv": { return "RLV"; }
-                case "code": { return "Required"; }
-                case "enablehttp": { return "HTTP"; }
-                case "httppublicurlbase": { return "HTTP"; }
-                case "httpport": { return "HTTP"; }
-                case "httpkey": { return "HTTP"; }
-                case "httphost": { return "HTTP"; }
-                case "discordfullserver": { return "DiscordFull"; }
-                case "discordclienttoken": { return "DiscordFull"; }
-                case "discordserverid": { return "DiscordFull"; }
-                case "discordserverimhistoryhours": { return "DiscordFull"; }
-                case "commandstoconsole": { return "Options"; }
-                case "maxcommandhistory": { return "Options"; }
-                case "relayimtoavatar": { return "Options"; }
-                case "homeregion": { return "AtHome"; }
-                case "defaultsituuid": { return "AtHome"; }
-                case "athomelocktopos": { return "AtHome"; }
-                case "athomelocktoposmaxrange": { return "AtHome"; }
-                case "allowfunds": { return "security"; }
-                default: { return "Unknown"; }
-            }
-    }
+            string[] bits = cmd.Split("_");
+            return bits.First();
+        }
+
         public override string GetCommandHelp(string cmd)
         {
-            cmd = cmd.ToLowerInvariant();
-            switch (cmd)
-            {
-                case "username": { return "The full username of the bot"; }
-                case "password": { return "Raw password OR  $1$ followed by the md5 of your password"; }
-                case "master": { return "A vaild avatar name, you can skip Resident if thats the last name"; }
-                case "defaultsituuid": { return "The UUID to sit on when at home region [Any invaild UUID to disable like \"none\"]"; }
-                case "homeregion": { return "An array of SLurl strings to teleport to to avoid a sim shutdown"; }
-                case "discordgrouptarget": { return "The target group UUID to relay group chat from, leave empty for all groups"; }
-                case "discordwebhookurl": { return "A vaild discord hook URL to relay group chat onto<br/>leave as \"\" to disable"; }
-                case "allowrlv": { return "Enable RLV commands interface for the bot"; }
-                case "code": { return "A known secret between your secondlife scripts and the bot<br/>Used to support IM commands"; }
-                case "enablehttp": { return "Enable the HTTP interface (using the HTTP settings)"; }
-                case "httppublicurlbase": { return "what is the public url base for the http interface"; }
-                case "httpport": { return "What port the HTTP interface should be on<br/> Example: 8080"; }
-                case "httpkey": { return "A known secret between used for HTTP calls<br/>Example: \"DontUseThis\""; }
-                case "httphost": { return "The URL to listen for HTTP connections on"; }
-                case "discordfullserver": { return "Should we switch to a full server control discord link"; }
-                case "discordclienttoken": { return "What is the bots client token"; }
-                case "discordserverid": { return "What is the Discord server id we should be using"; }
-                case "discordserverimhistoryhours": { return "How long to keep history messages in Group/IM chats in hours"; }
-                case "commandstoconsole": { return "Should the bot log commands to the console window"; }
-                case "maxcommandhistory": { return "How many commands should the bots command history be"; }
-                case "relayimtoavatar": { return "The UUID to relay avatar IMs to [Any invaild UUID to disable like \"none\"]"; }
-                case "athomelocktopos": { return "When set to true the @home system will attempt to teleport the bot back to the home pos if it leaves athomelocktopos maxrange"; }
-                case "athomelocktoposmaxrange": { return "How far away from the location in homeregion can the bot be before teleporting"; }
-                case "allowfunds": { return "Allow the bot to transfer L$ to avatars / objects and display its L$ balance via command/web gui"; }
-                default: { return "None given"; }
-            }
+            // Basic
+            if (cmd == "Basic_BotUserName") return "Username of the bot *you can leave out Resident if you so wish*";
+            else if (cmd == "Basic_BotPassword") return "Password of the bot *add $1$ followed by the md5 hash if you dont want to expose the raw password example: $1$A3DCB4D229DE6FDE0DB5686DEE47145D";
+            else if (cmd == "Basic_HomeRegions") return "a CSV of SLURLs that the bot will attempt to return to after avoiding a sim shutdown (In testing)";
+            // Security
+            else if (cmd == "Security_MasterUsername") return "The username of the bots owner *you can leave out Resident if you so wish*";
+            else if (cmd == "Security_SignedCommandkey") return "Used when sending the bot a HTTP or IM command that has a hash validation";
+            else if (cmd == "Security_WebUIKey") return "Used with the webUI to login, note: 2FA support is planned soon for this system that will replace this UIkey";
+            // Settings
+            else if (cmd == "Setting_AllowRLV") return "Enable the RLV api interface";
+            else if (cmd == "Setting_AllowFunds") return "Allow the bot to transfer L$ and get a non zero balance";
+            else if (cmd == "Setting_LogCommands") return "Allow the bot to send command to console and discord full if enabled";
+            else if (cmd == "Setting_RelayImToAvatarUUID") return "UUID of who the bot should relay IMs to in secondlife";
+            else if (cmd == "Setting_DefaultSit_UUID") return "UUID of a object the bot should attempt to sit on after logging in";
+            // Discord
+            else if (cmd == "DiscordRelay_URL") return "The webhook URL to send group chat to";
+            else if (cmd == "DiscordRelay_GroupUUID") return "The group UUID to relay group chat for";
+            else if (cmd == "DiscordFull_Enable") return "Allow the bot to fully connect to discord (Disables relay)";
+            else if (cmd == "DiscordFull_Token") return "The discord client token (see: https://discord.com/developers/applications)";
+            else if (cmd == "DiscordFull_ServerID") return "UUID of a object the bot should attempt to sit on after logging in";
+            // HTTP
+            else if (cmd == "Http_Enable") return "Allow the bot to start a HTTP interface (Required for web UI and Post commands)";
+            else if (cmd == "Http_Port") return "The port the HTTP interface should be running on";
+            else if (cmd == "Http_Host") return "The URL the interface is on example use \"docker\" for auto or \"http://localhost:portnum\"";
+            else if (cmd == "Http_PublicUrl") return "The public url used to access the web ui";
+            // Give up
+            return "Unknown value:" + cmd;
         }
 
         public override int ApiCommandsCount { get { return GetCommandsList().Length; } }
@@ -95,37 +68,40 @@ namespace BetterSecondBotShared.Json
             else if (valuetype.Name == "Single") { return new[] { "Float" }; }
             return new[] { "Unknown" };
         }
+
         public override string[] GetCommandArgHints(string cmd)
         {
-            cmd = cmd.ToLowerInvariant();
-            switch (cmd)
-            {
-                case "username": { return new[] { "\"Firstname LastName\"" }; }
-                case "password": { return new[] { "\"PassWord\"" }; }
-                case "master": { return new[] { "\"Madpeter Zond\"" }; }
-                case "homeregion": { return new[] { "[\"SLurl1\",\"SLurl2\"]" }; }
-                case "discordgrouptarget": { return new[] { "\"" + OpenMetaverse.UUID.Zero + "\"" }; }
-                case "discordwebhookurl": { return new[] { "\"https://discordapp.com/api/webhooks/XXXX/YYYY\"" }; }
-                case "allowrlv": { return new[] { "False" }; }
-                case "code": { return new[] { "\"DontTellAnyoneThis\"" }; }
-                case "enablehttp": { return new[] { "false" }; }
-                case "httppublicurlbase": { return new[] { "\"http://bot.domain.com\"" }; }
-                case "httpport": { return new[] { "8080" }; }
-                case "httpkey": { return new[] { "\"ThisIsAKeyYo\"" }; }
-                case "httphost": { return new[] { "\"http://localhost\"" }; }
-                case "discordfullserver": { return new[] { "false" }; }
-                case "discordclienttoken": { return new[] { "https://discordapp.com/developers/ Bot" }; }
-                case "discordserverid": { return new[] { "1234567890" }; }
-                case "discordserverimhistoryhours": { return new[] { "24" }; }
-                case "defaultsituuid": { return new[] { "\"" + OpenMetaverse.UUID.Zero + "\"" }; }
-                case "commandstoconsole": { return new[] { "false" }; }
-                case "maxcommandhistory": { return new[] { "250" }; }
-                case "relayimtoavatar": { return new[] { "\"" + OpenMetaverse.UUID.Zero + "\"" }; }
-                case "athomelocktopos": { return new[] { "false" }; }
-                case "athomelocktoposmaxrange": { return new[] { "10.0" }; }
-                case "allowfunds": { return new[] { "true" }; }
-                default: { return new string[] { }; }
-            }
+            return new string[] { JsonGetCommandArgHints(cmd) };
+        }
+        public string JsonGetCommandArgHints(string cmd)
+        {
+            // Basic
+            if (cmd == "Basic_BotUserName") return "Example Resident";
+            else if (cmd == "Basic_BotPassword") return "Pass";
+            else if (cmd == "Basic_HomeRegions") return "http://maps.secondlife.com/secondlife/Viserion/50/140/23";
+            // Security
+            else if (cmd == "Security_MasterUsername") return "Madpeter Zond";
+            else if (cmd == "Security_SignedCommandkey") return "asdt234t34d3f34f";
+            else if (cmd == "Security_WebUIKey") return "2135r3y4vw232";
+            // Settings
+            else if (cmd == "Setting_AllowRLV") return "False";
+            else if (cmd == "Setting_AllowFunds") return "True";
+            else if (cmd == "Setting_LogCommands") return "True";
+            else if (cmd == "Setting_RelayImToAvatarUUID") return "";
+            else if (cmd == "Setting_DefaultSit_UUID") return "";
+            // Discord
+            else if (cmd == "DiscordRelay_URL") return "";
+            else if (cmd == "DiscordRelay_GroupUUID") return "";
+            else if (cmd == "DiscordFull_Enable") return "False";
+            else if (cmd == "DiscordFull_Token") return "";
+            else if (cmd == "DiscordFull_ServerID") return "";
+            // HTTP
+            else if (cmd == "Http_Enable") return "False";
+            else if (cmd == "Http_Port") return "80";
+            else if (cmd == "Http_Host") return "http://localhost:80";
+            else if (cmd == "Http_PublicUrl") return "http://localhost/";
+            // Give up
+            return "Unknown value:" + cmd;
         }
         public override int GetCommandArgs(string cmd)
         {
@@ -211,38 +187,38 @@ namespace BetterSecondBotShared.Json
 
         public static JsonConfig http_config_check(JsonConfig jsonConfig)
         {
-            if (helpers.notempty(jsonConfig.Httpkey) == true)
+            if (helpers.notempty(jsonConfig.Security_WebUIKey) == true)
             {
-                if (helpers.notempty(jsonConfig.HttpHost) == true)
+                if (helpers.notempty(jsonConfig.Http_Host) == true)
                 {
-                    jsonConfig.EnableHttp = false;
-                    if (jsonConfig.Httpkey.Length < 12)
+                    jsonConfig.Http_Enable = false;
+                    if (jsonConfig.Security_WebUIKey.Length < 12)
                     {
-                        ConsoleLog.Warn("Http disabled: Httpkey length must be 12 or more");
+                        ConsoleLog.Warn("Http disabled: Security_WebUIKey length must be 12 or more");
                     }
-                    else if (jsonConfig.Httpport < 80)
+                    else if (jsonConfig.Http_Port < 80)
                     {
-                        ConsoleLog.Warn("Http disabled: Httpport range below protected range - Given: (" + jsonConfig.Httpport + ")");
+                        ConsoleLog.Warn("Http disabled: Httpport range below protected range - Given: (" + jsonConfig.Http_Port + ")");
                     }
-                    else if ((jsonConfig.HttpHost != "docker") && (jsonConfig.HttpHost.StartsWith("http") == false))
+                    else if ((jsonConfig.Http_Host != "docker") && (jsonConfig.Http_Host.StartsWith("http") == false))
                     {
-                        ConsoleLog.Warn("Http disabled: HttpHost must be vaild: http://XXXXXX or \"docker\" - Given: ("+jsonConfig.HttpHost+")");
+                        ConsoleLog.Warn("Http disabled: Http_Host must be vaild: http://XXXXXX or \"docker\" - Given: (" + jsonConfig.Http_Host + ")");
                     }
                     else
                     {
-                        jsonConfig.EnableHttp = true;
+                        jsonConfig.Http_Enable = true;
                     }
                 }
                 else
                 {
-                    ConsoleLog.Warn("Http disabled: HttpHost is null");
-                    jsonConfig.EnableHttp = false;
+                    ConsoleLog.Warn("Http disabled: Http_Host is null");
+                    jsonConfig.Http_Enable = false;
                 }
             }
             else
             {
-                ConsoleLog.Warn("Http disabled: Httpkey is null");
-                jsonConfig.EnableHttp = false;
+                ConsoleLog.Warn("Http disabled: Security_WebUIKey is null");
+                jsonConfig.Http_Enable = false;
             }
             return jsonConfig;
         }

@@ -74,9 +74,9 @@ namespace BetterSecondBot.HttpWebUi
                 }
                 string layout = helpers.ReadResourceFile(Assembly.GetExecutingAssembly(), "full.layout");
                 layout = layout.Replace("[[page_content]]", helpers.ReadResourceFile(Assembly.GetExecutingAssembly(), "login.block"));
-                layout = layout.Replace("[[url_base]]", siteconfig.HttpPublicUrlBase);
+                layout = layout.Replace("[[url_base]]", siteconfig.Http_PublicUrl);
                 layout = layout.Replace("[[html_title_after]]", "Secondbot web UI");
-                layout = layout.Replace("[[html_title]]", siteconfig.userName);
+                layout = layout.Replace("[[html_title]]", siteconfig.Basic_BotUserName);
                 layout = layout.Replace("[[html_cs_top]]", helpers.ReadResourceFile(Assembly.GetExecutingAssembly(), "cdn.css.layout"));
                 layout = layout.Replace("[[html_js_bottom]]", helpers.ReadResourceFile(Assembly.GetExecutingAssembly(), "cdn.js.layout"));
                 

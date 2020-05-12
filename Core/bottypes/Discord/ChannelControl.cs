@@ -49,7 +49,7 @@ namespace BSB.bottypes
             }
             else
             {
-                await CleanDiscordChannel(result, myconfig.DiscordServerImHistoryHours).ConfigureAwait(false);
+                await CleanDiscordChannel(result, 24).ConfigureAwait(false);
             }
             DiscordLock = false;
             return result;
@@ -109,7 +109,7 @@ namespace BSB.bottypes
             }
             else if (sender_id == UUID.Zero.ToString())
             {
-                display_topic = "" + myconfig.userName + " #" + MyVersion + "";
+                display_topic = "" + myconfig.Basic_BotUserName + " #" + MyVersion + "";
             }
             else if (channeltopictype == "Group")
             {

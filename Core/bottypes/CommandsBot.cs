@@ -42,17 +42,17 @@ namespace BSB.bottypes
                     sb.Append("]");
                 }
                 CommandHistory.Add(sb.ToString());
-                if (CommandHistory.Count() > myconfig.MaxCommandHistory)
+                if (CommandHistory.Count() > 50)
                 {
                     CommandHistory.RemoveAt(0);
                 }
                 message = sb.ToString();
-                if (myconfig.CommandsToConsole == true)
+                if (myconfig.Setting_LogCommands == true)
                 {
                     ConsoleLog.Info(message);
                 }
                 commandid++;
-                if (commandid >= myconfig.MaxCommandHistory)
+                if (commandid >= 50)
                 {
                     commandid = 1;
                 }
@@ -154,7 +154,7 @@ namespace BSB.bottypes
             {
                 if (signing_code != "")
                 {
-                    string raw = "" + command + "" + arg + "" + myconfig.code + "";
+                    string raw = "" + command + "" + arg + "" + myconfig.Security_SignedCommandkey + "";
                     string hashcheck = helpers.GetSHA1(raw);
                     if (hashcheck == signing_code)
                     {

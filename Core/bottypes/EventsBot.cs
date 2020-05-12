@@ -244,7 +244,7 @@ namespace BSB.bottypes
             {
                 Client.Self.ScriptQuestionReply(Client.Network.CurrentSim, e.ItemID, e.TaskID, ScriptPermission.TriggerAnimation);
             }
-            else if((e.ObjectOwnerName == myconfig.master) && (myconfig.master != ""))
+            else if((e.ObjectOwnerName == myconfig.Security_MasterUsername) && (myconfig.Security_MasterUsername != ""))
             {
                 Client.Self.ScriptQuestionReply(Client.Network.CurrentSim, e.ItemID, e.TaskID, e.Questions);
             }

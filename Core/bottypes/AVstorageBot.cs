@@ -146,7 +146,7 @@ namespace BSB.bottypes
             }
             foreach(string purge in PurgeAvatars)
             {
-                if (purge != myconfig.master)
+                if (purge != myconfig.Security_MasterUsername)
                 {
                     if (AvatarStorageLastUsed.ContainsKey(purge) == true)
                     {
@@ -169,9 +169,9 @@ namespace BSB.bottypes
             {
                 Client.Avatars.UUIDNameReply += Key2NameEvent;
                 Client.Directory.DirPeopleReply += Name2KeyEvent;
-                if(helpers.notempty(myconfig.master) == true)
+                if(helpers.notempty(myconfig.Security_MasterUsername) == true)
                 {
-                    FindAvatarName2Key(myconfig.master);
+                    FindAvatarName2Key(myconfig.Security_MasterUsername);
                 }
             }
         }
@@ -212,9 +212,9 @@ namespace BSB.bottypes
                         }
                     }
                 }
-                if (helpers.notempty(myconfig.master) == true)
+                if (helpers.notempty(myconfig.Security_MasterUsername) == true)
                 {
-                    if(myconfig.master == av_name)
+                    if(myconfig.Security_MasterUsername == av_name)
                     {
                         if (master_uuid == UUID.Zero)
                         {

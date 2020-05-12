@@ -20,21 +20,21 @@ namespace BSB.bottypes
         {
             if (reconnect == false)
             {
-                if (helpers.notempty(myconfig.DiscordClientToken) == false)
+                if (helpers.notempty(myconfig.DiscordFull_Token) == false)
                 {
-                    myconfig.DiscordFullServer = false;
+                    myconfig.DiscordFull_Enable = false;
                 }
-                else if (myconfig.DiscordServerID <= 0)
+                else if (myconfig.DiscordFull_ServerID <= 0)
                 {
-                    myconfig.DiscordFullServer = false;
+                    myconfig.DiscordFull_Enable = false;
                 }
-                if (myconfig.DiscordFullServer == false)
+                if (myconfig.DiscordFull_Enable == false)
                 {
-                    if (helpers.notempty(myconfig.discordWebhookURL) == true)
+                    if (helpers.notempty(myconfig.DiscordRelay_URL) == true)
                     {
-                        if (helpers.notempty(myconfig.discordGroupTarget) == true)
+                        if (helpers.notempty(myconfig.DiscordRelay_GroupUUID) == true)
                         {
-                            if (UUID.TryParse(myconfig.discordGroupTarget, out UUID targetgroup) == true)
+                            if (UUID.TryParse(myconfig.DiscordRelay_GroupUUID, out UUID targetgroup) == true)
                             {
                                 if (targetgroup != UUID.Zero)
                                 {
@@ -46,19 +46,11 @@ namespace BSB.bottypes
                 }
                 else
                 {
-                    if (myconfig.DiscordServerImHistoryHours > 48)
-                    {
-                        myconfig.DiscordServerImHistoryHours = 48;
-                    }
-                    else if (myconfig.DiscordServerImHistoryHours < 1)
-                    {
-                        myconfig.DiscordServerImHistoryHours = 1;
-                    }
                     DiscordClient = new DiscordSocketClient();
                     DiscordClient.Ready += DiscordClientReady;
                     DiscordClient.LoggedOut += DiscordClientLoggedOut;
                     DiscordClient.MessageReceived += DiscordClientMessageReceived;
-                    await DiscordClient.LoginAsync(TokenType.Bot, myconfig.DiscordClientToken);
+                    await DiscordClient.LoginAsync(TokenType.Bot, myconfig.DiscordFull_Token);
                     _ = DiscordClient.StartAsync();
                 }
             }
@@ -66,7 +58,7 @@ namespace BSB.bottypes
 
         protected Task DiscordClientReady()
         {
-            DiscordServer = DiscordClient.GetGuild(myconfig.DiscordServerID);
+            DiscordServer = DiscordClient.GetGuild(myconfig.DiscordFull_ServerID);
             if (DiscordServer != null)
             {
                 DiscordUnixTimeOnine = helpers.UnixTimeNow();

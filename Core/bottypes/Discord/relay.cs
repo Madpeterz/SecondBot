@@ -54,19 +54,19 @@ namespace BSB.bottypes
         {
             if (fromme == false)
             {
-                if (myconfig.DiscordFullServer == false)
+                if (myconfig.DiscordFull_Enable == false)
                 {
                     if (discord_group_relay == true)
                     {
                         // GroupChat Relay only
                         if (group == true)
                         {
-                            if (myconfig.discordWebhookURL != "")
+                            if (myconfig.DiscordRelay_URL != "")
                             {
-                                if ((myconfig.discordGroupTarget == group_uuid.ToString()) || (myconfig.discordGroupTarget == "*") || (myconfig.discordGroupTarget == "all"))
+                                if ((myconfig.DiscordRelay_GroupUUID == group_uuid.ToString()) || (myconfig.DiscordRelay_GroupUUID == "*") || (myconfig.DiscordRelay_GroupUUID == "all"))
                                 {
                                     Group Gr = mygroups[group_uuid];
-                                    using var DWHclient = new DiscordWebhookClient(myconfig.discordWebhookURL);
+                                    using var DWHclient = new DiscordWebhookClient(myconfig.DiscordRelay_URL);
                                     string SendMessage = "(" + Gr.Name + ") @" + sender_name + ":" + message + "";
                                     await DWHclient.SendMessageAsync(text: SendMessage).ConfigureAwait(false);
                                     DWHclient.Dispose();

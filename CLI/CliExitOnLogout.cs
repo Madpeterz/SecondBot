@@ -22,7 +22,7 @@ namespace BetterSecondBot
                 SecondBot Bot = new SecondBot();
                 Bot.Setup(Config, AssemblyInfo.GetGitHash());
                 Bot.Start();
-                if (Config.EnableHttp == true)
+                if (Config.Http_Enable == true)
                 {
                     SecondBotHttpServer my_http_server = new SecondBotHttpServer();
                     my_http_server.StartHttpServer(Bot,Config);

@@ -28,12 +28,12 @@ namespace BSB.bottypes
                 started_friendship_hug = true;
                 if (Client.Friends.FriendList.ContainsKey(master_uuid) == false)
                 {
-                    CommandsInterface.Call("IM", String.Join("~#~", new string[] { myconfig.master, "Hello master, I am sending you a friend request now!" }));
-                    CommandsInterface.Call("FriendRequest", myconfig.master, Client.Self.AgentID);
+                    CommandsInterface.Call("IM", String.Join("~#~", new string[] { myconfig.Security_MasterUsername, "Hello master, I am sending you a friend request now!" }));
+                    CommandsInterface.Call("FriendRequest", myconfig.Security_MasterUsername, Client.Self.AgentID);
                 }
                 else
                 {
-                    CommandsInterface.Call("FriendFullPerms", String.Join("~#~", new string[] { myconfig.master, "true" }), Client.Self.AgentID);
+                    CommandsInterface.Call("FriendFullPerms", String.Join("~#~", new string[] { myconfig.Security_MasterUsername, "true" }), Client.Self.AgentID);
                 }
             }
         }
@@ -49,7 +49,7 @@ namespace BSB.bottypes
         }
         protected override void FoundMasterAvatar()
         {
-            if (helpers.notempty(myconfig.master) == true)
+            if (helpers.notempty(myconfig.Security_MasterUsername) == true)
             {
                 masteruuid_ready = true;
                 TryHugMaster();
@@ -61,9 +61,9 @@ namespace BSB.bottypes
             base.FriendshipResponse(o, E);
             if(E.Accepted == true)
             {
-                if(E.AgentName == myconfig.master)
+                if(E.AgentName == myconfig.Security_MasterUsername)
                 {
-                    CommandsInterface.Call("FriendFullPerms", String.Join("~#~", new string[] { myconfig.master, "true" }), Client.Self.AgentID);
+                    CommandsInterface.Call("FriendFullPerms", String.Join("~#~", new string[] { myconfig.Security_MasterUsername, "true" }), Client.Self.AgentID);
                 }
             }
         }

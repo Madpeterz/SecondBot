@@ -9,18 +9,6 @@ namespace BSB.bottypes
 {
     public abstract class AtHome : MessageSwitcherBot
     {
-        public void TempUpdateAtHomeSimOnly(bool status)
-        {
-            myconfig.AtHomeLockToPos = !status;
-        }
-        public void TempUpdateAtHomeSimRange(float range)
-        {
-            if (range < 3)
-            {
-                range = 3;
-            }
-            myconfig.AtHomeLockToPosMaxRange = range;
-        }
         protected string LoggedOutNextAction()
         {
             string addon = "";
@@ -92,7 +80,7 @@ namespace BSB.bottypes
                 }
                 else
                 {
-                    if (UUID.TryParse(myconfig.DefaultSitUUID, out UUID sit_UUID) == true)
+                    if (UUID.TryParse(myconfig.Setting_DefaultSit_UUID, out UUID sit_UUID) == true)
                     {
                         Client.Self.RequestSit(sit_UUID, Vector3.Zero);
                     }
@@ -144,47 +132,22 @@ namespace BSB.bottypes
         public bool IsSimHome(string simname)
         {
             simname = simname.ToLowerInvariant();
-            if (helpers.notempty(myconfig.homeRegion) == false)
+            if (helpers.notempty(myconfig.Basic_HomeRegions) == false)
             {
                 return false;
             }
-            else if (myconfig.homeRegion.Length == 0)
+            else if (myconfig.Basic_HomeRegions.Length == 0)
             {
                 return false;
             }
             else
             {
                 bool reply = false;
-                foreach (string sl_url in myconfig.homeRegion)
+                foreach (string sl_url in myconfig.Basic_HomeRegions)
                 {
                     if (sl_url.ToLowerInvariant().Contains(simname) == true)
                     {
-                        if (myconfig.AtHomeLockToPos == true)
-                        {
-                            bool inrange = true;
-                            string[] bits = helpers.ParseSLurl(sl_url);
-                            if (helpers.notempty(bits) == true)
-                            {
-                                if (bits.Length == 4)
-                                {
-                                    if (GetClient.Self.SittingOn == 0)
-                                    {
-                                        float.TryParse(bits[1], out float posX);
-                                        float.TryParse(bits[2], out float posY);
-                                        float.TryParse(bits[3], out float posZ);
-                                        inrange = helpers.distance_check(Client.Self.SimPosition.X, posX, myconfig.AtHomeLockToPosMaxRange, inrange);
-                                        inrange = helpers.distance_check(Client.Self.SimPosition.Y, posY, myconfig.AtHomeLockToPosMaxRange, inrange);
-                                        inrange = helpers.distance_check(Client.Self.SimPosition.Z, posZ, myconfig.AtHomeLockToPosMaxRange, inrange);
-                                    }
-                                }
-                            }
-                            reply = inrange;
-                        }
-                        else
-                        {
-                            reply = true;
-                        }
-                        break;
+                        reply = true;
                     }
                 }
                 return reply;
@@ -201,15 +164,15 @@ namespace BSB.bottypes
         {
             if (panic_mode == false)
             {
-                if (myconfig.homeRegion.Length > 0)
+                if (myconfig.Basic_HomeRegions.Length > 0)
                 {
                     last_tp_attempt_unixtime = helpers.UnixTimeNow();
                     last_tested_home_id++;
-                    if (myconfig.homeRegion.Length >= last_tested_home_id)
+                    if (myconfig.Basic_HomeRegions.Length >= last_tested_home_id)
                     {
                         last_tested_home_id = 0;
                     }
-                    TeleportWithSLurl(myconfig.homeRegion[last_tested_home_id]);
+                    TeleportWithSLurl(myconfig.Basic_HomeRegions[last_tested_home_id]);
                     return " [@home **** active teleport: "+ last_attempted_teleport_region+"***]";
                 }
                 return " [@home No home regions]";
@@ -218,7 +181,7 @@ namespace BSB.bottypes
             {
                 SimShutdownAvoid = true;
                 string UseSLurl = "";
-                foreach (string Slurl in myconfig.homeRegion)
+                foreach (string Slurl in myconfig.Basic_HomeRegions)
                 {
                     string simname = helpers.RegionnameFromSLurl(Slurl);
                     if (avoid_sims.Keys.Contains(simname) == false)
@@ -274,7 +237,7 @@ namespace BSB.bottypes
                 Client.Self.AlertMessage += AlertEvent;
                 Client.Network.SimChanged += ChangeSim;
             }
-            if (UUID.TryParse(myconfig.DefaultSitUUID, out UUID sit_UUID) == true)
+            if (UUID.TryParse(myconfig.Setting_DefaultSit_UUID, out UUID sit_UUID) == true)
             {
                 Client.Self.RequestSit(sit_UUID, Vector3.Zero);
             }
@@ -306,11 +269,11 @@ namespace BSB.bottypes
         {
             if (sl_url != null)
             {
-                if (myconfig.homeRegion.Contains(sl_url) == false)
+                if (myconfig.Basic_HomeRegions.Contains(sl_url) == false)
                 {
-                    List<string> old = myconfig.homeRegion.ToList();
+                    List<string> old = myconfig.Basic_HomeRegions.ToList();
                     old.Add(sl_url);
-                    myconfig.homeRegion = old.ToArray();
+                    myconfig.Basic_HomeRegions = old.ToArray();
                 }
             }
             last_tested_home_id = -1;

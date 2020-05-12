@@ -52,13 +52,13 @@ namespace BSB.bottypes
                 {
                     if(avatar == true)
                     {
-                        if (myconfig.RelayImToAvatar != null)
+                        if (myconfig.Setting_RelayImToAvatarUUID != null)
                         {
-                            if (myconfig.RelayImToAvatar != UUID.Zero.ToString())
+                            if (myconfig.Setting_RelayImToAvatarUUID != UUID.Zero.ToString())
                             {
-                                if (myconfig.RelayImToAvatar.Length == UUID.Zero.ToString().Length)
+                                if (myconfig.Setting_RelayImToAvatarUUID.Length == UUID.Zero.ToString().Length)
                                 {
-                                    if (UUID.TryParse(myconfig.RelayImToAvatar, out UUID targetav) == true)
+                                    if (UUID.TryParse(myconfig.Setting_RelayImToAvatarUUID, out UUID targetav) == true)
                                     {
                                         Client.Self.InstantMessage(targetav, "Relay-> " + sender_name + ": " + message + "");
                                     }
@@ -101,7 +101,7 @@ namespace BSB.bottypes
                     {
                         CoreCommandLib(sender_uuid, false, bits.ElementAt(0), bits.ElementAt(1), signing_code, arg_signed_with);
                     }
-                    else if (myconfig.master == sender_name)
+                    else if (myconfig.Security_MasterUsername == sender_name)
                     {
                         CoreCommandLib(sender_uuid, true, bits.ElementAt(0), bits.ElementAt(1), "", arg_signed_with);
                     }
