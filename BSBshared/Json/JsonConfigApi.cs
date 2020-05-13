@@ -191,22 +191,29 @@ namespace BetterSecondBotShared.Json
             {
                 if (helpers.notempty(jsonConfig.Http_Host) == true)
                 {
-                    jsonConfig.Http_Enable = false;
-                    if (jsonConfig.Security_WebUIKey.Length < 12)
+                    if (jsonConfig.Http_Enable == true)
                     {
-                        ConsoleLog.Warn("Http disabled: Security_WebUIKey length must be 12 or more");
-                    }
-                    else if (jsonConfig.Http_Port < 80)
-                    {
-                        ConsoleLog.Warn("Http disabled: Httpport range below protected range - Given: (" + jsonConfig.Http_Port + ")");
-                    }
-                    else if ((jsonConfig.Http_Host != "docker") && (jsonConfig.Http_Host.StartsWith("http") == false))
-                    {
-                        ConsoleLog.Warn("Http disabled: Http_Host must be vaild: http://XXXXXX or \"docker\" - Given: (" + jsonConfig.Http_Host + ")");
+                        jsonConfig.Http_Enable = false;
+                        if (jsonConfig.Security_WebUIKey.Length < 12)
+                        {
+                            ConsoleLog.Warn("Http disabled: Security_WebUIKey length must be 12 or more");
+                        }
+                        else if (jsonConfig.Http_Port < 80)
+                        {
+                            ConsoleLog.Warn("Http disabled: Httpport range below protected range - Given: (" + jsonConfig.Http_Port + ")");
+                        }
+                        else if ((jsonConfig.Http_Host != "docker") && (jsonConfig.Http_Host.StartsWith("http") == false))
+                        {
+                            ConsoleLog.Warn("Http disabled: Http_Host must be vaild: http://XXXXXX or \"docker\" - Given: (" + jsonConfig.Http_Host + ")");
+                        }
+                        else
+                        {
+                            jsonConfig.Http_Enable = true;
+                        }
                     }
                     else
                     {
-                        jsonConfig.Http_Enable = true;
+                        ConsoleLog.Info("Http interface disabled by config");
                     }
                 }
                 else
