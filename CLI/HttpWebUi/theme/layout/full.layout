@@ -1,6 +1,7 @@
 <html>
 <head>
     <title>[[html_title]] - [[html_title_after]]</title>
+    [[html_cs_top_cdn]]
     [[html_cs_top]]
     <link rel="icon" type="image/png" href="[[url_base]]theme/images/favicon.png">
     <link rel="stylesheet" type="text/css" href="[[url_base]]theme/css/site.css">
@@ -22,6 +23,7 @@
             </div>
         </div>
     </div>
+    [[html_js_bottom_cdn]]
     [[html_js_bottom]]
     <script type="text/javascript" src="[[url_base]]theme/js/site.js"></script>
     <script type="text/javascript">
