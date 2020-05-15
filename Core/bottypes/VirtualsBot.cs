@@ -9,10 +9,42 @@ namespace BSB.bottypes
 {
     public abstract class VirtualsBot : BasicBot
     {
+        public virtual Dictionary<UUID, string> GetIMChatWindowKeyNames()
+        {
+            return new Dictionary<UUID, string>();
+        }
+        public virtual void AddToLocalChat(string name, string message)
+        {
+
+        }
+        #region IMchat
+        public virtual List<UUID> IMChatWindows()
+        {
+            return new List<UUID>();
+        }
+        public virtual bool ImChatWindowHasUnread(UUID chat_window)
+        {
+            return false;
+        }
+        public virtual List<string> GetIMChatWindow(UUID chat_window)
+        {
+            return new List<string>();
+        }
+        public virtual void AddToIMchat(UUID avatar, string name, string message)
+        {
+
+        }
+        #endregion
+
+
         #region group
         protected List<UUID> active_group_chat_sessions = new List<UUID>();
         public virtual List<UUID> GetActiveGroupchatSessions { get { return new List<UUID>(); } }
         #endregion
+        public virtual List<string> getLocalChatHistory()
+        {
+            return new List<string>() { };
+        }
         #region GroupIMs
         public virtual bool HasUnreadGroupchats()
         {
@@ -22,11 +54,11 @@ namespace BSB.bottypes
         {
             return new UUID[] { };
         }
-        public virtual string[] GetGroupchat(UUID group)
+        public virtual List<string> GetGroupchat(UUID group)
         {
-            return new string[] { };
+            return new List<string>();
         }
-        protected virtual void AddToGroupchat(UUID group, string name, string message)
+        public virtual void AddToGroupchat(UUID group, string name, string message)
         {
 
         }

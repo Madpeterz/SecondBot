@@ -31,6 +31,10 @@ namespace BSB.Commands.Chat
                         }
                     }
                 }
+                if (channel == 0)
+                {
+                    bot.AddToLocalChat(bot.GetClient.Self.Name, message);
+                }
                 bot.GetClient.Self.Chat(message, channel, ChatLevel);
                 return true;
             }

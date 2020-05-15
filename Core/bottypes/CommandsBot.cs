@@ -77,6 +77,7 @@ namespace BSB.bottypes
         }
         public virtual void SendIM(UUID avatar,string message)
         {
+            AddToIMchat(avatar, GetClient.Self.Name, message);
             Client.Self.InstantMessage(avatar, message);
         }
 

@@ -24,7 +24,10 @@ namespace BSB.bottypes
                     {
                         av = true;
                     }
-                    BotChatControler(e.Message, e.FromName, e.SourceID, av, false, UUID.Zero, true, fromme);
+                    if (e.Message != "")
+                    {
+                        BotChatControler(e.Message, e.FromName, e.SourceID, av, false, UUID.Zero, true, fromme);
+                    }
                 }
             }
         }
