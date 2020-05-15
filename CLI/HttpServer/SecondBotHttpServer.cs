@@ -15,6 +15,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace BetterSecondBot.HttpServer
 {
@@ -104,10 +105,20 @@ namespace BetterSecondBot.HttpServer
                 HttpListenerRequest req = ctx.Request;
                 HttpListenerResponse resp = ctx.Response;
                 resp.Cookies = req.Cookies;
-                string test = req.Url.AbsolutePath.Substring(1);
+                string test = req.Url.AbsoluteUri;
                 if (helpers.notempty(Config.Http_PublicUrl) == true)
                 {
+                    // normal mapped
                     test = test.Replace(Config.Http_PublicUrl, "");
+
+                    //rproxy weirdness
+                    string use_http_url = Config.Http_PublicUrl.Replace("http://", "");
+                    use_http_url = Config.Http_PublicUrl.Replace("https://", "");
+                    test = test.Replace(":" + Config.Http_Port.ToString(), "");
+                    test = test.Replace(use_http_url, "");
+                    test = test.Replace("https://", "");
+                    test = test.Replace("http://", "");
+                    
                 }
                 json_http_reply reply = new json_http_reply();
                 List<string> http_args = test.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -149,7 +160,7 @@ namespace BetterSecondBot.HttpServer
                         string[] bits = B.Split('=', StringSplitOptions.RemoveEmptyEntries);
                         if (bits.Length == 2)
                         {
-                            post_args.Add(bits[0].Trim(), bits[1].Trim());
+                            post_args.Add(bits[0].Trim(), HttpUtility.UrlDecode(bits[1].Trim()));
                         }
                     }
                     resp.StatusCode = 200;
@@ -195,13 +206,20 @@ namespace BetterSecondBot.HttpServer
                             reply.message = String.Join("###", post_controler.Call(command, arg));
                         }
                     }
-                    if(reply.redirect != "")
+                    if (reply.redirect != "")
                     {
-                        if(reply.redirect == "/")
+                        if (reply.redirect != null)
                         {
-                            reply.redirect = "";
+                            if (reply.redirect == "/")
+                            {
+                                reply.redirect = Config.Http_PublicUrl;
+                            }
+                            else
+                            {
+                                reply.redirect = Config.Http_PublicUrl + reply.redirect;
+                            }
                         }
-                        reply.redirect = "" + Config.Http_PublicUrl + "" + reply.redirect + "";
+
                     }
                     data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(reply));
                     resp.ContentLength64 = data.LongLength;
@@ -230,15 +248,21 @@ namespace BetterSecondBot.HttpServer
                 }
                 if (ok == true)
                 {
-                    try
+                    bool clean_exit = false;
+                    ConsoleLog.Status("Listening for connections on " + url + "");
+                    while (clean_exit == false)
                     {
-                        ConsoleLog.Status("Listening for connections on " + url + "");
-                        Task listenTask = HandleIncomingConnections();
-                        listenTask.GetAwaiter().GetResult();
-                    }
-                    catch(Exception e)
-                    {
-                        ConsoleLog.Status("Http interface killed itself: "+e.ToString()+"");
+                        try
+                        {
+                            ConsoleLog.Status("HTTP ready");
+                            Task listenTask = HandleIncomingConnections();
+                            listenTask.GetAwaiter().GetResult();
+                        }
+                        catch (Exception e)
+                        {
+                            ConsoleLog.Status("HTTP died");
+                            //ConsoleLog.Status("Http interface killed itself: " + e.ToString() + "");
+                        }
                     }
                 }
                 listener.Close();
