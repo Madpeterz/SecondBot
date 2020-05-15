@@ -258,7 +258,7 @@ namespace BetterSecondBot.HttpServer
                             Task listenTask = HandleIncomingConnections();
                             listenTask.GetAwaiter().GetResult();
                         }
-                        catch (Exception e)
+                        catch
                         {
                             ConsoleLog.Status("HTTP died");
                             //ConsoleLog.Status("Http interface killed itself: " + e.ToString() + "");
