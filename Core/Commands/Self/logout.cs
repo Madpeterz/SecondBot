@@ -2,6 +2,15 @@
 
 namespace BSB.Commands.Self
 {
+    public class Bye : Logout
+    {
+        public override string Helpfile { get { return "Makes the bot kill itself you monster"; } }
+        public override bool CallFunction(string[] args)
+        {
+            bot.KillMePlease();
+            return true;
+        }
+    }
     public class Logout : CoreCommand
     {
         public override string Helpfile { get { return "Makes the bot kill itself you monster"; } }
