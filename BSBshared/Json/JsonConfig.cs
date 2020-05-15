@@ -23,6 +23,7 @@ namespace BetterSecondBotShared.Json
         public bool Setting_LogCommands { get; set; }
         public string Setting_RelayImToAvatarUUID { get; set; }
         public string Setting_DefaultSit_UUID { get; set; }
+        public string Setting_loginURI { get; set; }
 
         // Discord Relay
         public string DiscordRelay_URL { get; set; }

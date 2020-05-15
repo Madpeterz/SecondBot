@@ -34,6 +34,7 @@ namespace BetterSecondBotShared.Json
             else if (cmd == "Setting_LogCommands") return "Allow the bot to send command to console and discord full if enabled";
             else if (cmd == "Setting_RelayImToAvatarUUID") return "UUID of who the bot should relay IMs to in secondlife";
             else if (cmd == "Setting_DefaultSit_UUID") return "UUID of a object the bot should attempt to sit on after logging in";
+            else if (cmd == "Setting_loginURI") return "the URI to login to (leave as \"secondlife\" unless you know what your doing!)";
             // Discord
             else if (cmd == "DiscordRelay_URL") return "The webhook URL to send group chat to";
             else if (cmd == "DiscordRelay_GroupUUID") return "The group UUID to relay group chat for";
@@ -89,6 +90,7 @@ namespace BetterSecondBotShared.Json
             else if (cmd == "Setting_LogCommands") return "True";
             else if (cmd == "Setting_RelayImToAvatarUUID") return "";
             else if (cmd == "Setting_DefaultSit_UUID") return "";
+            else if (cmd == "Setting_loginURI") return "secondlife";
             // Discord
             else if (cmd == "DiscordRelay_URL") return "";
             else if (cmd == "DiscordRelay_GroupUUID") return "";
