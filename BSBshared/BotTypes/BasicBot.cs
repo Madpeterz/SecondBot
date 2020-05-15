@@ -75,7 +75,31 @@ namespace BetterSecondBotShared.bottypes
             Client.Settings.ALWAYS_REQUEST_OBJECTS = true;
             Client.Settings.AVATAR_TRACKING = true;
             List<string> bits = myconfig.Basic_BotUserName.Split(' ').ToList();
-            LoginParams Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
+            LoginParams Lp;
+            if (myconfig.Setting_loginURI != "secondlife")
+            {
+                if (myconfig.Setting_loginURI != null)
+                {
+                    if (myconfig.Setting_loginURI.Length > 5)
+                    {
+                        Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version, myconfig.Setting_loginURI);
+                    }
+                    else
+                    {
+                        ConsoleLog.Warn("loginURI invaild: using secondlife");
+                        Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
+                    }
+                }
+                else
+                {
+                    ConsoleLog.Warn("loginURI invaild: using secondlife");
+                    Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
+                }
+            }
+            else
+            {
+                Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
+            }
             if (reconnect == false)
             {
                 BotStartHandler();
