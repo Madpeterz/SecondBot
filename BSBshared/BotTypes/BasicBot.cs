@@ -15,6 +15,18 @@ namespace BetterSecondBotShared.bottypes
         {
             LastStatusMessage = "No status";
         }
+        protected List<string> SubMasters = new List<string>();
+        public bool is_avatar_master(string name)
+        {
+            if (name == myconfig.Security_MasterUsername)
+            {
+                return true;
+            }
+            else
+            {
+                return SubMasters.Contains(name);
+            }
+        }
 
         protected bool killMe;
         protected JsonConfig myconfig;
@@ -64,6 +76,21 @@ namespace BetterSecondBotShared.bottypes
             {
                 bits.Add("Resident");
                 myconfig.Security_MasterUsername = String.Join(" ", bits);
+
+            }
+            if (helpers.notempty(myconfig.Security_SubMasters) == true)
+            {
+                string[] master_names = myconfig.Security_SubMasters.Split(",", StringSplitOptions.RemoveEmptyEntries);
+                foreach (string a in master_names)
+                {
+                    bits = a.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+                    if (bits.Count == 1)
+                    {
+                        bits.Add("Resident");
+                    }
+                    SubMasters.Add(String.Join(" ", bits));
+                    ConsoleLog.Info("Sub-Master: " + myconfig.Security_MasterUsername);
+                }
             }
             ConsoleLog.Info("Build: " + version);
         }
@@ -159,9 +186,17 @@ namespace BetterSecondBotShared.bottypes
 
         protected virtual void GroupInvite(InstantMessageEventArgs e)
         {
-            string[] stage1 = myconfig.Security_MasterUsername.ToLowerInvariant().Split(' ');
-            string bad_master_name = String.Join('.', stage1);
-            if (e.IM.FromAgentName == bad_master_name)
+            string[] stage1 = e.IM.FromAgentName.ToLowerInvariant().Split('.');
+            string name = "" + stage1[0].FirstCharToUpper() + "";
+            if (stage1.Length == 1)
+            {
+                name = " Resident";
+            }
+            else
+            {
+                name = "" + name + " " + stage1[1].FirstCharToUpper() + "";
+            }
+            if(is_avatar_master(name) == true)
             {
                 GroupInvitationEventArgs G = new GroupInvitationEventArgs(e.Simulator, e.IM.FromAgentID, e.IM.FromAgentName, e.IM.Message);
                 Client.Self.GroupInviteRespond(G.AgentID, e.IM.IMSessionID, true);
@@ -170,7 +205,7 @@ namespace BetterSecondBotShared.bottypes
         }
         protected virtual void FriendshipOffer(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
-            if (FromAgentName == myconfig.Security_MasterUsername)
+            if (is_avatar_master(FromAgentName) == true)
             {
                 Client.Friends.AcceptFriendship(FromAgentID, IMSessionID);
             }
@@ -178,7 +213,7 @@ namespace BetterSecondBotShared.bottypes
 
         protected virtual void RequestLure(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
-            if (FromAgentName == myconfig.Security_MasterUsername)
+            if (is_avatar_master(FromAgentName) == true)
             {
                 Client.Self.SendTeleportLure(FromAgentID);
             }
@@ -196,7 +231,7 @@ namespace BetterSecondBotShared.bottypes
         protected virtual void RequestTeleport(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
             bool allow = false;
-            if (FromAgentName == myconfig.Security_MasterUsername)
+            if (is_avatar_master(FromAgentName) == true)
             {
                 allow = true;
             }

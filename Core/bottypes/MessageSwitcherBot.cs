@@ -104,9 +104,12 @@ namespace BSB.bottypes
                     {
                         CoreCommandLib(sender_uuid, false, bits.ElementAt(0), bits.ElementAt(1), signing_code, arg_signed_with);
                     }
-                    else if (myconfig.Security_MasterUsername == sender_name)
+                    else
                     {
-                        CoreCommandLib(sender_uuid, true, bits.ElementAt(0), bits.ElementAt(1), "", arg_signed_with);
+                        if (is_avatar_master(sender_name) == true)
+                        {
+                            CoreCommandLib(sender_uuid, true, bits.ElementAt(0), bits.ElementAt(1), "", arg_signed_with);
+                        }
                     }
                 }
             }

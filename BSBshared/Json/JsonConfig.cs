@@ -13,6 +13,7 @@ namespace BetterSecondBotShared.Json
 
         // Security
         public string Security_MasterUsername { get; set; }
+        public string Security_SubMasters { get; set; }
         public string Security_SignedCommandkey { get; set; }
         public string Security_WebUIKey { get; set; }
 

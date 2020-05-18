@@ -26,6 +26,8 @@ namespace BetterSecondBotShared.Json
             else if (cmd == "Basic_HomeRegions") return "a CSV of SLURLs that the bot will attempt to return to after avoiding a sim shutdown (In testing)";
             // Security
             else if (cmd == "Security_MasterUsername") return "The username of the bots owner *you can leave out Resident if you so wish*";
+            else if (cmd == "Security_SubMasters") return "A CSV of avatar names who can issue commands to the bot";
+            
             else if (cmd == "Security_SignedCommandkey") return "Used when sending the bot a HTTP or IM command that has a hash validation";
             else if (cmd == "Security_WebUIKey") return "Used with the webUI to login, note: 2FA support is planned soon for this system that will replace this UIkey";
             // Settings
@@ -82,6 +84,7 @@ namespace BetterSecondBotShared.Json
             else if (cmd == "Basic_HomeRegions") return "http://maps.secondlife.com/secondlife/Viserion/50/140/23";
             // Security
             else if (cmd == "Security_MasterUsername") return "Madpeter Zond";
+            else if (cmd == "Security_SubMasters") return "Master Zond,Madpeter Zond,Madpeter Zond";
             else if (cmd == "Security_SignedCommandkey") return "asdt234t34d3f34f";
             else if (cmd == "Security_WebUIKey") return "2135r3y4vw232";
             // Settings

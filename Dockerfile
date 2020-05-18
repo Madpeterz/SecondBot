@@ -30,6 +30,7 @@ ENV Basic_BotPassword=''
 ENV Basic_HomeRegions='http://maps.secondlife.com/secondlife/Viserion/50/140/23'
 
 ENV Security_MasterUsername='Madpeter Zond'
+ENV Security_SubMasters='X X,Y Y,Z Z'
 ENV Security_SignedCommandkey=''
 ENV Security_WebUIKey=''
 
@@ -38,6 +39,7 @@ ENV Setting_AllowFunds='false'
 ENV Setting_LogCommands='true'
 ENV Setting_RelayImToAvatarUUID=''
 ENV Setting_DefaultSit_UUID=''
+ENV Setting_loginURI='secondlife'
 
 ENV DiscordRelay_URL=''
 ENV DiscordRelay_GroupUUID=''
