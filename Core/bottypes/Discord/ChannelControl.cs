@@ -119,9 +119,16 @@ namespace BSB.bottypes
             {
                 display_topic = "" + channeltopictype + ":" + sender_id + ": Actions -> !clear, !close";
             }
-            IGuildChannel channel = await DiscordServer.CreateTextChannelAsync(channelname, X => DiscordGetNewChannelProperies(X, channelname, display_topic, channeltopictype.ToLowerInvariant()));
-            ITextChannel Txtchan = await DiscordServer.GetTextChannelAsync(channel.Id);
-            return Txtchan;
+            try
+            {
+                IGuildChannel channel = await DiscordServer.CreateTextChannelAsync(channelname, X => DiscordGetNewChannelProperies(X, channelname, display_topic, channeltopictype.ToLowerInvariant()));
+                ITextChannel Txtchan = await DiscordServer.GetTextChannelAsync(channel.Id);
+                return Txtchan;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         protected void DiscordGetNewChannelProperies(TextChannelProperties C, string channelname, string channeltopic, string catname)
