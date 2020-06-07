@@ -193,7 +193,7 @@ namespace BSB.bottypes
 
         protected void AddAvatarToDB(UUID av_uuid,string av_name)
         {
-            if ((av_name != "null") && (av_name != null))
+            if ((av_name != "null") && (av_name != null) && (av_name.ToLowerInvariant() != "secondlife") && (av_uuid != UUID.Zero))
             {
                 if (AvatarStorageLastUsed.ContainsKey(av_name) == false)
                 {
