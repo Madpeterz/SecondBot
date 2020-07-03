@@ -35,7 +35,7 @@ namespace BSB.Commands.StreamAdmin
                             }
                             else
                             {
-                                return Failed("Notecard title is to short");
+                                return Failed("Notecard title is to short - "+ endpoint_checks.Content);
                             }
                         }
                         return Failed(server_reply.message);
