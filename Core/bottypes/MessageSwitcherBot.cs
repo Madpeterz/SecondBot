@@ -26,7 +26,10 @@ namespace BSB.bottypes
                     }
                     if (e.Message != "")
                     {
-                        BotChatControler(e.Message, e.FromName, e.SourceID, av, false, UUID.Zero, true, fromme);
+                        if (e.FromName.ToLowerInvariant() != "secondlife")
+                        {
+                            BotChatControler(e.Message, e.FromName, e.SourceID, av, false, UUID.Zero, true, fromme);
+                        }
                     }
                 }
             }
@@ -159,14 +162,17 @@ namespace BSB.bottypes
                 case InstantMessageDialog.MessageFromAgent: // shared with SessionSend
                 case InstantMessageDialog.SessionSend:
                     {
-                        if (mygroups.ContainsKey(e.IM.IMSessionID) == true)
+                        if (e.IM.FromAgentName.ToLowerInvariant() != "secondlife")
                         {
-                            AddToGroupchat(e.IM.IMSessionID, e.IM.FromAgentName, e.IM.Message);
-                            BotChatControler(e.IM.Message, e.IM.FromAgentName, e.IM.FromAgentID, true, true, e.IM.IMSessionID, false, fromme);
-                        }
-                        else
-                        {
-                            BotChatControler(e.IM.Message, e.IM.FromAgentName, e.IM.FromAgentID, true, false, UUID.Zero, false, fromme);
+                            if (mygroups.ContainsKey(e.IM.IMSessionID) == true)
+                            {
+                                AddToGroupchat(e.IM.IMSessionID, e.IM.FromAgentName, e.IM.Message);
+                                BotChatControler(e.IM.Message, e.IM.FromAgentName, e.IM.FromAgentID, true, true, e.IM.IMSessionID, false, fromme);
+                            }
+                            else
+                            {
+                                BotChatControler(e.IM.Message, e.IM.FromAgentName, e.IM.FromAgentID, true, false, UUID.Zero, false, fromme);
+                            }
                         }
                         break;
                     }
