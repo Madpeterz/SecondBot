@@ -35,7 +35,7 @@ namespace BSB.Commands.StreamAdmin
                             }
                             else
                             {
-                                Failed("Notecard title is to short");
+                                return Failed("Notecard title is to short");
                             }
                         }
                         return Failed(server_reply.message);
@@ -50,7 +50,7 @@ namespace BSB.Commands.StreamAdmin
                     return Failed("HTTP error DataObject broken Status:"+ endpoint_checks.StatusCode.ToString()+" @ "+ attempt_endpoint+"");
                 }
             }
-            return false;
+            return Failed("incorrect number of args");
         }
     }
 
