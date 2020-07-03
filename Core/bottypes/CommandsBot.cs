@@ -235,6 +235,7 @@ namespace BSB.bottypes
                                 {
                                     if (finalSuccess)
                                     {
+                                        ConsoleLog.Info("Sending notecard now");
                                         Client.Inventory.GiveItem(finalItemID, name, AssetType.Notecard, sendToUUID, false);
                                     }
                                     else
