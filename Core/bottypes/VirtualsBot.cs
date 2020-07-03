@@ -9,6 +9,12 @@ namespace BSB.bottypes
 {
     public abstract class VirtualsBot : BasicBot
     {
+        #region DiscordOutputTarget
+        public virtual bool send_to_discord(string command,string message)
+        {
+            return false;
+        }
+        #endregion
         public virtual Dictionary<UUID, string> GetIMChatWindowKeyNames()
         {
             return new Dictionary<UUID, string>();
