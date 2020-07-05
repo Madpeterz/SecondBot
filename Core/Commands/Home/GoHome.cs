@@ -8,6 +8,7 @@
             if (base.CallFunction(args) == true)
             {
                 bot.GotoNextHomeRegion();
+                return true;
             }
             return false;
         }
