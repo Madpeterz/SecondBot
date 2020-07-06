@@ -76,32 +76,9 @@ namespace BSB.Commands.Group
                         {
                             if (bot.GetAllowGroupInvite(target_avatar) == true)
                             {
-                                if (bot.FastCheckInGroup(target_group, target_avatar) == false)
-                                {
-                                    if (bot.NeedReloadGroupData(target_group) == true)
-                                    {
-                                        if (bot.CreateAwaitEventReply("groupmembersreply", this, args) == true)
-                                        {
-                                            bot.GroupInviteLockoutArm(target_avatar); // enable 120 sec cooldown
-                                            bot.GetClient.Groups.RequestGroupMembers(target_group);
-                                            return true;
-                                        }
-                                        else
-                                        {
-                                            return Failed("Unable to await reply");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        bot.GroupInviteLockoutArm(target_avatar); // enable 120 sec cooldown
-                                        ForRealGroupInvite(args, target_group, target_avatar);
-                                        return true;
-                                    }
-                                }
-                                else
-                                {
-                                    return true; // they are in the group (or we have old data) retry in like 2 mins
-                                }
+                                bot.GroupInviteLockoutArm(target_avatar); // enable 120 sec cooldown
+                                ForRealGroupInvite(args, target_group, target_avatar);
+                                return true;
                             }
                             else
                             {
