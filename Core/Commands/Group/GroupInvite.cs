@@ -16,18 +16,21 @@ namespace BSB.Commands.Group
             UUID target_role = UUID.Zero;
             if (args.Length == 3)
             {
-                UUID.TryParse(args[2], out target_role);
-            }
-            List<UUID> invite_roles = new List<UUID>();
-            if (target_role != UUID.Zero)
-            {
-                invite_roles.Add(target_role);
-                invite_roles.Add(UUID.Zero);
+                if(UUID.TryParse(args[2], out target_role) == true)
+                {
+                    ConsoleLog.Info("GroupInvite: Inviting to role: "+ target_role.ToString()+".");
+                }
+                else
+                {
+                    ConsoleLog.Info("GroupInvite: Role uuid not vaild using everyone.");
+                }
             }
             else
             {
-                invite_roles.Add(UUID.Zero);
+                ConsoleLog.Info("GroupInvite: Inviting to everyone role.");
             }
+            List<UUID> invite_roles = new List<UUID>();
+            invite_roles.Add(target_role);
             bot.GetClient.Groups.Invite(group, invite_roles, avatar);
         }
         public override void Callback(string[] args, EventArgs e)
