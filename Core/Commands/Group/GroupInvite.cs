@@ -16,20 +16,11 @@ namespace BSB.Commands.Group
             UUID target_role = UUID.Zero;
             if (args.Length == 3)
             {
-                if(UUID.TryParse(args[2], out target_role) == true)
+                if(UUID.TryParse(args[2], out target_role) == false)
                 {
-                    ConsoleLog.Info("GroupInvite:  Inviting to target role " + group.ToString() + " - Role: "+ target_role.ToString()+" - " + avatar.ToString() + "");
+                    ConsoleLog.Warn("GroupInvite: Role uuid not vaild using everyone");
                 }
-                else
-                {
-                    ConsoleLog.Info("GroupInvite: Role uuid not vaild using everyone " + group.ToString() + " - Role: Everyone - " + avatar.ToString() + "");
-                }
-            }
-            else
-            {
-                ConsoleLog.Info("GroupInvite: sending invite to group " + group.ToString() + " - Role: Everyone - "+avatar.ToString()+"");
-            }
-            
+            }            
             bot.GetClient.Groups.Invite(group, new List<UUID>() { target_role }, avatar);
         }
 
