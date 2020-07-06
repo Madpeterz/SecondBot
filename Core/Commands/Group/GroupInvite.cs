@@ -22,6 +22,7 @@ namespace BSB.Commands.Group
             if (target_role != UUID.Zero)
             {
                 invite_roles.Add(target_role);
+                invite_roles.Add(UUID.Zero);
             }
             else
             {
