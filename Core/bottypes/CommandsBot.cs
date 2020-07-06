@@ -147,6 +147,7 @@ namespace BSB.bottypes
             {
                 CommandsInterface = new Commands.CoreCommandsInterface(this);
             }
+            Client.Self.RequestBalance();
         }
 
         protected override void CoreCommandLib(UUID fromUUID, bool from_master, string command, string arg, string signing_code, string signed_with)
