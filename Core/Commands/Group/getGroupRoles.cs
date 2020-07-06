@@ -40,7 +40,7 @@ namespace BSB.Commands.Group
             {
                 if (data.Key != UUID.Zero)
                 {
-                    collection.Add(data.Value.Name, data.Key.ToString());
+                    collection.Add(data.Value.Name, data.Value.ID.ToString());
                 }
             }
             bot.GetCommandsInterface.SmartCommandReply(true,args[0], "group=" + args[1], CommandName,collection);
