@@ -29,10 +29,10 @@ namespace BSB.Commands.Group
             {
                 ConsoleLog.Info("GroupInvite: Inviting to everyone role.");
             }
-            List<UUID> invite_roles = new List<UUID>();
-            invite_roles.Add(target_role);
-            bot.GetClient.Groups.Invite(group, invite_roles, avatar);
+            ConsoleLog.Info("GroupInvite: sending invite to group "+group.ToString()+".");
+            bot.GetClient.Groups.Invite(group, new List<UUID>() { target_role }, avatar);
         }
+
         public override void Callback(string[] args, EventArgs e)
         {
             GroupMembersReplyEventArgs reply = (GroupMembersReplyEventArgs)e;
