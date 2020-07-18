@@ -31,17 +31,14 @@ namespace BSB.bottypes
                 {
                     // eventid
                     // KeyValuePair<CommandLink,Args>
-                    // Args: Group, Message
-                    if (await_reply.Value.Value.Length == 2)
+                    // Args: Group, args, args
+                    if (UUID.TryParse(await_reply.Value.Value[0], out UUID test_group) == true)
                     {
-                        if (UUID.TryParse(await_reply.Value.Value[0], out UUID test_group) == true)
+                        if (test_group == e.GroupID)
                         {
-                            if (test_group == e.GroupID)
-                            {
-                                // oh shit its for me
-                                PurgeAwaiters.Add(await_reply.Key);
-                                await_reply.Value.Key.Callback(await_reply.Value.Value, e);
-                            }
+                            // oh shit its for me
+                            PurgeAwaiters.Add(await_reply.Key);
+                            await_reply.Value.Key.Callback(await_reply.Value.Value, e);
                         }
                     }
                 }
