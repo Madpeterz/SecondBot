@@ -23,42 +23,6 @@ namespace BSB.Commands.Group
             }            
             bot.GetClient.Groups.Invite(group, new List<UUID>() { target_role }, avatar);
         }
-
-        public override void Callback(string[] args, EventArgs e)
-        {
-            GroupMembersReplyEventArgs reply = (GroupMembersReplyEventArgs)e;
-            if (UUID.TryParse(args[0], out UUID target_group) == true)
-            {
-                if (UUID.TryParse(args[1], out UUID target_avatar) == true)
-                {
-                    if (reply.GroupID == target_group)
-                    {
-                        if (reply.Members.ContainsKey(target_avatar) == false)
-                        {
-                            ForRealGroupInvite(args, target_group, target_avatar);
-                            base.Callback(args, e);
-                        }
-                        else
-                        {
-                            base.Callback(args, e, false);
-                        }
-                    }
-                    else
-                    {
-                        ConsoleLog.Crit("Callback sent for the wrong group as part of group invite!");
-                        base.Callback(args, e, false);
-                    }
-                }
-                else
-                {
-                    base.Callback(args, e, false);
-                }
-            }
-            else
-            {
-                base.Callback(args, e, false);
-            }
-        }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)
