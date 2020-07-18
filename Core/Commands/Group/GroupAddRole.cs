@@ -26,11 +26,12 @@ namespace BSB.Commands.Group
                             if(reply.Members.ContainsKey(target_avatar) == false)
                             {
                                 bot.GetClient.Groups.AddToRole(target_group, target_role, target_avatar);
+                                ConsoleLog.Info("Role added to avatar: " + target_avatar.ToString() + "");
                                 base.Callback(args, e, true);
                             }
                             else
                             {
-                                ConsoleLog.Info("Member not in group to get role, passing to invite");
+                                ConsoleLog.Info("{GroupAddRole} Member not in group to get role, passing to invite");
                                 bot.GetCommandsInterface.Call("GroupInvite", String.Join("~#~", args), caller, "~#~");
                                 base.Callback(args, e, true);
                             }
@@ -77,6 +78,7 @@ namespace BSB.Commands.Group
                                     if (bot.CreateAwaitEventReply("groupmembersreply", this, args) == true)
                                     {
                                         bot.GetClient.Groups.RequestGroupMembers(target_group);
+                                        ConsoleLog.Info("Requesting group membership wait for callback");
                                         return true;
                                     }
                                     else
