@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using OpenMetaverse;
 using BetterSecondBotShared.logs;
-using System.Linq;
 
 namespace BSB.Commands.Group
 {
-    public class GroupAddRole : CoreCommand_3arg
+    class GroupAddRole : CoreCommand_3arg
     {
         public override string[] ArgTypes { get { return new[] { "UUID", "Avatar", "UUID" }; } }
         public override string[] ArgHints { get { return new[] { "GROUP", "Avatar [UUID or Firstname Lastname]", "Role" }; } }
@@ -23,15 +21,15 @@ namespace BSB.Commands.Group
                     {
                         if (UUID.TryParse(args[2], out UUID target_role) == true)
                         {
-                            if(reply.Members.ContainsKey(target_avatar) == false)
+                            if(reply.Members.ContainsKey(target_avatar) == true)
                             {
                                 bot.GetClient.Groups.AddToRole(target_group, target_role, target_avatar);
-                                ConsoleLog.Info("Role added to avatar: " + target_avatar.ToString() + "");
+                                InfoBlob = "Role added to avatar: " + target_avatar.ToString() + "";
                                 base.Callback(args, e, true);
                             }
                             else
                             {
-                                ConsoleLog.Info("{GroupAddRole} Member not in group to get role, passing to invite");
+                                InfoBlob = "{GroupAddRole} Member not in group to get role, passing to invite";
                                 bot.GetCommandsInterface.Call("GroupInvite", String.Join("~#~", args), caller, "~#~");
                                 base.Callback(args, e, true);
                             }
@@ -39,25 +37,25 @@ namespace BSB.Commands.Group
                         }
                         else
                         {
-                            ConsoleLog.Crit("{GroupAddRole} Unable to unpack role as part of the callback");
+                            InfoBlob = "{ GroupAddRole} Unable to unpack role as part of the callback";
                             base.Callback(args, e, false);
                         }
                     }
                     else
                     {
-                        ConsoleLog.Crit("{GroupAddRole} Unable to unpack avatar as part of the callback");
+                        InfoBlob = "{GroupAddRole} Unable to unpack avatar as part of the callback";
                         base.Callback(args, e, false);
                     }
                 }
                 else
                 {
-                    ConsoleLog.Crit("Callback sent for the wrong group as part of GroupAddRole!");
+                    InfoBlob = "Callback sent for the wrong group as part of GroupAddRole!";
                     base.Callback(args, e, false);
                 }
             }
             else
             {
-                ConsoleLog.Crit("{GroupAddRole} Unable to unpack group as part of the callback");
+                InfoBlob = "{GroupAddRole} Unable to unpack group as part of the callback";
                 base.Callback(args, e, false);
             }
         }
@@ -73,22 +71,15 @@ namespace BSB.Commands.Group
                         {
                             if (bot.MyGroups.ContainsKey(target_group) == true)
                             {
-                                if (bot.GetAllowGroupInvite(target_avatar) == true)
+                                if (bot.CreateAwaitEventReply("groupmembersreply", this, args) == true)
                                 {
-                                    if (bot.CreateAwaitEventReply("groupmembersreply", this, args) == true)
-                                    {
-                                        bot.GetClient.Groups.RequestGroupMembers(target_group);
-                                        ConsoleLog.Info("Requesting group membership wait for callback");
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        return Failed("Unable to await reply");
-                                    }
+                                    bot.GetClient.Groups.RequestGroupMembers(target_group);
+                                    InfoBlob = "Requesting group membership";
+                                    return true;
                                 }
                                 else
                                 {
-                                    return Failed("Group invite to this avatar is on 120sec cooldown");
+                                    return Failed("Unable to await reply");
                                 }
                             }
                             else
