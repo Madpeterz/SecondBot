@@ -51,6 +51,10 @@ ENV Http_Enable='false'
 ENV Http_Port='80'
 ENV Http_Host='http://localhost:80'
 ENV Http_PublicUrl='http://localhost/'
+
+ENV Name2Key_Enable='false'
+ENV Name2Key_Url='http://localhost:1234'
+ENV Name2Key_Key='magic'
 EXPOSE 80
 ENV ASPNETCORE_URLS http://+:80
 

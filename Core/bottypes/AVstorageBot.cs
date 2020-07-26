@@ -1,5 +1,7 @@
 ﻿using BetterSecondBotShared.Static;
+using Newtonsoft.Json;
 using OpenMetaverse;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +20,6 @@ namespace BSB.bottypes
         protected Dictionary<string, KeyValuePair<long, int>> PendingAvatarFinds_vianame = new Dictionary<string, KeyValuePair<long, int>>();
         protected Dictionary<UUID, KeyValuePair<long, int>> PendingAvatarFinds_viauuid = new Dictionary<UUID, KeyValuePair<long, int>>();
 
-        protected long max_wait_for_retry_name2key = 30; // How long to wait before we attempt a name to key lookup again for the same avatar (in secs)
-        protected long max_wait_for_retry_key2name = 10; // How long to wait before we attempt a key to name lookup again for the same avatar (in secs)
-        protected int max_retry_attempts = 2; // how many times should we attempt to get the avatar before giving up.
         protected long max_db_storage_age = 240; // how long should we keep an avatar in memory before clearing (in secs) [now - last accessed]
         protected bool show_av_storage_info_in_status = true;
 
@@ -63,18 +62,7 @@ namespace BSB.bottypes
             List<UUID> giveup_key2name = new List<UUID>();
             foreach (KeyValuePair<UUID, KeyValuePair<long, int>> pair in PendingAvatarFinds_viauuid)
             {
-                long dif = now - pair.Value.Key;
-                if (dif > max_wait_for_retry_key2name)
-                {
-                    if (pair.Value.Value < max_retry_attempts)
-                    {
-                        retrigger_key2name.Add(pair.Key);
-                    }
-                    else
-                    {
-                        giveup_key2name.Add(pair.Key);
-                    }
-                }
+                giveup_key2name.Add(pair.Key);
             }
             if(retrigger_key2name.Count > 0)
             {
@@ -97,18 +85,7 @@ namespace BSB.bottypes
             List<string> giveup_name2key = new List<string>();
             foreach (KeyValuePair<string, KeyValuePair<long, int>> pair in PendingAvatarFinds_vianame)
             {
-                long dif = now - pair.Value.Key;
-                if (dif > max_wait_for_retry_key2name)
-                {
-                    if (pair.Value.Value < max_retry_attempts)
-                    {
-                        retrigger_name2key.Add(pair.Key);
-                    }
-                    else
-                    {
-                        giveup_name2key.Add(pair.Key);
-                    }
-                }
+                giveup_name2key.Add(pair.Key);
             }
             
             foreach (string avname in retrigger_name2key)
@@ -226,9 +203,16 @@ namespace BSB.bottypes
                 }
             }
         }
-
         public string FindAvatarName2Key(string avatar_name)
         {
+            return FindAvatarName2Key(avatar_name, false);
+        }
+        public string FindAvatarName2Key(string avatar_name,bool skip_http)
+        {
+            if (myconfig.Name2Key_Enable == false)
+            {
+                skip_http = true;
+            }
             List<string> bits = avatar_name.Split(' ').ToList();
             if(bits.Count() == 1)
             {
@@ -245,14 +229,54 @@ namespace BSB.bottypes
             {
                 if(PendingAvatarFinds_vianame.ContainsKey(avatar_name) == false)
                 {
-                    PendingAvatarFinds_vianame.Add(avatar_name, new KeyValuePair<long, int>(now, 0));
-                    Client.Directory.StartPeopleSearch(avatar_name, 0);
+                    if (skip_http == false)
+                    {
+                        var client = new RestClient(myconfig.Name2Key_Url);
+                        var request = new RestRequest("name2key/" + avatar_name + "/" + myconfig.Name2Key_Key + "", Method.GET);
+                        client.Timeout = 3000; // ? does this even do anything
+                        request.Timeout = 3000;
+                        IRestResponse endpoint_checks = client.Get(request);
+                        if (endpoint_checks.StatusCode == System.Net.HttpStatusCode.OK)
+                        {
+                            try
+                            {
+                                namekeyservicereply server_reply = JsonConvert.DeserializeObject<namekeyservicereply>(endpoint_checks.Content);
+                                if (server_reply.status == true)
+                                {
+                                    if (server_reply.found == true)
+                                    {
+                                        AddAvatarToDB((UUID)server_reply.uuid, server_reply.name);
+                                        return server_reply.uuid;
+                                    }
+                                }
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                        return FindAvatarName2Key(avatar_name, true);
+
+                    }
+                    else
+                    {
+                        PendingAvatarFinds_vianame.Add(avatar_name, new KeyValuePair<long, int>(now, 0));
+                        Client.Directory.StartPeopleSearch(avatar_name, 0);
+                    }
                 }
             }
             return "lookup";
         }
         public string FindAvatarKey2Name(UUID avatar_uuid)
         {
+            return FindAvatarKey2Name(avatar_uuid, false);
+        }
+        public string FindAvatarKey2Name(UUID avatar_uuid, bool skip_http)
+        {
+            if (myconfig.Name2Key_Enable == false)
+            {
+                skip_http = true;
+            }
             long now = helpers.UnixTimeNow();
             if (AvatarKey2Name.ContainsKey(avatar_uuid) == true)
             {
@@ -261,10 +285,41 @@ namespace BSB.bottypes
             }
             else
             {
-                if (PendingAvatarFinds_viauuid.ContainsKey(avatar_uuid) == false)
+                if (skip_http == false)
                 {
-                    PendingAvatarFinds_viauuid.Add(avatar_uuid, new KeyValuePair<long, int>(now, 0));
-                    Client.Avatars.RequestAvatarName(avatar_uuid);
+                    var client = new RestClient(myconfig.Name2Key_Url);
+                    var request = new RestRequest("key2name/" + avatar_uuid.ToString() + "/" + myconfig.Name2Key_Key + "", Method.GET);
+                    client.Timeout = 3000; // ? does this even do anything
+                    request.Timeout = 3000;
+                    IRestResponse endpoint_checks = client.Get(request);
+                    if (endpoint_checks.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        try
+                        {
+                            namekeyservicereply server_reply = JsonConvert.DeserializeObject<namekeyservicereply>(endpoint_checks.Content);
+                            if (server_reply.status == true)
+                            {
+                                if(server_reply.found == true)
+                                {
+                                    AddAvatarToDB((UUID)server_reply.uuid, server_reply.name);
+                                    return server_reply.name;
+                                }
+                            }
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    return FindAvatarKey2Name(avatar_uuid, true);
+                }
+                else
+                {
+                    if (PendingAvatarFinds_viauuid.ContainsKey(avatar_uuid) == false)
+                    {
+                        PendingAvatarFinds_viauuid.Add(avatar_uuid, new KeyValuePair<long, int>(now, 0));
+                        Client.Avatars.RequestAvatarName(avatar_uuid);
+                    }
                 }
                 return "lookup";
             }
@@ -274,5 +329,15 @@ namespace BSB.bottypes
         {
 
         }
+    }
+
+    public class namekeyservicereply
+    {
+        public string lookingfor { get; set; }
+        public string uuid { get; set; }
+        public string name { get; set; }
+        public bool found { get; set; }
+        public bool status { get; set; }
+        public string message { get; set; }
     }
 }
