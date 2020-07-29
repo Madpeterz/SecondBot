@@ -1,6 +1,6 @@
 ﻿using System;
 using OpenMetaverse;
-namespace BSB.Commands.Movement
+namespace BSB.Commands.Friends
 {
     public class FriendRequest : CoreCommand_1arg
     {
