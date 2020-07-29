@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.Self
+﻿namespace BSB.Commands.Animation
 {
     public class AddToAllowAnimations : CoreCommand_1arg
     {
