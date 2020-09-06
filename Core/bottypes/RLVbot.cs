@@ -10,7 +10,6 @@ namespace BSB.bottypes
     public abstract class RLVbot : RLVbotHelper
     {
         // normal bot stuff 
-        protected bool allow_RLV;
         protected RLV.RLVcontrol RLVinterface;
         public RLV.RLVcontrol GetRLVinterface { get { return RLVinterface; } }
 
@@ -32,7 +31,7 @@ namespace BSB.bottypes
             base.ChatInputHandler(sender, e);
             if (e.Type == ChatType.OwnerSay)
             {
-                if (allow_RLV == true)
+                if (myconfig.Setting_AllowRLV == true)
                 {
                     if (e.Message.StartsWith("@") == true)
                     {
