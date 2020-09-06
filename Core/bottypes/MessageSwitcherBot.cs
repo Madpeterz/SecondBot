@@ -8,6 +8,7 @@ namespace BSB.bottypes
 {
     public abstract class MessageSwitcherBot : EventsBot
     {
+        string[] hard_blocked_agents = new string[] { "secondlife", "second life"};
         protected override void ChatInputHandler(object sender, ChatEventArgs e)
         {
             bool fromme = false;
@@ -26,7 +27,8 @@ namespace BSB.bottypes
                     }
                     if (e.Message != "")
                     {
-                        if (e.FromName.ToLowerInvariant() != "secondlife")
+                        string name_lower = e.FromName.ToLowerInvariant();
+                        if (hard_blocked_agents.Contains(name_lower) == false)
                         {
                             BotChatControler(e.Message, e.FromName, e.SourceID, av, false, UUID.Zero, true, fromme);
                         }
