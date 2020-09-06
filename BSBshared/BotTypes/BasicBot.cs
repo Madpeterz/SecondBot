@@ -80,16 +80,21 @@ namespace BetterSecondBotShared.bottypes
             }
             if (helpers.notempty(myconfig.Security_SubMasters) == true)
             {
-                string[] master_names = myconfig.Security_SubMasters.Split(",", StringSplitOptions.RemoveEmptyEntries);
-                foreach (string a in master_names)
+                SubMasters.Clear();
+                string[] submaster_names = myconfig.Security_SubMasters.Split(",", StringSplitOptions.RemoveEmptyEntries);
+                foreach (string a in submaster_names)
                 {
-                    bits = a.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
-                    if (bits.Count == 1)
+                    if (a.Length > 3)
                     {
-                        bits.Add("Resident");
+                        bits = a.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+                        if (bits.Count == 1)
+                        {
+                            bits.Add("Resident");
+                        }
+                        string namesubmaster = String.Join(" ", bits);
+                        SubMasters.Add(namesubmaster);
+                        ConsoleLog.Info("Sub-Master: " + namesubmaster);
                     }
-                    SubMasters.Add(String.Join(" ", bits));
-                    ConsoleLog.Info("Sub-Master: " + myconfig.Security_MasterUsername);
                 }
             }
             ConsoleLog.Info("Build: " + version);
