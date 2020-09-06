@@ -17,7 +17,7 @@ namespace BSB.RLV.Sitting
             {
                 if (args[1] == "force")
                 {
-                    return bot.GetCommandsInterface.Call("sit", args[0], UUID.Zero);
+                    return bot.GetCommandsInterface.Call("BotSit", args[0], UUID.Zero);
                 }
                 else
                 {
