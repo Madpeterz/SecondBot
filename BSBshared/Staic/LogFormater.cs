@@ -13,26 +13,47 @@ namespace BetterSecondBotShared.logs
     };
     public static class LogFormater
     {
-        public static string Warn(string message,bool send_to_console=true)
+        public static string Warn(string message,bool send_to_console)
         {
             return Add(message, ConsoleLogLogLevel.Warn, send_to_console);
         }
-        public static string Crit(string message, bool send_to_console = true)
+        public static string Crit(string message, bool send_to_console)
         {
             return Add(message, ConsoleLogLogLevel.Crit, send_to_console);
         }
-        public static string Info(string message, bool send_to_console = true)
+        public static string Info(string message, bool send_to_console)
         {
             return Add(message, ConsoleLogLogLevel.Info, send_to_console);
         }
-        public static string Status(string message, bool send_to_console = true)
+        public static string Status(string message, bool send_to_console)
         {
             return Add(message, ConsoleLogLogLevel.Status, send_to_console);
         }
-        public static string Debug(string message, bool send_to_console = true)
+        public static string Debug(string message, bool send_to_console)
         {
-            return Add(message, ConsoleLogLogLevel.Debug, send_to_console);
+            return Add(message, ConsoleLogLogLevel.Debug, true);
         }
+        public static string Warn(string message)
+        {
+            return Warn(message, true);
+        }
+        public static string Crit(string message)
+        {
+            return Crit(message, true);
+        }
+        public static string Info(string message)
+        {
+            return Info(message, true);
+        }
+        public static string Status(string message)
+        {
+            return Status(message, true);
+        }
+        public static string Debug(string message)
+        {
+            return Debug(message, true);
+        }
+
         private static string Add(string message, ConsoleLogLogLevel Level, bool send_to_console = true)
         {
             var date = DateTime.Now;
