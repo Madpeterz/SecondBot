@@ -37,7 +37,9 @@ namespace BSB.bottypes
 			var logFolderPath = LogFolderName;
 
 			if (!Directory.Exists(logFolderPath))
-                Directory.CreateDirectory(logFolderPath);
+			{
+				Directory.CreateDirectory(logFolderPath);
+			}
 
             var logFilePath = Path.Combine(logFolderPath, LogFileName);
 
@@ -52,11 +54,15 @@ namespace BSB.bottypes
 		private void Rotate(string filePath)
 		{
 			if (!File.Exists(filePath))
+			{
 				return;
+			}
 
 			var fileInfo = new FileInfo(filePath);
 			if (fileInfo.Length < _logChunkSize)
+			{
 				return;
+			}
 
 			var fileTime = DateTime.Now.ToString("dd_MM_yy_h_m_s");
 			var rotatedPath = filePath.Replace(".log", $".{fileTime}");
@@ -68,7 +74,9 @@ namespace BSB.bottypes
 			var chunks = logFolderContent.Where(x => !x.Extension.Equals(".zip", StringComparison.OrdinalIgnoreCase));
 
 			if (chunks.Count() <= _logChunkMaxCount)
+			{
 				return;
+			}
 
 			var archiveFolderInfo = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(rotatedPath), $"{LogFolderName}_{fileTime}"));
 
@@ -83,7 +91,9 @@ namespace BSB.bottypes
 			var archives = logFolderContent.Where(x => x.Extension.Equals(".zip", StringComparison.OrdinalIgnoreCase)).ToArray();
 
 			if (archives.Count() <= _logArchiveMaxCount)
+			{
 				return;
+			}
 
 			var oldestArchive = archives.OrderBy(x => x.CreationTime).First();
 			var cleanupDate = oldestArchive.CreationTime.AddDays(_logCleanupPeriod);
@@ -95,7 +105,9 @@ namespace BSB.bottypes
 				}
 			}
 			else
+			{
 				File.Delete(oldestArchive.FullName);
+			}
 
 		}
 	}
