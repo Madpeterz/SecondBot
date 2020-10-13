@@ -16,7 +16,7 @@ namespace BetterSecondBot
             Thread.Sleep(3000);
             LogFormater.Status("-> Getting config from Docker");
             JsonConfig Config = MakeJsonConfig.FromENV();
-            Config = MakeJsonConfig.http_config_check(Config);
+            Config = MakeJsonConfig.Http_config_check(Config);
             new CliExitOnLogout(Config);
         }
     }

@@ -16,7 +16,7 @@ namespace BetterSecondBotShared.bottypes
             LastStatusMessage = "No status";
         }
         protected List<string> SubMasters = new List<string>();
-        public bool is_avatar_master(string name)
+        public bool Is_avatar_master(string name)
         {
             if (name == myconfig.Security_MasterUsername)
             {
@@ -202,7 +202,7 @@ namespace BetterSecondBotShared.bottypes
             {
                 name = "" + name + " " + stage1[1].FirstCharToUpper() + "";
             }
-            if(is_avatar_master(name) == true)
+            if(Is_avatar_master(name) == true)
             {
                 GroupInvitationEventArgs G = new GroupInvitationEventArgs(e.Simulator, e.IM.FromAgentID, e.IM.FromAgentName, e.IM.Message);
                 Client.Self.GroupInviteRespond(G.AgentID, e.IM.IMSessionID, true);
@@ -211,7 +211,7 @@ namespace BetterSecondBotShared.bottypes
         }
         protected virtual void FriendshipOffer(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
-            if (is_avatar_master(FromAgentName) == true)
+            if (Is_avatar_master(FromAgentName) == true)
             {
                 Client.Friends.AcceptFriendship(FromAgentID, IMSessionID);
             }
@@ -219,14 +219,14 @@ namespace BetterSecondBotShared.bottypes
 
         protected virtual void RequestLure(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
-            if (is_avatar_master(FromAgentName) == true)
+            if (Is_avatar_master(FromAgentName) == true)
             {
                 Client.Self.SendTeleportLure(FromAgentID);
             }
         }
 
         protected List<UUID> accept_next_teleport_from = new List<UUID>();
-        public void add_uuid_to_teleport_list(UUID avatar)
+        public void Add_uuid_to_teleport_list(UUID avatar)
         {
             if (accept_next_teleport_from.Contains(avatar) == false)
             {
@@ -237,7 +237,7 @@ namespace BetterSecondBotShared.bottypes
         protected virtual void RequestTeleport(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
             bool allow = false;
-            if (is_avatar_master(FromAgentName) == true)
+            if (Is_avatar_master(FromAgentName) == true)
             {
                 allow = true;
             }

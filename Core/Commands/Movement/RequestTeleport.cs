@@ -14,7 +14,7 @@ namespace BSB.Commands.Movement
             {
                 if(UUID.TryParse(args[0],out UUID avatar) == true)
                 {
-                    bot.add_uuid_to_teleport_list(avatar);
+                    bot.Add_uuid_to_teleport_list(avatar);
                     bot.GetClient.Self.SendTeleportLureRequest(avatar, "I would like to teleport to you");
                     return true;
                 }

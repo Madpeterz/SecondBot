@@ -359,7 +359,7 @@ namespace BetterSecondBotShared.Json
 
         }
 
-        protected JsonConfig process_prop(JsonConfig reply,string arg,string arg_value_default)
+        protected JsonConfig Process_prop(JsonConfig reply,string arg,string arg_value_default)
         {
             string arg_type = GetCommandArgTypes(arg).First();
             if (arg_type != "")
@@ -378,7 +378,7 @@ namespace BetterSecondBotShared.Json
             return reply;
         }
 
-        public static JsonConfig http_config_check(JsonConfig jsonConfig)
+        public static JsonConfig Http_config_check(JsonConfig jsonConfig)
         {
             if (helpers.notempty(jsonConfig.Security_WebUIKey) == true)
             {
@@ -437,7 +437,7 @@ namespace BetterSecondBotShared.Json
                     arg_value_default = arg_value_default.Replace("]", "");
                     arg_value_default = arg_value_default.Replace("\"", "");
                 }
-                reply = process_prop(reply, arg, arg_value_default);
+                reply = Process_prop(reply, arg, arg_value_default);
             }
             return reply;
         }

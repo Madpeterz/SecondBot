@@ -31,7 +31,7 @@ namespace BetterSecondBotShared.logs
         }
         public static string Debug(string message, bool send_to_console)
         {
-            return Add(message, ConsoleLogLogLevel.Debug, true);
+            return Add(message, ConsoleLogLogLevel.Debug, send_to_console);
         }
         public static string Warn(string message)
         {

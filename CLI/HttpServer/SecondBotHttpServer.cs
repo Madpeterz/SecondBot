@@ -19,7 +19,7 @@ using System.Web;
 
 namespace BetterSecondBot.HttpServer
 {
-    public class json_http_reply
+    public class Json_http_reply
     {
         public bool status;
         public string message;
@@ -100,7 +100,7 @@ namespace BetterSecondBot.HttpServer
 
         protected async Task HandleIncomingConnections()
         {
-            webui myUI = new webui(Config,Bot);
+            Webui myUI = new Webui(Config,Bot);
             while (Bot.KillMe == false)
             {
                 HttpListenerContext ctx = await listener.GetContextAsync().ConfigureAwait(true);
@@ -114,22 +114,20 @@ namespace BetterSecondBot.HttpServer
                     test = test.Replace(Config.Http_PublicUrl, "");
 
                     //rproxy weirdness
-                    string use_http_url = Config.Http_PublicUrl.Replace("http://", "");
-                    use_http_url = Config.Http_PublicUrl.Replace("https://", "");
-                    test = test.Replace(":" + Config.Http_Port.ToString(), "");
-                    test = test.Replace(use_http_url, "");
-                    test = test.Replace("https://", "");
-                    test = test.Replace("http://", "");
-                    
+                    test = test.Replace(Config.Http_PublicUrl, "");
+                    Config.Http_PublicUrl = Config.Http_PublicUrl.Replace("http://", "");
+                    Config.Http_PublicUrl = Config.Http_PublicUrl.Replace("https://", "");
+                    test = test.Replace(Config.Http_PublicUrl, "");
+                    test = test.Replace(":" + Config.Http_Port.ToString(), "");                 
                 }
-                json_http_reply reply = new json_http_reply();
+                Json_http_reply reply = new Json_http_reply();
                 List<string> http_args = test.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
                 byte[] data;
                 resp.StatusCode = 200;
                 resp.ContentType = "text/html";
                 if (req.HttpMethod == "GET")
                 {
-                    KeyValuePair<string, byte[]> replydata = myUI.Get_Process(req, resp, http_args);
+                    KeyValuePair<string, byte[]> replydata = myUI.Get_Process(resp, http_args);
                     if (replydata.Value != null)
                     {
                         resp.ContentType = replydata.Key;
@@ -166,7 +164,7 @@ namespace BetterSecondBot.HttpServer
                         }
                     }
                     resp.StatusCode = 200;
-                    if (myUI.Post_process(reply, req, resp, http_args, post_args) == true)
+                    if (myUI.Post_process(reply, resp, http_args, post_args) == true)
                     {
                         bool accept_request = false;
                         string why_request_failed = "Bad signing request";

@@ -65,9 +65,9 @@ namespace BSB.Commands.Group
             {
                 if (UUID.TryParse(args[0], out UUID target_group) == true)
                 {
-                    if (UUID.TryParse(args[1], out UUID target_avatar) == true)
+                    if (UUID.TryParse(args[1], out UUID _) == true)
                     {
-                        if (UUID.TryParse(args[2], out UUID target_role) == true)
+                        if (UUID.TryParse(args[2], out UUID _) == true)
                         {
                             if (bot.MyGroups.ContainsKey(target_group) == true)
                             {

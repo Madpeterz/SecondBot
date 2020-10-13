@@ -76,7 +76,7 @@ namespace BetterSecondBot
             }
             if(ok_to_try_start == true)
             {
-                Config = MakeJsonConfig.http_config_check(Config);
+                Config = MakeJsonConfig.Http_config_check(Config);
                 new CliExitOnLogout(Config);
             }
         }

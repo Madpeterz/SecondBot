@@ -8,7 +8,7 @@ namespace BSB.bottypes
 {
     public abstract class MessageSwitcherBot : EventsBot
     {
-        string[] hard_blocked_agents = new string[] { "secondlife", "second life"};
+        readonly string[] hard_blocked_agents = new string[] { "secondlife", "second life"};
         protected override void ChatInputHandler(object sender, ChatEventArgs e)
         {
             bool fromme = false;
@@ -90,8 +90,10 @@ namespace BSB.bottypes
                     if (bits.Count > 2)
                     {
                         arg_signed_with = "|||";
-                        List<string> newbits = new List<string>();
-                        newbits.Add(bits[0]);
+                        List<string> newbits = new List<string>
+                        {
+                            bits[0]
+                        };
                         StringBuilder B = new StringBuilder();
                         int loop = 1;
                         string addon = "";
@@ -111,7 +113,7 @@ namespace BSB.bottypes
                     }
                     else
                     {
-                        if (is_avatar_master(sender_name) == true)
+                        if (Is_avatar_master(sender_name) == true)
                         {
                             CoreCommandLib(sender_uuid, true, bits.ElementAt(0), bits.ElementAt(1), "", arg_signed_with);
                         }

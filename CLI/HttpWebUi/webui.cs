@@ -15,27 +15,26 @@ using System.Threading;
 
 namespace BetterSecondBot.HttpWebUi
 {
-    public class webui
+    public class Webui
     {
-        JsonConfig siteconfig;
-        SecondBot bot;
-        Dictionary<string, long> vaildlogincookies = new Dictionary<string, long>();
-        public webui(JsonConfig setconfig, SecondBot setbot)
+        private JsonConfig siteconfig;
+        private SecondBot bot;
+        private Dictionary<string, long> vaildlogincookies = new Dictionary<string, long>();
+        public Webui(JsonConfig setconfig, SecondBot setbot)
         {
             bot = setbot;
             siteconfig = setconfig;
         }
-        protected KeyValuePair<bool, bool> logincookievaild(HttpListenerRequest reqs, HttpListenerResponse resp)
+        protected KeyValuePair<bool, bool> Logincookievaild(HttpListenerResponse resp)
         {
-            return logincookievaild(reqs, resp, false);
+            return Logincookievaild(resp, false);
         }
-        protected KeyValuePair<bool, bool> logincookievaild(HttpListenerRequest reqs, HttpListenerResponse resp, bool force_logout)
+        protected KeyValuePair<bool, bool> Logincookievaild(HttpListenerResponse resp, bool force_logout)
         {
             foreach (Cookie C in resp.Cookies)
             {
                 if (C.Name == "logincookie")
                 {
-                    Cookie old = C;
                     if (force_logout == true)
                     {
                         if (vaildlogincookies.ContainsKey(C.Value) == true)
@@ -61,7 +60,7 @@ namespace BetterSecondBot.HttpWebUi
             }
             return new KeyValuePair<bool, bool>(false, false);
         }
-        public bool Post_process(json_http_reply reply, HttpListenerRequest reqs, HttpListenerResponse resp, List<string> args, Dictionary<string, string> post_args)
+        public bool Post_process(Json_http_reply reply, HttpListenerResponse resp, List<string> args, Dictionary<string, string> post_args)
         {
             bool processed = false;
             if (args != null)
@@ -82,7 +81,7 @@ namespace BetterSecondBot.HttpWebUi
                         {
                             area = args[2];
                         }
-                        KeyValuePair<bool, bool> logincheck = logincookievaild(reqs, resp);
+                        KeyValuePair<bool, bool> logincheck = Logincookievaild(resp);
 
                         if (logincheck.Key == false)
                         {
@@ -99,9 +98,11 @@ namespace BetterSecondBot.HttpWebUi
                                             newcookiecode = helpers.GetSHA1(siteconfig.Security_WebUIKey + helpers.UnixTimeNow().ToString() + new Random().Next(12345).ToString());
                                         }
                                         vaildlogincookies.Add(newcookiecode, helpers.UnixTimeNow() + (5 * 60)); // auto logout after 5 mins
-                                        Cookie logincookie = new Cookie("logincookie", newcookiecode);
-                                        logincookie.Expires = DateTime.Now.AddDays(1);
-                                        logincookie.Path = "/";
+                                        Cookie logincookie = new Cookie("logincookie", newcookiecode)
+                                        {
+                                            Expires = DateTime.Now.AddDays(1),
+                                            Path = "/"
+                                        };
                                         resp.Cookies.Add(logincookie);
                                         Console.WriteLine("Cookie created: " + logincookie.Value + " <=> " + newcookiecode + "");
                                         reply.message = "ok";
@@ -133,7 +134,7 @@ namespace BetterSecondBot.HttpWebUi
                                 // logged in
                                 if (mod == "logout")
                                 {
-                                    logincookievaild(reqs, resp, true);
+                                    Logincookievaild(resp, true);
                                     reply.message = "logged-out";
                                     reply.redirect = "/";
                                     reply.status = false;
@@ -356,7 +357,7 @@ namespace BetterSecondBot.HttpWebUi
                                 // login expired
                                 reply.message = "login-expired";
                                 reply.redirect = "/";
-                                logincookievaild(reqs, resp, true);
+                                Logincookievaild(resp, true);
                             }
                         }
                     }
@@ -364,7 +365,7 @@ namespace BetterSecondBot.HttpWebUi
             }
             return !processed;
         }
-        public string html_logged_in(string mod, string area)
+        public string Html_logged_in(string mod, string area)
         {
             string layout = helpers.ReadResourceFile(Assembly.GetExecutingAssembly(), "sidemenu.layout");
             Dictionary<string, string> swaps = new Dictionary<string, string>();
@@ -387,7 +388,6 @@ namespace BetterSecondBot.HttpWebUi
                 loop++;
             }
             swaps.Add("html_menu", menu);
-            menu = "";
             if (mod == "none")
             {
                 pagecontent = "<p>Please select a menu item on the left</p>";
@@ -428,7 +428,7 @@ namespace BetterSecondBot.HttpWebUi
             }
             return layout;
         }
-        public string html_logged_out()
+        public string Html_logged_out()
         {
             string layout = helpers.ReadResourceFile(Assembly.GetExecutingAssembly(), "full.layout");
             layout = layout.Replace("[[page_content]]", helpers.ReadResourceFile(Assembly.GetExecutingAssembly(), "login.block"));
@@ -438,7 +438,7 @@ namespace BetterSecondBot.HttpWebUi
             layout = layout.Replace("[[html_title]]", siteconfig.Basic_BotUserName);
             return layout;
         }
-        public KeyValuePair<string, byte[]> Get_Process(HttpListenerRequest reqs, HttpListenerResponse resp, List<string> args)
+        public KeyValuePair<string, byte[]> Get_Process(HttpListenerResponse resp, List<string> args)
         {
 
             // get content
@@ -467,18 +467,18 @@ namespace BetterSecondBot.HttpWebUi
                 }
             }
             // get display
-            KeyValuePair<bool, bool> logincheck = logincookievaild(reqs, resp);
+            KeyValuePair<bool, bool> logincheck = Logincookievaild(resp);
             if (logincheck.Key == true)
             {
                 if (logincheck.Value == false)
                 {
-                    logincookievaild(reqs, resp, true);
+                    Logincookievaild(resp, true);
                 }
             }
-            string reply_with = "";
+            string reply_with;
             if (logincheck.Value == false)
             {
-                reply_with = html_logged_out();
+                reply_with = Html_logged_out();
             }
             else
             {
@@ -495,13 +495,13 @@ namespace BetterSecondBot.HttpWebUi
 
                 if (mod == "logout")
                 {
-                    logincookievaild(reqs, resp, true);
-                    reply_with = html_logged_out();
+                    Logincookievaild(resp, true);
+                    reply_with = Html_logged_out();
                 }
                 else
                 {
                     // logged in
-                    reply_with = html_logged_in(mod, area);
+                    reply_with = Html_logged_in(mod, area);
                 }
             }
             reply_with = reply_with.Replace("[[url_base]]", siteconfig.Http_PublicUrl);
