@@ -33,6 +33,7 @@ namespace BetterSecondBot.HttpServer
         protected JsonConfig Config;
         public JsonConfig GetConfig { get { return Config; } }
         protected HTTPCommandsInterface post_controler;
+
         protected string url = "";
         public bool ShutdownHTTP { get; set; }
         public bool HTTPCnCmode { get; set; }
@@ -78,6 +79,7 @@ namespace BetterSecondBot.HttpServer
             Config = setConfig;
             Bot = LinkBot;
             int port = Math.Abs(Config.Http_Port);
+            url = Config.Http_Host;
             if (Config.Http_Host == "docker")
             {
                 url = "http://*:" + port.ToString() + "/";
