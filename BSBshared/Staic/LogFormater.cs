@@ -13,27 +13,27 @@ namespace BetterSecondBotShared.logs
     };
     public static class LogFormater
     {
-        public static string Warn(string message)
+        public static string Warn(string message,bool send_to_console=true)
         {
-            return Add(message, ConsoleLogLogLevel.Warn);
+            return Add(message, ConsoleLogLogLevel.Warn, send_to_console);
         }
-        public static string Crit(string message)
+        public static string Crit(string message, bool send_to_console = true)
         {
-            return Add(message, ConsoleLogLogLevel.Crit);
+            return Add(message, ConsoleLogLogLevel.Crit, send_to_console);
         }
-        public static string Info(string message)
+        public static string Info(string message, bool send_to_console = true)
         {
-            return Add(message, ConsoleLogLogLevel.Info);
+            return Add(message, ConsoleLogLogLevel.Info, send_to_console);
         }
-        public static string Status(string message)
+        public static string Status(string message, bool send_to_console = true)
         {
-            return Add(message, ConsoleLogLogLevel.Status);
+            return Add(message, ConsoleLogLogLevel.Status, send_to_console);
         }
-        public static string Debug(string message)
+        public static string Debug(string message, bool send_to_console = true)
         {
-            return Add(message, ConsoleLogLogLevel.Debug);
+            return Add(message, ConsoleLogLogLevel.Debug, send_to_console);
         }
-        private static string Add(string message, ConsoleLogLogLevel Level)
+        private static string Add(string message, ConsoleLogLogLevel Level, bool send_to_console = true)
         {
             var date = DateTime.Now;
             StringBuilder n = new StringBuilder();
@@ -86,6 +86,10 @@ namespace BetterSecondBotShared.logs
                     }
             }
             n.Append(message);
+            if(send_to_console == true)
+            {
+                Console.WriteLine(n.ToString());
+            }
             return n.ToString();
         }
     }

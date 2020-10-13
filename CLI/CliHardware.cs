@@ -18,7 +18,7 @@ namespace BetterSecondBot
             LogFormater.Status("Hardware/Debug version");
             json_file = "debug.json";
 #else
-            Status("Hardware/Live version");
+            LogFormater.Status("Hardware/Live version");
             if(args.Length == 1)
             {
                 json_file = ""+args[0]+".json";
@@ -26,7 +26,7 @@ namespace BetterSecondBot
             else
             {
                 json_file = "mybot.json";
-                Warn("Using: mybot.json as the config");
+                LogFormater.Warn("Using: mybot.json as the config");
             }
 
 #endif

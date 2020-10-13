@@ -281,23 +281,23 @@ namespace BetterSecondBotShared.bottypes
 
         public virtual void Warn(string message)
         {
-            Log2File(LogFormater.Warn(message), ConsoleLogLogLevel.Warn);
+            Log2File(LogFormater.Warn(message,false), ConsoleLogLogLevel.Warn);
         }
         public virtual void Crit(string message)
         {
-            Log2File(LogFormater.Crit(message), ConsoleLogLogLevel.Crit);
+            Log2File(LogFormater.Crit(message, false), ConsoleLogLogLevel.Crit);
         }
         public virtual void Info(string message)
         {
-            Log2File(LogFormater.Info(message), ConsoleLogLogLevel.Info);
+            Log2File(LogFormater.Info(message, false), ConsoleLogLogLevel.Info);
         }
         public virtual void Status(string message)
         {
-            Log2File(LogFormater.Status(message), ConsoleLogLogLevel.Status);
+            Log2File(LogFormater.Status(message, false), ConsoleLogLogLevel.Status);
         }
         public virtual void Debug(string message)
         {
-            Log2File(LogFormater.Debug(message), ConsoleLogLogLevel.Debug);
+            Log2File(LogFormater.Debug(message, false), ConsoleLogLogLevel.Debug);
         }
 
         public virtual void Log2File(string message, ConsoleLogLogLevel Level)
