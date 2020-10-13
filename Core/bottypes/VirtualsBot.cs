@@ -1,5 +1,4 @@
-﻿using BetterSecondBotShared.bottypes;
-using BetterSecondBotShared.logs;
+﻿using BetterSecondBotShared.logs;
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
@@ -7,7 +6,7 @@ using System.Text;
 
 namespace BSB.bottypes
 {
-    public abstract class VirtualsBot : BasicBot
+    public abstract class VirtualsBot : Log2FileBot
     {
         #region DiscordOutputTarget
         public virtual bool send_to_discord(string command,string message)
@@ -84,20 +83,20 @@ namespace BSB.bottypes
         #region events
         protected virtual void PermissionsHandler(object sender, ScriptQuestionEventArgs e)
         {
-            ConsoleLog.Debug("PermissionsHandler proc not overridden");
+            Debug("PermissionsHandler proc not overridden");
         }
         protected virtual void AvatarAnimationHandler(object sender, AvatarAnimationEventArgs e)
         {
-            ConsoleLog.Debug("AvatarAnimationHandler proc not overridden");
+            Debug("AvatarAnimationHandler proc not overridden");
         }
 
         protected virtual void SitHandler(object sender, AvatarSitResponseEventArgs e)
         {
-            ConsoleLog.Debug("SitHandler proc not overridden");
+            Debug("SitHandler proc not overridden");
         }
         protected virtual void MessageHandler(object sender, InstantMessageEventArgs e)
         {
-            ConsoleLog.Debug("MessageHandler proc not overridden");
+            Debug("MessageHandler proc not overridden");
         }
         #endregion
         #region Dialogs

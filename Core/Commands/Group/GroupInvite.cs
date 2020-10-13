@@ -18,7 +18,7 @@ namespace BSB.Commands.Group
             {
                 if(UUID.TryParse(args[2], out target_role) == false)
                 {
-                    ConsoleLog.Warn("GroupInvite: Role uuid not vaild using everyone");
+                    LogFormater.Warn("GroupInvite: Role uuid not vaild using everyone");
                 }
             }            
             bot.GetClient.Groups.Invite(group, new List<UUID>() { target_role }, avatar);

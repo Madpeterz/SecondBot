@@ -15,10 +15,10 @@ namespace BetterSecondBot
             JsonConfig Config = new JsonConfig();
             string json_file = "";
 #if DEBUG
-            ConsoleLog.Status("Hardware/Debug version");
+            LogFormater.Status("Hardware/Debug version");
             json_file = "debug.json";
 #else
-            ConsoleLog.Status("Hardware/Live version");
+            Status("Hardware/Live version");
             if(args.Length == 1)
             {
                 json_file = ""+args[0]+".json";
@@ -26,15 +26,15 @@ namespace BetterSecondBot
             else
             {
                 json_file = "mybot.json";
-                ConsoleLog.Warn("Using: mybot.json as the config");
+                Warn("Using: mybot.json as the config");
             }
 
 #endif
             if (SimpleIO.dir_exists("wiki") == false)
             {
-                ConsoleLog.Info("Basic Wiki [Creating]");
+                LogFormater.Info("Basic Wiki [Creating]");
                 new DebugModeCreateWiki(AssemblyInfo.GetGitHash(), io);
-                ConsoleLog.Info("Basic Wiki [Ready]");
+                LogFormater.Info("Basic Wiki [Ready]");
                 io = new SimpleIO();
             }
             bool ok_to_try_start = false;
@@ -52,7 +52,7 @@ namespace BetterSecondBot
                         }
                         catch (Exception e)
                         {
-                            ConsoleLog.Warn("Unable to read config file\n moving config to " + json_file + ".old and creating a empty config\nError was: " + e.Message + "");
+                            LogFormater.Warn("Unable to read config file\n moving config to " + json_file + ".old and creating a empty config\nError was: " + e.Message + "");
                             io.makeOld(json_file);
                             Config = new JsonConfig();
                             io.WriteJsonConfig(MakeJsonConfig.GetDefault(), json_file);
@@ -60,19 +60,19 @@ namespace BetterSecondBot
                     }
                     else
                     {
-                        ConsoleLog.Warn("Json config is empty creating an empty one for you");
+                        LogFormater.Warn("Json config is empty creating an empty one for you");
                         io.WriteJsonConfig(MakeJsonConfig.GetDefault(), json_file);
                     }
                 }
                 else
                 {
-                    ConsoleLog.Warn("Json config does not Exist creating it for you");
+                    LogFormater.Warn("Json config does not Exist creating it for you");
                     io.WriteJsonConfig(MakeJsonConfig.GetDefault(), json_file);
                 }
             }
             else
             {
-                ConsoleLog.Crit("you must select a .json file for config! example \"BetterSecondBot.exe mybot\" will use the mybot.json file!");
+                LogFormater.Crit("you must select a .json file for config! example \"BetterSecondBot.exe mybot\" will use the mybot.json file!");
             }
             if(ok_to_try_start == true)
             {

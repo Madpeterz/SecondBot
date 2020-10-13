@@ -13,6 +13,7 @@ namespace BSB.bottypes
         protected string LastSendDiscordStatus = "";
         protected long DiscordUnixTimeOnine;
         protected bool DiscordLock;
+
         protected Dictionary<string, ICategoryChannel> catmap = new Dictionary<string, ICategoryChannel>();
     }
 }

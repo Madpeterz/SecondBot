@@ -1,0 +1,6 @@
+﻿SecondBot -> DialogsBot -> DiscordBotTTS -> DiscordBot -> DiscordBotInbound -> 
+DiscordBotRelay -> DiscordBotStatus -> DiscordBotChannelControl ->
+DiscordBotFunctions -> Values -> ChatRelay -> RLVbot -> RLVbotHelper -> 
+AwaitReplyEventBot -> CommandsBot -> AVstorageBot -> AtHome ->
+MessageSwitcherBot -> EventsBot -> VoidEventBot -> AnimationsBot ->
+VirtualsBot -> Log2FileBot -> BasicBot

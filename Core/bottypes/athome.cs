@@ -56,6 +56,7 @@ namespace BSB.bottypes
             {
                 addon = " [" + login_status + "]";
             }
+            Debug("Function/LoggedOutNextAction - "+ addon);
             return addon;
         }
         protected int last_tested_home_id = -1;
@@ -90,7 +91,7 @@ namespace BSB.bottypes
             {
                 if (SimShutdownAvoid == true)
                 {
-                    ConsoleLog.Status("Avoided sim shutdown will attempt to go home in 4 mins");
+                    Status("Avoided sim shutdown will attempt to go home in 4 mins");
                     SimShutdownAvoid = false;
                 }
             }
@@ -100,7 +101,7 @@ namespace BSB.bottypes
             if(e.Message.Contains("restart") == true)
             {
                 // oh snap region is dead run away
-                ConsoleLog.Info("--- Sim Restarting ---");
+                Info("--- Sim Restarting ---");
                 if (avoid_sims.ContainsKey(Client.Network.CurrentSim.Name) == false)
                 {
                     avoid_sims.Add(Client.Network.CurrentSim.Name, helpers.UnixTimeNow() + (10 * 60));
@@ -193,12 +194,12 @@ namespace BSB.bottypes
                 if (UseSLurl != "")
                 {
                     TeleportWithSLurl(UseSLurl);
-                    ConsoleLog.Status("Attempting panic evac to: "+ last_attempted_teleport_region+"");
+                    Status("Attempting panic evac to: "+ last_attempted_teleport_region+"");
                     AvoidSim(UseSLurl); // black list that region so we dont try to go back there if we get a shutdown notice again
                 }
                 else
                 {
-                    ConsoleLog.Status("No vaild SLurl found, Teleporting to backup hub");
+                    Status("No vaild SLurl found, Teleporting to backup hub");
                     string[] Hubs = new[] { "https://maps.secondlife.com/secondlife/Morris/28/228/40/", "https://maps.secondlife.com/secondlife/Ahern/28/28/40/",
                             "https://maps.secondlife.com/secondlife/Bonifacio/228/228/40/","https://maps.secondlife.com/secondlife/Dore/228/28/40/" };
                     TeleportWithSLurl(Hubs[new Random().Next(0, Hubs.Length - 1)]);

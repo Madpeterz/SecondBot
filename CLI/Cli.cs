@@ -18,7 +18,7 @@ namespace BetterSecondBot
             {
                 new CliHardware(args);
             }
-            ConsoleLog.Status("- Exiting in 5 secs -");
+            LogFormater.Status("- Exiting in 5 secs -");
             Thread.Sleep(5000);
         }
 

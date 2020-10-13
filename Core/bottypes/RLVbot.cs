@@ -20,7 +20,7 @@ namespace BSB.bottypes
             {
                 if (myconfig.Setting_AllowRLV == true)
                 {
-                    ConsoleLog.Info("RLV: Enabled");
+                    Info("RLV: Enabled");
                     RLVinterface = new RLV.RLVcontrol(this);
                 }
             }
@@ -80,7 +80,7 @@ namespace BSB.bottypes
                                 }
                                 else
                                 {
-                                    ConsoleLog.Debug("RLV API -> blacklisted [" + command + "]");
+                                    Debug("RLV API -> blacklisted [" + command + "]");
                                 }
                             }
                         }

@@ -84,7 +84,7 @@ namespace BetterSecondBot.WikiMake
                     }
                     else
                     {
-                        ConsoleLog.Debug("command " + c + " from " + interface_name + " overlaps an ready loaded command from "+ seen_command_names[c]+"");
+                        LogFormater.Debug("command " + c + " from " + interface_name + " overlaps an ready loaded command from "+ seen_command_names[c]+"");
                     }
                 }
                 string workspace = shared_interface.GetCommandWorkspace(c);
@@ -132,7 +132,7 @@ namespace BetterSecondBot.WikiMake
                         else
                         {
                             ExampleCall.Append("?");
-                            ConsoleLog.Debug("[WikiMake] " + area + " Command " + c + " missing some required hint values");
+                            LogFormater.Debug("[WikiMake] " + area + " Command " + c + " missing some required hint values");
                         }
                         loop++;
                     }
@@ -261,7 +261,7 @@ namespace BetterSecondBot.WikiMake
         }
         protected void InterfaceWiki(string area,API_supported_interface shared_interface, bool track_commands = false)
         {
-            ConsoleLog.Info("[WIKI] Starting area " + area + "");
+            LogFormater.Info("[WIKI] Starting area " + area + "");
             // create index 
             InterfaceIndex(area, shared_interface);
 
@@ -270,7 +270,7 @@ namespace BetterSecondBot.WikiMake
 
             // create commands
             InterfaceCommands(area, shared_interface, track_commands);
-            ConsoleLog.Info("[WIKI] Done with area");
+            LogFormater.Info("[WIKI] Done with area");
         }
 
         public DebugModeCreateWiki(string Version, SimpleIO shareio)

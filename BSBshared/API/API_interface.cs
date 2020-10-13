@@ -60,7 +60,7 @@ namespace BetterSecondBotShared.API
                             }
                             else
                             {
-                                ConsoleLog.Crit("[CMD] command: " + D.CommandName + " already defined!");
+                                LogFormater.Crit("[CMD] command: " + D.CommandName + " already defined!");
                             }
                         }
                     }
@@ -80,7 +80,7 @@ namespace BetterSecondBotShared.API
             }
             else
             {
-                ConsoleLog.Crit(this.GetType() + " Attempted to call GetSubTypes without setting API_TYPE first!");
+                LogFormater.Crit(this.GetType() + " Attempted to call GetSubTypes without setting API_TYPE first!");
             }
             return null;
         }

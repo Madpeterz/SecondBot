@@ -243,25 +243,25 @@ namespace BetterSecondBot.HttpServer
                 catch (Exception e)
                 {
                     ok = false;
-                    ConsoleLog.Crit("Unable to setup http service: "+e.Message+"");
-                    ConsoleLog.Crit("if running on windows please check: https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/configuring-http-and-https?redirectedfrom=MSDN");
+                    LogFormater.Crit("Unable to setup http service: "+e.Message+"");
+                    LogFormater.Crit("if running on windows please check: https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/configuring-http-and-https?redirectedfrom=MSDN");
                 }
                 if (ok == true)
                 {
                     bool clean_exit = false;
-                    ConsoleLog.Status("Listening for connections on " + url + "");
+                    LogFormater.Status("Listening for connections on " + url + "");
                     while (clean_exit == false)
                     {
                         try
                         {
-                            ConsoleLog.Status("HTTP ready");
+                            LogFormater.Status("HTTP ready");
                             Task listenTask = HandleIncomingConnections();
                             listenTask.GetAwaiter().GetResult();
                         }
                         catch
                         {
-                            ConsoleLog.Status("HTTP died");
-                            //ConsoleLog.Status("Http interface killed itself: " + e.ToString() + "");
+                            LogFormater.Status("HTTP died");
+                            //Status("Http interface killed itself: " + e.ToString() + "");
                         }
                     }
                 }

@@ -12,7 +12,7 @@ using System.Threading;
 
 namespace BSB.bottypes
 {
-    public abstract class DialogsBot : DiscordBot
+    public abstract class DialogsBot : DiscordBotTTS
     {
         protected bool TrackDialogs;
         protected int RelayDialogsToChannel;

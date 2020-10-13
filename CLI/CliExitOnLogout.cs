@@ -16,7 +16,7 @@ namespace BetterSecondBot
     {
         public CliExitOnLogout(JsonConfig Config)
         {
-            ConsoleLog.Status("Mode: Cli [Basic]");
+            LogFormater.Status("Mode: Cli [Basic]");
             if (helpers.botRequired(Config) == true)
             {
                 SecondBot Bot = new SecondBot();
@@ -33,7 +33,7 @@ namespace BetterSecondBot
                     if (NewStatusMessage != Bot.LastStatusMessage)
                     {
                         Bot.LastStatusMessage = NewStatusMessage;
-                        ConsoleLog.Status(Bot.LastStatusMessage);
+                        Bot.Log2File(LogFormater.Status(Bot.LastStatusMessage),ConsoleLogLogLevel.Status);
                     }
                     Thread.Sleep(1000);
                 }
@@ -41,7 +41,7 @@ namespace BetterSecondBot
             }
             else
             {
-                ConsoleLog.Warn("Required settings missing");
+                LogFormater.Warn("Required settings missing");
             }
         }
     }

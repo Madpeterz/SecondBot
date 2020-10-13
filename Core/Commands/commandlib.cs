@@ -187,7 +187,7 @@ namespace BSB.Commands
                 else
                 {
                     run_status = false;
-                    ConsoleLog.Crit("[SmartReply] output Channel must be zero or higher");
+                    LogFormater.Crit("[SmartReply] output Channel must be zero or higher");
                 }
             }
             else if (mode == "IM")
@@ -209,12 +209,12 @@ namespace BSB.Commands
                 catch (Exception e)
                 {
                     run_status = false;
-                    ConsoleLog.Crit("[SmartReply] HTTP failed: " + e.Message + "");
+                    LogFormater.Crit("[SmartReply] HTTP failed: " + e.Message + "");
                 }
             }
             else
             {
-                ConsoleLog.Crit("[SmartReply] Unsupported output target");
+                LogFormater.Crit("[SmartReply] Unsupported output target");
                 return false;
             }
             return run_status;

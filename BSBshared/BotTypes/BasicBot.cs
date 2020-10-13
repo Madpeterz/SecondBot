@@ -31,6 +31,7 @@ namespace BetterSecondBotShared.bottypes
         protected bool killMe;
         protected JsonConfig myconfig;
         protected string version = "NotSet V1.0.0.0";
+
         protected bool reconnect;
         public string MyVersion { get { return version; } }
         public string Name { get { return myconfig.Basic_BotUserName; } }
@@ -63,7 +64,7 @@ namespace BetterSecondBotShared.bottypes
             if (myconfig.Security_SignedCommandkey.Length < 8)
             {
                 myconfig.Security_SignedCommandkey = helpers.GetSHA1("" + myconfig.Basic_BotUserName + "" + myconfig.Basic_BotPassword + "" + helpers.UnixTimeNow().ToString() + "").Substring(0, 8);
-                ConsoleLog.Warn("Given code is not acceptable (min length 8)");
+                Warn("Given code is not acceptable (min length 8)");
             }
             List<string> bits = myconfig.Basic_BotUserName.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
             if (bits.Count == 1)
@@ -93,11 +94,11 @@ namespace BetterSecondBotShared.bottypes
                         }
                         string namesubmaster = String.Join(" ", bits);
                         SubMasters.Add(namesubmaster);
-                        ConsoleLog.Info("Sub-Master: " + namesubmaster);
+                        Info("Sub-Master: " + namesubmaster);
                     }
                 }
             }
-            ConsoleLog.Info("Build: " + version);
+            Info("Build: " + version);
         }
 
         public virtual void Start()
@@ -118,13 +119,13 @@ namespace BetterSecondBotShared.bottypes
                     }
                     else
                     {
-                        ConsoleLog.Warn("loginURI invaild: using secondlife");
+                        Warn("loginURI invaild: using secondlife");
                         Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
                     }
                 }
                 else
                 {
-                    ConsoleLog.Warn("loginURI invaild: using secondlife");
+                    Warn("loginURI invaild: using secondlife");
                     Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
                 }
             }
@@ -140,7 +141,7 @@ namespace BetterSecondBotShared.bottypes
         }
         protected virtual void BotStartHandler()
         {
-            ConsoleLog.Debug("BotStartHandler proc not overridden");
+            Debug("BotStartHandler proc not overridden");
         }
 
         protected string GetSimPositionAsString()
@@ -181,7 +182,7 @@ namespace BetterSecondBotShared.bottypes
 
         protected virtual void LoginHandler(object o, LoginProgressEventArgs e)
         {
-            ConsoleLog.Debug("LoginHandler proc not overridden");
+            Debug("LoginHandler proc not overridden");
         }
 
         protected virtual void AfterBotLoginHandler()
@@ -255,7 +256,7 @@ namespace BetterSecondBotShared.bottypes
 
         protected virtual void ChatInputHandler(object sender, ChatEventArgs e)
         {
-            ConsoleLog.Debug("ChatInputHandler proc not overridden");
+            Debug("ChatInputHandler proc not overridden");
         }
 
         protected virtual void CoreCommandLib(UUID fromUUID, bool from_master, string command, string arg)
@@ -270,12 +271,48 @@ namespace BetterSecondBotShared.bottypes
 
         protected virtual void CoreCommandLib(UUID fromUUID,bool from_master,string command,string arg,string signing_code,string signed_with)
         {
-            ConsoleLog.Debug("CoreCommandLib proc not overridden");
+            Debug("CoreCommandLib proc not overridden");
         }
 
         public virtual void ResetAnimations()
         {
-           ConsoleLog.Debug("reset_animations not enabled at this level");
+           Debug("reset_animations not enabled at this level");
+        }
+
+        public virtual void Warn(string message)
+        {
+            Log2File(LogFormater.Warn(message), ConsoleLogLogLevel.Warn);
+        }
+        public virtual void Crit(string message)
+        {
+            Log2File(LogFormater.Crit(message), ConsoleLogLogLevel.Crit);
+        }
+        public virtual void Info(string message)
+        {
+            Log2File(LogFormater.Info(message), ConsoleLogLogLevel.Info);
+        }
+        public virtual void Status(string message)
+        {
+            Log2File(LogFormater.Status(message), ConsoleLogLogLevel.Status);
+        }
+        public virtual void Debug(string message)
+        {
+            Log2File(LogFormater.Debug(message), ConsoleLogLogLevel.Debug);
+        }
+
+        public virtual void Log2File(string message, ConsoleLogLogLevel Level)
+        {
+            if (myconfig == null)
+            {
+                Console.WriteLine(message);
+            }
+            else
+            {
+                if (myconfig.Log2File_Level >= (int)Level)
+                {
+                    Console.WriteLine(message);
+                }
+            }
         }
     }
 }

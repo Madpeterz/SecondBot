@@ -5,35 +5,35 @@ namespace BetterSecondBotShared.logs
 {
     public enum ConsoleLogLogLevel
     {
-        Debug, // [Not logged unless in debug]
-        Info, // [Not logged unless in debug]
         Status,
+        Info,
+        Crit,
         Warn,
-        Crit
+        Debug,
     };
-    public static class ConsoleLog
+    public static class LogFormater
     {
-        public static void Warn(string message)
+        public static string Warn(string message)
         {
-            Add(message, ConsoleLogLogLevel.Warn);
+            return Add(message, ConsoleLogLogLevel.Warn);
         }
-        public static void Crit(string message)
+        public static string Crit(string message)
         {
-            Add(message, ConsoleLogLogLevel.Crit);
+            return Add(message, ConsoleLogLogLevel.Crit);
         }
-        public static void Info(string message)
+        public static string Info(string message)
         {
-            Add(message, ConsoleLogLogLevel.Info);
+            return Add(message, ConsoleLogLogLevel.Info);
         }
-        public static void Status(string message)
+        public static string Status(string message)
         {
-            Add(message, ConsoleLogLogLevel.Status);
+            return Add(message, ConsoleLogLogLevel.Status);
         }
-        public static void Debug(string message)
+        public static string Debug(string message)
         {
-            Add(message, ConsoleLogLogLevel.Debug);
+            return Add(message, ConsoleLogLogLevel.Debug);
         }
-        private static void Add(string message, ConsoleLogLogLevel Level)
+        private static string Add(string message, ConsoleLogLogLevel Level)
         {
             var date = DateTime.Now;
             StringBuilder n = new StringBuilder();
@@ -86,7 +86,7 @@ namespace BetterSecondBotShared.logs
                     }
             }
             n.Append(message);
-            Console.WriteLine(n.ToString());
+            return n.ToString();
         }
     }
 }

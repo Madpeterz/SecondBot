@@ -79,7 +79,7 @@ namespace BSB.bottypes
                         await SendMessageToChannelAsync("interface", "Please format help request as follows: !help commandname", "bot", UUID.Zero, "bot");
                     }
                 }
-                else if (message.Content != "!clear")
+                else
                 {
                     output.Append("Unknown request: ");
                     output.Append(message.Content);
@@ -120,13 +120,13 @@ namespace BSB.bottypes
             }
             return Task.CompletedTask;
         }
-        protected async Task<Task> InboundImMessage(ITextChannel Chan, SocketMessage message)
+        protected virtual async Task<Task> InboundImMessage(ITextChannel Chan, SocketMessage message)
         {
-            if (message.Content == "!close")
+            if (message.Content.StartsWith("!close"))
             {
                 await Chan.DeleteAsync();
             }
-            else if (message.Content == "!clear")
+            else if (message.Content.StartsWith("!clear"))
             {
                 await CleanDiscordChannel(Chan, 0, true);
             }
@@ -137,11 +137,7 @@ namespace BSB.bottypes
                 {
                     if (bits[0] == "IM")
                     {
-                        if (message.Content == "!clear")
-                        {
-                            await CleanDiscordChannel(Chan, 0, true);
-                        }
-                        else if (UUID.TryParse(bits[1], out UUID avatar) == true)
+                        if (UUID.TryParse(bits[1], out UUID avatar) == true)
                         {
                             IGuildUser user = (IGuildUser)message.Author;
                             Client.Self.InstantMessage(avatar, "[" + user.Nickname + "]->" + message.Content);
@@ -220,13 +216,13 @@ namespace BSB.bottypes
                     else
                     {
                         ITextChannel Chan = (ITextChannel)message.Channel;
-                        if (Chan.CategoryId == catmap["bot"].Id)
+                        if (message.Content.StartsWith("!clear") == true)
                         {
-                            if (message.Content == "!clear")
-                            {
-                                await CleanDiscordChannel(Chan, 0, true).ConfigureAwait(false);
-                            }
-                            else if (Chan.Name == "interface")
+                            await CleanDiscordChannel(Chan, 0, true).ConfigureAwait(false);
+                        }
+                        else if (Chan.CategoryId == catmap["bot"].Id)
+                        {
+                            if (Chan.Name == "interface")
                             {
                                 await InboundInterfaceMessage(message).ConfigureAwait(false);
                             }

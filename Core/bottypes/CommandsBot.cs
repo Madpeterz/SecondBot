@@ -49,7 +49,7 @@ namespace BSB.bottypes
                 message = sb.ToString();
                 if (myconfig.Setting_LogCommands == true)
                 {
-                    ConsoleLog.Info(message);
+                    Info(message);
                 }
                 commandid++;
                 if (commandid >= 50)
@@ -236,27 +236,27 @@ namespace BSB.bottypes
                                 {
                                     if (finalSuccess)
                                     {
-                                        ConsoleLog.Info("Sending notecard now");
+                                        Info("Sending notecard now");
                                         Client.Inventory.GiveItem(finalItemID, name, AssetType.Notecard, sendToUUID, false);
                                     }
                                     else
                                     {
                                         returnstatus = false;
-                                        ConsoleLog.Warn("Unable to request notecard upload");
+                                        Warn("Unable to request notecard upload");
                                     }
 
                                 });
                             }
                             else
                             {
-                                ConsoleLog.Crit("The fuck empty success notecard create");
+                                Crit("The fuck empty success notecard create");
                                 returnstatus = false;
                             }
                         });
                     }
                     else
                     {
-                        ConsoleLog.Warn("Unable to find default notecards folder");
+                        Warn("Unable to find default notecards folder");
                         returnstatus = false;
                     }
                 }
@@ -328,7 +328,7 @@ namespace BSB.bottypes
                                 {
                                     if (finalcompileSuccess == false)
                                     {
-                                        ConsoleLog.Warn("Script failed to compile, sending anyway.");
+                                        Warn("Script failed to compile, sending anyway.");
                                     }
                                     Client.Inventory.GiveItem(finalitemID, name, AssetType.LSLText, sendToUUID, false);
 
@@ -336,14 +336,14 @@ namespace BSB.bottypes
                             }
                             else
                             {
-                                ConsoleLog.Crit("The fuck empty success Script create");
+                                Crit("The fuck empty success Script create");
                                 returnstatus = false;
                             }
                         });
                     }
                     else
                     {
-                        ConsoleLog.Warn("Unable to find default Scripts folder");
+                        Warn("Unable to find default Scripts folder");
                         returnstatus = false;
                     }
                 }

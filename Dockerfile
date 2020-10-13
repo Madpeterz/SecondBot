@@ -36,14 +36,14 @@ ENV Security_WebUIKey=''
 
 ENV Setting_AllowRLV='false'
 ENV Setting_AllowFunds='false'
-ENV Setting_LogCommands='true'
+ENV Setting_LogCommands='false'
 ENV Setting_RelayImToAvatarUUID=''
 ENV Setting_DefaultSit_UUID=''
 ENV Setting_loginURI='secondlife'
 
 ENV DiscordRelay_URL=''
 ENV DiscordRelay_GroupUUID=''
-ENV DiscordFull_Enable='true'
+ENV DiscordFull_Enable='false'
 ENV DiscordFull_Token=''
 ENV DiscordFull_ServerID=''
 
@@ -55,6 +55,15 @@ ENV Http_PublicUrl='http://localhost/'
 ENV Name2Key_Enable='false'
 ENV Name2Key_Url='http://localhost:1234'
 ENV Name2Key_Key='magic'
+
+ENV DiscordTTS_Enable='false'
+ENV DiscordTTS_server_id=''
+ENV DiscordTTS_channel_name=''
+ENV DiscordTTS_avatar_uuid=''
+ENV DiscordTTS_Nickname=''
+
+ENV Log2File_Enable='false'
+ENV Log2File_Level=1
 
 EXPOSE 80
 ENV ASPNETCORE_URLS http://+:80

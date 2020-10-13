@@ -35,7 +35,7 @@ namespace BetterSecondBot.HttpServer
             }
             else
             {
-                ConsoleLog.Debug("" + command + " [Failed]: I have no fucking idea what you are talking about");
+                LogFormater.Debug("" + command + " [Failed]: I have no fucking idea what you are talking about");
                 return new[] { "Failed", "I have no fucking idea what you are talking about" };
             }
         }
@@ -68,7 +68,7 @@ namespace BetterSecondBot.HttpServer
         }
         protected string[] Failed(string why_failed)
         {
-            ConsoleLog.Warn("HTTP: " + CommandName + " [Failed]: " + why_failed);
+            LogFormater.Warn("HTTP: " + CommandName + " [Failed]: " + why_failed);
             return new [] {"Failed",why_failed};
         }
     }

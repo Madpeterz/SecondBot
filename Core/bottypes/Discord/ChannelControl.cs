@@ -26,15 +26,20 @@ namespace BSB.bottypes
 
         protected async Task<ITextChannel> FindTextChannel(string channelname, ICategoryChannel cat, UUID sender, string TopicType)
         {
+            return await FindTextChannel(DiscordServer, channelname, cat, sender, TopicType);
+        }
+
+        protected async Task<ITextChannel> FindTextChannel(IGuild onserver,string channelname, ICategoryChannel cat, UUID sender, string TopicType,bool create_channel=true)
+        {
             await WaitForUnlock().ConfigureAwait(false);
             channelname = channelname.ToLowerInvariant();
             channelname = String.Concat(channelname.Where(char.IsLetterOrDigit));
             DiscordLock = true;
-            IReadOnlyCollection<ITextChannel> found_chans = await DiscordServer.GetTextChannelsAsync(CacheMode.AllowDownload);
+            IReadOnlyCollection<ITextChannel> found_chans = await onserver.GetTextChannelsAsync(CacheMode.AllowDownload);
             ITextChannel result = null;
             foreach (ITextChannel ITC in found_chans)
             {
-                if (ITC.CategoryId == cat.Id)
+                if (create_channel == false)
                 {
                     if (ITC.Name == channelname)
                     {
@@ -42,14 +47,28 @@ namespace BSB.bottypes
                         break;
                     }
                 }
+                else
+                {
+                    if (ITC.CategoryId == cat.Id)
+                    {
+                        if (ITC.Name == channelname)
+                        {
+                            result = ITC;
+                            break;
+                        }
+                    }
+                }
             }
-            if (result == null)
+            if (create_channel == true)
             {
-                result = await CreateChannel(channelname, TopicType, sender.ToString()).ConfigureAwait(false);
-            }
-            else
-            {
-                await CleanDiscordChannel(result, 24).ConfigureAwait(false);
+                if (result == null)
+                {
+                    result = await CreateChannel(onserver, channelname, TopicType, sender.ToString()).ConfigureAwait(false);
+                }
+                else
+                {
+                    await CleanDiscordChannel(result, 24).ConfigureAwait(false);
+                }
             }
             DiscordLock = false;
             return result;
@@ -66,7 +85,7 @@ namespace BSB.bottypes
 
         protected async static Task CleanDiscordChannel(ITextChannel chan, int HistoryHours, bool forceempty)
         {
-            DateTimeOffset Now = new DateTimeOffset(new DateTime());
+            long nowunix = DateTimeOffset.Now.ToUnixTimeSeconds();
             IEnumerable<IMessage> messages;
             bool empty = false;
             while (empty == false)
@@ -74,23 +93,51 @@ namespace BSB.bottypes
                 empty = true;
                 messages = await chan.GetMessagesAsync(50).FlattenAsync();
                 List<ulong> deleteMessages = new List<ulong>();
+                List<IMessage> slowDeleteMessages = new List<IMessage>();
+                
                 foreach (IMessage mess in messages)
                 {
-                    var hours = ((Now.ToUnixTimeSeconds() - mess.Timestamp.ToUnixTimeSeconds()) / 60) / 60;
+                    long messageunix = mess.Timestamp.ToUnixTimeSeconds();
+                    long dif = nowunix - messageunix;
+                    var hours = (dif / 60)/60;
+                    bool slowdel = false;
+                    
+                    if (hours > (24 * 13))
+                    {
+                        slowdel = true;
+                    }
                     if ((hours > HistoryHours) || (forceempty == true))
                     {
                         empty = false;
-                        deleteMessages.Add(mess.Id);
+                        if (slowdel == false)
+                        {
+                            deleteMessages.Add(mess.Id);
+                        }
+                        else
+                        {
+                            slowDeleteMessages.Add(mess);
+                        }
                     }
                 }
-                if (deleteMessages.Count > 0)
+                if ((deleteMessages.Count > 0) || (slowDeleteMessages.Count > 0))
                 {
-                    await chan.DeleteMessagesAsync(deleteMessages);
+                    if (deleteMessages.Count > 0)
+                    {
+                        await chan.DeleteMessagesAsync(deleteMessages).ConfigureAwait(true);
+                    }
+                    if (slowDeleteMessages.Count > 0)
+                    {
+                        foreach (IMessage slowdelmessage in slowDeleteMessages)
+                        {
+                            await chan.DeleteMessageAsync(slowdelmessage).ConfigureAwait(true);
+                        }
+                    }
+                    empty = false;
                 }
             }
         }
 
-        protected async Task<ITextChannel> CreateChannel(string channelname, string channeltopictype, string sender_id)
+        protected async Task<ITextChannel> CreateChannel(IGuild onserver, string channelname, string channeltopictype, string sender_id)
         {
             channelname = channelname.ToLowerInvariant();
             channelname = String.Concat(channelname.Where(char.IsLetterOrDigit));
@@ -121,8 +168,8 @@ namespace BSB.bottypes
             }
             try
             {
-                IGuildChannel channel = await DiscordServer.CreateTextChannelAsync(channelname, X => DiscordGetNewChannelProperies(X, channelname, display_topic, channeltopictype.ToLowerInvariant()));
-                ITextChannel Txtchan = await DiscordServer.GetTextChannelAsync(channel.Id);
+                IGuildChannel channel = await onserver.CreateTextChannelAsync(channelname, X => DiscordGetNewChannelProperies(X, channelname, display_topic, channeltopictype.ToLowerInvariant()));
+                ITextChannel Txtchan = await onserver.GetTextChannelAsync(channel.Id);
                 return Txtchan;
             }
             catch

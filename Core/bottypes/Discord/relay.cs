@@ -28,7 +28,7 @@ namespace BSB.bottypes
                 }
             }
         }
-        protected async Task DiscordIMMessage(UUID sender_uuid, string sender_name, string message)
+        protected virtual async Task DiscordIMMessage(UUID sender_uuid, string sender_name, string message)
         {
             if ((helpers.notempty(sender_name) == true) && (helpers.notempty(message) == true))
             {
@@ -54,28 +54,25 @@ namespace BSB.bottypes
         {
             if (fromme == false)
             {
-                if (myconfig.DiscordFull_Enable == false)
+                if (discord_group_relay == true)
                 {
-                    if (discord_group_relay == true)
+                    // GroupChat Relay only
+                    if (group == true)
                     {
-                        // GroupChat Relay only
-                        if (group == true)
+                        if (myconfig.DiscordRelay_URL != "")
                         {
-                            if (myconfig.DiscordRelay_URL != "")
+                            if ((myconfig.DiscordRelay_GroupUUID == group_uuid.ToString()) || (myconfig.DiscordRelay_GroupUUID == "*") || (myconfig.DiscordRelay_GroupUUID == "all"))
                             {
-                                if ((myconfig.DiscordRelay_GroupUUID == group_uuid.ToString()) || (myconfig.DiscordRelay_GroupUUID == "*") || (myconfig.DiscordRelay_GroupUUID == "all"))
-                                {
-                                    Group Gr = mygroups[group_uuid];
-                                    using var DWHclient = new DiscordWebhookClient(myconfig.DiscordRelay_URL);
-                                    string SendMessage = "(" + Gr.Name + ") @" + sender_name + ":" + message + "";
-                                    await DWHclient.SendMessageAsync(text: SendMessage).ConfigureAwait(false);
-                                    DWHclient.Dispose();
-                                }
+                                Group Gr = mygroups[group_uuid];
+                                using var DWHclient = new DiscordWebhookClient(myconfig.DiscordRelay_URL);
+                                string SendMessage = "(" + Gr.Name + ") @" + sender_name + ":" + message + "";
+                                await DWHclient.SendMessageAsync(text: SendMessage).ConfigureAwait(false);
+                                DWHclient.Dispose();
                             }
                         }
                     }
                 }
-                else if (DiscordClientConnected == true)
+                if (DiscordClientConnected == true)
                 {
                     if (avatar == true)
                     {
@@ -83,17 +80,24 @@ namespace BSB.bottypes
                         {
                             if (group == true)
                             {
+                                Debug("DiscordBotChatControler - GroupChat:("+ group_uuid.ToString()+" -> " + sender_name + ":" + message);
                                 await DiscordGroupMessage(group_uuid, sender_name, message).ConfigureAwait(false);
                             }
                             else
                             {
+                                Debug("DiscordBotChatControler - IM:" + sender_name + ":" + message);
                                 await DiscordIMMessage(sender_uuid, sender_name, message).ConfigureAwait(false);
                             }
                         }
                         else
                         {
+                            Debug("DiscordBotChatControler - Localchat:" + sender_name + ":" + message);
                             await SendMessageToChannelAsync("localchat", "" + sender_name + ":" + message, "bot", UUID.Zero, "bot").ConfigureAwait(false);
                         }
+                    }
+                    else
+                    {
+                        Debug("DiscordBotChatControler - Not from an avatar");
                     }
                 }
             }

@@ -152,15 +152,15 @@ namespace BetterSecondBotShared.Static
                 {
                     if (Testing.GetCommandArgTypes(a).First() == MakeJsonConfig.GetProp(test, a))
                     {
-                        ConsoleLog.Warn("" + a + " is currently set to the default");
+                        LogFormater.Warn("" + a + " is currently set to the default");
                         default_value_found = true;
                         break;
                     }
                 }
                 if (default_value_found == false)
                 {
-                    ConsoleLog.Status("User => " + test.Basic_BotUserName);
-                    ConsoleLog.Status("Master => " + test.Security_MasterUsername);
+                    LogFormater.Status("User => " + test.Basic_BotUserName);
+                    LogFormater.Status("Master => " + test.Security_MasterUsername);
                 }
                 return !default_value_found;
             }
@@ -168,19 +168,19 @@ namespace BetterSecondBotShared.Static
             {
                 if (helpers.notempty(test.Basic_BotUserName) == false)
                 {
-                    ConsoleLog.Warn("Basic_BotUserName is null or empty");
+                    LogFormater.Warn("Basic_BotUserName is null or empty");
                 }
                 if (helpers.notempty(test.Basic_BotPassword) == false)
                 {
-                    ConsoleLog.Warn("Basic_BotPassword is null or empty");
+                    LogFormater.Warn("Basic_BotPassword is null or empty");
                 }
                 if (helpers.notempty(test.Security_MasterUsername) == false)
                 {
-                    ConsoleLog.Warn("Security_MasterUsername is null or empty");
+                    LogFormater.Warn("Security_MasterUsername is null or empty");
                 }
                 if (helpers.notempty(test.Security_SignedCommandkey) == false)
                 {
-                    ConsoleLog.Warn("Security_SignedCommandkey is null or empty");
+                    LogFormater.Warn("Security_SignedCommandkey is null or empty");
                 }
                 return false;
             }

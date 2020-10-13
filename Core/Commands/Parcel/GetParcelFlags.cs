@@ -45,7 +45,7 @@ namespace BSB.Commands.CMD_Parcel
                         }
                         else
                         {
-                            ConsoleLog.Warn("Flag: " + a + " is unknown");
+                            LogFormater.Warn("Flag: " + a + " is unknown");
                         }
                     }
                 }

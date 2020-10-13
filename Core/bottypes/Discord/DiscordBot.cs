@@ -16,7 +16,7 @@ namespace BSB.bottypes
             base.AfterBotLoginHandler();
             _ = DiscordBotAfterLogin();
         }
-        protected async Task DiscordBotAfterLogin()
+        protected virtual async Task DiscordBotAfterLogin()
         {
             if (reconnect == false)
             {
@@ -56,14 +56,14 @@ namespace BSB.bottypes
             }
         }
 
-        protected Task DiscordClientReady()
+        protected virtual async Task<Task> DiscordClientReady()
         {
             DiscordServer = DiscordClient.GetGuild(myconfig.DiscordFull_ServerID);
             if (DiscordServer != null)
             {
                 DiscordUnixTimeOnine = helpers.UnixTimeNow();
                 DiscordClientConnected = true;
-                _ = DiscordRebuildChannels();
+                await DiscordRebuildChannels();
             }
             else
             {

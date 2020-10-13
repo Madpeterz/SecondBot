@@ -27,13 +27,12 @@ namespace BetterSecondBotShared.Json
             // Security
             else if (cmd == "Security_MasterUsername") return "The username of the bots owner *you can leave out Resident if you so wish*";
             else if (cmd == "Security_SubMasters") return "A CSV of avatar names who can issue commands to the bot";
-            
+
             else if (cmd == "Security_SignedCommandkey") return "Used when sending the bot a HTTP or IM command that has a hash validation";
             else if (cmd == "Security_WebUIKey") return "Used with the webUI to login, note: 2FA support is planned soon for this system that will replace this UIkey";
             // Settings
             else if (cmd == "Setting_AllowRLV") return "Enable the RLV api interface";
             else if (cmd == "Setting_AllowFunds") return "Allow the bot to transfer L$ and get a non zero balance";
-            else if (cmd == "Setting_LogCommands") return "Allow the bot to send command to console and discord full if enabled";
             else if (cmd == "Setting_RelayImToAvatarUUID") return "UUID of who the bot should relay IMs to in secondlife";
             else if (cmd == "Setting_DefaultSit_UUID") return "UUID of a object the bot should attempt to sit on after logging in";
             else if (cmd == "Setting_loginURI") return "the URI to login to (leave as \"secondlife\" unless you know what your doing!)";
@@ -48,6 +47,23 @@ namespace BetterSecondBotShared.Json
             else if (cmd == "Http_Port") return "The port the HTTP interface should be running on";
             else if (cmd == "Http_Host") return "The URL the interface is on example use \"docker\" for auto or \"http://localhost:portnum\"";
             else if (cmd == "Http_PublicUrl") return "The public url used to access the web ui";
+            // Discord TTS
+            else if (cmd == "DiscordTTS_Enable") return "Enable discord TTS helper (Requires DiscordFull_Enable set to true) ";
+            else if (cmd == "DiscordTTS_server_id") return "The server ID to use for TTS";
+            else if (cmd == "DiscordTTS_channel_name") return "The channel name to use (found on the server set by DiscordTTS_server_id)";
+            else if (cmd == "DiscordTTS_avatar_uuid") return "The avatar UUID whos IMs will be turned into TTS";
+            else if (cmd == "DiscordTTS_Nickname") return "The nickname to use on the TTS server";
+            // Logs
+            else if (cmd == "Log2File_Enable") return "Enable writing to logs to files [Logs are sent to the Logs folder]"
+                    + "\n If you dont attach a volume called logs to the bot it will not be kept when the docker instance is restarted";
+            else if (cmd == "Log2File_Level") return "Enabled logging levels\n"
+                                                    + "- 1: Nothing\n"
+                                                    + "0: Status only\n"
+                                                    + "1: +Info\n"
+                                                    + "2: +Crititcal\n"
+                                                    + "3: +Warnings\n"
+                                                    + "4: +Debug\n";
+            else if (cmd == "Setting_LogCommands") return "Allow the bot to send command to console and discord full if enabled";
             // Give up
             return "Unknown value:" + cmd;
         }
@@ -90,7 +106,6 @@ namespace BetterSecondBotShared.Json
             // Settings
             else if (cmd == "Setting_AllowRLV") return "False";
             else if (cmd == "Setting_AllowFunds") return "True";
-            else if (cmd == "Setting_LogCommands") return "True";
             else if (cmd == "Setting_RelayImToAvatarUUID") return "";
             else if (cmd == "Setting_DefaultSit_UUID") return "";
             else if (cmd == "Setting_loginURI") return "secondlife";
@@ -105,6 +120,16 @@ namespace BetterSecondBotShared.Json
             else if (cmd == "Http_Port") return "80";
             else if (cmd == "Http_Host") return "http://localhost:80";
             else if (cmd == "Http_PublicUrl") return "http://localhost/";
+            // Discord TTS
+            else if (cmd == "DiscordTTS_Enable") return "False";
+            else if (cmd == "DiscordTTS_server_id") return "";
+            else if (cmd == "DiscordTTS_channel_name") return "";
+            else if (cmd == "DiscordTTS_avatar_uuid") return "";
+            else if (cmd == "DiscordTTS_Nickname") return "";
+            // Logs
+            else if (cmd == "Log2File_Enable") return "False";
+            else if (cmd == "Log2File_Level") return "1";
+            else if (cmd == "Setting_LogCommands") return "True";
             // Give up
             return "Unknown value:" + cmd;
         }
@@ -169,23 +194,23 @@ namespace BetterSecondBotShared.Json
                             }
                             else
                             {
-                                ConsoleLog.Debug("unsupported arg_type: " + arg_type + " for " + arg + "");
+                                LogFormater.Debug("unsupported arg_type: " + arg_type + " for " + arg + "");
                             }
                         }
                         else
                         {
-                            ConsoleLog.Warn("Unable to write to " + arg + "");
+                            LogFormater.Warn("Unable to write to " + arg + "");
                         }
                     }
                     else
                     {
-                        ConsoleLog.Crit("unknown prop " + arg + "");
+                        LogFormater.Crit("unknown prop " + arg + "");
                     }
                 }
             }
             else
             {
-                ConsoleLog.Debug("unknown arg_type for " + arg + "");
+                LogFormater.Debug("unknown arg_type for " + arg + "");
             }
             return reply;
         }
@@ -201,15 +226,15 @@ namespace BetterSecondBotShared.Json
                         jsonConfig.Http_Enable = false;
                         if (jsonConfig.Security_WebUIKey.Length < 12)
                         {
-                            ConsoleLog.Warn("Http disabled: Security_WebUIKey length must be 12 or more");
+                            LogFormater.Warn("Http disabled: Security_WebUIKey length must be 12 or more");
                         }
                         else if (jsonConfig.Http_Port < 80)
                         {
-                            ConsoleLog.Warn("Http disabled: Httpport range below protected range - Given: (" + jsonConfig.Http_Port + ")");
+                            LogFormater.Warn("Http disabled: Httpport range below protected range - Given: (" + jsonConfig.Http_Port + ")");
                         }
                         else if ((jsonConfig.Http_Host != "docker") && (jsonConfig.Http_Host.StartsWith("http") == false))
                         {
-                            ConsoleLog.Warn("Http disabled: Http_Host must be vaild: http://XXXXXX or \"docker\" - Given: (" + jsonConfig.Http_Host + ")");
+                            LogFormater.Warn("Http disabled: Http_Host must be vaild: http://XXXXXX or \"docker\" - Given: (" + jsonConfig.Http_Host + ")");
                         }
                         else
                         {
@@ -218,18 +243,18 @@ namespace BetterSecondBotShared.Json
                     }
                     else
                     {
-                        ConsoleLog.Info("Http interface disabled by config");
+                        LogFormater.Info("Http interface disabled by config");
                     }
                 }
                 else
                 {
-                    ConsoleLog.Warn("Http disabled: Http_Host is null");
+                    LogFormater.Warn("Http disabled: Http_Host is null");
                     jsonConfig.Http_Enable = false;
                 }
             }
             else
             {
-                ConsoleLog.Warn("Http disabled: Security_WebUIKey is null");
+                LogFormater.Warn("Http disabled: Security_WebUIKey is null");
                 jsonConfig.Http_Enable = false;
             }
             return jsonConfig;
@@ -279,7 +304,7 @@ namespace BetterSecondBotShared.Json
                     }
                     else
                     {
-                        ConsoleLog.Debug("[Notice] No args hint found for " + arg + "");
+                        LogFormater.Debug("[Notice] No args hint found for " + arg + "");
                     }
                 }
                 if (arg_value_default != null)
@@ -329,17 +354,17 @@ namespace BetterSecondBotShared.Json
                             }
                             else
                             {
-                                ConsoleLog.Debug("unknown arg_type: " + arg_type + " for " + arg + "");
+                                LogFormater.Debug("unknown arg_type: " + arg_type + " for " + arg + "");
                             }
                         }
                         else
                         {
-                            ConsoleLog.Warn("Unable to write to " + arg + "");
+                            LogFormater.Warn("Unable to write to " + arg + "");
                         }
                     }
                     else
                     {
-                        ConsoleLog.Crit("unknown prop " + arg + "");
+                        LogFormater.Crit("unknown prop " + arg + "");
                     }
                 }
             }

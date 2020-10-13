@@ -42,7 +42,7 @@ namespace BSB.RLV
                 }
                 else
                 {
-                    ConsoleLog.Warn("[RLVapi/Failed] " + command + ": Incorrect number of args");
+                    LogFormater.Warn("[RLVapi/Failed] " + command + ": Incorrect number of args");
                 }
             }
             else
@@ -50,7 +50,7 @@ namespace BSB.RLV
                 if(suppress_warning.Contains(command) == false)
                 {
                     suppress_warning.Add(command);
-                    ConsoleLog.Warn("[RLVapi/Failed] " + command + ": I have no fucking idea what you are talking about");
+                    LogFormater.Warn("[RLVapi/Failed] " + command + ": I have no fucking idea what you are talking about");
                 }
             }
             return false;
@@ -97,7 +97,7 @@ namespace BSB.RLV
 
         public bool Failed(string why_failed)
         {
-            ConsoleLog.Warn("[RLVapi/Failed] " + CommandName + ": " + why_failed);
+            LogFormater.Warn("[RLVapi/Failed] " + CommandName + ": " + why_failed);
             return false;
         }
 

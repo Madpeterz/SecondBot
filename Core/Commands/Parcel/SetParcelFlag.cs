@@ -37,17 +37,17 @@ namespace BSB.Commands.CMD_Parcel
                             }
                             else
                             {
-                                ConsoleLog.Crit("Unable to set flag " + parts[0] + " to : " + parts[1] + "");
+                                LogFormater.Crit("Unable to set flag " + parts[0] + " to : " + parts[1] + "");
                             }
                         }
                         else
                         {
-                            ConsoleLog.Warn("Flag: " + parts[0] + " is unknown");
+                            LogFormater.Warn("Flag: " + parts[0] + " is unknown");
                         }
                     }
                     else
                     {
-                        ConsoleLog.Warn("Flag: " + a + " missing = True|False");
+                        LogFormater.Warn("Flag: " + a + " missing = True|False");
                     }
                 }
                 if (setflags.Count > 0)
