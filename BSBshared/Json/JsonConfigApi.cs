@@ -17,55 +17,174 @@ namespace BetterSecondBotShared.Json
             string[] bits = cmd.Split("_");
             return bits.First();
         }
-
-        public override string GetCommandHelp(string cmd)
+        #region GetHelp
+        protected string GetHelp_Basic(string cmd)
         {
             // Basic
-            if (cmd == "Basic_BotUserName") return "Username of the bot *you can leave out Resident if you so wish*";
-            else if (cmd == "Basic_BotPassword") return "Password of the bot *add $1$ followed by the md5 hash if you dont want to expose the raw password example: $1$A3DCB4D229DE6FDE0DB5686DEE47145D";
-            else if (cmd == "Basic_HomeRegions") return "a CSV of SLURLs that the bot will attempt to return to after avoiding a sim shutdown (In testing)";
+            if (cmd == "Basic_BotUserName")
+            {
+                return "Username of the bot *you can leave out Resident if you so wish*";
+            }
+            else if (cmd == "Basic_BotPassword")
+            {
+                return "Password of the bot *add $1$ followed by the md5 hash if you dont want to expose the raw password example: $1$A3DCB4D229DE6FDE0DB5686DEE47145D";
+            }
+            else if (cmd == "Basic_HomeRegions")
+            {
+                return "a CSV of SLURLs that the bot will attempt to return to after avoiding a sim shutdown (In testing)";
+            }
+            return "";
+        }
+        protected string GetHelp_Security(string cmd)
+        {
             // Security
-            else if (cmd == "Security_MasterUsername") return "The username of the bots owner *you can leave out Resident if you so wish*";
-            else if (cmd == "Security_SubMasters") return "A CSV of avatar names who can issue commands to the bot";
-
-            else if (cmd == "Security_SignedCommandkey") return "Used when sending the bot a HTTP or IM command that has a hash validation";
-            else if (cmd == "Security_WebUIKey") return "Used with the webUI to login, note: 2FA support is planned soon for this system that will replace this UIkey";
+            if (cmd == "Security_MasterUsername")
+            {
+                return "The username of the bots owner *you can leave out Resident if you so wish*";
+            }
+            else if (cmd == "Security_SubMasters")
+            {
+                return "A CSV of avatar names who can issue commands to the bot";
+            }
+            else if (cmd == "Security_SignedCommandkey")
+            {
+                return "Used when sending the bot a HTTP or IM command that has a hash validation";
+            }
+            else if (cmd == "Security_WebUIKey")
+            {
+                return "Used with the webUI to login, note: 2FA support is planned soon for this system that will replace this UIkey";
+            }
+            return "";
+        }
+        protected string GetHelp_Settings(string cmd)
+        {
             // Settings
-            else if (cmd == "Setting_AllowRLV") return "Enable the RLV api interface";
-            else if (cmd == "Setting_AllowFunds") return "Allow the bot to transfer L$ and get a non zero balance";
-            else if (cmd == "Setting_RelayImToAvatarUUID") return "UUID of who the bot should relay IMs to in secondlife";
-            else if (cmd == "Setting_DefaultSit_UUID") return "UUID of a object the bot should attempt to sit on after logging in";
-            else if (cmd == "Setting_loginURI") return "the URI to login to (leave as \"secondlife\" unless you know what your doing!)";
+            if (cmd == "Setting_AllowRLV")
+            {
+                return "Enable the RLV api interface";
+            }
+            else if (cmd == "Setting_AllowFunds")
+            {
+                return "Allow the bot to transfer L$ and get a non zero balance";
+            }
+            else if (cmd == "Setting_RelayImToAvatarUUID")
+            {
+                return "UUID of who the bot should relay IMs to in secondlife";
+            }
+            else if (cmd == "Setting_DefaultSit_UUID")
+            {
+                return "UUID of a object the bot should attempt to sit on after logging in";
+            }
+            else if (cmd == "Setting_loginURI")
+            {
+                return "the URI to login to (leave as \"secondlife\" unless you know what your doing!)";
+            }
+            return "";
+        }
+        protected string GetHelp_Discord(string cmd)
+        {
             // Discord
-            else if (cmd == "DiscordRelay_URL") return "The webhook URL to send group chat to";
-            else if (cmd == "DiscordRelay_GroupUUID") return "The group UUID to relay group chat for";
-            else if (cmd == "DiscordFull_Enable") return "Allow the bot to fully connect to discord (Disables relay)";
-            else if (cmd == "DiscordFull_Token") return "The discord client token (see: https://discord.com/developers/applications)";
-            else if (cmd == "DiscordFull_ServerID") return "UUID of a object the bot should attempt to sit on after logging in";
+            if (cmd == "DiscordRelay_URL")
+            {
+                return "The webhook URL to send group chat to";
+            }
+            else if (cmd == "DiscordRelay_GroupUUID")
+            {
+                return "The group UUID to relay group chat for";
+            }
+            else if (cmd == "DiscordFull_Enable")
+            {
+                return "Allow the bot to fully connect to discord (Disables relay)";
+            }
+            else if (cmd == "DiscordFull_Token")
+            {
+                return "The discord client token (see: https://discord.com/developers/applications)";
+            }
+            else if (cmd == "DiscordFull_ServerID")
+            {
+                return "UUID of a object the bot should attempt to sit on after logging in";
+            }
+            return "";
+        }
+        protected string GetHelp_HTTP(string cmd)
+        {
             // HTTP
-            else if (cmd == "Http_Enable") return "Allow the bot to start a HTTP interface (Required for web UI and Post commands)";
-            else if (cmd == "Http_Port") return "The port the HTTP interface should be running on";
-            else if (cmd == "Http_Host") return "The URL the interface is on example use \"docker\" for auto or \"http://localhost:portnum\"";
-            else if (cmd == "Http_PublicUrl") return "The public url used to access the web ui";
+            if (cmd == "Http_Enable")
+            {
+                return "Allow the bot to start a HTTP interface (Required for web UI and Post commands)";
+            }
+            else if (cmd == "Http_Port")
+            {
+                return "The port the HTTP interface should be running on";
+            }
+            else if (cmd == "Http_Host")
+            {
+                return "The URL the interface is on example use \"docker\" for auto or \"http://localhost:portnum\"";
+            }
+            else if (cmd == "Http_PublicUrl")
+            {
+                return "The public url used to access the web ui";
+            }
+            return "";
+        }
+        protected string GetHelp_DiscordTTS(string cmd)
+        {
             // Discord TTS
-            else if (cmd == "DiscordTTS_Enable") return "Enable discord TTS helper (Requires DiscordFull_Enable set to true) ";
-            else if (cmd == "DiscordTTS_server_id") return "The server ID to use for TTS";
-            else if (cmd == "DiscordTTS_channel_name") return "The channel name to use (found on the server set by DiscordTTS_server_id)";
-            else if (cmd == "DiscordTTS_avatar_uuid") return "The avatar UUID whos IMs will be turned into TTS";
-            else if (cmd == "DiscordTTS_Nickname") return "The nickname to use on the TTS server";
+            if (cmd == "DiscordTTS_Enable")
+            {
+                return "Enable discord TTS helper (Requires DiscordFull_Enable set to true) ";
+            }
+            else if (cmd == "DiscordTTS_server_id")
+            {
+                return "The server ID to use for TTS";
+            }
+            else if (cmd == "DiscordTTS_channel_name")
+            {
+                return "The channel name to use (found on the server set by DiscordTTS_server_id)";
+            }
+            else if (cmd == "DiscordTTS_avatar_uuid")
+            {
+                return "The avatar UUID whos IMs will be turned into TTS";
+            }
+            else if (cmd == "DiscordTTS_Nickname")
+            {
+                return "The nickname to use on the TTS server";
+            }
+            return "";
+        }
+        protected string GetHelp_Logs(string cmd)
+        {
             // Logs
-            else if (cmd == "Log2File_Enable") return "Enable writing to logs to files [Logs are sent to the Logs folder]"
+            if (cmd == "Log2File_Enable")
+            {
+                return "Enable writing to logs to files [Logs are sent to the Logs folder]"
                     + "\n If you dont attach a volume called logs to the bot it will not be kept when the docker instance is restarted";
-            else if (cmd == "Log2File_Level") return "Enabled logging levels\n"
+            }
+            else if (cmd == "Log2File_Level")
+            {
+                return "Enabled logging levels\n"
                                                     + "- 1: Nothing\n"
                                                     + "0: Status only\n"
                                                     + "1: +Info\n"
                                                     + "2: +Crititcal\n"
                                                     + "3: +Warnings\n"
                                                     + "4: +Debug\n";
-            else if (cmd == "Setting_LogCommands") return "Allow the bot to send command to console and discord full if enabled";
-            // Give up
+            }
+            else if (cmd == "Setting_LogCommands")
+            {
+                return "Allow the bot to send command to console and discord full if enabled";
+            }
             return "Unknown value:" + cmd;
+        }
+        #endregion
+        public override string GetCommandHelp(string cmd)
+        {
+            if (cmd.StartsWith("Basic") == true) { return GetHelp_Basic(cmd); }
+            else if (cmd.StartsWith("Security") == true) { return GetHelp_Security(cmd); }
+            else if (cmd.StartsWith("Settings") == true) { return GetHelp_Settings(cmd); }
+            else if (cmd.StartsWith("DiscordTTS") == true) { return GetHelp_DiscordTTS(cmd); }
+            else if (cmd.StartsWith("Discord") == true) { return GetHelp_Discord(cmd); }
+            else { return GetHelp_Logs(cmd); }
         }
 
         public override int ApiCommandsCount { get { return GetCommandsList().Length; } }
@@ -92,46 +211,84 @@ namespace BetterSecondBotShared.Json
         {
             return new string[] { JsonGetCommandArgHints(cmd) };
         }
-        public string JsonGetCommandArgHints(string cmd)
+
+
+
+        #region GetValueHint
+        protected string GetValueHint_Basic(string cmd)
         {
             // Basic
-            if (cmd == "Basic_BotUserName") return "Example Resident";
-            else if (cmd == "Basic_BotPassword") return "Pass";
-            else if (cmd == "Basic_HomeRegions") return "http://maps.secondlife.com/secondlife/Viserion/50/140/23";
+            if (cmd == "Basic_BotUserName") { return "Example Resident"; }
+            else if (cmd == "Basic_BotPassword") { return "Pass"; }
+            else if (cmd == "Basic_HomeRegions") { return "http://maps.secondlife.com/secondlife/Viserion/50/140/23"; }
+            return "";
+        }
+        protected string GetValueHint_Security(string cmd)
+        {
             // Security
-            else if (cmd == "Security_MasterUsername") return "Madpeter Zond";
-            else if (cmd == "Security_SubMasters") return "Master Zond,Madpeter Zond,Madpeter Zond";
-            else if (cmd == "Security_SignedCommandkey") return "asdt234t34d3f34f";
-            else if (cmd == "Security_WebUIKey") return "2135r3y4vw232";
+            if (cmd == "Security_MasterUsername") { return "Madpeter Zond"; }
+            else if (cmd == "Security_SubMasters") { return "Master Zond,Madpeter Zond,Madpeter Zond"; }
+            else if (cmd == "Security_SignedCommandkey") { return "asdt234t34d3f34f"; }
+            else if (cmd == "Security_WebUIKey") { return "2135r3y4vw232"; }
+            return "";
+        }
+        protected string GetValueHint_Settings(string cmd)
+        {
             // Settings
-            else if (cmd == "Setting_AllowRLV") return "False";
-            else if (cmd == "Setting_AllowFunds") return "True";
-            else if (cmd == "Setting_RelayImToAvatarUUID") return "";
-            else if (cmd == "Setting_DefaultSit_UUID") return "";
-            else if (cmd == "Setting_loginURI") return "secondlife";
+            if (cmd == "Setting_AllowRLV") { return "False"; }
+            else if (cmd == "Setting_AllowFunds") { return "True"; }
+            else if (cmd == "Setting_RelayImToAvatarUUID") { return ""; }
+            else if (cmd == "Setting_DefaultSit_UUID") { return ""; }
+            else if (cmd == "Setting_loginURI") { return "secondlife"; }
+            return "";
+        }
+        protected string GetValueHint_Discord(string cmd)
+        {
             // Discord
-            else if (cmd == "DiscordRelay_URL") return "";
-            else if (cmd == "DiscordRelay_GroupUUID") return "";
-            else if (cmd == "DiscordFull_Enable") return "False";
-            else if (cmd == "DiscordFull_Token") return "";
-            else if (cmd == "DiscordFull_ServerID") return "";
+            if (cmd == "DiscordRelay_URL") { return ""; }
+            else if (cmd == "DiscordRelay_GroupUUID") { return ""; }
+            else if (cmd == "DiscordFull_Enable") { return "False"; }
+            else if (cmd == "DiscordFull_Token") { return ""; }
+            else if (cmd == "DiscordFull_ServerID") { return ""; }
+            return "";
+        }
+        protected string GetValueHint_HTTP(string cmd)
+        {
             // HTTP
-            else if (cmd == "Http_Enable") return "False";
-            else if (cmd == "Http_Port") return "80";
-            else if (cmd == "Http_Host") return "http://localhost:80";
-            else if (cmd == "Http_PublicUrl") return "http://localhost/";
+            if (cmd == "Http_Enable") { return "False"; }
+            else if (cmd == "Http_Port") { return "80"; }
+            else if (cmd == "Http_Host") { return "http://localhost:80"; }
+            else if (cmd == "Http_PublicUrl") { return "http://localhost/"; }
+            return "";
+        }
+        protected string GetValueHint_DiscordTTS(string cmd)
+        {
             // Discord TTS
-            else if (cmd == "DiscordTTS_Enable") return "False";
-            else if (cmd == "DiscordTTS_server_id") return "";
-            else if (cmd == "DiscordTTS_channel_name") return "";
-            else if (cmd == "DiscordTTS_avatar_uuid") return "";
-            else if (cmd == "DiscordTTS_Nickname") return "";
+            if (cmd == "DiscordTTS_Enable") { return "False"; }
+            else if (cmd == "DiscordTTS_server_id") { return ""; }
+            else if (cmd == "DiscordTTS_channel_name") { return ""; }
+            else if (cmd == "DiscordTTS_avatar_uuid") { return ""; }
+            else if (cmd == "DiscordTTS_Nickname") { return ""; }
+            return "";
+        }
+        protected string GetValueHint_Logs(string cmd)
+        {
             // Logs
-            else if (cmd == "Log2File_Enable") return "False";
-            else if (cmd == "Log2File_Level") return "1";
-            else if (cmd == "Setting_LogCommands") return "True";
-            // Give up
+            if (cmd == "Log2File_Enable") { return "False"; }
+            else if (cmd == "Log2File_Level") { return "1"; }
+            else if (cmd == "Setting_LogCommands") { return "True"; }
             return "Unknown value:" + cmd;
+        }
+        #endregion
+
+        public string JsonGetCommandArgHints(string cmd)
+        {
+            if (cmd.StartsWith("Basic") == true) { return GetValueHint_Basic(cmd); }
+            else if (cmd.StartsWith("Security") == true) { return GetValueHint_Security(cmd); }
+            else if (cmd.StartsWith("Settings") == true) { return GetValueHint_Settings(cmd); }
+            else if (cmd.StartsWith("DiscordTTS") == true) { return GetValueHint_DiscordTTS(cmd); }
+            else if (cmd.StartsWith("Discord") == true) { return GetValueHint_Discord(cmd); }
+            else { return GetValueHint_Logs(cmd); }
         }
         public override int GetCommandArgs(string cmd)
         {
@@ -143,6 +300,65 @@ namespace BetterSecondBotShared.Json
             return reply.GetType().GetProperty(arg, BindingFlags.Public | BindingFlags.Instance).GetValue(reply).ToString();
         }
 
+        protected void SetPropTypeAndValue(JsonConfig reply,PropertyInfo prop,string arg,string arg_type,string arg_value_default)
+        {
+            if (prop != null)
+            {
+                if (prop.CanWrite == true)
+                {
+                    if (arg_type == "Number")
+                    {
+                        if (int.TryParse(arg_value_default, out int result) == true)
+                        {
+                            prop.SetValue(reply, result, null);
+                        }
+                    }
+                    else if (arg_type == "Text")
+                    {
+                        prop.SetValue(reply, arg_value_default, null);
+                    }
+                    else if (arg_type == "True|False")
+                    {
+                        if (bool.TryParse(arg_value_default, out bool result) == true)
+                        {
+                            prop.SetValue(reply, result, null);
+                        }
+                    }
+                    else if (arg_type == "Collection")
+                    {
+                        prop.SetValue(reply, arg_value_default.Split(','), null);
+                    }
+                    else if (arg_type == "BigNumber")
+                    {
+                        if (ulong.TryParse(arg_value_default, out ulong result) == true)
+                        {
+                            prop.SetValue(reply, result, null);
+                        }
+                    }
+                    else if (arg_type == "Float")
+                    {
+                        if (float.TryParse(arg_value_default, out float result) == true)
+                        {
+                            prop.SetValue(reply, result, null);
+                        }
+                    }
+                    else
+                    {
+                        LogFormater.Debug("unsupported arg_type: " + arg_type + " for " + arg + "");
+                    }
+                }
+                else
+                {
+                    LogFormater.Warn("Unable to write to " + arg + "");
+                }
+            }
+            else
+            {
+                LogFormater.Crit("unknown prop " + arg + "");
+            }
+
+        }
+
         protected JsonConfig process_prop(JsonConfig reply,string arg,string arg_value_default)
         {
             string arg_type = GetCommandArgTypes(arg).First();
@@ -152,60 +368,7 @@ namespace BetterSecondBotShared.Json
                 {
                     Type Dtype = reply.GetType();
                     PropertyInfo prop = Dtype.GetProperty(arg, BindingFlags.Public | BindingFlags.Instance);
-                    if (prop != null)
-                    {
-                        if (prop.CanWrite == true)
-                        {
-                            if (arg_type == "Number")
-                            {
-                                if (int.TryParse(arg_value_default, out int result) == true)
-                                {
-                                    prop.SetValue(reply, result, null);
-                                }
-                            }
-                            else if (arg_type == "Text")
-                            {
-                                prop.SetValue(reply, arg_value_default, null);
-                            }
-                            else if (arg_type == "True|False")
-                            {
-                                if (bool.TryParse(arg_value_default, out bool result) == true)
-                                {
-                                    prop.SetValue(reply, result, null);
-                                }
-                            }
-                            else if (arg_type == "Collection")
-                            {
-                                prop.SetValue(reply, arg_value_default.Split(','), null);
-                            }
-                            else if (arg_type == "BigNumber")
-                            {
-                                if (ulong.TryParse(arg_value_default, out ulong result) == true)
-                                {
-                                    prop.SetValue(reply, result, null);
-                                }
-                            }
-                            else if(arg_type == "Float")
-                            {
-                                if (float.TryParse(arg_value_default, out float result) == true)
-                                {
-                                    prop.SetValue(reply, result, null);
-                                }
-                            }
-                            else
-                            {
-                                LogFormater.Debug("unsupported arg_type: " + arg_type + " for " + arg + "");
-                            }
-                        }
-                        else
-                        {
-                            LogFormater.Warn("Unable to write to " + arg + "");
-                        }
-                    }
-                    else
-                    {
-                        LogFormater.Crit("unknown prop " + arg + "");
-                    }
+                    SetPropTypeAndValue(reply, prop, arg, arg_type, arg_value_default);
                 }
             }
             else
@@ -311,61 +474,7 @@ namespace BetterSecondBotShared.Json
                 {
                     Type Dtype = reply.GetType();
                     PropertyInfo prop = Dtype.GetProperty(arg, BindingFlags.Public | BindingFlags.Instance);
-                    if (prop != null)
-                    {
-                        if (prop.CanWrite == true)
-                        {
-                            if (arg_type == "Number")
-                            {
-                                if (int.TryParse(arg_value_default, out int result) == true)
-                                {
-                                    prop.SetValue(reply, result, null);
-                                }
-                            }
-                            else if (arg_type == "Text")
-                            {
-                                prop.SetValue(reply, arg_value_default, null);
-                            }
-                            else if (arg_type == "True|False")
-                            {
-                                if (bool.TryParse(arg_value_default, out bool result) == true)
-                                {
-                                    prop.SetValue(reply, result, null);
-                                }
-                            }
-                            else if (arg_type == "Collection")
-                            {
-                                prop.SetValue(reply, arg_value_default.Split(','), null);
-                            }
-                            else if (arg_type == "BigNumber")
-                            {
-                                if (ulong.TryParse(arg_value_default, out ulong result) == true)
-                                {
-                                    prop.SetValue(reply, result, null);
-                                }
-                            }
-
-                            else if (arg_type == "Float")
-                            {
-                                if (float.TryParse(arg_value_default, out float result) == true)
-                                {
-                                    prop.SetValue(reply, result, null);
-                                }
-                            }
-                            else
-                            {
-                                LogFormater.Debug("unknown arg_type: " + arg_type + " for " + arg + "");
-                            }
-                        }
-                        else
-                        {
-                            LogFormater.Warn("Unable to write to " + arg + "");
-                        }
-                    }
-                    else
-                    {
-                        LogFormater.Crit("unknown prop " + arg + "");
-                    }
+                    SetPropTypeAndValue(reply, prop, arg, arg_type, arg_value_default);
                 }
             }
             return reply;
