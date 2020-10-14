@@ -29,6 +29,11 @@ namespace BSB.bottypes
             return await FindTextChannel(DiscordServer, channelname, cat, sender, TopicType);
         }
 
+        protected async Task<ITextChannel> FindTextChannel(IGuild onserver, string channelname)
+        {
+            return await FindTextChannel(onserver, channelname, null, UUID.Zero, "notUSED", false);
+        }
+
         protected async Task<ITextChannel> FindTextChannel(IGuild onserver,string channelname, ICategoryChannel cat, UUID sender, string TopicType,bool create_channel=true)
         {
             await WaitForUnlock().ConfigureAwait(false);
