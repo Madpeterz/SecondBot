@@ -16,7 +16,7 @@ namespace BSB.bottypes
         protected override async Task<Task> DiscordClientReady()
         {
             await base.DiscordClientReady();
-            TTSDiscordServer = DiscordClient.GetGuild(myconfig.DiscordFull_ServerID);
+            TTSDiscordServer = DiscordClient.GetGuild(myconfig.DiscordTTS_server_id);
             if (TTSDiscordServer != null)
             {
                 IGuildUser user = await TTSDiscordServer.GetCurrentUserAsync();
