@@ -159,25 +159,33 @@ namespace BetterSecondBotShared.bottypes
             return "0,0,0";
         }
 
+        protected string BasicBot_laststatus = "";
         public virtual string GetStatus()
         {
+            string reply = "Info: No client";
             if (Client != null)
             {
+                reply = "Network: Not ready";
                 if (Client.Network != null)
                 {
+                    reply = "Network: Not connected";
                     if (Client.Network.Connected)
                     {
+                        reply = "Sim: Not on sim";
                         if (Client.Network.CurrentSim != null)
                         {
-                            return "Sim: " + Client.Network.CurrentSim.Name + " " + GetSimPositionAsString() + "";
+                            reply = "Sim: " + Client.Network.CurrentSim.Name + " " + GetSimPositionAsString() + "";
                         }
-                        return "Sim: Not on sim";
                     }
-                    return "Network: Not connected";
                 }
-                return "Network: Not ready";
             }
-            return "Info: No client";
+
+            if (reply != BasicBot_laststatus)
+            {
+                BasicBot_laststatus = reply;
+                return reply;
+            }
+            return "";
         }
 
         protected virtual void LoginHandler(object o, LoginProgressEventArgs e)

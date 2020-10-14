@@ -21,40 +21,40 @@ namespace BSB.bottypes
                 teleported = false;
                 reconnect_mode = true;
                 last_reconnect_attempt = helpers.UnixTimeNow();
-                addon = " [Connection lost - switching to recovery mode]";
+                addon = "Connection lost - switching to recovery mode";
             }
             else if ((login_auto_logout == false) && (reconnect_mode == false) && (after_login_fired == false))
             {
-                addon = " [" + login_status + "]";
+                addon = login_status;
             }
             else if ((login_auto_logout == false) && (reconnect_mode == true) && (dif > 120))
             {
-                addon = " [@Attempting reconnect]";
+                addon = "Attempting reconnect";
                 last_reconnect_attempt = helpers.UnixTimeNow();
                 reconnect = true;
                 Start();
             }
             else if ((login_auto_logout == false) && (reconnect_mode == true) && (dif <= 120))
             {
-                addon = " [W4>Reconnect attempt timer]";
+                addon = "W4>Reconnect attempt timer";
             }
             else if ((login_auto_logout == true) && (auto_logout_login_recover == false))
             {
                 auto_logout_login_recover = true;
                 last_reconnect_attempt = helpers.UnixTimeNow();
-                addon = " [W4>" + login_status + " (10 secs)]";
+                addon = "W4>" + login_status + " (10 secs)";
             }
             else if ((login_auto_logout == true) && (auto_logout_login_recover == true) && (dif >= 10))
             {
                 login_auto_logout = false;
                 auto_logout_login_recover = false;
                 last_reconnect_attempt = helpers.UnixTimeNow();
-                addon = " [Restarting first login]";
+                addon = "Restarting first login";
                 Start();
             }
             else
             {
-                addon = " [" + login_status + "]";
+                addon = login_status;
             }
             Debug("Function/LoggedOutNextAction - "+ addon);
             return addon;
@@ -69,6 +69,7 @@ namespace BSB.bottypes
         protected string last_attempted_teleport_region = "";
         protected Dictionary<string, long> avoid_sims = new Dictionary<string, long>();
         protected bool SimShutdownAvoid;
+        protected long SimShutdownAvoidCooldown = 0;
         protected bool auto_logout_login_recover;
 
         protected void ChangeSim(object sender,SimChangedEventArgs e)
@@ -112,22 +113,47 @@ namespace BSB.bottypes
 
         public void ResetAtHome()
         {
+            Debug("@home / ResetAtHome");
             last_tested_home_id = -1;
-            last_tp_attempt_unixtime = 0;
+            after_login_fired = false;
             teleported = false;
-            reconnect_mode = true;
+            reconnect_mode = false;
+            last_tp_attempt_unixtime = 0;
         }
 
 
 
         protected void AvoidSim(string simname)
         {
-            if(avoid_sims.ContainsKey(simname) == false)
+            if (avoid_sims.ContainsKey(simname) == false)
             {
+                Debug("@home / AvoidSim: " + simname);
                 avoid_sims.Add(simname, helpers.UnixTimeNow() + 240); // @home will avoid that sim for the next 4 mins
             }
         }
 
+        protected void ExpireOldAvoidSims()
+        {
+            if(avoid_sims.Count() > 0)
+            {
+                List<string> remove_keys = new List<string>();
+                long now = helpers.UnixTimeNow();
+                foreach (KeyValuePair<string,long> avoids in avoid_sims)
+                {
+                    if(avoids.Value < now)
+                    {
+                        remove_keys.Add(avoids.Key);
+                    }
+                }
+                if(remove_keys.Count() > 0)
+                {
+                    foreach (string a in remove_keys)
+                    {
+                        avoid_sims.Remove(a);
+                    }
+                }
+            }
+        }
 
 
         public bool IsSimHome(string simname)
@@ -156,6 +182,60 @@ namespace BSB.bottypes
             
         }
 
+        public string LoggedinAthome()
+        {
+            string addon = "";
+            if(IsSimHome(Client.Network.CurrentSim.Name) == true)
+            {
+                addon = "Home region";
+            }
+            else
+            {
+                if (SimShutdownAvoid == false)
+                {
+                    long dif = SimShutdownAvoidCooldown - helpers.UnixTimeNow();
+                    if (dif < 0)
+                    {
+                        dif = helpers.UnixTimeNow() - last_tp_attempt_unixtime;
+                        if (dif > 30)
+                        {
+                            addon = GotoNextHomeRegion(false);
+                        }
+                        else
+                        {
+                            addon = "Busy with TP cooldown";
+                        }
+                    }
+                    else
+                    {
+                        if (avoid_sims.Keys.Contains(Client.Network.CurrentSim.Name) == true)
+                        {
+                            dif = helpers.UnixTimeNow() - last_tp_attempt_unixtime;
+                            if (dif > 30)
+                            {
+                                addon = GotoNextHomeRegion(true);
+                            }
+                            else
+                            {
+                                addon = "Avoid teleport underway";
+                            }
+                        }
+                        else
+                        {
+                            double mins = Math.Round((double)dif / 60);
+                            int min = (int)mins;
+                            addon = "Hiding from the storm ("+min.ToString()+" mins remain)";
+                        }
+                    }
+                }
+                else
+                {
+                    addon = "Avoiding sim shutdown [TP underway]";
+                }
+            }
+            return addon;
+        }
+
         public string GotoNextHomeRegion()
         {
             return GotoNextHomeRegion(false);
@@ -173,14 +253,25 @@ namespace BSB.bottypes
                     {
                         last_tested_home_id = 0;
                     }
-                    TeleportWithSLurl(myconfig.Basic_HomeRegions[last_tested_home_id]);
-                    return " [@home **** active teleport: "+ last_attempted_teleport_region+"***]";
+                    string Slurl = myconfig.Basic_HomeRegions[last_tested_home_id];
+                    string simname = helpers.RegionnameFromSLurl(Slurl);
+                    if (avoid_sims.Keys.Contains(simname) == false)
+                    {
+                        string whyrejected = TeleportWithSLurl(Slurl);
+                        if (whyrejected == "ok")
+                        {
+                            return "**** active teleport: " + last_attempted_teleport_region + "***";
+                        }
+                        return "TP to " + simname + " rejected - " + whyrejected;
+                    }
+                    return "unable to teleport to home region: " + simname + " currently in avoid list";
                 }
-                return " [@home No home regions]";
+                return "No home regions";
             }
             else
             {
                 SimShutdownAvoid = true;
+                SimShutdownAvoidCooldown = helpers.UnixTimeNow() + (60 * 10);
                 string UseSLurl = "";
                 foreach (string Slurl in myconfig.Basic_HomeRegions)
                 {
@@ -208,18 +299,38 @@ namespace BSB.bottypes
             }
         }
 
-        
 
+        protected string AtHomeStatus(string message)
+        {
+            return " [@Home: " + message+"]";
+        }
+
+        protected string AtHome_laststatus = "";
         public override string GetStatus()
         {
+            ExpireOldAvoidSims();
+            string reply;
             if (Client.Network.Connected == true)
             {
-                return base.GetStatus();
+                if (Client.Network.CurrentSim != null)
+                {
+                    reply = AtHomeStatus(LoggedinAthome());
+                }
+                else
+                {
+                    reply = AtHomeStatus("No Sim");
+                }
             }
             else
             {
-                return base.GetStatus() + LoggedOutNextAction();
+                reply = AtHomeStatus(LoggedOutNextAction());
             }
+            if (reply != AtHome_laststatus)
+            {
+                AtHome_laststatus = reply;
+                return base.GetStatus() + reply;
+            }
+            return base.GetStatus();
         }
 
         protected override void AfterBotLoginHandler()
@@ -228,24 +339,26 @@ namespace BSB.bottypes
             last_tp_attempt_unixtime = helpers.UnixTimeNow() + 30;
             if (reconnect == true)
             {
-                last_tested_home_id = -1;
-                after_login_fired = false;
-                teleported = false;
-                reconnect_mode = false;
+                ResetAtHome();
             }
             else
             {
                 Client.Self.AlertMessage += AlertEvent;
                 Client.Network.SimChanged += ChangeSim;
             }
-            if (UUID.TryParse(myconfig.Setting_DefaultSit_UUID, out UUID sit_UUID) == true)
+            if (IsSimHome(Client.Network.CurrentSim.Name) == true)
             {
-                Client.Self.RequestSit(sit_UUID, Vector3.Zero);
+                if (UUID.TryParse(myconfig.Setting_DefaultSit_UUID, out UUID sit_UUID) == true)
+                {
+                    Client.Self.RequestSit(sit_UUID, Vector3.Zero);
+                }
             }
             after_login_fired = true;
         }
 
-        public void TeleportWithSLurl(string sl_url)
+
+
+        public string TeleportWithSLurl(string sl_url)
         {
             string[] bits = helpers.ParseSLurl(sl_url);
             if (helpers.notempty(bits) == true)
@@ -261,9 +374,13 @@ namespace BSB.bottypes
                         last_tp_attempt_unixtime = helpers.UnixTimeNow();
                         last_attempted_teleport_region = regionName;
                         Client.Self.Teleport(regionName, new Vector3(posX, posY, posZ));
+                        return "ok";
                     }
+                    return "Sim in avoid list";
                 }
+                return "Invaild bits length for SLurl";
             }
+            return "No bits decoded";
         }
 
         public void SetHome(string sl_url)

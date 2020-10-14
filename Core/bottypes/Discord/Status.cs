@@ -15,7 +15,7 @@ namespace BSB.bottypes
                 }
             }
         }
-
+        string DiscordBotStatus_laststatus = "";
         public override string GetStatus()
         {
             string reply = "";
@@ -39,7 +39,12 @@ namespace BSB.bottypes
             {
                 reply = " " + reply;
             }
-            return base.GetStatus() + reply;
+            if (reply != DiscordBotStatus_laststatus)
+            {
+                DiscordBotStatus_laststatus = reply;
+                return base.GetStatus() + reply;
+            }
+            return base.GetStatus();
         }
 
     }

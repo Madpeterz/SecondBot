@@ -32,8 +32,12 @@ namespace BetterSecondBot
                     string NewStatusMessage = Bot.GetStatus();
                     if (NewStatusMessage != Bot.LastStatusMessage)
                     {
-                        Bot.LastStatusMessage = NewStatusMessage;
-                        Bot.Log2File(LogFormater.Status(Bot.LastStatusMessage),ConsoleLogLogLevel.Status);
+                        NewStatusMessage = NewStatusMessage.Trim();
+                        if (NewStatusMessage.Replace(" ","") != "")
+                        {
+                            Bot.LastStatusMessage = NewStatusMessage;
+                            Bot.Log2File(LogFormater.Status(Bot.LastStatusMessage, false), ConsoleLogLogLevel.Status);
+                        }
                     }
                     Thread.Sleep(1000);
                 }

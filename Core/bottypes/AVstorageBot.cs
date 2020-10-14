@@ -22,6 +22,7 @@ namespace BSB.bottypes
 
         protected long max_db_storage_age = 240; // how long should we keep an avatar in memory before clearing (in secs) [now - last accessed]
         protected bool show_av_storage_info_in_status = true;
+        protected string AVstorageBot_laststatus = "";
 
         public override string GetStatus()
         {
@@ -52,7 +53,12 @@ namespace BSB.bottypes
                     reply = " (AVStorage: Empty)";
                 }
             }
-            return base.GetStatus() + reply;
+            if (reply != AVstorageBot_laststatus)
+            {
+                AVstorageBot_laststatus = reply;
+                return base.GetStatus() + reply;
+            }
+            return base.GetStatus();
         }
 
         protected void ReTriggerUUIDtoName()
