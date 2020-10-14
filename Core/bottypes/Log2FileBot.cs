@@ -45,8 +45,15 @@ namespace BSB.bottypes
 
             Rotate(logFilePath);
 
-            using var sw = File.AppendText(logFilePath);
-            sw.WriteLine(message);
+			try
+			{
+				using var sw = File.AppendText(logFilePath);
+				sw.WriteLine(message);
+			}
+			catch
+			{
+
+			}
         }
 
 		private void Rotate(string filePath)
