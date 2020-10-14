@@ -23,22 +23,37 @@ namespace BSB.bottypes
                 await user.ModifyAsync(x => {
                     x.Nickname = myconfig.DiscordTTS_Nickname;
                 });
-                if (myconfig.DiscordTTS_Enable == true)
-                {
-                    TTSchannel = await FindTextChannel(TTSDiscordServer, myconfig.DiscordTTS_channel_name, null, UUID.Zero, "notUSED", false);
-                }
+                FindTTsChannel();
             }
             return Task.CompletedTask;
+        }
+
+        protected async void FindTTsChannel()
+        {
+            if (myconfig.DiscordTTS_Enable == true)
+            {
+                TTSchannel = await FindTextChannel(TTSDiscordServer, myconfig.DiscordTTS_channel_name);
+            }
         }
 
         protected override async Task DiscordIMMessage(UUID sender_uuid, string sender_name, string message)
         {
             await base.DiscordIMMessage(sender_uuid, sender_name, message);
-            if ((helpers.notempty(sender_name) == true) && (helpers.notempty(message) == true))
+            if (myconfig.DiscordTTS_Enable == true)
             {
-                if(sender_uuid.ToString() == myconfig.DiscordTTS_avatar_uuid)
+                if ((helpers.notempty(sender_name) == true) && (helpers.notempty(message) == true))
                 {
-                    await TTSchannel.SendMessageAsync(message, true);
+                    if (sender_uuid.ToString() == myconfig.DiscordTTS_avatar_uuid)
+                    {
+                        if (TTSchannel == null)
+                        {
+                            FindTTsChannel();
+                        }
+                        if (TTSchannel != null)
+                        {
+                            await TTSchannel.SendMessageAsync(message, true);
+                        }
+                    }
                 }
             }
         }
