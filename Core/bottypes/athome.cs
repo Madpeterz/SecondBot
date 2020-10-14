@@ -199,7 +199,14 @@ namespace BSB.bottypes
                         dif = helpers.UnixTimeNow() - last_tp_attempt_unixtime;
                         if (dif > 30)
                         {
-                            addon = GotoNextHomeRegion(false);
+                            if (teleported == false)
+                            {
+                                addon = GotoNextHomeRegion(false);
+                            }
+                            else
+                            {
+                                addon = "- Teleported by script/master -";
+                            }
                         }
                         else
                         {
