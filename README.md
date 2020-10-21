@@ -9,6 +9,7 @@
 ```
 # Secondbot
 Secondbot is a CommandLine based bot for SecondLife based on libremetaverse retargeted for .net core.
+[Wiki](https://magicmadpeter.xyz/wiki/index.html)
 
 ## Status
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/madpeter/secondbot?style=flat-square)](https://hub.docker.com/r/madpeter/secondbot)
