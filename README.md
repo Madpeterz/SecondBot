@@ -20,6 +20,6 @@ Secondbot is a CommandLine based bot for SecondLife based on libremetaverse reta
 ## Releases
 These are pre compiled versions for the most upto date please use docker or compile it yourself.
 
-[Windows x64](https://github.com/Madpeterz/SecondBot/releases/tag/windows64)
+[Windows x64](https://github.com/Madpeterz/SecondBot/releases/tag/windows-x64)
 
-[Linux (Tested on Deb) x64](https://github.com/Madpeterz/SecondBot/releases/tag/Linux64)
+[Linux (Tested on Deb) x64](https://github.com/Madpeterz/SecondBot/releases/tag/linux-x64)
