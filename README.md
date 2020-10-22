@@ -24,3 +24,10 @@ These are pre compiled versions for the most upto date please use docker or comp
 [Windows x64](https://github.com/Madpeterz/SecondBot/releases/tag/windows-x64)
 
 [Linux (Tested on Deb) x64](https://github.com/Madpeterz/SecondBot/releases/tag/linux-x64)
+
+## Starting multiple bots from the same executable in windows
+Create a shortcut (rename it for the bot) and 'madpeterbot' after the end of the target
+
+so the target would look something like this: BetterSecondBot.exe" madpeterbot
+
+save changes to the shortcut and your ready to go.
