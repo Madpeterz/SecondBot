@@ -5,9 +5,9 @@ namespace BSB.Commands.Group
 {
     class Groupnotice : CoreCommand_2arg
     {
-        public override string[] ArgTypes { get { return new[] { "UUID", "TEXT","TEXT" }; } }
-        public override string[] ArgHints { get { return new[] { "Group", "Message/Title", "Message" }; } }
-        public override string Helpfile { get { return "Sends a group notice to [ARG 1] with the message [ARG 2]<hr/>if given 3 Args: Sends a group notice to [ARG 1] with the title [ARG 2] and the message [ARG 3]"; } }
+        public override string[] ArgTypes { get { return new[] { "UUID", "TEXT","TEXT","TEXT" }; } }
+        public override string[] ArgHints { get { return new[] { "Group", "Message/Title", "Message","Inventory UUID" }; } }
+        public override string Helpfile { get { return "Sends a group notice to [ARG 1] with the message [ARG 2]<hr/>if given 3 Args: Sends a group notice to [ARG 1] with the title [ARG 2] and the message [ARG 3]<br/>if [ARG 4] is given then it also sends the notice with an attachment"; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)
@@ -27,6 +27,13 @@ namespace BSB.Commands.Group
                         NewNotice.Subject = Noticetitle;
                         NewNotice.Message = Noticemessage;
                         NewNotice.OwnerID = bot.GetClient.Self.AgentID;
+                        if (args.Length == 4)
+                        {
+                            if (UUID.TryParse(args[3], out UUID result) == true)
+                            {
+                                NewNotice.AttachmentID = result;
+                            }
+                        }
                         bot.GetClient.Groups.SendGroupNotice(targetgroup, NewNotice);
                         return true;
                     }
