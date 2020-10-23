@@ -6,7 +6,7 @@
     <AssemblyMetadataCommand Remove="GitDescription" />
   </ItemGroup>
   <PropertyGroup>
-    <MSBuildGitHashCommand>git describe --long --always</MSBuildGitHashCommand>
+    <MSBuildGitHashCommand>git rev-parse --short HEAD</MSBuildGitHashCommand>
     <MSBuildGitHashValidate>False</MSBuildGitHashValidate>
     <MSBuildGitHashSuppressDirtyWarning>False</MSBuildGitHashSuppressDirtyWarning>
   </PropertyGroup>
