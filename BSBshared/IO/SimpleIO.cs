@@ -49,6 +49,16 @@ namespace BetterSecondBotShared.IO
                 serializer.Serialize(writer, Config);
             }
         }
+        public void WriteJsonCommands(JsonCommandsfile commandsfile, string targetfile)
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            using (StreamWriter sw = new StreamWriter(@"" + root_folder + "" + targetfile))
+            using (JsonWriter writer = new JsonTextWriter(sw) { Formatting = Formatting.Indented })
+            {
+                serializer.Serialize(writer, commandsfile);
+            }
+        }
+
         public void makeOld(string targetfile)
         {
             System.IO.File.Move(@""+root_folder + "" + targetfile, @"" + root_folder + "" + targetfile+".old");
