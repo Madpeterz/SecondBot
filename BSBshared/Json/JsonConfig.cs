@@ -4,6 +4,10 @@ using System.Text;
 
 namespace BetterSecondBotShared.Json
 {
+    public class JsonCommandsfile
+    {
+        public string[] CustomCommands { get; set; }
+    }
     public class JsonConfig
     {
         // Basics
