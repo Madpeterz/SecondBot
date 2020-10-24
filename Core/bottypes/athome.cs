@@ -172,9 +172,16 @@ namespace BSB.bottypes
                 bool reply = false;
                 foreach (string sl_url in myconfig.Basic_HomeRegions)
                 {
-                    if (sl_url.ToLowerInvariant().Contains(simname) == true)
+                    string[] bits = helpers.ParseSLurl(sl_url);
+                    if (helpers.notempty(bits) == true)
                     {
-                        reply = true;
+                        if (bits.Length == 4)
+                        {
+                            if(bits[0].ToLowerInvariant() == simname)
+                            {
+                                return true;
+                            }
+                        }
                     }
                 }
                 return reply;
