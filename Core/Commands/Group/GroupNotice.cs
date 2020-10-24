@@ -17,12 +17,12 @@ namespace BSB.Commands.Group
                     if (bot.MyGroups.ContainsKey(targetgroup) == true)
                     {
                         string Noticetitle = "GroupNotice@"+ helpers.UnixTimeNow().ToString()+"";
-                        string Noticemessage = "";
-                        if (args.Length == 3)
+                        string Noticemessage = args[1];
+                        if (args.Length >= 3)
                         {
                             Noticetitle = args[1];
+                            Noticemessage = args[2];
                         }
-                        Noticemessage = args[^1];
                         GroupNotice NewNotice = new GroupNotice();
                         NewNotice.Subject = Noticetitle;
                         NewNotice.Message = Noticemessage;
