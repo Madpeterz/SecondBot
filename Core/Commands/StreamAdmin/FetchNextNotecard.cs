@@ -47,7 +47,7 @@ namespace BSB.Commands.StreamAdmin
                 }
                 else
                 {
-                    return Failed("HTTP error DataObject broken Status:"+ endpoint_checks.StatusCode.ToString()+" @ "+ attempt_endpoint+"");
+                    return Failed("HTTP error DataObject broken Status:"+ endpoint_checks.StatusCode.ToString()+" @ "+ attempt_endpoint+"\n Message given (if any): "+endpoint_checks.Content);
                 }
             }
             return Failed("incorrect number of args");
