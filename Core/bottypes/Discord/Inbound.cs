@@ -5,6 +5,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Threading;
 
 namespace BSB.bottypes
 {
@@ -90,16 +91,27 @@ namespace BSB.bottypes
             {
                 string[] bits = message.Content.Split("|||");
                 string command = bits[0].ToLowerInvariant();
-                if (CommandsInterface.GetCommandsList().Contains(command) == true)
+                bool known_command = CommandsInterface.GetCommandsList().Contains(command);
+                if(known_command == false)
+                {
+                    known_command = custom_commands.ContainsKey(command);
+                }
+                if (known_command == true)
                 {
                     bool process_status = false;
-                    if (bits.Length == 2)
+                    if(bits.Length == 1)
+                    {
+                        bits = new string[] { bits[0], "" };
+                    }
+                    if (custom_commands.ContainsKey(command) == false)
                     {
                         process_status = CommandsInterface.Call(command, bits[1], UUID.Zero);
                     }
                     else
                     {
-                        process_status = CommandsInterface.Call(command);
+                        process_status = true;
+                        Thread t = new Thread(() => custom_commands_loop(command, bits[1], UUID.Zero));
+                        t.Start();
                     }
                     if (process_status == true)
                     {

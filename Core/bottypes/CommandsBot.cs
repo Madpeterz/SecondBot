@@ -6,6 +6,7 @@ using OpenMetaverse;
 using OpenMetaverse.Assets;
 using BetterSecondBotShared.Static;
 using BetterSecondBotShared.logs;
+using System.Threading;
 
 namespace BSB.bottypes
 {
@@ -15,6 +16,7 @@ namespace BSB.bottypes
         {
             CommandsInterface = new Commands.CoreCommandsInterface(this);
         }
+
         protected List<string> CommandHistory = new List<string>();
         protected int commandid = 1;
         public virtual string CommandHistoryAdd(string command, string arg, bool status,string infomessage)
@@ -131,13 +133,49 @@ namespace BSB.bottypes
             }
         }
 
+        protected void custom_commands_loop(string command,string arg,UUID caller)
+        {
+            List<string> customargs = arg.Split(new[] { "~#~" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            while(customargs.Count < 5)
+            {
+                customargs.Add("notset");
+            }
+            foreach (string A in custom_commands[command])
+            {
+                List<string> command_args_split = A.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                int loop = 1;
+                string args_passed = "";
+                if (command_args_split.Count() == 2)
+                {
+                    args_passed = command_args_split[1];
+                    while (loop <= 5)
+                    {
+                        args_passed = args_passed.Replace("[C_ARG_"+loop.ToString()+"]", customargs[loop-1]);
+                        loop++;
+                    }
+                }
+                CommandsInterface.Call(command_args_split[0], args_passed, caller, "~#~");
+            }
+        }
+        protected virtual void CallCommandLib(string command, string arg)
+        {
+            CallCommandLib(command, arg, UUID.Zero);
+        }
         protected virtual void CallCommandLib(string command, string arg, UUID caller)
         {
             CallCommandLib(command, arg, caller, "~#~");
         }
         protected virtual void CallCommandLib(string command, string arg, UUID caller,string signed_with)
         {
-            CommandsInterface.Call(command, arg, caller, signed_with);
+            if(custom_commands.ContainsKey(command) == false)
+            {
+                CommandsInterface.Call(command, arg, caller, signed_with);
+            }
+            else
+            {
+                Thread t = new Thread(() => custom_commands_loop(command, arg, caller));
+                t.Start();
+            }
         }
 
         protected override void AfterBotLoginHandler()

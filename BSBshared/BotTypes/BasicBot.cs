@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using BetterSecondBotShared.IO;
 using BetterSecondBotShared.Json;
 using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
+using Newtonsoft.Json;
 using OpenMetaverse;
 
 namespace BetterSecondBotShared.bottypes
@@ -26,6 +27,85 @@ namespace BetterSecondBotShared.bottypes
             {
                 return SubMasters.Contains(name);
             }
+        }
+
+        protected Dictionary<string, string[]> custom_commands = new Dictionary<string, string[]>();
+        protected bool loaded_custom_commands = false;
+        protected void LoadCustomCommands()
+        {
+            if (running_in_docker == true)
+            {
+                // search env for cmd_
+                foreach (System.Collections.DictionaryEntry env in Environment.GetEnvironmentVariables())
+                {
+                    string name = env.Key.ToString();
+                    if (name.StartsWith("cmd_") == true)
+                    {
+                        string[] steps = env.Value.ToString().Split(new string[] { "{-}" }, StringSplitOptions.None);
+                        name = name.Replace("cmd_", "");
+                        name = name.ToLowerInvariant();
+                        custom_commands.Add(name, steps);
+                    }
+                }
+            }
+            else
+            {
+                // search for file called "commands.cmd"
+                JsonCommandsfile LoadedCommands = new JsonCommandsfile();
+                LoadedCommands.CustomCommands = new string[] { "sayexample!!!say|||Hello{-}delay|||2500{-}say|||Bye" }; 
+                string CommandsFile = "custom_commands.json";
+                SimpleIO io = new SimpleIO();
+                if (SimpleIO.FileType(CommandsFile, "json") == true)
+                {
+                    if (io.Exists(CommandsFile) == true)
+                    {
+                        string json = io.ReadFile(CommandsFile);
+                        if (json.Length > 0)
+                        {
+                            try
+                            {
+                                LoadedCommands = JsonConvert.DeserializeObject<JsonCommandsfile>(json);
+                                foreach(string loaded in LoadedCommands.CustomCommands)
+                                {
+                                    string[] bits = loaded.Split(new string[] { "!!!" }, StringSplitOptions.None);
+                                    if (bits.Length == 2)
+                                    {
+                                        string[] steps = bits[1].Split(new string[] { "{-}" }, StringSplitOptions.None);
+                                        custom_commands.Add(bits[0].ToLowerInvariant(), steps);
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                io.makeOld(CommandsFile);
+                                io.WriteJsonCommands(LoadedCommands, CommandsFile);
+                            }
+                        }
+                        else
+                        {
+                            io.WriteJsonCommands(LoadedCommands, CommandsFile);
+                        }
+                    }
+                    else
+                    {
+                        io.WriteJsonCommands(LoadedCommands, CommandsFile);
+                    }
+                }
+                else
+                {
+                    io.WriteJsonCommands(LoadedCommands, CommandsFile);
+                }
+            }
+            if(custom_commands.Count > 0)
+            {
+                Info("Custom commands: " + custom_commands.Count.ToString());
+            }
+        }
+
+        protected bool running_in_docker = false;
+        public void AsDocker()
+        {
+            running_in_docker = true;
         }
 
         protected bool killMe;
@@ -162,6 +242,11 @@ namespace BetterSecondBotShared.bottypes
         protected string BasicBot_laststatus = "";
         public virtual string GetStatus()
         {
+            if (loaded_custom_commands == false)
+            {
+                loaded_custom_commands = true;
+                LoadCustomCommands();
+            }
             string reply = "Info: No client";
             if (Client != null)
             {

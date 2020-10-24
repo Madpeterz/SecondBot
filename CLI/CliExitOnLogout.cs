@@ -14,18 +14,22 @@ namespace BetterSecondBot
 {
     public class CliExitOnLogout
     {
-        public CliExitOnLogout(JsonConfig Config)
+        public CliExitOnLogout(JsonConfig Config, bool as_docker)
         {
             LogFormater.Status("Mode: Cli [Basic]");
             if (helpers.botRequired(Config) == true)
             {
                 SecondBot Bot = new SecondBot();
                 Bot.Setup(Config, AssemblyInfo.GetGitHash());
+                if(as_docker == true)
+                {
+                    Bot.AsDocker();
+                }
                 Bot.Start();
                 if (Config.Http_Enable == true)
                 {
                     SecondBotHttpServer my_http_server = new SecondBotHttpServer();
-                    my_http_server.StartHttpServer(Bot,Config);
+                    my_http_server.StartHttpServer(Bot, Config);
                 }
                 while (Bot.KillMe == false)
                 {
@@ -33,7 +37,7 @@ namespace BetterSecondBot
                     if (NewStatusMessage != Bot.LastStatusMessage)
                     {
                         NewStatusMessage = NewStatusMessage.Trim();
-                        if (NewStatusMessage.Replace(" ","") != "")
+                        if (NewStatusMessage.Replace(" ", "") != "")
                         {
                             Bot.LastStatusMessage = NewStatusMessage;
                             Bot.Log2File(LogFormater.Status(Bot.LastStatusMessage, false), ConsoleLogLogLevel.Status);
