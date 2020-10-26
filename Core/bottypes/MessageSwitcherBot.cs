@@ -113,10 +113,24 @@ namespace BSB.bottypes
                     }
                     else
                     {
+                        bool run_command;
                         if (Is_avatar_master(sender_name) == true)
                         {
-                            CoreCommandLib(sender_uuid, true, bits.ElementAt(0), bits.ElementAt(1), "", arg_signed_with);
+                            run_command = true;
                         }
+                        else
+                        {
+                            run_command = Accept_action_from("command", sender_uuid);
+                            if (run_command == true)
+                            {
+                                Remove_action_from("command", sender_uuid);
+                            }
+                        }
+                        if (run_command == true)
+                        {
+                            CoreCommandLib(sender_uuid, true, bits.ElementAt(0), bits.ElementAt(1), signing_code, arg_signed_with);
+                        }
+
                     }
                 }
             }

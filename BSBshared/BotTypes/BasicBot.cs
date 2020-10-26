@@ -322,17 +322,17 @@ namespace BetterSecondBotShared.bottypes
             Debug("ChatInputHandler proc not overridden");
         }
 
-        protected virtual void CoreCommandLib(UUID fromUUID, bool from_master, string command, string arg)
+        protected virtual void CoreCommandLib(UUID fromUUID, bool from_accepted_avatar, string command, string arg)
         {
-            CoreCommandLib(fromUUID, from_master, command, arg, "");
+            CoreCommandLib(fromUUID, from_accepted_avatar, command, arg, "");
         }
 
-        protected virtual void CoreCommandLib(UUID fromUUID, bool from_master, string command, string arg, string signing_code)
+        protected virtual void CoreCommandLib(UUID fromUUID, bool from_accepted_avatar, string command, string arg, string signing_code)
         {
-            CoreCommandLib(fromUUID, from_master, command, arg, signing_code, "~#~");
+            CoreCommandLib(fromUUID, from_accepted_avatar, command, arg, signing_code, "~#~");
         }
 
-        protected virtual void CoreCommandLib(UUID fromUUID,bool from_master,string command,string arg,string signing_code,string signed_with)
+        protected virtual void CoreCommandLib(UUID fromUUID,bool from_accepted_avatar,string command,string arg,string signing_code,string signed_with)
         {
             Debug("CoreCommandLib proc not overridden");
         }

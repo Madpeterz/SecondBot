@@ -188,11 +188,15 @@ namespace BSB.bottypes
             Client.Self.RequestBalance();
         }
 
-        protected override void CoreCommandLib(UUID fromUUID, bool from_master, string command, string arg, string signing_code, string signed_with)
+        protected override void CoreCommandLib(UUID fromUUID, bool from_accepted_avatar, string command, string arg, string signing_code, string signed_with)
         {
             if (CommandsInterface != null)
             {
-                if (signing_code != "")
+                if (from_accepted_avatar == true)
+                {
+                    CallCommandLib(command, arg, fromUUID, signed_with);
+                }
+                else if (signing_code != "")
                 {
                     string raw = "" + command + "" + arg + "" + myconfig.Security_SignedCommandkey + "";
                     string hashcheck = helpers.GetSHA1(raw);
@@ -200,10 +204,6 @@ namespace BSB.bottypes
                     {
                         CallCommandLib(command, arg, fromUUID, signed_with);
                     }
-                }
-                else if (from_master == true)
-                {
-                    CallCommandLib(command, arg, fromUUID, signed_with);
                 }
             }
         }
