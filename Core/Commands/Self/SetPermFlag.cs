@@ -10,7 +10,7 @@ namespace BSB.Commands.Self
     {
         public override string[] ArgTypes { get { return new[] { "Avatar", "Text","Text (True|Flase)", "Text (True|Flase)" }; } }
         public override string[] ArgHints { get { return new[] { "Avatar [UUID or Firstname Lastname]", "Flag: friend, group, animation, teleport or command", "State to set the flag to","Make the permission sticky" }; } }
-        public override string Helpfile { get { return "Makes the bot pay a avatar"; } }
+        public override string Helpfile { get { return "Makes the bot set/clear a permission flag for a selected action, sticky permissions are kept untill they are removed or the bot restarts"; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)
