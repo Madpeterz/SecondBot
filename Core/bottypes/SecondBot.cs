@@ -15,7 +15,7 @@ namespace BSB.bottypes
         protected bool masteruuid_ready;
         protected bool started_friendship_hug;
 
-        protected virtual void friendsListReady(object sender,FriendsReadyEventArgs e)
+        protected virtual void FriendsListReady(object sender,FriendsReadyEventArgs e)
         {
             friendslist_ready = true;
             TryHugMaster();
@@ -44,7 +44,7 @@ namespace BSB.bottypes
             friendslist_ready = false;
             if (reconnect == false)
             {
-                Client.Friends.friendsListReady += friendsListReady;
+                Client.Friends.friendsListReady += FriendsListReady;
             }
         }
         protected override void FoundMasterAvatar()
