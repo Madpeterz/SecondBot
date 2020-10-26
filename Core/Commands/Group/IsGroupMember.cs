@@ -19,23 +19,36 @@ namespace BSB.Commands.Group
                 {
                     if (UUID.TryParse(args[2], out UUID testavatar) == true)
                     {
-                        if (bot.MyGroups.ContainsKey(targetgroup) == true)
+                        if (bot.FastCheckInGroup(targetgroup, testavatar) == true)
                         {
-                            if (bot.CreateAwaitEventReply("groupmembersreply", this, args) == true)
+                            Dictionary<string, string> reply = new Dictionary<string, string>
                             {
-                                bot.GetClient.Groups.RequestGroupMembers(targetgroup);
-                                InfoBlob = "Requesting group membership";
-                                return true;
-                            }
-                            else
-                            {
-                                return Failed("Unable to await reply");
-                            }
-
+                                { "group", args[0] },
+                                { "avatar", args[2] },
+                                { "ingroup", "1" }
+                            };
+                            return bot.GetCommandsInterface.SmartCommandReply(true, args[1], JsonConvert.SerializeObject(reply), CommandName);
                         }
                         else
                         {
-                            return Failed("Unknown group");
+                            if (bot.MyGroups.ContainsKey(targetgroup) == true)
+                            {
+                                if (bot.CreateAwaitEventReply("groupmembersreply", this, args) == true)
+                                {
+                                    bot.GetClient.Groups.RequestGroupMembers(targetgroup);
+                                    InfoBlob = "Requesting group membership";
+                                    return true;
+                                }
+                                else
+                                {
+                                    return Failed("Unable to await reply");
+                                }
+
+                            }
+                            else
+                            {
+                                return Failed("Unknown group");
+                            }
                         }
                     }
                     else
@@ -65,10 +78,12 @@ namespace BSB.Commands.Group
                         break;
                     }
                 }
-                Dictionary<string,string> reply = new Dictionary<string, string>();
-                reply.Add("group", args[0]);
-                reply.Add("avatar", args[2]);
-                reply.Add("ingroup", return_status);
+                Dictionary<string, string> reply = new Dictionary<string, string>
+                {
+                    { "group", args[0] },
+                    { "avatar", args[2] },
+                    { "ingroup", return_status }
+                };
                 bot.GetCommandsInterface.SmartCommandReply(true, args[1], JsonConvert.SerializeObject(reply), CommandName);
             }
             base.Callback(args, e);
