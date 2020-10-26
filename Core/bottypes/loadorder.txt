@@ -3,4 +3,4 @@ DiscordBotRelay -> DiscordBotStatus -> DiscordBotChannelControl ->
 DiscordBotFunctions -> Values -> ChatRelay -> RLVbot -> RLVbotHelper -> 
 AwaitReplyEventBot -> CommandsBot -> AVstorageBot -> AtHome ->
 MessageSwitcherBot -> EventsBot -> VoidEventBot -> AnimationsBot ->
-VirtualsBot -> Log2FileBot -> BasicBot
+VirtualsBot -> Log2FileBot -> ActionsAutoAcceptBot -> BasicBot
