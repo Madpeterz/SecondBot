@@ -51,8 +51,10 @@ namespace BetterSecondBotShared.bottypes
             else
             {
                 // search for file called "commands.cmd"
-                JsonCommandsfile LoadedCommands = new JsonCommandsfile();
-                LoadedCommands.CustomCommands = new string[] { "sayexample!!!say|||Hello{-}delay|||2500{-}say|||Bye" }; 
+                JsonCommandsfile LoadedCommands = new JsonCommandsfile
+                {
+                    CustomCommands = new string[] { "sayexample!!!say|||Hello{-}delay|||2500{-}say|||Bye" }
+                };
                 string CommandsFile = "custom_commands.json";
                 SimpleIO io = new SimpleIO();
                 if (SimpleIO.FileType(CommandsFile, "json") == true)
@@ -280,34 +282,17 @@ namespace BetterSecondBotShared.bottypes
 
         protected virtual void AfterBotLoginHandler()
         {
+            Debug("AfterBotLoginHandler proc not overridden");
         }
 
 
         protected virtual void GroupInvite(InstantMessageEventArgs e)
         {
-            string[] stage1 = e.IM.FromAgentName.ToLowerInvariant().Split('.');
-            string name = "" + stage1[0].FirstCharToUpper() + "";
-            if (stage1.Length == 1)
-            {
-                name = " Resident";
-            }
-            else
-            {
-                name = "" + name + " " + stage1[1].FirstCharToUpper() + "";
-            }
-            if(Is_avatar_master(name) == true)
-            {
-                GroupInvitationEventArgs G = new GroupInvitationEventArgs(e.Simulator, e.IM.FromAgentID, e.IM.FromAgentName, e.IM.Message);
-                Client.Self.GroupInviteRespond(G.AgentID, e.IM.IMSessionID, true);
-                Client.Groups.RequestCurrentGroups();
-            }
+            Debug("GroupInvite proc not overridden");
         }
         protected virtual void FriendshipOffer(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
-            if (Is_avatar_master(FromAgentName) == true)
-            {
-                Client.Friends.AcceptFriendship(FromAgentID, IMSessionID);
-            }
+            Debug("FriendshipOffer proc not overridden");
         }
 
         protected virtual void RequestLure(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
@@ -329,22 +314,7 @@ namespace BetterSecondBotShared.bottypes
 
         protected virtual void RequestTeleport(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
         {
-            bool allow = false;
-            if (Is_avatar_master(FromAgentName) == true)
-            {
-                allow = true;
-            }
-            else if(accept_next_teleport_from.Contains(FromAgentID) == true)
-            {
-                allow = true;
-                accept_next_teleport_from.Remove(FromAgentID);
-            }
-            if(allow == true)
-            {
-                ResetAnimations();
-                SetTeleported();
-                Client.Self.TeleportLureRespond(FromAgentID, IMSessionID, true);
-            }
+            Debug("RequestTeleport proc not overridden");
         }
 
         protected virtual void ChatInputHandler(object sender, ChatEventArgs e)

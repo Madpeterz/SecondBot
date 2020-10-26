@@ -64,7 +64,6 @@ namespace BSB.bottypes
     }
     public class EventsBot : VoidEventBot
     {
-        protected List<string> accept_animation_request_from_users = new List<string>();
         protected bool login_auto_logout;
         protected long delay_group_fetch;
         protected Dictionary<UUID, KeyValuePair<long, List<UUID>>> group_members_storage = new Dictionary<UUID, KeyValuePair<long, List<UUID>>>();
@@ -101,7 +100,7 @@ namespace BSB.bottypes
             return result;
         }
 
-        protected void cleanup_group_member_storage()
+        protected void Cleanup_group_member_storage()
         {
             lock (group_members_storage)
             {
@@ -118,18 +117,6 @@ namespace BSB.bottypes
                 {
                     group_members_storage.Remove(group);
                 }
-            }
-        }
-
-        public void ToggleAutoAcceptAnimations(string userName)
-        {
-            if(accept_animation_request_from_users.Contains(userName) == true)
-            {
-                accept_animation_request_from_users.Remove(userName);
-            }
-            else
-            {
-                accept_animation_request_from_users.Add(userName);
             }
         }
 
@@ -150,8 +137,8 @@ namespace BSB.bottypes
                         if (dif > 30)
                         {
                             last_cleanup = helpers.UnixTimeNow();
-                            cleanup_await_events();
-                            cleanup_group_member_storage();
+                            Cleanup_await_events();
+                            Cleanup_group_member_storage();
                         }
                         if (delay_group_fetch > 0)
                         {
@@ -236,36 +223,146 @@ namespace BSB.bottypes
 
         protected override void PermissionsHandler(object sender, ScriptQuestionEventArgs e)
         {
-            if(e.ObjectOwnerName == Client.Self.Name)
+            if (e.Questions == ScriptPermission.TriggerAnimation)
             {
-                Client.Self.ScriptQuestionReply(Client.Network.CurrentSim, e.ItemID, e.TaskID, e.Questions);
-            }
-            else if(accept_animation_request_from_users.Contains(e.ObjectOwnerName) == true)
-            {
-                Client.Self.ScriptQuestionReply(Client.Network.CurrentSim, e.ItemID, e.TaskID, ScriptPermission.TriggerAnimation);
-            }
-            else if((e.ObjectOwnerName == myconfig.Security_MasterUsername) && (myconfig.Security_MasterUsername != ""))
-            {
-                Client.Self.ScriptQuestionReply(Client.Network.CurrentSim, e.ItemID, e.TaskID, e.Questions);
-            }
-            else if(Client.Self.SittingOn > 0)
-            {
-                if(Client.Network.CurrentSim.ObjectsPrimitives.ContainsKey(Client.Self.SittingOn))
-                {
-                    Primitive obj = GetClient.Network.CurrentSim.ObjectsPrimitives[Client.Self.SittingOn];
-                    if(obj.ID == e.ItemID)
-                    {
-                        Client.Self.ScriptQuestionReply(Client.Network.CurrentSim, e.ItemID, e.TaskID, ScriptPermission.TriggerAnimation);
-                    }     
-                }
+                TriggerAnimation(e);
             }
             else
             {
-                Client.Self.ScriptQuestionReply(Client.Network.CurrentSim, e.ItemID, e.TaskID, ScriptPermission.None);
+                if (e.ObjectOwnerName == Client.Self.Name)
+                {
+                    Client.Self.ScriptQuestionReply(Client.Network.CurrentSim, e.ItemID, e.TaskID, e.Questions);
+                }
+                else
+                {
+                    Client.Self.ScriptQuestionReply(Client.Network.CurrentSim, e.ItemID, e.TaskID, ScriptPermission.None);
+                }
             }
         }
 
-        protected void cleanup_await_events()
+        public bool IsSittingOnUUID(UUID id)
+        {
+            if (Client.Self.SittingOn > 0)
+            {
+                if (Client.Network.CurrentSim.ObjectsPrimitives.ContainsKey(Client.Self.SittingOn))
+                {
+                    Primitive obj = GetClient.Network.CurrentSim.ObjectsPrimitives[Client.Self.SittingOn];
+                    if (obj.ID == id)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        protected virtual void TriggerAnimation(ScriptQuestionEventArgs e)
+        {
+            bool accept_invite;
+            if (Is_avatar_master(e.ObjectOwnerName) == true)
+            {
+                accept_invite = true;
+            }
+            else if (e.ObjectOwnerName == Client.Self.Name)
+            {
+                accept_invite = true;
+            }
+            else if(IsSittingOnUUID(e.ItemID) == true)
+            {
+                accept_invite = true;
+            }
+            else
+            {
+                accept_invite = Accept_action_from("animation", e.ItemID);
+                if (accept_invite == true)
+                {
+                    Remove_action_from("animation", e.ItemID);
+                }
+            }
+            if (accept_invite == true)
+            {
+                Client.Self.ScriptQuestionReply(Client.Network.CurrentSim, e.ItemID, e.TaskID, ScriptPermission.TriggerAnimation);
+            }
+        }
+
+        protected override void FriendshipOffer(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
+        {
+            bool accept_invite;
+            if (Is_avatar_master(FromAgentName) == true)
+            {
+                accept_invite = true;
+            }
+            else
+            {
+                accept_invite = Accept_action_from("friend", FromAgentID);
+                if (accept_invite == true)
+                {
+                    Remove_action_from("friend", FromAgentID);
+                }
+            }
+            if (accept_invite == true)
+            {
+                Client.Friends.AcceptFriendship(FromAgentID, IMSessionID);
+            }
+        }
+
+        protected override void RequestTeleport(UUID IMSessionID, string FromAgentName, UUID FromAgentID)
+        {
+            bool accept_invite;
+            if (Is_avatar_master(FromAgentName) == true)
+            {
+                accept_invite = true;
+            }
+            else
+            {
+                accept_invite = Accept_action_from("teleport", FromAgentID);
+                if (accept_invite == true)
+                {
+                    Remove_action_from("teleport", FromAgentID);
+                }
+            }
+            if (accept_invite == true)
+            {
+                ResetAnimations();
+                SetTeleported();
+                Client.Self.TeleportLureRespond(FromAgentID, IMSessionID, true);
+            }
+        }
+
+        protected override void GroupInvite(InstantMessageEventArgs e)
+        {
+            string[] stage1 = e.IM.FromAgentName.ToLowerInvariant().Split('.');
+            string name = "" + stage1[0].FirstCharToUpper() + "";
+            if (stage1.Length == 1)
+            {
+                name = " Resident";
+            }
+            else
+            {
+                name = "" + name + " " + stage1[1].FirstCharToUpper() + "";
+            }
+            bool accept_invite;
+            if (Is_avatar_master(name) == true)
+            {
+                accept_invite = true;
+            }
+            else
+            {
+                accept_invite = Accept_action_from("group", e.IM.FromAgentID);
+                if(accept_invite == true)
+                {
+                    Remove_action_from("group", e.IM.FromAgentID);
+                }
+            }
+            if (accept_invite == true)
+            {
+                GroupInvitationEventArgs G = new GroupInvitationEventArgs(e.Simulator, e.IM.FromAgentID, e.IM.FromAgentName, e.IM.Message);
+                Client.Self.GroupInviteRespond(G.AgentID, e.IM.IMSessionID, true);
+                Client.Groups.RequestCurrentGroups();
+            }
+        }
+
+        protected void Cleanup_await_events()
         {
             long dif;
             List<string> purge_event_ids = new List<string>();
