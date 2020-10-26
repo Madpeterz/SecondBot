@@ -9,7 +9,7 @@ namespace BSB.Commands.Self
     public class SetPermFlag : CoreCommand_3arg
     {
         public override string[] ArgTypes { get { return new[] { "Avatar", "Text","Text (True|Flase)", "Text (True|Flase)" }; } }
-        public override string[] ArgHints { get { return new[] { "Avatar [UUID or Firstname Lastname]", "Flag", "State to set the flag to","Make the permission sticky" }; } }
+        public override string[] ArgHints { get { return new[] { "Avatar [UUID or Firstname Lastname]", "Flag: friend, group, animation, teleport or command", "State to set the flag to","Make the permission sticky" }; } }
         public override string Helpfile { get { return "Makes the bot pay a avatar"; } }
         public override bool CallFunction(string[] args)
         {
@@ -17,7 +17,7 @@ namespace BSB.Commands.Self
             {
                 if(UUID.TryParse(args[0],out UUID targetUUID) == true)
                 {
-                    string[] AcceptedFlags = new string[] { "friend", "group", "animation", "teleport", "commands" };
+                    string[] AcceptedFlags = new string[] { "friend", "group", "animation", "teleport", "command" };
                     if(AcceptedFlags.Contains(args[1]) == true)
                     {
                         if(bool.TryParse(args[2],out bool stateflag) == true)
