@@ -11,8 +11,8 @@ using System.IO.Compression;
 
 namespace BSB.bottypes
 {
-    public abstract class Log2FileBot : BasicBot
-    {
+    public abstract class Log2FileBot : ActionsAutoAcceptBot
+	{
 		// stolen from: https://gist.github.com/Kashkovsky/eba3c91cc9d64e705f18ba9a272f7d92
 		protected string LogFolderName = "logs";
         protected string LogFileName = "secondbot.log";
