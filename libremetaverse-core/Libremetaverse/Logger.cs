@@ -60,7 +60,7 @@ namespace OpenMetaverse
             Console.WriteLine(message);
         }
     }
-    
+
     public static class Logger
     {
         // Warn,Error,Log,Debug functions
@@ -103,7 +103,7 @@ namespace OpenMetaverse
         #region Message+Client without levels
         public static void Warn(string message, GridClient client)
         {
-            Log(message, Helpers.LogLevel.Warning,client);
+            Log(message, Helpers.LogLevel.Warning, client);
         }
         public static void Error(string message, GridClient client)
         {
@@ -139,7 +139,15 @@ namespace OpenMetaverse
 
         public static void Log(string message, Helpers.LogLevel Level, GridClient client, Exception exception)
         {
-            if (Settings.LOG_LEVEL >= Level)
+            Helpers.LogLevel UseLevel = Helpers.LogLevel.Info;
+            string useWriter = "Console";
+            
+            if (client != null)
+            {
+                UseLevel = client.Settings.LOG_LEVEL;
+                useWriter = client.Settings.LOG_WRITER;
+            }
+            if (UseLevel >= Level)
             {
                 StringBuilder NewMessage = new StringBuilder();
                 if (client != null)
@@ -152,7 +160,7 @@ namespace OpenMetaverse
                     }
                 }
                 NewMessage.Append(message);
-                switch (Settings.LOG_WRITER)
+                switch (useWriter)
                 {
                     case "NoLogWriter":
                         {
@@ -172,7 +180,7 @@ namespace OpenMetaverse
         }
         public static void LogFormat(string Message, string[] Values)
         {
-            LogFormat(Message, Helpers.LogLevel.Debug,Values);
+            LogFormat(Message, Helpers.LogLevel.Debug, Values);
         }
         public static void LogFormat(string Message, Helpers.LogLevel Level, string[] Values)
         {

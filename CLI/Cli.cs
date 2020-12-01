@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Linq;
 using BetterSecondBotShared.Static;
 using BetterSecondBotShared.logs;
+using OpenMetaverse.Imaging;
+
 namespace BetterSecondBot
 {
     static class Program

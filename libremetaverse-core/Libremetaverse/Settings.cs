@@ -202,7 +202,7 @@ namespace OpenMetaverse
         /// <summary>Should we connect to multiple sims? This will allow
         /// viewing in to neighboring simulators and sim crossings
         /// (Experimental)</summary>
-        public bool MULTIPLE_SIMS = false;
+        public bool MULTIPLE_SIMS = true;
 
         /// <summary>If true, all object update packets will be decoded in to
         /// native objects. If false, only updates for our own agent will be
@@ -340,26 +340,12 @@ namespace OpenMetaverse
 
         #region Logging Configuration
 
-        /// <summary>
-        /// Get or set the minimum log level to output to the console by default
-        /// 
-        /// If the library is not compiled with DEBUG defined and this level is set to DEBUG
-        /// You will get no output on the console. This behavior can be overriden by creating
-        /// a logger configuration file for log4net
-        /// </summary>
-        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.Debug;
-
-        public static string LOG_WRITER = "console";
-
-        /// <summary>Attach avatar names to log messages</summary>
+        public string LOG_WRITER = "Console";
         public bool LOG_NAMES = true;
+        public bool LOG_DISKCACHE = false;
+        public bool LOG_RESENDS = false;
+        public Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.Info;
 
-        /// <summary>Log packet retransmission info</summary>
-        public bool LOG_RESENDS = true;
-
-        /// <summary>Log disk cache misses and other info</summary>
-        public bool LOG_DISKCACHE = true;
-        
         #endregion
         #region Private Fields
 
@@ -389,5 +375,6 @@ namespace OpenMetaverse
         }
 
         #endregion
+
     }
 }

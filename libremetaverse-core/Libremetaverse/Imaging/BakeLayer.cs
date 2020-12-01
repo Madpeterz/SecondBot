@@ -331,7 +331,6 @@ namespace OpenMetaverse.Imaging
             }
 
             // Apply any alpha wearable textures to make parts of the avatar disappear
-            Logger.LogFormat("[XBakes]: Number of alpha wearable textures: {0}", Helpers.LogLevel.Debug, alphaWearableTextures.Count);
             foreach (ManagedImage img in alphaWearableTextures)
                 AddAlpha(bakedTexture.Image, img);
 
@@ -356,7 +355,7 @@ namespace OpenMetaverse.Imaging
                 }
                 if (bitmap == null)
                 {
-                    Logger.LogFormat("[XBakes]: Number of alpha wearable textures: {0}", Helpers.LogLevel.Error, new[] { fileName });
+                    Logger.Log(String.Format("Failed loading resource file: {0}", fileName), Helpers.LogLevel.Error);
                     return null;
                 }
                 else
@@ -366,10 +365,8 @@ namespace OpenMetaverse.Imaging
             }
             catch (Exception e)
             {
-                Logger.Error(
-                    String.Format("Failed loading resource file: {0} ({1})", fileName, e.Message),
-                    e
-                );
+                Logger.Log(String.Format("Failed loading resource file: {0} ({1})", fileName, e.Message),
+                    Helpers.LogLevel.Error, e);
                 return null;
             }
         }

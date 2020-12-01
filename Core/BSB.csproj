@@ -3,9 +3,17 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Configurations>Debug;Release;DockerBuild</Configurations>
-    <Platforms>x64</Platforms>
+    <Platforms>x64;AnyCPU</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DockerBuild|x64'">
+    <ErrorReport>none</ErrorReport>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishSingleFile>false</PublishSingleFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DockerBuild|AnyCPU'">
     <ErrorReport>none</ErrorReport>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <PublishTrimmed>false</PublishTrimmed>

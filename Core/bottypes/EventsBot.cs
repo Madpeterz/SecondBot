@@ -4,6 +4,7 @@ using System.Text;
 using BetterSecondBotShared.Static;
 using BSB.Commands;
 using OpenMetaverse;
+using OpenMetaverse.Imaging;
 using OpenMetaverse.Packets;
 
 namespace BSB.bottypes
@@ -32,10 +33,7 @@ namespace BSB.bottypes
                                 if (dif <= 0)
                                 {
                                     delay_appearence_update = -1;
-                                    if(Client.Appearance.RequestSetAppearance() == "retry")
-                                    {
-                                        delay_appearence_update = helpers.UnixTimeNow() + 1;
-                                    }
+                                    Client.Appearance.RequestSetAppearance();
                                 }
                             }
                         }

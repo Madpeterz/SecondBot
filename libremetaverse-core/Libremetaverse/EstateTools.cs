@@ -547,19 +547,15 @@ namespace OpenMetaverse
         /// <summary>
         /// Begin the region restart process
         /// </summary>
+        public void RestartRegion()
+        {
+            RestartRegion(120);
+        }
         public void RestartRegion(int delay)
         {
             if (delay < 30) delay = 30;
             else if (delay > 240) delay = 240;
             EstateOwnerMessage("restart", delay.ToString());
-        }
-
-        /// <summary>
-        /// Begin the region restart process
-        /// </summary>
-        public void RestartRegion()
-        {
-            EstateOwnerMessage("restart", "120");
         }
 
         /// <summary>
