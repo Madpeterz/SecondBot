@@ -16,9 +16,15 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\libremetaverse-core\LibreMetaverse.StructuredData\LibreMetaverse.StructuredData.csproj" />
-    <ProjectReference Include="..\libremetaverse-core\LibreMetaverseTypes\LibreMetaverse.Types.csproj" />
-    <ProjectReference Include="..\libremetaverse-core\LibreMetaverse\LibreMetaverse.csproj" />
+    <Reference Include="LibreMetaverse">
+      <HintPath>..\libremetaverse-core\bin\netstandard2.1\LibreMetaverse.dll</HintPath>
+    </Reference>
+    <Reference Include="LibreMetaverse.StructuredData">
+      <HintPath>..\libremetaverse-core\bin\netstandard2.1\LibreMetaverse.StructuredData.dll</HintPath>
+    </Reference>
+    <Reference Include="LibreMetaverse.Types">
+      <HintPath>..\libremetaverse-core\bin\netstandard2.1\LibreMetaverse.Types.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
 
