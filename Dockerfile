@@ -8,9 +8,9 @@ WORKDIR /src
 COPY ["CLI/BetterSecondBot.csproj", "CLI/"]
 COPY ["Core/BSB.csproj", "Core/"]
 COPY ["BSBshared/BSBshared.csproj", "BSBshared/"]
-COPY ["libremetaverse-core/Libremetaverse/LibreMetaverse-core.csproj", "libremetaverse-core/Libremetaverse/"]
-COPY ["libremetaverse-core/Libremetaverse.structureddata/LibreMetaverse-core.StructuredData.csproj", "libremetaverse-core/Libremetaverse.structureddata/"]
-COPY ["libremetaverse-core/Libremetaverse.types/LibreMetaverse-core.Types.csproj", "libremetaverse-core/Libremetaverse.types/"]
+COPY ["libremetaverse-core/LibreMetaverse/LibreMetaverse.csproj", "libremetaverse-core/LibreMetaverse/"]
+COPY ["libremetaverse-core/LibreMetaverse.StructuredData/LibreMetaverse.StructuredData.csproj", "libremetaverse-core/LibreMetaverse.StructuredData/"]
+COPY ["libremetaverse-core/LibreMetaverseTypes/LibreMetaverse.Types.csproj", "libremetaverse-core/LibreMetaverseTypes/"]
 RUN dotnet restore "CLI/BetterSecondBot.csproj"
 COPY . .
 WORKDIR "/src/CLI"
