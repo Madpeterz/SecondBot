@@ -8,9 +8,9 @@ WORKDIR /src
 COPY ["CLI/BetterSecondBot.csproj", "CLI/"]
 COPY ["Core/BSB.csproj", "Core/"]
 COPY ["BSBshared/BSBshared.csproj", "BSBshared/"]
+COPY ["libremetaverse-core/LibreMetaverseTypes/LibreMetaverse.Types.csproj", "libremetaverse-core/LibreMetaverseTypes/"]
 COPY ["libremetaverse-core/LibreMetaverse/LibreMetaverse.csproj", "libremetaverse-core/LibreMetaverse/"]
 COPY ["libremetaverse-core/LibreMetaverse.StructuredData/LibreMetaverse.StructuredData.csproj", "libremetaverse-core/LibreMetaverse.StructuredData/"]
-COPY ["libremetaverse-core/LibreMetaverseTypes/LibreMetaverse.Types.csproj", "libremetaverse-core/LibreMetaverseTypes/"]
 RUN dotnet restore "CLI/BetterSecondBot.csproj"
 COPY . .
 WORKDIR "/src/CLI"
@@ -69,5 +69,4 @@ EXPOSE 80
 ENV ASPNETCORE_URLS http://+:80
 
 # --- End of settings ---
-
 ENTRYPOINT ["/app/BetterSecondBot"]
