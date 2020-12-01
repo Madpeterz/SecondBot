@@ -74,6 +74,22 @@ namespace OpenMetaverse
             Debug
         };
 
+
+        public static string[] SplitBy(this string str, int chunkLength)
+        {
+            List<string> reply = new List<string>();
+            if (String.IsNullOrEmpty(str)) throw new ArgumentException();
+            if (chunkLength < 1) throw new ArgumentException();
+
+            for (int i = 0; i < str.Length; i += chunkLength)
+            {
+                if (chunkLength + i > str.Length)
+                    chunkLength = str.Length - i;
+                reply.Add(str.Substring(i, chunkLength));
+            }
+            return reply.ToArray();
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -84,20 +100,6 @@ namespace OpenMetaverse
             offset = Utils.Clamp(offset, -1.0f, 1.0f);
             offset *= 32767.0f;
             return (short)Math.Round(offset);
-        }
-
-        public static IEnumerable<string> SplitBy(this string str, int chunkLength)
-        {
-            if (String.IsNullOrEmpty(str)) throw new ArgumentException();
-            if (chunkLength < 1) throw new ArgumentException();
-
-            for (int i = 0; i < str.Length; i += chunkLength)
-            {
-                if (chunkLength + i > str.Length)
-                    chunkLength = str.Length - i;
-
-                yield return str.Substring(i, chunkLength);
-            }
         }
 
         /// <summary>

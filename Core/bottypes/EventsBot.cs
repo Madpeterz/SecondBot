@@ -32,7 +32,10 @@ namespace BSB.bottypes
                                 if (dif <= 0)
                                 {
                                     delay_appearence_update = -1;
-                                    Client.Appearance.RequestSetAppearance();
+                                    if(Client.Appearance.RequestSetAppearance() == "retry")
+                                    {
+                                        delay_appearence_update = helpers.UnixTimeNow() + 1;
+                                    }
                                 }
                             }
                         }

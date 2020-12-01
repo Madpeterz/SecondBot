@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse-core", "Libremetaverse\LibreMetaverse-core.csproj", "{21DA0F7B-FF4F-41AC-90EF-4A49A26AAC14}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse-core.StructuredData", "Libremetaverse.structureddata\LibreMetaverse-core.StructuredData.csproj", "{2AB39AF8-5296-44D9-8E25-595950D112E4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse-core.Types", "Libremetaverse.types\LibreMetaverse-core.Types.csproj", "{65583D32-5492-494E-9137-E288CB713167}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		DockerBuild|x64 = DockerBuild|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{21DA0F7B-FF4F-41AC-90EF-4A49A26AAC14}.Debug|x64.ActiveCfg = Debug|x64
+		{21DA0F7B-FF4F-41AC-90EF-4A49A26AAC14}.Debug|x64.Build.0 = Debug|x64
+		{21DA0F7B-FF4F-41AC-90EF-4A49A26AAC14}.DockerBuild|x64.ActiveCfg = DockerBuild|x64
+		{21DA0F7B-FF4F-41AC-90EF-4A49A26AAC14}.DockerBuild|x64.Build.0 = DockerBuild|x64
+		{21DA0F7B-FF4F-41AC-90EF-4A49A26AAC14}.Release|x64.ActiveCfg = Release|x64
+		{21DA0F7B-FF4F-41AC-90EF-4A49A26AAC14}.Release|x64.Build.0 = Release|x64
+		{2AB39AF8-5296-44D9-8E25-595950D112E4}.Debug|x64.ActiveCfg = Debug|x64
+		{2AB39AF8-5296-44D9-8E25-595950D112E4}.Debug|x64.Build.0 = Debug|x64
+		{2AB39AF8-5296-44D9-8E25-595950D112E4}.DockerBuild|x64.ActiveCfg = DockerBuild|x64
+		{2AB39AF8-5296-44D9-8E25-595950D112E4}.DockerBuild|x64.Build.0 = DockerBuild|x64
+		{2AB39AF8-5296-44D9-8E25-595950D112E4}.Release|x64.ActiveCfg = Release|x64
+		{2AB39AF8-5296-44D9-8E25-595950D112E4}.Release|x64.Build.0 = Release|x64
+		{65583D32-5492-494E-9137-E288CB713167}.Debug|x64.ActiveCfg = Debug|x64
+		{65583D32-5492-494E-9137-E288CB713167}.Debug|x64.Build.0 = Debug|x64
+		{65583D32-5492-494E-9137-E288CB713167}.DockerBuild|x64.ActiveCfg = DockerBuild|x64
+		{65583D32-5492-494E-9137-E288CB713167}.DockerBuild|x64.Build.0 = DockerBuild|x64
+		{65583D32-5492-494E-9137-E288CB713167}.Release|x64.ActiveCfg = Release|x64
+		{65583D32-5492-494E-9137-E288CB713167}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0939E3DD-583A-454E-BF78-F9D77F907B6E}
+	EndGlobalSection
+EndGlobal
