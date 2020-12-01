@@ -284,8 +284,7 @@ namespace OpenMetaverse
         /// </summary>
         /// <param name="e">A ParticleUpdateEventArgs object containing 
         /// the data sent from the simulator</param>
-        protected virtual void OnParticleUpdate(ParticleUpdateEventArgs e)
-        {
+        protected virtual void OnParticleUpdate(ParticleUpdateEventArgs e) {
             EventHandler<ParticleUpdateEventArgs> handler = m_ParticleUpdate;
             if (handler != null)
                 handler(this, e);
@@ -306,8 +305,7 @@ namespace OpenMetaverse
         #endregion AvatarUpdate event
 
         #region TerseObjectUpdate event
-        public event EventHandler<ParticleUpdateEventArgs> ParticleUpdate
-        {
+        public event EventHandler<ParticleUpdateEventArgs> ParticleUpdate {
             add { lock (m_ParticleUpdateLock) { m_ParticleUpdate += value; } }
             remove { lock (m_ParticleUpdateLock) { m_ParticleUpdate -= value; } }
         }
@@ -1687,18 +1685,16 @@ namespace OpenMetaverse
             {
                 ObjectMediaNavigateMessage req = new ObjectMediaNavigateMessage
                 {
-                    PrimID = primID,
-                    URL = newURL,
-                    Face = face
+                    PrimID = primID, URL = newURL, Face = face
                 };
 
                 request.OnComplete += (client, result, error) =>
-                {
-                    if (error != null)
                     {
-                        Logger.Log("ObjectMediaNavigate: " + error.Message, Helpers.LogLevel.Error, Client);
-                    }
-                };
+                        if (error != null)
+                        {
+                            Logger.Log("ObjectMediaNavigate: " + error.Message, Helpers.LogLevel.Error, Client);
+                        }
+                    };
 
                 request.BeginGetResponse(req.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
@@ -1720,15 +1716,15 @@ namespace OpenMetaverse
             CapsClient request;
             if (sim.Caps != null && (request = Client.Network.CurrentSim.Caps.CreateCapsClient("ObjectMedia")) != null)
             {
-                ObjectMediaUpdate req = new ObjectMediaUpdate { PrimID = primID, FaceMedia = faceMedia, Verb = "UPDATE" };
+                ObjectMediaUpdate req = new ObjectMediaUpdate {PrimID = primID, FaceMedia = faceMedia, Verb = "UPDATE"};
 
                 request.OnComplete += (client, result, error) =>
-                {
-                    if (error != null)
                     {
-                        Logger.Log("ObjectMediaUpdate: " + error.Message, Helpers.LogLevel.Error, Client);
-                    }
-                };
+                        if (error != null)
+                        {
+                            Logger.Log("ObjectMediaUpdate: " + error.Message, Helpers.LogLevel.Error, Client);
+                        }
+                    };
                 request.BeginGetResponse(req.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
@@ -1748,42 +1744,42 @@ namespace OpenMetaverse
             CapsClient request;
             if (sim.Caps != null && (request = Client.Network.CurrentSim.Caps.CreateCapsClient("ObjectMedia")) != null)
             {
-                ObjectMediaRequest req = new ObjectMediaRequest { PrimID = primID, Verb = "GET" };
+                ObjectMediaRequest req = new ObjectMediaRequest {PrimID = primID, Verb = "GET"};
 
                 request.OnComplete += (client, result, error) =>
-                {
-                    if (result == null)
                     {
-                        Logger.Log("Failed retrieving ObjectMedia data", Helpers.LogLevel.Error, Client);
-                        try { callback(false, string.Empty, null); }
-                        catch (Exception ex) { Logger.Log(ex.Message, Helpers.LogLevel.Error, Client); }
-                        return;
-                    }
-
-                    ObjectMediaMessage msg = new ObjectMediaMessage();
-                    msg.Deserialize((OSDMap)result);
-
-                    if (msg.Request is ObjectMediaResponse response)
-                    {
-                        if (Client.Settings.OBJECT_TRACKING)
+                        if (result == null)
                         {
-                            Primitive prim = sim.ObjectsPrimitives.Find((Primitive p) => p.ID == primID);
-                            if (prim != null)
-                            {
-                                prim.MediaVersion = response.Version;
-                                prim.FaceMedia = response.FaceMedia;
-                            }
+                            Logger.Log("Failed retrieving ObjectMedia data", Helpers.LogLevel.Error, Client);
+                            try { callback(false, string.Empty, null); }
+                            catch (Exception ex) { Logger.Log(ex.Message, Helpers.LogLevel.Error, Client); }
+                            return;
                         }
 
-                        try { callback(true, response.Version, response.FaceMedia); }
-                        catch (Exception ex) { Logger.Log(ex.Message, Helpers.LogLevel.Error, Client); }
-                    }
-                    else
-                    {
-                        try { callback(false, string.Empty, null); }
-                        catch (Exception ex) { Logger.Log(ex.Message, Helpers.LogLevel.Error, Client); }
-                    }
-                };
+                        ObjectMediaMessage msg = new ObjectMediaMessage();
+                        msg.Deserialize((OSDMap)result);
+
+                        if (msg.Request is ObjectMediaResponse response)
+                        {
+                            if (Client.Settings.OBJECT_TRACKING)
+                            {
+                                Primitive prim = sim.ObjectsPrimitives.Find((Primitive p) => p.ID == primID);
+                                if (prim != null)
+                                {
+                                    prim.MediaVersion = response.Version;
+                                    prim.FaceMedia = response.FaceMedia;
+                                }
+                            }
+
+                            try { callback(true, response.Version, response.FaceMedia); }
+                            catch (Exception ex) { Logger.Log(ex.Message, Helpers.LogLevel.Error, Client); }
+                        }
+                        else
+                        {
+                            try { callback(false, string.Empty, null); }
+                            catch (Exception ex) { Logger.Log(ex.Message, Helpers.LogLevel.Error, Client); }
+                        }
+                    };
 
                 request.BeginGetResponse(req.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
@@ -2111,16 +2107,15 @@ namespace OpenMetaverse
                         prim.Rotation = objectupdate.Rotation;
                         prim.AngularVelocity = objectupdate.AngularVelocity;
                         #endregion
-
+                        
                         EventHandler<PrimEventArgs> handler = m_ObjectUpdate;
                         if (handler != null)
                         {
-                            ThreadPool.QueueUserWorkItem(delegate (object o)
+                            ThreadPool.QueueUserWorkItem(delegate(object o)
                             { handler(this, new PrimEventArgs(simulator, prim, update.RegionData.TimeDilation, isNewObject, attachment)); });
                         }
                         //OnParticleUpdate handler replacing decode particles, PCode.Particle system appears to be deprecated this is a fix
-                        if (prim.ParticleSys.PartMaxAge != 0)
-                        {
+                        if (prim.ParticleSys.PartMaxAge != 0) {
                             OnParticleUpdate(new ParticleUpdateEventArgs(simulator, prim.ParticleSys, prim));
                         }
 
@@ -2337,7 +2332,7 @@ namespace OpenMetaverse
                     EventHandler<TerseObjectUpdateEventArgs> handler = m_TerseObjectUpdate;
                     if (handler != null)
                     {
-                        ThreadPool.QueueUserWorkItem(delegate (object o)
+                        ThreadPool.QueueUserWorkItem(delegate(object o)
                         { handler(this, new TerseObjectUpdateEventArgs(simulator, obj, update, terse.RegionData.TimeDilation)); });
                     }
 
@@ -2503,7 +2498,7 @@ namespace OpenMetaverse
                         i++;
 
                         // Text color
-                        prim.TextColor = new Color4(block.Data, i, false, true);
+                        prim.TextColor = new Color4(block.Data, i,false,true);
                         i += 4;
                     }
                     else
@@ -2629,7 +2624,7 @@ namespace OpenMetaverse
                 catch (IndexOutOfRangeException ex)
                 {
                     Logger.Log("Error decoding an ObjectUpdateCompressed packet", Helpers.LogLevel.Warning, Client, ex);
-                    Logger.Log(block.ToString(), Helpers.LogLevel.Warning);
+                    Logger.Log(block, Helpers.LogLevel.Warning);
                 }
             }
         }
@@ -2659,9 +2654,9 @@ namespace OpenMetaverse
                         {
                             continue;
                         }
-                    }
+                    }                        
                     ids.Add(localID);
-                }
+                }               
                 RequestObjects(simulator, ids);
             }
         }
@@ -3135,7 +3130,7 @@ namespace OpenMetaverse
 
         #region Object Tracking Link
 
-        /// <summary>
+                /// <summary>
         /// 
         /// </summary>
         /// <param name="simulator"></param>
@@ -3257,7 +3252,7 @@ namespace OpenMetaverse
 
                     // Iterate through all of this sims avatars
                     sim.ObjectsAvatars.ForEach(
-                        delegate (Avatar avatar)
+                        delegate(Avatar avatar)
                         {
                             #region Linear Motion
                             // Only do movement interpolation (extrapolation) when there is a non-zero velocity but 
@@ -3274,7 +3269,7 @@ namespace OpenMetaverse
 
                     // Iterate through all of this sims primitives
                     sim.ObjectsPrimitives.ForEach(
-                        delegate (Primitive prim)
+                        delegate(Primitive prim)
                         {
                             if (prim.Joint == JointType.Invalid)
                             {
@@ -3475,8 +3470,7 @@ namespace OpenMetaverse
         }
     }
 
-    public class ParticleUpdateEventArgs : EventArgs
-    {
+    public class ParticleUpdateEventArgs : EventArgs {
         private readonly Simulator m_Simulator;
         private readonly Primitive.ParticleSystem m_ParticleSystem;
         private readonly Primitive m_Source;
@@ -3494,8 +3488,7 @@ namespace OpenMetaverse
         /// <param name="simulator">The simulator the packet originated from</param>
         /// <param name="particlesystem">The ParticleSystem data</param>
         /// <param name="source">The Primitive source</param>
-        public ParticleUpdateEventArgs(Simulator simulator, Primitive.ParticleSystem particlesystem, Primitive source)
-        {
+        public ParticleUpdateEventArgs(Simulator simulator, Primitive.ParticleSystem particlesystem, Primitive source) {
             this.m_Simulator = simulator;
             this.m_ParticleSystem = particlesystem;
             this.m_Source = source;

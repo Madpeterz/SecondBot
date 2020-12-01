@@ -115,8 +115,8 @@ namespace OpenMetaverse.Assets
             if (i == -1)
             {
                 Logger.Log(
-                     $"[OarFile]: Could not find extension information in asset path {assetPath} since it's missing the separator " +
-                     $"{ArchiveConstants.ASSET_EXTENSION_SEPARATOR}.  Skipping", Helpers.LogLevel.Warning);
+                    $"[OarFile]: Could not find extension information in asset path {assetPath} since it's missing the separator " +
+                    $"{ArchiveConstants.ASSET_EXTENSION_SEPARATOR}.  Skipping", Helpers.LogLevel.Warning);
                 return false;
             }
 

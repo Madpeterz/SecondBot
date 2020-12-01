@@ -243,12 +243,14 @@ namespace OpenMetaverse
                 handler(this, e);
         }
 
+        /// <summary>Thread sync lock object</summary>
+        private readonly object m_FriendsListReadyLock = new object();
+
         public event EventHandler<FriendsReadyEventArgs> friendsListReady
         {
-            add { lock (m_FriendOfflineLock) { m_FriendsListReadyResponse += value; } }
-            remove { lock (m_FriendOfflineLock) { m_FriendsListReadyResponse -= value; } }
+            add { lock (m_FriendsListReadyLock) { m_FriendsListReadyResponse += value; } }
+            remove { lock (m_FriendsListReadyLock) { m_FriendsListReadyResponse -= value; } }
         }
-
 
         /// <summary>The event subscribers. null if no subcribers</summary>
         private EventHandler<FriendInfoEventArgs> m_FriendOnline;
@@ -937,9 +939,6 @@ namespace OpenMetaverse
                 OnfriendsListReady(new FriendsReadyEventArgs(FriendList.Count));
             }
         }
-
-
-
     }
     #region EventArgs
 
@@ -953,11 +952,9 @@ namespace OpenMetaverse
         /// <summary>Get the name of the agent we requested a friendship with</summary>
 
         /// <summary>
-        /// Construct a new instance of the FriendShipResponseEventArgs class
+        /// Construct a new instance of the FriendsReadyEventArgs class
         /// </summary>
-        /// <param name="Count">The ID of the agent we requested a friendship with</param>
-        /// <param name="agentName">The name of the agent we requested a friendship with</param>
-        /// <param name="accepted">true if the agent accepted our friendship offer</param>
+        /// <param name="Count">The total number of people loaded into the friend list.</param>
         public FriendsReadyEventArgs(int count)
         {
             this.m_count = count;

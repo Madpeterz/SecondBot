@@ -202,7 +202,7 @@ namespace OpenMetaverse
         /// <summary>Should we connect to multiple sims? This will allow
         /// viewing in to neighboring simulators and sim crossings
         /// (Experimental)</summary>
-        public bool MULTIPLE_SIMS = false;
+        public bool MULTIPLE_SIMS = true;
 
         /// <summary>If true, all object update packets will be decoded in to
         /// native objects. If false, only updates for our own agent will be
@@ -348,8 +348,6 @@ namespace OpenMetaverse
         /// a logger configuration file for log4net
         /// </summary>
         public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.Debug;
-
-        public static string LOG_WRITER = "console";
 
         /// <summary>Attach avatar names to log messages</summary>
         public bool LOG_NAMES = true;

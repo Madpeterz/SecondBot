@@ -505,16 +505,8 @@ namespace OpenMetaverse
         /// <param name="packet">Incoming packet to process</param>
         public void EnqueueOutgoing(OutgoingPacket packet)
         {
-            try
-            {
-
-                if (_packetOutbox.Writer.TryWrite(packet))
-                    Interlocked.Increment(ref _packetOutboxCount);
-            }
-            catch (Exception E)
-            {
-                Logger.Log("EnqueueOutgoing - Something has broken", Helpers.LogLevel.Error, E);
-            }
+            if (_packetOutbox.Writer.TryWrite(packet))
+                Interlocked.Increment(ref _packetOutboxCount);
         }
 
         /// <summary>

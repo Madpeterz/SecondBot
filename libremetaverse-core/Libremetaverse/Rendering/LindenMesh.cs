@@ -550,9 +550,6 @@ namespace OpenMetaverse.Rendering
         {
             int pos = s.IndexOf("\0", StringComparison.Ordinal);
 
-            if (pos >= 0)
-                return s.Substring(0, pos);
-
             return pos >= 0 ? s.Substring(0, pos) : s;
         }
     }
