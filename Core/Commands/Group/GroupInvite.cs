@@ -33,9 +33,9 @@ namespace BSB.Commands.Group
                     {
                         if (bot.MyGroups.ContainsKey(target_group) == true)
                         {
-                            if (bot.GetAllowGroupInvite(target_avatar, target_group) == true)
+                            if (bot.GetAllowGroupInvite(target_avatar) == true)
                             {
-                                bot.GroupInviteLockoutArm(target_avatar,target_group); // enable 120 sec cooldown
+                                bot.GroupInviteLockoutArm(target_avatar); // enable 120 sec cooldown
                                 ForRealGroupInvite(args, target_group, target_avatar);
                                 return true;
                             }

@@ -88,7 +88,7 @@ namespace BSB.bottypes
 
         protected Dictionary<string, string> Scripts_content = new Dictionary<string, string>();
         protected Dictionary<string, string> notecards_content = new Dictionary<string, string>();
-        protected Dictionary<UUID, Dictionary<UUID, long>> group_invite_lockout_timer = new Dictionary<UUID, Dictionary<UUID, long>>();
+        protected Dictionary<UUID, long> group_invite_lockout_timer = new Dictionary<UUID, long>();
         protected long last_cleanup_commands;
 
         public override string GetStatus()
@@ -102,45 +102,34 @@ namespace BSB.bottypes
             CommandsInterface.StatusTick();
             return base.GetStatus();
         }
-        public bool GetAllowGroupInvite(UUID avatar, UUID group)
+        public bool GetAllowGroupInvite(UUID avatar)
         {
-            if (group_invite_lockout_timer.ContainsKey(group) == true)
-            {
-                return !group_invite_lockout_timer[group].ContainsKey(avatar);
-            }
-            return true;
+            return !group_invite_lockout_timer.ContainsKey(avatar);
         }
 
-        public void GroupInviteLockoutArm(UUID avatar, UUID group)
+        public void GroupInviteLockoutArm(UUID avatar)
         {
-            if (group_invite_lockout_timer.ContainsKey(group) == false)
+            if (group_invite_lockout_timer.ContainsKey(avatar) == false)
             {
-                group_invite_lockout_timer.Add(group, new Dictionary<UUID, long>());
+                group_invite_lockout_timer.Add(avatar,0);
             }
-            if (group_invite_lockout_timer[group].ContainsKey(avatar) == false)
-            {
-                group_invite_lockout_timer[group].Add(avatar,0);
-            }
-            group_invite_lockout_timer[group][avatar] = helpers.UnixTimeNow();
+            group_invite_lockout_timer[avatar] = helpers.UnixTimeNow();
         }
         protected void PurgeOldGroupinviteLockouts()
         {
             long now = helpers.UnixTimeNow();
-            foreach (UUID group in group_invite_lockout_timer.Keys)
+            List<UUID> clear_locks = new List<UUID>();
+            foreach(KeyValuePair<UUID,long> Glock in group_invite_lockout_timer)
             {
-                List<UUID> clear_locks = new List<UUID>();
-                foreach (KeyValuePair<UUID, long> Glock in group_invite_lockout_timer[group])
+                long dif = now - Glock.Value;
+                if(dif >= 120)
                 {
-                    long dif = now - Glock.Value;
-                    if (dif >= 120)
-                    {
-                        clear_locks.Add(Glock.Key);
-                    }
+                    clear_locks.Add(Glock.Key);
                 }
-                foreach (UUID glock in clear_locks)
-                {
-                    group_invite_lockout_timer[group].Remove(glock);
-                }
+            }
+            foreach(UUID glock in clear_locks)
+            {
+                group_invite_lockout_timer.Remove(glock);
             }
         }
 
