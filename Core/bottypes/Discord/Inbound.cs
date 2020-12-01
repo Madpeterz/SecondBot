@@ -14,7 +14,7 @@ namespace BSB.bottypes
         protected async Task<Task> InboundLocalchatMessage(SocketMessage message)
         {
             IGuildUser user = (IGuildUser)message.Author;
-            Client.Self.Chat("[" + user.Nickname + "]->" + message.Content, 0, ChatType.Normal);
+            Client.Self.Chat(message.Content, 0, ChatType.Normal);
             return await MarkMessage(message, "✅");
         }
         protected async Task<Task> InboundInterfaceMessage(SocketMessage message)
@@ -152,7 +152,7 @@ namespace BSB.bottypes
                         if (UUID.TryParse(bits[1], out UUID avatar) == true)
                         {
                             IGuildUser user = (IGuildUser)message.Author;
-                            Client.Self.InstantMessage(avatar, "[" + user.Nickname + "]->" + message.Content);
+                            Client.Self.InstantMessage(avatar, message.Content);
                             await MarkMessage(message, "✅");
                         }
                     }
@@ -198,7 +198,7 @@ namespace BSB.bottypes
                             else
                             {
                                 IGuildUser user = (IGuildUser)message.Author;
-                                CommandsInterface.Call("Groupchat", "" + group.ToString() + "~#~" + "[" + user.Nickname + "]->" + message.Content, UUID.Zero);
+                                CommandsInterface.Call("Groupchat", "" + group.ToString() + "~#~" + message.Content, UUID.Zero);
                                 await MarkMessage(message, "✅");
                             }
                         }
