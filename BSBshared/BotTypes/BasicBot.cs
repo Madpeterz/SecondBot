@@ -215,6 +215,19 @@ namespace BetterSecondBotShared.bottypes
             {
                 Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
             }
+            if(helpers.notempty(myconfig.Basic_LoginLocation) == true)
+            {
+                if((myconfig.Basic_LoginLocation != "home") && (myconfig.Basic_LoginLocation != "last"))
+                {
+                    Info("Basic_LoginLocation: is set to a uri! if login fails try using home or last");
+                }
+                Lp.Start = myconfig.Basic_LoginLocation;
+            }
+            else
+            {
+                Info("Basic_LoginLocation: is empty using home!");
+                Lp.Start = "home";
+            }
             if (reconnect == false)
             {
                 BotStartHandler();

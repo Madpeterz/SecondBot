@@ -33,6 +33,11 @@ namespace BetterSecondBotShared.Json
             {
                 return "a CSV of SLURLs that the bot will attempt to return to after avoiding a sim shutdown (In testing)";
             }
+            else if (cmd == "Basic_LoginLocation")
+            {
+                return "the location to login to: home or last or a vaild URI encoded string example: uri:simname&X&Y&Z";
+            }
+            
             return "";
         }
         protected string GetHelp_Security(string cmd)
@@ -221,6 +226,7 @@ namespace BetterSecondBotShared.Json
             if (cmd == "Basic_BotUserName") { return "Example Resident"; }
             else if (cmd == "Basic_BotPassword") { return "Pass"; }
             else if (cmd == "Basic_HomeRegions") { return "http://maps.secondlife.com/secondlife/Viserion/50/140/23"; }
+            else if (cmd == "Basic_LoginLocation") { return "home"; }
             return "";
         }
         protected string GetValueHint_Security(string cmd)

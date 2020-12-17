@@ -15,6 +15,8 @@ namespace BetterSecondBotShared.Json
         public string Basic_BotPassword { get; set; }
         public string[] Basic_HomeRegions { get; set; }
 
+        public string Basic_LoginLocation { get; set; }
+
         // Security
         public string Security_MasterUsername { get; set; }
         public string Security_SubMasters { get; set; }
