@@ -28,6 +28,7 @@ COPY --from=publish /app/publish .
 ENV Basic_BotUserName=''
 ENV Basic_BotPassword=''
 ENV Basic_HomeRegions='http://maps.secondlife.com/secondlife/Viserion/50/140/23'
+ENV Basic_LoginLocation='home'
 
 ENV Security_MasterUsername='Madpeter Zond'
 ENV Security_SubMasters='X X,Y Y,Z Z'
