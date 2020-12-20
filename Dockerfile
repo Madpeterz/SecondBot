@@ -5,6 +5,7 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
+COPY ["NuGet.Config", ""]
 COPY ["CLI/BetterSecondBot.csproj", "CLI/"]
 COPY ["Core/BSB.csproj", "Core/"]
 COPY ["BSBshared/BSBshared.csproj", "BSBshared/"]
