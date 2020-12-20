@@ -32,7 +32,7 @@ namespace BSB.bottypes
                 addon = "Attempting reconnect";
                 last_reconnect_attempt = helpers.UnixTimeNow();
                 reconnect = true;
-                Start();
+                Start(true);
             }
             else if ((login_auto_logout == false) && (reconnect_mode == true) && (dif <= 120))
             {
@@ -253,6 +253,29 @@ namespace BSB.bottypes
         public string GotoNextHomeRegion()
         {
             return GotoNextHomeRegion(false);
+        }
+
+        protected override string[] getNextHomeArgs()
+        {
+            string UseSLurl = "";
+            foreach (string Slurl in myconfig.Basic_HomeRegions)
+            {
+                string simname = helpers.RegionnameFromSLurl(Slurl);
+                if (avoid_sims.Keys.Contains(simname) == false)
+                {
+                    UseSLurl = Slurl;
+                    break;
+                }
+            }
+            string[] bits = helpers.ParseSLurl(UseSLurl);
+            if (helpers.notempty(bits) == true)
+            {
+                if (bits.Length == 4)
+                {
+                    return bits;
+                }
+            }
+            return new string[] { };
         }
 
         protected string GotoNextHomeRegion(bool panic_mode)

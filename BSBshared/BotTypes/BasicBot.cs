@@ -182,8 +182,15 @@ namespace BetterSecondBotShared.bottypes
             }
             Info("Build: " + version);
         }
-
+        protected virtual string[] getNextHomeArgs()
+        {
+            return new string[] { };
+        }
         public virtual void Start()
+        {
+            Start(false);
+        }
+        public virtual void Start(bool use_home_region_redirect)
         {
             Client = new GridClient();
             Client.Settings.LOG_RESENDS = false;
@@ -215,18 +222,34 @@ namespace BetterSecondBotShared.bottypes
             {
                 Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
             }
-            if(helpers.notempty(myconfig.Basic_LoginLocation) == true)
+            if (use_home_region_redirect == false)
             {
-                if((myconfig.Basic_LoginLocation != "home") && (myconfig.Basic_LoginLocation != "last"))
+                if (helpers.notempty(myconfig.Basic_LoginLocation) == true)
                 {
-                    Info("Basic_LoginLocation: is set to a uri! if login fails try using home or last");
+                    if ((myconfig.Basic_LoginLocation != "home") && (myconfig.Basic_LoginLocation != "last"))
+                    {
+                        Info("Basic_LoginLocation: is set to a uri! if login fails try using home or last");
+                    }
+                    Lp.Start = myconfig.Basic_LoginLocation;
                 }
-                Lp.Start = myconfig.Basic_LoginLocation;
+                else
+                {
+                    Info("Basic_LoginLocation: is empty using home!");
+                    Lp.Start = "home";
+                }
             }
             else
             {
-                Info("Basic_LoginLocation: is empty using home!");
-                Lp.Start = "home";
+                string[] nexthome = getNextHomeArgs();
+                if (nexthome.Length == 4) {
+                    Info("Recovery login going to "+ nexthome[0]);
+                    Lp.Start = "" + Lp.URI + ":" + String.Join("&", nexthome);
+                }
+                else
+                {
+                    Info("Recovery login all home locations used: using last");
+                    Lp.Start = "last";
+                }
             }
             if (reconnect == false)
             {
