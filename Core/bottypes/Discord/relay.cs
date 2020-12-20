@@ -64,10 +64,17 @@ namespace BSB.bottypes
                             if ((myconfig.DiscordRelay_GroupUUID == group_uuid.ToString()) || (myconfig.DiscordRelay_GroupUUID == "*") || (myconfig.DiscordRelay_GroupUUID == "all"))
                             {
                                 Group Gr = mygroups[group_uuid];
-                                using var DWHclient = new DiscordWebhookClient(myconfig.DiscordRelay_URL);
-                                string SendMessage = "(" + Gr.Name + ") @" + sender_name + ":" + message + "";
-                                await DWHclient.SendMessageAsync(text: SendMessage).ConfigureAwait(false);
-                                DWHclient.Dispose();
+                                try
+                                {
+                                    using var DWHclient = new DiscordWebhookClient(myconfig.DiscordRelay_URL);
+                                    string SendMessage = "(" + Gr.Name + ") @" + sender_name + ":" + message + "";
+                                    await DWHclient.SendMessageAsync(text: SendMessage).ConfigureAwait(false);
+                                    DWHclient.Dispose();
+                                }
+                                catch {
+                                    Info("Discord web hook has failed - marking as disabled untill next restart!");
+                                    myconfig.DiscordRelay_URL = "";
+                                }
                             }
                         }
                     }
