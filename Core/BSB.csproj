@@ -21,8 +21,8 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
   </PropertyGroup>  <ItemGroup>
-    <PackageReference Include="Discord.Net.Webhook" Version="2.2.0" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="2.2.0" />
+    <PackageReference Include="Discord.Net" Version="2.3.0-dev-20201219.2" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="2.3.0-dev-20201219.2" />
     <PackageReference Include="RestSharp" Version="106.11.2" />
   </ItemGroup>
 
