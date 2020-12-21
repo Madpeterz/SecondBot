@@ -190,6 +190,10 @@ namespace BetterSecondBotShared.bottypes
         {
             Start(false);
         }
+        protected virtual void AvoidSim(string simname)
+        {
+        }
+
         public virtual void Start(bool use_home_region_redirect)
         {
             Client = new GridClient();
@@ -243,6 +247,7 @@ namespace BetterSecondBotShared.bottypes
                 string[] nexthome = getNextHomeArgs();
                 if (nexthome.Length == 4) {
                     Info("Recovery login going to "+ nexthome[0]);
+                    AvoidSim(nexthome[0]);
                     Lp.Start = "" + Lp.URI + ":" + String.Join("&", nexthome);
                 }
                 else

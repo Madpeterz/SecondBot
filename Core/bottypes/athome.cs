@@ -123,7 +123,7 @@ namespace BSB.bottypes
 
 
 
-        protected void AvoidSim(string simname)
+        protected override void AvoidSim(string simname)
         {
             if (avoid_sims.ContainsKey(simname) == false)
             {
