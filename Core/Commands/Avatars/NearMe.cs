@@ -24,7 +24,7 @@ namespace BSB.Commands.Avatars
                     }
                     Dictionary<string, string> entrys = new Dictionary<string, string>();
                     entrys.Add("Username",av.Name);
-                    entrys.Add("Pos", pos.X.ToString() + "," + pos.Y.ToString() + "," + pos.Z.ToString());
+                    entrys.Add("Pos", JsonConvert.SerializeObject(pos));
                     collection.Add(av.ID.ToString(), JsonConvert.SerializeObject(entrys));
                 }
                 return bot.GetCommandsInterface.SmartCommandReply(true, args[0], "ok", CommandName, collection);
