@@ -9,11 +9,74 @@ namespace BSB.bottypes
 {
     public abstract class AtHome : MessageSwitcherBot
     {
-        protected string LoggedOutNextAction()
+        protected long ConnectionLostAt = 0;
+        protected override void AfterBotLoginHandler()
         {
-            string addon = "";
+            base.AfterBotLoginHandler();
+            last_tp_attempt_unixtime = helpers.UnixTimeNow() + 30;
+            if (reconnect == true)
+            {
+                ResetAtHome();
+            }
+            else
+            {
+                Client.Self.AlertMessage += AlertEvent;
+                Client.Network.SimChanged += ChangeSim;
+            }
+            if (Client.Network.Connected == true)
+            {
+                if (Client.Network.CurrentSim != null)
+                {
+                    if (IsSimHome(Client.Network.CurrentSim.Name) == true)
+                    {
+                        if (UUID.TryParse(myconfig.Setting_DefaultSit_UUID, out UUID sit_UUID) == true)
+                        {
+                            Client.Self.RequestSit(sit_UUID, Vector3.Zero);
+                        }
+                    }
+                }
+            }
+            after_login_fired = true;
+        }
+
+        protected string FirstLoginStage()
+        {
             long dif = helpers.UnixTimeNow() - last_reconnect_attempt;
-            if ((login_auto_logout == false) && (reconnect_mode == false) && (after_login_fired == true))
+            if (login_auto_logout == true)
+            {
+                if (last_reconnect_attempt == 0)
+                {
+                    return login_status;
+                }
+                else
+                {
+                    if (auto_logout_login_recover == false)
+                    {
+                        auto_logout_login_recover = true;
+                        last_reconnect_attempt = helpers.UnixTimeNow();
+                        return "W4>" + login_status + " (20 secs)";
+                    }
+                    else if (dif >= 20)
+                    {
+                        login_auto_logout = false;
+                        auto_logout_login_recover = false;
+                        last_reconnect_attempt = helpers.UnixTimeNow();
+                        Start(true);
+                        return "Restarting first login [Using Alt locations]";
+                    }
+                    return "Waiting for cooldown";
+                }
+            }
+            else
+            {
+                return login_status;
+            }
+        }
+
+        protected string LoggedInConnectionLost()
+        {
+            long dif = helpers.UnixTimeNow() - last_reconnect_attempt;
+            if (reconnect_mode == true)
             {
                 last_tested_home_id = -1;
                 last_tp_attempt_unixtime = 0;
@@ -21,43 +84,35 @@ namespace BSB.bottypes
                 teleported = false;
                 reconnect_mode = true;
                 last_reconnect_attempt = helpers.UnixTimeNow();
-                addon = "Connection lost - switching to recovery mode";
-            }
-            else if ((login_auto_logout == false) && (reconnect_mode == false) && (after_login_fired == false))
-            {
-                addon = login_status;
-            }
-            else if ((login_auto_logout == false) && (reconnect_mode == true) && (dif > 120))
-            {
-                addon = "Attempting reconnect";
-                last_reconnect_attempt = helpers.UnixTimeNow();
-                reconnect = true;
-                Start(true);
-            }
-            else if ((login_auto_logout == false) && (reconnect_mode == true) && (dif <= 120))
-            {
-                addon = "W4>Reconnect attempt timer";
-            }
-            else if ((login_auto_logout == true) && (auto_logout_login_recover == false))
-            {
-                auto_logout_login_recover = true;
-                last_reconnect_attempt = helpers.UnixTimeNow();
-                addon = "W4>" + login_status + " (10 secs)";
-            }
-            else if ((login_auto_logout == true) && (auto_logout_login_recover == true) && (dif >= 10))
-            {
-                login_auto_logout = false;
-                auto_logout_login_recover = false;
-                last_reconnect_attempt = helpers.UnixTimeNow();
-                addon = "Restarting first login";
-                Start();
+                return "Connection lost - switching to recovery mode";
             }
             else
             {
-                addon = login_status;
+                if (dif <= 60)
+                {
+                    return "W4> Network reset timeout [60 secs]";
+                }
+                else
+                {
+                    last_reconnect_attempt = helpers.UnixTimeNow();
+                    reconnect = true;
+                    Start(true);
+                    return "Attempting reconnect";
+                }
             }
-            Debug("Function/LoggedOutNextAction - "+ addon);
-            return addon;
+        }
+
+        protected string LoggedOutNextAction()
+        {
+            if (login_auto_logout == true)
+            {
+                return FirstLoginStage();
+            }
+            if ((attempted_first_login == true) && (login_failed == true))
+            {
+                return LoggedInConnectionLost();
+            }
+            return "";
         }
         protected int last_tested_home_id = -1;
         protected long last_tp_attempt_unixtime;
@@ -119,6 +174,7 @@ namespace BSB.bottypes
             teleported = false;
             reconnect_mode = false;
             last_tp_attempt_unixtime = 0;
+            avoid_sims = new Dictionary<string, long>();
         }
 
 
@@ -134,10 +190,14 @@ namespace BSB.bottypes
 
         protected void ExpireOldAvoidSims()
         {
-            if(avoid_sims.Count() > 0)
+            if (avoid_sims.Count() > 0)
             {
                 List<string> remove_keys = new List<string>();
                 long now = helpers.UnixTimeNow();
+                if (GetClient.Network.Connected == false)
+                {
+                    now -= 240; // when logged out, add 240s to all sims we are avoiding
+                }
                 foreach (KeyValuePair<string,long> avoids in avoid_sims)
                 {
                     if(avoids.Value < now)
@@ -351,6 +411,10 @@ namespace BSB.bottypes
             {
                 if (Client.Network.CurrentSim != null)
                 {
+                    if(after_login_fired == false)
+                    {
+                        AfterBotLoginHandler();
+                    }
                     reply = AtHomeStatus(LoggedinAthome());
                 }
                 else
@@ -369,31 +433,6 @@ namespace BSB.bottypes
             }
             return base.GetStatus();
         }
-
-        protected override void AfterBotLoginHandler()
-        {
-            base.AfterBotLoginHandler();
-            last_tp_attempt_unixtime = helpers.UnixTimeNow() + 30;
-            if (reconnect == true)
-            {
-                ResetAtHome();
-            }
-            else
-            {
-                Client.Self.AlertMessage += AlertEvent;
-                Client.Network.SimChanged += ChangeSim;
-            }
-            if (IsSimHome(Client.Network.CurrentSim.Name) == true)
-            {
-                if (UUID.TryParse(myconfig.Setting_DefaultSit_UUID, out UUID sit_UUID) == true)
-                {
-                    Client.Self.RequestSit(sit_UUID, Vector3.Zero);
-                }
-            }
-            after_login_fired = true;
-        }
-
-
 
         public string TeleportWithSLurl(string sl_url)
         {

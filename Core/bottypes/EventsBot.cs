@@ -155,14 +155,16 @@ namespace BSB.bottypes
         protected string login_status = "Waiting to login";
         protected override void LoginHandler(object o, LoginProgressEventArgs e)
         {
+            attempted_first_login = true;
+            login_failed = false;
             if (e.Status == LoginStatus.Success)
             {
                 login_status = "Ok";
-                AfterBotLoginHandler();
             }
             else if(e.Status == LoginStatus.Failed)
             {
-                login_status = "Login failed";
+                login_failed = true;
+                login_status = "Login failed <"+e.Message+">";
                 login_auto_logout = true;
                 if (e.FailReason == "presence")
                 {
@@ -189,6 +191,7 @@ namespace BSB.bottypes
             {
                 login_status = "Redirecting";
             }
+            Info("Login status -> " + login_status);
 
         }
         public virtual void GroupsHandler(object sender, CurrentGroupsEventArgs e)

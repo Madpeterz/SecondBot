@@ -17,6 +17,8 @@ namespace BetterSecondBotShared.bottypes
             LastStatusMessage = "No status";
         }
         protected List<string> SubMasters = new List<string>();
+        protected bool attempted_first_login = false;
+        protected bool login_failed = false;
         public bool Is_avatar_master(string name)
         {
             if (name == myconfig.Security_MasterUsername)
@@ -208,6 +210,7 @@ namespace BetterSecondBotShared.bottypes
                 {
                     if (myconfig.Setting_loginURI.Length > 5)
                     {
+                        Info("Using custom login server");
                         Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version, myconfig.Setting_loginURI);
                     }
                     else
@@ -235,6 +238,7 @@ namespace BetterSecondBotShared.bottypes
                         Info("Basic_LoginLocation: is set to a uri! if login fails try using home or last");
                     }
                     Lp.Start = myconfig.Basic_LoginLocation;
+                    Info("Basic_LoginLocation: First login using->"+Lp.Start);
                 }
                 else
                 {

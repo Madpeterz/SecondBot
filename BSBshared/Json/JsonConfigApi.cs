@@ -84,6 +84,10 @@ namespace BetterSecondBotShared.Json
             {
                 return "the URI to login to (leave as \"secondlife\" unless you know what your doing!)";
             }
+            else if (cmd == "Setting_LogCommands")
+            {
+                return "Allow the bot to send command to console and discord full if enabled";
+            }
             return "";
         }
         protected string GetHelp_Discord(string cmd)
@@ -175,10 +179,9 @@ namespace BetterSecondBotShared.Json
                                                     + "3: +Warnings\n"
                                                     + "4: +Debug\n";
             }
-            else if (cmd == "Setting_LogCommands")
-            {
-                return "Allow the bot to send command to console and discord full if enabled";
-            }
+            // Name2Key
+            else if (cmd == "Name2Key_Url") { return "url to the name to key provider"; }
+            else if (cmd == "Name2Key_Key") { return "access code for the provider"; }
             return "Unknown value:" + cmd;
         }
         #endregion
@@ -189,6 +192,7 @@ namespace BetterSecondBotShared.Json
             else if (cmd.StartsWith("Settings") == true) { return GetHelp_Settings(cmd); }
             else if (cmd.StartsWith("DiscordTTS") == true) { return GetHelp_DiscordTTS(cmd); }
             else if (cmd.StartsWith("Discord") == true) { return GetHelp_Discord(cmd); }
+            else if (cmd.StartsWith("Http_") == true) { return GetHelp_HTTP(cmd); }
             else { return GetHelp_Logs(cmd); }
         }
 
@@ -246,6 +250,7 @@ namespace BetterSecondBotShared.Json
             else if (cmd == "Setting_RelayImToAvatarUUID") { return ""; }
             else if (cmd == "Setting_DefaultSit_UUID") { return ""; }
             else if (cmd == "Setting_loginURI") { return "secondlife"; }
+            else if (cmd == "Setting_LogCommands") { return "True"; }
             return "";
         }
         protected string GetValueHint_Discord(string cmd)
@@ -282,7 +287,9 @@ namespace BetterSecondBotShared.Json
             // Logs
             if (cmd == "Log2File_Enable") { return "False"; }
             else if (cmd == "Log2File_Level") { return "1"; }
-            else if (cmd == "Setting_LogCommands") { return "True"; }
+            // Name2Key
+            else if(cmd == "Name2Key_Url") { return ""; }
+            else if(cmd == "Name2Key_Key") { return ""; }
             return "Unknown value:" + cmd;
         }
         #endregion
@@ -291,9 +298,10 @@ namespace BetterSecondBotShared.Json
         {
             if (cmd.StartsWith("Basic") == true) { return GetValueHint_Basic(cmd); }
             else if (cmd.StartsWith("Security") == true) { return GetValueHint_Security(cmd); }
-            else if (cmd.StartsWith("Settings") == true) { return GetValueHint_Settings(cmd); }
-            else if (cmd.StartsWith("DiscordTTS") == true) { return GetValueHint_DiscordTTS(cmd); }
+            else if (cmd.StartsWith("Setting_") == true) { return GetValueHint_Settings(cmd); }
+            else if (cmd.StartsWith("DiscordTTS_") == true) { return GetValueHint_DiscordTTS(cmd); }
             else if (cmd.StartsWith("Discord") == true) { return GetValueHint_Discord(cmd); }
+            else if (cmd.StartsWith("Http_") == true) { return GetValueHint_HTTP(cmd); }
             else { return GetValueHint_Logs(cmd); }
         }
         public override int GetCommandArgs(string cmd)
