@@ -127,18 +127,24 @@ namespace BSB.bottypes
                     }
                 }
             }
-            foreach(string purge in PurgeAvatars)
+            lock (AvatarName2Key)
             {
-                if (purge != myconfig.Security_MasterUsername)
+                lock (AvatarStorageLastUsed)
                 {
-                    if (AvatarStorageLastUsed.ContainsKey(purge) == true)
+                    foreach (string purge in PurgeAvatars)
                     {
-                        if(AvatarName2Key.ContainsKey(purge) == true)
+                        if (purge != myconfig.Security_MasterUsername)
                         {
-                            AvatarStorageLastUsed.Remove(purge);
-                            UUID avuuid = AvatarName2Key[purge];
-                            AvatarName2Key.Remove(purge);
-                            AvatarKey2Name.Remove(avuuid);
+                            if (AvatarStorageLastUsed.ContainsKey(purge) == true)
+                            {
+                                if (AvatarName2Key.ContainsKey(purge) == true)
+                                {
+                                    AvatarStorageLastUsed.Remove(purge);
+                                    UUID avuuid = AvatarName2Key[purge];
+                                    AvatarName2Key.Remove(purge);
+                                    AvatarKey2Name.Remove(avuuid);
+                                }
+                            }
                         }
                     }
                 }

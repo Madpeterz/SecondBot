@@ -20,11 +20,14 @@ namespace BSB.bottypes
 
         public override void ResetAnimations()
         {
-            foreach (UUID ani in active_animations)
+            lock (active_animations)
             {
-                Client.Self.AnimationStop(ani, true);
+                foreach (UUID ani in active_animations)
+                {
+                    Client.Self.AnimationStop(ani, true);
+                }
+                active_animations.Clear();
             }
-            active_animations.Clear();
         }
 
         protected override void AvatarAnimationHandler(object sender, AvatarAnimationEventArgs e)
