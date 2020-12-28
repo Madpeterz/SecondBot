@@ -229,35 +229,35 @@ namespace BetterSecondBotShared.bottypes
             {
                 Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
             }
+            if (helpers.notempty(myconfig.Basic_LoginLocation) == false)
+            {
+                myconfig.Basic_LoginLocation = "home";
+                Info("Basic_LoginLocation: is empty using home!");
+            }
             if (use_home_region_redirect == false)
             {
-                if (helpers.notempty(myconfig.Basic_LoginLocation) == true)
+                if ((myconfig.Basic_LoginLocation != "home") && (myconfig.Basic_LoginLocation != "last"))
                 {
-                    if ((myconfig.Basic_LoginLocation != "home") && (myconfig.Basic_LoginLocation != "last"))
-                    {
-                        Info("Basic_LoginLocation: is set to a uri! if login fails try using home or last");
-                    }
-                    Lp.Start = myconfig.Basic_LoginLocation;
-                    Info("Basic_LoginLocation: First login using->"+Lp.Start);
+                    Info("Basic_LoginLocation: is set to a uri! if login fails try using home or last");
                 }
-                else
-                {
-                    Info("Basic_LoginLocation: is empty using home!");
-                    Lp.Start = "home";
-                }
+                Lp.Start = myconfig.Basic_LoginLocation;
+                Info("Basic_LoginLocation: First login using->"+Lp.Start);
             }
             else
             {
-                string[] nexthome = getNextHomeArgs();
-                if (nexthome.Length == 4) {
-                    Info("Recovery login going to "+ nexthome[0]);
-                    AvoidSim(nexthome[0]);
-                    Lp.Start = "" + Lp.URI + ":" + String.Join("&", nexthome);
+                if ((myconfig.Basic_LoginLocation != "home") && (myconfig.Basic_LoginLocation != "last"))
+                {
+                    Lp.Start = "home";
+                }
+                if (Lp.Start == "home")
+                {
+                    Info("Recovery login: using last location not home!");
+                    Lp.Start = "last";
                 }
                 else
                 {
-                    Info("Recovery login all home locations used: using last");
-                    Lp.Start = "last";
+                    Info("Recovery login: using home location not last!");
+                    Lp.Start = "home";
                 }
             }
             if (reconnect == false)
