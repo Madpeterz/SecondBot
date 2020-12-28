@@ -362,12 +362,13 @@ namespace BSB.bottypes
                         string simname = helpers.RegionnameFromSLurl(UseSLurl);
                         if (simname != last_attempted_teleport_region)
                         {
-                            AvoidSim(simname); // avoid this sim we are trying to teleport to incase something goes wrong
                             string whyrejected = TeleportWithSLurl(UseSLurl);
                             if (whyrejected == "ok")
                             {
+                                AvoidSim(simname);
                                 return "**** active teleport: " + last_attempted_teleport_region + "***";
                             }
+                            AvoidSim(simname);
                             return "TP to " + simname + " rejected - " + whyrejected;
                         }
                     }
