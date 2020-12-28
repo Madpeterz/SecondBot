@@ -96,12 +96,20 @@ namespace BSB.bottypes
                 }
                 else
                 {
-                    last_reconnect_attempt = helpers.UnixTimeNow();
-                    reconnect = true;
-                    login_failed = false;
-                    login_auto_logout = false;
-                    Start(true);
-                    return "Attempting reconnect";
+                    if (last_reconnect_attempt == 0)
+                    {
+                        last_reconnect_attempt = helpers.UnixTimeNow();
+                        return "First connection failed";
+                    }
+                    else
+                    {
+                        last_reconnect_attempt = helpers.UnixTimeNow();
+                        reconnect = true;
+                        login_failed = false;
+                        login_auto_logout = false;
+                        Start(true);
+                        return "Attempting reconnect";
+                    }
                 }
             }
         }
