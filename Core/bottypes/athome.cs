@@ -46,6 +46,7 @@ namespace BSB.bottypes
             {
                 if (last_reconnect_attempt == 0)
                 {
+                    last_reconnect_attempt = helpers.UnixTimeNow();
                     return login_status;
                 }
                 else
