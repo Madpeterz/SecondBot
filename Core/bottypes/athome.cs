@@ -84,7 +84,7 @@ namespace BSB.bottypes
                 last_tp_attempt_unixtime = 0;
                 after_login_fired = false;
                 teleported = false;
-                reconnect_mode = true;
+                reconnect_mode = false;
                 last_reconnect_attempt = helpers.UnixTimeNow();
                 return "Connection lost - switching to recovery mode";
             }
@@ -98,6 +98,8 @@ namespace BSB.bottypes
                 {
                     last_reconnect_attempt = helpers.UnixTimeNow();
                     reconnect = true;
+                    login_failed = false;
+                    login_auto_logout = false;
                     Start(true);
                     return "Attempting reconnect";
                 }
@@ -106,13 +108,13 @@ namespace BSB.bottypes
 
         protected string LoggedOutNextAction()
         {
-            if (login_auto_logout == true)
-            {
-                return FirstLoginStage();
-            }
-            if ((attempted_first_login == true) && (login_failed == true))
+            if (login_failed == true)
             {
                 return LoggedInConnectionLost();
+            }
+            else if (login_auto_logout == true)
+            {
+                return FirstLoginStage();
             }
             return "";
         }
