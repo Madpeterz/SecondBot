@@ -13,6 +13,7 @@ namespace BSB.bottypes
         protected override void AfterBotLoginHandler()
         {
             base.AfterBotLoginHandler();
+            Info("Home regions count: " + myconfig.Basic_HomeRegions.Length.ToString() + "");
             last_tp_attempt_unixtime = helpers.UnixTimeNow() + 30;
             if (reconnect == true)
             {
@@ -286,7 +287,7 @@ namespace BSB.bottypes
                         if (avoid_sims.Keys.Contains(Client.Network.CurrentSim.Name) == true)
                         {
                             dif = helpers.UnixTimeNow() - last_tp_attempt_unixtime;
-                            if (dif > 30)
+                            if (dif > 45)
                             {
                                 addon = GotoNextHomeRegion(true);
                             }
@@ -346,23 +347,31 @@ namespace BSB.bottypes
                 if (myconfig.Basic_HomeRegions.Length > 0)
                 {
                     last_tp_attempt_unixtime = helpers.UnixTimeNow();
-                    last_tested_home_id++;
-                    if (myconfig.Basic_HomeRegions.Length >= last_tested_home_id)
+                    string UseSLurl = "";
+                    foreach (string Slurl in myconfig.Basic_HomeRegions)
                     {
-                        last_tested_home_id = 0;
-                    }
-                    string Slurl = myconfig.Basic_HomeRegions[last_tested_home_id];
-                    string simname = helpers.RegionnameFromSLurl(Slurl);
-                    if (avoid_sims.Keys.Contains(simname) == false)
-                    {
-                        string whyrejected = TeleportWithSLurl(Slurl);
-                        if (whyrejected == "ok")
+                        string simname = helpers.RegionnameFromSLurl(Slurl);
+                        if (avoid_sims.Keys.Contains(simname) == false)
                         {
-                            return "**** active teleport: " + last_attempted_teleport_region + "***";
+                            UseSLurl = Slurl;
+                            break;
                         }
-                        return "TP to " + simname + " rejected - " + whyrejected;
                     }
-                    return "unable to teleport to home region: " + simname + " currently in avoid list";
+                    if (UseSLurl != "")
+                    {
+                        string simname = helpers.RegionnameFromSLurl(UseSLurl);
+                        if (simname != last_attempted_teleport_region)
+                        {
+                            AvoidSim(simname); // avoid this sim we are trying to teleport to incase something goes wrong
+                            string whyrejected = TeleportWithSLurl(UseSLurl);
+                            if (whyrejected == "ok")
+                            {
+                                return "**** active teleport: " + last_attempted_teleport_region + "***";
+                            }
+                            return "TP to " + simname + " rejected - " + whyrejected;
+                        }
+                    }
+                    return "No other sims found to teleport to [Maybe only 1 home region?]";
                 }
                 return "No home regions";
             }
