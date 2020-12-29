@@ -104,11 +104,18 @@ namespace BSB.bottypes
                     else
                     {
                         last_reconnect_attempt = helpers.UnixTimeNow();
-                        reconnect = true;
+                        if (after_login_fired == true)
+                        {
+                            reconnect = true;
+                        }
                         login_failed = false;
                         login_auto_logout = false;
                         Start(true);
-                        return "Attempting reconnect";
+                        if (reconnect == true)
+                        {
+                            return "Attempting reconnect";
+                        }
+                        return "Trying to connect again";
                     }
                 }
             }
