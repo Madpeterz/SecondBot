@@ -245,6 +245,7 @@ namespace BetterSecondBotShared.bottypes
             }
             else
             {
+                Lp.Start = myconfig.Basic_LoginLocation;
                 if ((myconfig.Basic_LoginLocation != "home") && (myconfig.Basic_LoginLocation != "last"))
                 {
                     Lp.Start = "home";
