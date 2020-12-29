@@ -35,7 +35,7 @@ namespace BetterSecondBotShared.Json
             }
             else if (cmd == "Basic_LoginLocation")
             {
-                return "the location to login to: home or last or a vaild URI encoded string example: uri:simname&X&Y&Z";
+                return "the location to login to: home or last or a region/X/Y/Z string example: Tentacles/128/64/109";
             }
             
             return "";
