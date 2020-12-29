@@ -254,11 +254,13 @@ namespace BetterSecondBotShared.bottypes
                 {
                     Info("Recovery login: using last location not home!");
                     Lp.Start = "last";
+                    myconfig.Basic_LoginLocation = "last";
                 }
                 else
                 {
                     Info("Recovery login: using home location not last!");
                     Lp.Start = "home";
+                    myconfig.Basic_LoginLocation = "home";
                 }
             }
             if (reconnect == false)
