@@ -20,12 +20,13 @@ namespace BSB.bottypes
 
         public override void ResetAnimations()
         {
+            List<UUID> copyAnyimations = active_animations;
+            foreach (UUID ani in copyAnyimations)
+            {
+                Client.Self.AnimationStop(ani, true);
+            }
             lock (active_animations)
             {
-                foreach (UUID ani in active_animations)
-                {
-                    Client.Self.AnimationStop(ani, true);
-                }
                 active_animations.Clear();
             }
         }
