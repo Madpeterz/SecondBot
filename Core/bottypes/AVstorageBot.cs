@@ -225,8 +225,11 @@ namespace BSB.bottypes
                 {
                     if (av_uuid != UUID.Zero)
                     {
-                        AvatarName2Key.Add(av_name, av_uuid);
-                        AvatarKey2Name.Add(av_uuid, av_name);
+                        if ((AvatarKey2Name.ContainsKey(av_uuid) == false) && (AvatarName2Key.ContainsKey(av_name) == false))
+                        {
+                            AvatarName2Key.Add(av_name, av_uuid);
+                            AvatarKey2Name.Add(av_uuid, av_name);
+                        }
                         AvatarStorageLastUsed.Add(av_name, helpers.UnixTimeNow());
                         if (PendingAvatarFinds_vianame.ContainsKey(av_name) == true)
                         {
