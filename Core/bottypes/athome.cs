@@ -34,23 +34,27 @@ namespace BSB.bottypes
        
         protected void ChangeSim(object sender,SimChangedEventArgs e)
         {
-            if (teleport_lockout == false)
+            if (IsSimHome(Client.Network.CurrentSim.Name) == false)
             {
-                if (last_attempted_teleport_region != "")
+                if (teleport_lockout == false)
                 {
-                    if (last_attempted_teleport_region != Client.Network.CurrentSim.Name)
+                    if (last_attempted_teleport_region != "")
                     {
-                        teleport_lockout = true;
-                        Info("Teleport by script/master detected - @home lock out enabled");
+                        if (last_attempted_teleport_region != Client.Network.CurrentSim.Name)
+                        {
+
+                            teleport_lockout = true;
+                            Info("Teleport by script/master detected - @home lock out enabled");
+                        }
+                    }
+                    else
+                    {
+                        last_attempted_teleport_region = Client.Network.CurrentSim.Name;
+                        Info("Connected to region");
                     }
                 }
-                else
-                {
-                    last_attempted_teleport_region = Client.Network.CurrentSim.Name;
-                    Info("Connected to region");
-                }
             }
-            if (IsSimHome(Client.Network.CurrentSim.Name) == true)
+            else
             {
                 if (UUID.TryParse(myconfig.Setting_DefaultSit_UUID, out UUID sit_UUID) == true)
                 {
