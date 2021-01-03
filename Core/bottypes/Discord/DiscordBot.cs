@@ -13,8 +13,8 @@ namespace BSB.bottypes
     {
         protected override void AfterBotLoginHandler()
         {
-            base.AfterBotLoginHandler();
             _ = DiscordBotAfterLogin();
+            base.AfterBotLoginHandler();
         }
         protected virtual async Task DiscordBotAfterLogin()
         {
