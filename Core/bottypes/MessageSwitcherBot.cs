@@ -180,7 +180,8 @@ namespace BSB.bottypes
                 case InstantMessageDialog.MessageFromAgent: // shared with SessionSend
                 case InstantMessageDialog.SessionSend:
                     {
-                        if (e.IM.FromAgentName.ToLowerInvariant() != "secondlife")
+                        string forcecheck = e.IM.FromAgentName.ToLowerInvariant().Replace(" ", "");
+                        if (forcecheck != "secondlife")
                         {
                             if (mygroups.ContainsKey(e.IM.IMSessionID) == true)
                             {
