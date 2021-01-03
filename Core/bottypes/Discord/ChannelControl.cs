@@ -14,6 +14,7 @@ namespace BSB.bottypes
         {
             if (AllowNewOutbound() == true)
             {
+
                 channelname = channelname.ToLowerInvariant();
                 channelname = String.Concat(channelname.Where(char.IsLetterOrDigit));
                 ITextChannel Channel = await FindTextChannel(channelname, catmap[catmapid], sender_id, TopicType).ConfigureAwait(false);
@@ -126,16 +127,23 @@ namespace BSB.bottypes
                 }
                 if ((deleteMessages.Count > 0) || (slowDeleteMessages.Count > 0))
                 {
-                    if (deleteMessages.Count > 0)
+                    try
                     {
-                        await chan.DeleteMessagesAsync(deleteMessages).ConfigureAwait(true);
-                    }
-                    if (slowDeleteMessages.Count > 0)
-                    {
-                        foreach (IMessage slowdelmessage in slowDeleteMessages)
+                        if (deleteMessages.Count > 0)
                         {
-                            await chan.DeleteMessageAsync(slowdelmessage).ConfigureAwait(true);
+                            await chan.DeleteMessagesAsync(deleteMessages).ConfigureAwait(true);
                         }
+                        if (slowDeleteMessages.Count > 0)
+                        {
+                            foreach (IMessage slowdelmessage in slowDeleteMessages)
+                            {
+                                await chan.DeleteMessageAsync(slowdelmessage).ConfigureAwait(true);
+                            }
+                        }
+                    }
+                    catch
+                    {
+
                     }
                     empty = false;
                 }
