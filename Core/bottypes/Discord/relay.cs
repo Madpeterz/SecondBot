@@ -14,7 +14,7 @@ namespace BSB.bottypes
             {
                 if (DiscordClientConnected == true)
                 {
-                    _ = DiscordIMMessage(avatar, AvatarKey2Name[avatar], message);
+                    _ = SendMessageToChannelAsync(AvatarKey2Name[avatar], "Bot/Script: " + message + "", "im", avatar, "IM").ConfigureAwait(false);
                 }
             }
         }
