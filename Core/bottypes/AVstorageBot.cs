@@ -20,7 +20,8 @@ namespace BSB.bottypes
         protected Dictionary<string, KeyValuePair<long, int>> PendingAvatarFinds_vianame = new Dictionary<string, KeyValuePair<long, int>>();
         protected Dictionary<UUID, KeyValuePair<long, int>> PendingAvatarFinds_viauuid = new Dictionary<UUID, KeyValuePair<long, int>>();
 
-        protected long max_db_storage_age = 240; // how long should we keep an avatar in memory before clearing (in secs) [now - last accessed]
+        protected long max_db_storage_age = 2240; // how long should we keep an avatar in memory before clearing (in secs) [now - last accessed]
+        protected int max_retry_attempts = 2;
         protected bool show_av_storage_info_in_status = true;
         protected string AVstorageBot_laststatus = "";
 
@@ -28,6 +29,7 @@ namespace BSB.bottypes
         {
             cleanupAvatarStorage();
             ReTriggerAvLookups();
+            UpdateStorageWithAroundMe();
             string reply = "";
             if (show_av_storage_info_in_status == true)
             {
@@ -61,6 +63,18 @@ namespace BSB.bottypes
             return base.GetStatus();
         }
 
+        protected void UpdateStorageWithAroundMe()
+        {
+            if(Client.Network.CurrentSim != null)
+            {
+                Dictionary<uint,Avatar> avcopy = Client.Network.CurrentSim.ObjectsAvatars.Copy();
+                foreach (Avatar av in avcopy.Values)
+                {
+                    AddAvatarToDB(av.ID, av.Name);
+                }
+            }
+        }
+
         protected void ReTriggerUUIDtoName()
         {
             long now = helpers.UnixTimeNow();
@@ -68,7 +82,18 @@ namespace BSB.bottypes
             List<UUID> giveup_key2name = new List<UUID>();
             foreach (KeyValuePair<UUID, KeyValuePair<long, int>> pair in PendingAvatarFinds_viauuid)
             {
-                giveup_key2name.Add(pair.Key);
+                long dif = now - pair.Value.Key;
+                if (dif > 30)
+                {
+                    if (pair.Value.Value < max_retry_attempts)
+                    {
+                        retrigger_key2name.Add(pair.Key);
+                    }
+                    else
+                    {
+                        giveup_key2name.Add(pair.Key);
+                    }
+                }     
             }
             if(retrigger_key2name.Count > 0)
             {
@@ -91,13 +116,25 @@ namespace BSB.bottypes
             List<string> giveup_name2key = new List<string>();
             foreach (KeyValuePair<string, KeyValuePair<long, int>> pair in PendingAvatarFinds_vianame)
             {
-                giveup_name2key.Add(pair.Key);
+                long dif = now - pair.Value.Key;
+                if (dif > 30)
+                {
+                    if (pair.Value.Value < max_retry_attempts)
+                    {
+                        retrigger_name2key.Add(pair.Key);
+                    }
+                    else
+                    {
+                        giveup_name2key.Add(pair.Key);
+                    }
+                }
             }
             
             foreach (string avname in retrigger_name2key)
             {
+                int retry_counter = PendingAvatarFinds_vianame[avname].Value + 1;
+                PendingAvatarFinds_vianame[avname] = new KeyValuePair<long, int>(now, retry_counter);
                 Client.Directory.StartPeopleSearch(avname, 0);
-                PendingAvatarFinds_vianame[avname] = new KeyValuePair<long, int>(now, PendingAvatarFinds_vianame[avname].Value + 1);
                 
             }
             foreach (string avname in giveup_name2key)
@@ -153,16 +190,16 @@ namespace BSB.bottypes
 
         protected override void AfterBotLoginHandler()
         {
-            base.AfterBotLoginHandler();
             if (reconnect == false)
             {
                 Client.Avatars.UUIDNameReply += Key2NameEvent;
                 Client.Directory.DirPeopleReply += Name2KeyEvent;
-                if(helpers.notempty(myconfig.Security_MasterUsername) == true)
+                if (helpers.notempty(myconfig.Security_MasterUsername) == true)
                 {
                     FindAvatarName2Key(myconfig.Security_MasterUsername);
                 }
             }
+            base.AfterBotLoginHandler();
         }
 
         protected void Key2NameEvent(object sender,UUIDNameReplyEventArgs e)
@@ -201,6 +238,10 @@ namespace BSB.bottypes
                         }
                     }
                 }
+                else
+                {
+                    AvatarStorageLastUsed[av_name] = helpers.UnixTimeNow();
+                }
                 if (helpers.notempty(myconfig.Security_MasterUsername) == true)
                 {
                     if(myconfig.Security_MasterUsername == av_name)
@@ -215,126 +256,137 @@ namespace BSB.bottypes
                 }
             }
         }
+
+        protected string httpLookupKey(string avatar_name)
+        {
+            if (myconfig.Name2Key_Enable == true)
+            {
+                var client = new RestClient(myconfig.Name2Key_Url);
+                var request = new RestRequest("name2key/" + avatar_name + "/" + myconfig.Name2Key_Key + "", Method.GET);
+                client.Timeout = 3000; // ? does this even do anything
+                request.Timeout = 3000;
+                IRestResponse endpoint_checks = client.Get(request);
+                if (endpoint_checks.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        namekeyservicereply server_reply = JsonConvert.DeserializeObject<namekeyservicereply>(endpoint_checks.Content);
+                        if (server_reply.status == true)
+                        {
+                            if (server_reply.found == true)
+                            {
+                                AddAvatarToDB((UUID)server_reply.uuid, server_reply.name);
+                                return server_reply.uuid;
+                            }
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+            return "";
+        }
+
+        protected string FindAvatarUUIDInStorage(string avatar_name)
+        {
+            if (AvatarStorageLastUsed.ContainsKey(avatar_name) == true)
+            {
+                AvatarStorageLastUsed[avatar_name] = helpers.UnixTimeNow();
+                return AvatarName2Key[avatar_name].ToString();
+            }
+            return "";
+        }
+
         public string FindAvatarName2Key(string avatar_name)
         {
-            return FindAvatarName2Key(avatar_name, false);
-        }
-        public string FindAvatarName2Key(string avatar_name,bool skip_http)
-        {
-            if (myconfig.Name2Key_Enable == false)
-            {
-                skip_http = true;
-            }
             List<string> bits = avatar_name.Split(' ').ToList();
             if(bits.Count() == 1)
             {
                 bits.Add("Resident");
             }
             avatar_name = bits[0].FirstCharToUpper() + " " + bits[1].FirstCharToUpper();
-            long now = helpers.UnixTimeNow();
-            if (AvatarStorageLastUsed.ContainsKey(avatar_name) == true)
+            string uuid = FindAvatarUUIDInStorage(avatar_name);
+            if (uuid != "")
             {
-                AvatarStorageLastUsed[avatar_name] = now;
-                return AvatarName2Key[avatar_name].ToString();
+                return uuid;
             }
-            else
+            uuid = httpLookupKey(avatar_name);
+            if (uuid != "")
             {
-                if(PendingAvatarFinds_vianame.ContainsKey(avatar_name) == false)
-                {
-                    if (skip_http == false)
-                    {
-                        var client = new RestClient(myconfig.Name2Key_Url);
-                        var request = new RestRequest("name2key/" + avatar_name + "/" + myconfig.Name2Key_Key + "", Method.GET);
-                        client.Timeout = 3000; // ? does this even do anything
-                        request.Timeout = 3000;
-                        IRestResponse endpoint_checks = client.Get(request);
-                        if (endpoint_checks.StatusCode == System.Net.HttpStatusCode.OK)
-                        {
-                            try
-                            {
-                                namekeyservicereply server_reply = JsonConvert.DeserializeObject<namekeyservicereply>(endpoint_checks.Content);
-                                if (server_reply.status == true)
-                                {
-                                    if (server_reply.found == true)
-                                    {
-                                        AddAvatarToDB((UUID)server_reply.uuid, server_reply.name);
-                                        return server_reply.uuid;
-                                    }
-                                }
-                            }
-                            catch
-                            {
-
-                            }
-                        }
-                        return FindAvatarName2Key(avatar_name, true);
-
-                    }
-                    else
-                    {
-                        PendingAvatarFinds_vianame.Add(avatar_name, new KeyValuePair<long, int>(now, 0));
-                        Client.Directory.StartPeopleSearch(avatar_name, 0);
-                    }
-                }
+                return uuid;
+            }
+            if (PendingAvatarFinds_vianame.ContainsKey(avatar_name) == false)
+            {
+                PendingAvatarFinds_vianame.Add(avatar_name, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 0));
+                Client.Directory.StartPeopleSearch(avatar_name, 0);
             }
             return "lookup";
         }
-        public string FindAvatarKey2Name(UUID avatar_uuid)
+
+
+        protected string FindAvatarNameInStorage(UUID avatar_uuid)
         {
-            return FindAvatarKey2Name(avatar_uuid, false);
-        }
-        public string FindAvatarKey2Name(UUID avatar_uuid, bool skip_http)
-        {
-            if (myconfig.Name2Key_Enable == false)
-            {
-                skip_http = true;
-            }
-            long now = helpers.UnixTimeNow();
             if (AvatarKey2Name.ContainsKey(avatar_uuid) == true)
             {
-                AvatarStorageLastUsed[AvatarKey2Name[avatar_uuid]] = now;
+                AvatarStorageLastUsed[AvatarKey2Name[avatar_uuid]] = helpers.UnixTimeNow();
                 return AvatarKey2Name[avatar_uuid];
             }
-            else
+            return "";
+        }
+
+        protected string httpLookupName(UUID avatar_uuid)
+        {
+            if (myconfig.Name2Key_Enable == true)
             {
-                if (skip_http == false)
+                var client = new RestClient(myconfig.Name2Key_Url);
+                var request = new RestRequest("key2name/" + avatar_uuid.ToString() + "/" + myconfig.Name2Key_Key + "", Method.GET);
+                client.Timeout = 3000; // ? does this even do anything
+                request.Timeout = 3000;
+                IRestResponse endpoint_checks = client.Get(request);
+                if (endpoint_checks.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    var client = new RestClient(myconfig.Name2Key_Url);
-                    var request = new RestRequest("key2name/" + avatar_uuid.ToString() + "/" + myconfig.Name2Key_Key + "", Method.GET);
-                    client.Timeout = 3000; // ? does this even do anything
-                    request.Timeout = 3000;
-                    IRestResponse endpoint_checks = client.Get(request);
-                    if (endpoint_checks.StatusCode == System.Net.HttpStatusCode.OK)
+                    try
                     {
-                        try
+                        namekeyservicereply server_reply = JsonConvert.DeserializeObject<namekeyservicereply>(endpoint_checks.Content);
+                        if (server_reply.status == true)
                         {
-                            namekeyservicereply server_reply = JsonConvert.DeserializeObject<namekeyservicereply>(endpoint_checks.Content);
-                            if (server_reply.status == true)
+                            if (server_reply.found == true)
                             {
-                                if(server_reply.found == true)
-                                {
-                                    AddAvatarToDB((UUID)server_reply.uuid, server_reply.name);
-                                    return server_reply.name;
-                                }
+                                AddAvatarToDB((UUID)server_reply.uuid, server_reply.name);
+                                return server_reply.name;
                             }
                         }
-                        catch
-                        {
-
-                        }
                     }
-                    return FindAvatarKey2Name(avatar_uuid, true);
-                }
-                else
-                {
-                    if (PendingAvatarFinds_viauuid.ContainsKey(avatar_uuid) == false)
+                    catch
                     {
-                        PendingAvatarFinds_viauuid.Add(avatar_uuid, new KeyValuePair<long, int>(now, 0));
-                        Client.Avatars.RequestAvatarName(avatar_uuid);
+
                     }
                 }
-                return "lookup";
             }
+            return "";
+        }
+
+
+        public string FindAvatarKey2Name(UUID avatar_uuid)
+        {
+            string avatar_name = FindAvatarNameInStorage(avatar_uuid);
+            if (avatar_name != "")
+            {
+                return avatar_name;
+            }
+            avatar_name = httpLookupName(avatar_uuid);
+            if (avatar_name != "")
+            {
+                return avatar_name;
+            }
+            if (PendingAvatarFinds_viauuid.ContainsKey(avatar_uuid) == false)
+            {
+                PendingAvatarFinds_viauuid.Add(avatar_uuid, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 0));
+                Client.Avatars.RequestAvatarName(avatar_uuid);
+            }
+            return "lookup";
         }
 
         protected virtual void FoundMasterAvatar()

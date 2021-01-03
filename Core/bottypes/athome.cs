@@ -9,165 +9,52 @@ namespace BSB.bottypes
 {
     public abstract class AtHome : MessageSwitcherBot
     {
-        protected long ConnectionLostAt = 0;
+        protected long last_tp_attempt_unixtime;
+        protected string last_attempted_teleport_region = "";
+        protected bool after_login_fired;
+        protected int last_tested_home_id = -1;
+        protected Dictionary<string, long> avoid_sims = new Dictionary<string, long>();
+        protected bool teleport_lockout;
+
         protected override void AfterBotLoginHandler()
         {
             base.AfterBotLoginHandler();
-            Info("Home regions count: " + myconfig.Basic_HomeRegions.Length.ToString() + "");
+            last_tested_home_id = -1;
             last_tp_attempt_unixtime = helpers.UnixTimeNow() + 30;
-            if (reconnect == true)
+            if (after_login_fired == false)
             {
-                ResetAtHome();
-            }
-            else
-            {
+                Info("Home regions count: " + myconfig.Basic_HomeRegions.Length.ToString() + "");
                 Client.Self.AlertMessage += AlertEvent;
                 Client.Network.SimChanged += ChangeSim;
-            }
-            if (Client.Network.Connected == true)
-            {
-                if (Client.Network.CurrentSim != null)
-                {
-                    if (IsSimHome(Client.Network.CurrentSim.Name) == true)
-                    {
-                        if (UUID.TryParse(myconfig.Setting_DefaultSit_UUID, out UUID sit_UUID) == true)
-                        {
-                            Client.Self.RequestSit(sit_UUID, Vector3.Zero);
-                        }
-                    }
-                }
-            }
-            after_login_fired = true;
-        }
-
-        protected string FirstLoginStage()
-        {
-            long dif = helpers.UnixTimeNow() - last_reconnect_attempt;
-            if (login_auto_logout == true)
-            {
-                if (last_reconnect_attempt == 0)
-                {
-                    last_reconnect_attempt = helpers.UnixTimeNow();
-                    return login_status;
-                }
-                else
-                {
-                    if (auto_logout_login_recover == false)
-                    {
-                        auto_logout_login_recover = true;
-                        last_reconnect_attempt = helpers.UnixTimeNow();
-                        return "W4>" + login_status + " (20 secs)";
-                    }
-                    else if (dif >= 20)
-                    {
-                        login_auto_logout = false;
-                        auto_logout_login_recover = false;
-                        last_reconnect_attempt = helpers.UnixTimeNow();
-                        Start(true);
-                        return "Restarting first login [Using Alt locations]";
-                    }
-                    return "Waiting for cooldown";
-                }
-            }
-            else
-            {
-                return login_status;
+                after_login_fired = true;
+                reconnect = true;
             }
         }
 
-        protected string LoggedInConnectionLost()
-        {
-            long dif = helpers.UnixTimeNow() - last_reconnect_attempt;
-            if (reconnect_mode == true)
-            {
-                last_tested_home_id = -1;
-                last_tp_attempt_unixtime = 0;
-                after_login_fired = false;
-                teleported = false;
-                reconnect_mode = false;
-                last_reconnect_attempt = helpers.UnixTimeNow();
-                return "Connection lost - switching to recovery mode";
-            }
-            else
-            {
-                if (dif <= 60)
-                {
-                    return "W4> Network reset timeout [60 secs]";
-                }
-                else
-                {
-                    if (last_reconnect_attempt == 0)
-                    {
-                        last_reconnect_attempt = helpers.UnixTimeNow();
-                        return "First connection failed";
-                    }
-                    else
-                    {
-                        last_reconnect_attempt = helpers.UnixTimeNow();
-                        if (after_login_fired == true)
-                        {
-                            reconnect = true;
-                        }
-                        login_failed = false;
-                        login_auto_logout = false;
-                        Start(true);
-                        if (reconnect == true)
-                        {
-                            return "Attempting reconnect";
-                        }
-                        return "Trying to connect again";
-                    }
-                }
-            }
-        }
-
-        protected string LoggedOutNextAction()
-        {
-            if (login_failed == true)
-            {
-                return LoggedInConnectionLost();
-            }
-            else if (login_auto_logout == true)
-            {
-                return FirstLoginStage();
-            }
-            return "";
-        }
-        protected int last_tested_home_id = -1;
-        protected long last_tp_attempt_unixtime;
-        protected bool after_login_fired;
-
-        
-        protected long last_reconnect_attempt;
-        protected bool reconnect_mode;
-        protected string last_attempted_teleport_region = "";
-        protected Dictionary<string, long> avoid_sims = new Dictionary<string, long>();
-        protected bool SimShutdownAvoid;
-        protected long SimShutdownAvoidCooldown = 0;
-        protected bool auto_logout_login_recover;
-
+       
         protected void ChangeSim(object sender,SimChangedEventArgs e)
         {
-            if (Client.Network.CurrentSim.Name != last_attempted_teleport_region)
+            if (teleport_lockout == false)
             {
-                if (IsSimHome(Client.Network.CurrentSim.Name) == false)
+                if (last_attempted_teleport_region != "")
                 {
-                    SetTeleported();
+                    if (last_attempted_teleport_region != Client.Network.CurrentSim.Name)
+                    {
+                        teleport_lockout = true;
+                        Info("Teleport by script/master detected - @home lock out enabled");
+                    }
                 }
                 else
                 {
-                    if (UUID.TryParse(myconfig.Setting_DefaultSit_UUID, out UUID sit_UUID) == true)
-                    {
-                        Client.Self.RequestSit(sit_UUID, Vector3.Zero);
-                    }
+                    last_attempted_teleport_region = Client.Network.CurrentSim.Name;
+                    Info("Connected to region");
                 }
             }
-            else
+            if (IsSimHome(Client.Network.CurrentSim.Name) == true)
             {
-                if (SimShutdownAvoid == true)
+                if (UUID.TryParse(myconfig.Setting_DefaultSit_UUID, out UUID sit_UUID) == true)
                 {
-                    Status("Avoided sim shutdown will attempt to go home in 4 mins");
-                    SimShutdownAvoid = false;
+                    Client.Self.RequestSit(sit_UUID, Vector3.Zero);
                 }
             }
         }
@@ -177,11 +64,8 @@ namespace BSB.bottypes
             {
                 // oh snap region is dead run away
                 Info("--- Sim Restarting ---");
-                if (avoid_sims.ContainsKey(Client.Network.CurrentSim.Name) == false)
-                {
-                    avoid_sims.Add(Client.Network.CurrentSim.Name, helpers.UnixTimeNow() + (10 * 60));
-                }
-                GotoNextHomeRegion(true);
+                AvoidSim(Client.Network.CurrentSim.Name);
+                GotoNextHomeRegion();
             }
         }
 
@@ -189,11 +73,10 @@ namespace BSB.bottypes
         {
             Debug("@home / ResetAtHome");
             last_tested_home_id = -1;
-            after_login_fired = false;
-            teleported = false;
-            reconnect_mode = false;
-            last_tp_attempt_unixtime = 0;
+            teleport_lockout = false;
+            last_attempted_teleport_region = "";
             avoid_sims = new Dictionary<string, long>();
+            last_tp_attempt_unixtime = helpers.UnixTimeNow() + 30;
         }
 
 
@@ -202,7 +85,7 @@ namespace BSB.bottypes
         {
             if (avoid_sims.ContainsKey(simname) == false)
             {
-                Debug("@home / AvoidSim: " + simname);
+                Debug("@home / Avoiding sim: " + simname);
                 avoid_sims.Add(simname, helpers.UnixTimeNow() + 240); // @home will avoid that sim for the next 4 mins
             }
         }
@@ -213,10 +96,6 @@ namespace BSB.bottypes
             {
                 List<string> remove_keys = new List<string>();
                 long now = helpers.UnixTimeNow();
-                if (GetClient.Network.Connected == false)
-                {
-                    now -= 240; // when logged out, add 240s to all sims we are avoiding
-                }
                 foreach (KeyValuePair<string,long> avoids in avoid_sims)
                 {
                     if(avoids.Value < now)
@@ -270,68 +149,72 @@ namespace BSB.bottypes
 
         public string LoggedinAthome()
         {
-            string addon = "";
-            if(IsSimHome(Client.Network.CurrentSim.Name) == true)
+            string addon = "Waiting for action";
+            if (teleport_lockout == false)
             {
-                addon = "Home region";
-            }
-            else
-            {
-                if (SimShutdownAvoid == false)
+                if (IsSimHome(Client.Network.CurrentSim.Name) == true)
                 {
-                    long dif = SimShutdownAvoidCooldown - helpers.UnixTimeNow();
-                    if (dif < 0)
-                    {
-                        dif = helpers.UnixTimeNow() - last_tp_attempt_unixtime;
-                        if (dif > 30)
-                        {
-                            if (teleported == false)
-                            {
-                                addon = GotoNextHomeRegion(false);
-                            }
-                            else
-                            {
-                                addon = "- Teleported by script/master -";
-                            }
-                        }
-                        else
-                        {
-                            addon = "Busy with TP cooldown";
-                        }
-                    }
-                    else
-                    {
-                        if (avoid_sims.Keys.Contains(Client.Network.CurrentSim.Name) == true)
-                        {
-                            dif = helpers.UnixTimeNow() - last_tp_attempt_unixtime;
-                            if (dif > 45)
-                            {
-                                addon = GotoNextHomeRegion(true);
-                            }
-                            else
-                            {
-                                addon = "Avoid teleport underway";
-                            }
-                        }
-                        else
-                        {
-                            double mins = Math.Round((double)dif / 60);
-                            int min = (int)mins;
-                            addon = "Hiding from the storm ("+min.ToString()+" mins remain)";
-                        }
-                    }
+                    addon = "Home region";
                 }
                 else
                 {
-                    addon = "Avoiding sim shutdown [TP underway]";
+                    long dif = last_tp_attempt_unixtime - helpers.UnixTimeNow();
+                    if (dif > 0)
+                    {
+                        addon = "Waiting for TP cooldown";
+                    }
+                    else
+                    {
+                        GotoNextHomeRegion();
+                    }
                 }
+            }
+            else
+            {
+                addon = "Lockout";
             }
             return addon;
         }
 
-        public string GotoNextHomeRegion()
+
+        protected long login_failed_retry_at = 0;
+        public string AtHomeReconnect()
         {
-            return GotoNextHomeRegion(false);
+            if (attempted_first_login == true)
+            {
+                if (login_failed == false)
+                {
+                    return login_status;
+                }
+                else
+                {
+                    if(login_failed_retry_at == 0)
+                    {
+                        login_failed_retry_at = helpers.UnixTimeNow() + 40;
+                        return login_status + " Retrying in 40 secs";
+                    }
+                    else
+                    {
+                        long dif = login_failed_retry_at - helpers.UnixTimeNow();
+                        if(dif > 0)
+                        {
+                            login_failed_retry_at = 0;
+                            attempted_first_login = false;
+                            Start(true);
+                            return "Attempting reconnect";
+                        }
+                        else
+                        {
+                            return "Waiting for reconnect - " + dif.ToString() + " secs";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return "Waiting";
+            }
+
         }
 
         protected override string[] getNextHomeArgs()
@@ -357,71 +240,45 @@ namespace BSB.bottypes
             return new string[] { };
         }
 
-        protected string GotoNextHomeRegion(bool panic_mode)
+        public string GotoNextHomeRegion()
         {
-            if (panic_mode == false)
+            if (myconfig.Basic_HomeRegions.Length > 0)
             {
-                if (myconfig.Basic_HomeRegions.Length > 0)
-                {
-                    last_tp_attempt_unixtime = helpers.UnixTimeNow();
-                    string UseSLurl = "";
-                    foreach (string Slurl in myconfig.Basic_HomeRegions)
-                    {
-                        string simname = helpers.RegionnameFromSLurl(Slurl);
-                        if (avoid_sims.Keys.Contains(simname) == false)
-                        {
-                            UseSLurl = Slurl;
-                            break;
-                        }
-                    }
-                    if (UseSLurl != "")
-                    {
-                        string simname = helpers.RegionnameFromSLurl(UseSLurl);
-                        if (simname != last_attempted_teleport_region)
-                        {
-                            string whyrejected = TeleportWithSLurl(UseSLurl);
-                            if (whyrejected == "ok")
-                            {
-                                AvoidSim(simname);
-                                return "**** active teleport: " + last_attempted_teleport_region + "***";
-                            }
-                            AvoidSim(simname);
-                            return "TP to " + simname + " rejected - " + whyrejected;
-                        }
-                    }
-                    return "No other sims found to teleport to [Maybe only 1 home region?]";
-                }
-                return "No home regions";
-            }
-            else
-            {
-                SimShutdownAvoid = true;
-                SimShutdownAvoidCooldown = helpers.UnixTimeNow() + (60 * 10);
+                last_tp_attempt_unixtime = helpers.UnixTimeNow();
+                List<string> tested_sims = new List<string>();
                 string UseSLurl = "";
-                foreach (string Slurl in myconfig.Basic_HomeRegions)
+                string simname = "";
+                while ((tested_sims.Count() != myconfig.Basic_HomeRegions.Length) && (UseSLurl == ""))
                 {
-                    string simname = helpers.RegionnameFromSLurl(Slurl);
-                    if (avoid_sims.Keys.Contains(simname) == false)
+                    last_tested_home_id++;
+                    if (last_tested_home_id > myconfig.Basic_HomeRegions.Length)
                     {
-                        UseSLurl = Slurl;
-                        break;
+                        last_tested_home_id = 0;
+                    }
+                    UseSLurl = myconfig.Basic_HomeRegions[last_tested_home_id];
+                    simname = helpers.RegionnameFromSLurl(UseSLurl);
+                    if (simname != last_attempted_teleport_region)
+                    {
+                        if (avoid_sims.ContainsKey(simname) == true)
+                        {
+                            UseSLurl = "";
+                        }
                     }
                 }
                 if (UseSLurl != "")
                 {
-                    TeleportWithSLurl(UseSLurl);
-                    Status("Attempting panic evac to: "+ last_attempted_teleport_region+"");
-                    AvoidSim(UseSLurl); // black list that region so we dont try to go back there if we get a shutdown notice again
+                    string whyrejected = TeleportWithSLurl(UseSLurl);
+                    if (whyrejected == "ok")
+                    {
+                        AvoidSim(simname);
+                        return "**** active teleport: " + last_attempted_teleport_region + "***";
+                    }
+                    AvoidSim(simname);
+                    return "TP to " + simname + " rejected - " + whyrejected;
                 }
-                else
-                {
-                    Status("No vaild SLurl found, Teleporting to backup hub");
-                    string[] Hubs = new[] { "https://maps.secondlife.com/secondlife/Morris/28/228/40/", "https://maps.secondlife.com/secondlife/Ahern/28/28/40/",
-                            "https://maps.secondlife.com/secondlife/Bonifacio/228/228/40/","https://maps.secondlife.com/secondlife/Dore/228/28/40/" };
-                    TeleportWithSLurl(Hubs[new Random().Next(0, Hubs.Length - 1)]);
-                }
-                return "Panic mode";
+                return "No other sims found to teleport to";
             }
+            return "No home regions";
         }
 
 
@@ -434,7 +291,7 @@ namespace BSB.bottypes
         public override string GetStatus()
         {
             ExpireOldAvoidSims();
-            string reply;
+            string reply = "Disconnected: No action";
             if (Client.Network.Connected == true)
             {
                 if (Client.Network.CurrentSim != null)
@@ -443,17 +300,18 @@ namespace BSB.bottypes
                     {
                         AfterBotLoginHandler();
                     }
-                    reply = AtHomeStatus(LoggedinAthome());
+                    reply = LoggedinAthome();
                 }
                 else
                 {
-                    reply = AtHomeStatus("No Sim");
+                    reply = "Connected: No Sim";
                 }
             }
             else
             {
-                reply = AtHomeStatus(LoggedOutNextAction());
+                reply = AtHomeReconnect();
             }
+            reply = AtHomeStatus(reply);
             if (reply != AtHome_laststatus)
             {
                 AtHome_laststatus = reply;
