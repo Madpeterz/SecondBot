@@ -264,6 +264,7 @@ namespace BSB.bottypes
                             UseSLurl = "";
                         }
                     }
+                    tested_sims.Add(simname);
                 }
                 if (UseSLurl != "")
                 {
