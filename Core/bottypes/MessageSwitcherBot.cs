@@ -52,8 +52,9 @@ namespace BSB.bottypes
         {
             BotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, false);
         }
-        protected virtual void BotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar,bool group, UUID group_uuid, bool localchat,bool fromme)
+        protected override void BotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar,bool group, UUID group_uuid, bool localchat,bool fromme)
         {
+            base.BotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
             if (fromme == false)
             {
                 if (localchat == false)
