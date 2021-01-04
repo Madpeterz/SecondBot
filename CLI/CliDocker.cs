@@ -1,4 +1,5 @@
-﻿using BetterSecondBotShared.IO;
+﻿using BetterSecondBot.DiscordSupervisor;
+using BetterSecondBotShared.IO;
 using BetterSecondBotShared.Json;
 using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
@@ -17,7 +18,7 @@ namespace BetterSecondBot
             LogFormater.Status("-> Getting config from Docker");
             JsonConfig Config = MakeJsonConfig.FromENV();
             Config = MakeJsonConfig.Http_config_check(Config);
-            new CliExitOnLogout(Config,true);
+            new DiscordTTS(Config,true);
         }
     }
 }

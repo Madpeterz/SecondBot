@@ -14,12 +14,35 @@ namespace BetterSecondBot
 {
     public class CliExitOnLogout
     {
-        public CliExitOnLogout(JsonConfig Config, bool as_docker)
+        public bool Exited { get { return exitBot; } }
+        protected bool exitBot = false;
+        public SecondBot Bot;
+
+        protected void keep_alive()
         {
+            while (Bot.KillMe == false)
+            {
+                string NewStatusMessage = Bot.GetStatus();
+                if (NewStatusMessage != Bot.LastStatusMessage)
+                {
+                    NewStatusMessage = NewStatusMessage.Trim();
+                    if (NewStatusMessage.Replace(" ", "") != "")
+                    {
+                        Bot.LastStatusMessage = NewStatusMessage;
+                        Bot.Log2File(LogFormater.Status(Bot.LastStatusMessage, false), ConsoleLogLogLevel.Status);
+                    }
+                }
+                Thread.Sleep(1000);
+            }
+            Bot.GetClient.Network.Logout();
+        }
+        public CliExitOnLogout(JsonConfig Config, bool as_docker, bool use_self_keep_alive)
+        {
+            exitBot = false;
             LogFormater.Status("Mode: Cli [Basic]");
             if (helpers.botRequired(Config) == true)
             {
-                SecondBot Bot = new SecondBot();
+                Bot = new SecondBot();
                 Bot.Setup(Config, AssemblyInfo.GetGitHash());
                 if(as_docker == true)
                 {
@@ -31,25 +54,18 @@ namespace BetterSecondBot
                     SecondBotHttpServer my_http_server = new SecondBotHttpServer();
                     my_http_server.StartHttpServer(Bot, Config);
                 }
-                while (Bot.KillMe == false)
+                if(use_self_keep_alive == true)
                 {
-                    string NewStatusMessage = Bot.GetStatus();
-                    if (NewStatusMessage != Bot.LastStatusMessage)
-                    {
-                        NewStatusMessage = NewStatusMessage.Trim();
-                        if (NewStatusMessage.Replace(" ", "") != "")
-                        {
-                            Bot.LastStatusMessage = NewStatusMessage;
-                            Bot.Log2File(LogFormater.Status(Bot.LastStatusMessage, false), ConsoleLogLogLevel.Status);
-                        }
-                    }
-                    Thread.Sleep(1000);
+                    keep_alive();
                 }
-                Bot.GetClient.Network.Logout();
             }
             else
             {
                 LogFormater.Warn("Required settings missing");
+            }
+            if (use_self_keep_alive == true)
+            {
+                exitBot = true;
             }
         }
     }

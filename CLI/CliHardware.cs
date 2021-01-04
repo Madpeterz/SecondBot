@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using System;
 using static BetterSecondBot.Program;
 using BetterSecondBotShared.logs;
+using BetterSecondBot.DiscordSupervisor;
+
 namespace BetterSecondBot
 {
     public class CliHardware
@@ -77,7 +79,7 @@ namespace BetterSecondBot
             if(ok_to_try_start == true)
             {
                 Config = MakeJsonConfig.Http_config_check(Config);
-                new CliExitOnLogout(Config,false);
+                new DiscordTTS(Config, false);
             }
         }
     }
