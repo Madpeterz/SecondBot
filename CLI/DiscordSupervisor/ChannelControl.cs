@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.DiscordSupervisor
 {
-    public abstract class DiscordBotChannelControl : DiscordBotFunctions
+    public abstract class DiscordChannelControl : DiscordFunctions
     {
 
-        protected async Task SendMessageToChannelAsync(string channelname, string message, string catmapid, UUID sender_id, string TopicType)
+        protected async Task<IUserMessage> SendMessageToChannelAsync(string channelname, string message, string catmapid, UUID sender_id, string TopicType)
         {
             if (AllowNewOutbound() == true)
             {
@@ -20,9 +20,10 @@ namespace BSB.bottypes
                 ITextChannel Channel = await FindTextChannel(channelname, catmap[catmapid], sender_id, TopicType).ConfigureAwait(false);
                 if (Channel != null)
                 {
-                    await Channel.SendMessageAsync(message);
+                    return await Channel.SendMessageAsync(message);
                 }
             }
+            return null;
         }
 
         protected async Task<ITextChannel> FindTextChannel(string channelname, ICategoryChannel cat, UUID sender, string TopicType)
@@ -169,7 +170,10 @@ namespace BSB.bottypes
             }
             else if (sender_id == UUID.Zero.ToString())
             {
-                display_topic = "" + myconfig.Basic_BotUserName + " #" + MyVersion + "";
+                if (controler.Bot != null)
+                {
+                    display_topic = "" + myconfig.Basic_BotUserName + " #" + controler.Bot.MyVersion + "";
+                }
             }
             else if (channeltopictype == "Group")
             {
@@ -242,13 +246,17 @@ namespace BSB.bottypes
             {
                 _ = await FindTextChannel(A, catmap["bot"], UUID.Zero, "bot").ConfigureAwait(false);
             }
-            foreach (Group G in mygroups.Values)
+
+            if (HasBot() == true)
             {
-                string groupname = G.Name.ToLowerInvariant();
-                groupname = String.Concat(groupname.Where(char.IsLetterOrDigit));
-                if (GroupChannels.Contains(groupname) == false)
+                foreach (Group G in controler.Bot.MyGroups.Values)
                 {
-                    _ = await FindTextChannel(groupname, catmap["group"], G.ID, "Group").ConfigureAwait(false);
+                    string groupname = G.Name.ToLowerInvariant();
+                    groupname = String.Concat(groupname.Where(char.IsLetterOrDigit));
+                    if (GroupChannels.Contains(groupname) == false)
+                    {
+                        _ = await FindTextChannel(groupname, catmap["group"], G.ID, "Group").ConfigureAwait(false);
+                    }
                 }
             }
         }

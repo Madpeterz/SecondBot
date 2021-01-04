@@ -144,7 +144,7 @@ namespace BSB.bottypes
             }
         }
 
-        protected void custom_commands_loop(string command,string arg,UUID caller)
+        public void custom_commands_loop(string command,string arg,UUID caller)
         {
             List<string> customargs = arg.Split(new[] { "~#~" }, StringSplitOptions.RemoveEmptyEntries).ToList();
             while(customargs.Count < 5)

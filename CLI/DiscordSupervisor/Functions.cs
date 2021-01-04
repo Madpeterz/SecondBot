@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.DiscordSupervisor
 {
-    public abstract class DiscordBotFunctions : Values
+    public abstract class DiscordFunctions : DiscordValues
     {
         protected Task WaitForUnlock()
         {
@@ -36,15 +36,6 @@ namespace BSB.bottypes
         {
             DiscordUnixTimeOnine = 0;
             await DiscordClient.LogoutAsync();
-        }
-
-        public override void KillMePlease()
-        {
-            base.KillMePlease();
-            if (DiscordClient != null)
-            {
-                _ = DiscordKillMePlease();
-            }
         }
 
     }

@@ -6,24 +6,33 @@ using BetterSecondBotShared.Static;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Linq;
+using BetterSecondBotShared.Json;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.DiscordSupervisor
 {
-    public abstract class DiscordBotTTS : DiscordBot
+    public class DiscordTTS : Discord_super
     {
+        public DiscordTTS(JsonConfig configfile, bool as_docker) : base(configfile, as_docker)
+        {
+
+        }
         protected ITextChannel TTSchannel;
         protected IGuild TTSDiscordServer;
         protected override async Task<Task> DiscordClientReady()
         {
             await base.DiscordClientReady();
-            TTSDiscordServer = DiscordClient.GetGuild(myconfig.DiscordTTS_server_id);
-            if (TTSDiscordServer != null)
+            if (myconfig.DiscordTTS_Enable == true)
             {
-                IGuildUser user = await TTSDiscordServer.GetCurrentUserAsync();
-                await user.ModifyAsync(x => {
-                    x.Nickname = myconfig.DiscordTTS_Nickname;
-                });
-                FindTTsChannel();
+                TTSDiscordServer = DiscordClient.GetGuild(myconfig.DiscordTTS_server_id);
+                if (TTSDiscordServer != null)
+                {
+                    IGuildUser user = await TTSDiscordServer.GetCurrentUserAsync();
+                    await user.ModifyAsync(x =>
+                    {
+                        x.Nickname = myconfig.DiscordTTS_Nickname;
+                    });
+                    FindTTsChannel();
+                }
             }
             return Task.CompletedTask;
         }
@@ -38,7 +47,6 @@ namespace BSB.bottypes
 
         protected override async Task DiscordIMMessage(UUID sender_uuid, string sender_name, string message)
         {
-            await base.DiscordIMMessage(sender_uuid, sender_name, message);
             if (myconfig.DiscordTTS_Enable == true)
             {
                 if ((helpers.notempty(sender_name) == true) && (helpers.notempty(message) == true))

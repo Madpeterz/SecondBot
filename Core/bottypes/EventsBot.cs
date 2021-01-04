@@ -60,13 +60,64 @@ namespace BSB.bottypes
 
 
     }
+
+    public class MessageEventArgs : EventArgs
+    {
+        public string message { get; }
+        public string sender_name { get; }
+        public UUID sender_uuid { get; }
+        public bool avatar { get; }
+        public bool group { get; }
+        public UUID group_uuid { get; }
+        public bool localchat { get; }
+        public bool fromme { get; }
+
+        public MessageEventArgs(string message, string sender_name, UUID sender_uuid, bool avatar, bool group, UUID group_uuid, bool localchat, bool fromme)
+        {
+            this.message = message;
+            this.sender_name = sender_name;
+            this.sender_uuid = sender_uuid;
+            this.avatar = avatar;
+            this.group = group;
+            this.group_uuid = group_uuid;
+            this.localchat = localchat;
+            this.fromme = fromme;
+        }
+    }
+
     public class EventsBot : VoidEventBot
     {
+        private EventHandler<MessageEventArgs> _MessageEvent;
+
+        private readonly object _MessageEventLock = new object();
+
+        /// <summary>Raised when a request we sent to friend another agent is accepted or declined</summary>
+        public event EventHandler<MessageEventArgs> MessageEvent
+        {
+            add { lock (_MessageEventLock) { _MessageEvent += value; } }
+            remove { lock (_MessageEventLock) { _MessageEvent -= value; } }
+        }
+
+        protected  void On_MessageEvent(MessageEventArgs e)
+        {
+            EventHandler<MessageEventArgs> handler = _MessageEvent;
+            handler?.Invoke(this, e);
+        }
+
+        protected virtual void BotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar, bool group, UUID group_uuid, bool localchat, bool fromme)
+        {
+            if (_MessageEvent != null)
+            {
+                On_MessageEvent(new MessageEventArgs(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme));
+            }
+        }
+
         protected bool login_auto_logout;
         protected long delay_group_fetch;
         protected Dictionary<UUID, KeyValuePair<long, List<UUID>>> group_members_storage = new Dictionary<UUID, KeyValuePair<long, List<UUID>>>();
         protected virtual void GroupMembersReplyHandler(object sender, GroupMembersReplyEventArgs e)
         {
+
         }
 
         public bool FastCheckInGroup(UUID group,UUID avatar)

@@ -15,8 +15,8 @@ namespace BSB.bottypes
         public UUID getMaster_uuid { get { return master_uuid; } }
 
         protected Dictionary<string, long> AvatarStorageLastUsed = new Dictionary<string, long>();
-        protected Dictionary<string, UUID> AvatarName2Key = new Dictionary<string, UUID>();
-        protected Dictionary<UUID, string> AvatarKey2Name = new Dictionary<UUID, string>();
+        public Dictionary<string, UUID> AvatarName2Key = new Dictionary<string, UUID>();
+        public Dictionary<UUID, string> AvatarKey2Name = new Dictionary<UUID, string>();
         protected Dictionary<string, KeyValuePair<long, int>> PendingAvatarFinds_vianame = new Dictionary<string, KeyValuePair<long, int>>();
         protected Dictionary<UUID, KeyValuePair<long, int>> PendingAvatarFinds_viauuid = new Dictionary<UUID, KeyValuePair<long, int>>();
 
