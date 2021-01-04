@@ -32,6 +32,7 @@ namespace BetterSecondBotShared.bottypes
         }
 
         protected Dictionary<string, string[]> custom_commands = new Dictionary<string, string[]>();
+        public Dictionary<string, string[]> getCustomCommands { get { return custom_commands; } }
         protected bool loaded_custom_commands = false;
         protected void LoadCustomCommands()
         {
