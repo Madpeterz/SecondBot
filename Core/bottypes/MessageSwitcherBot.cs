@@ -8,6 +8,29 @@ namespace BSB.bottypes
 {
     public abstract class MessageSwitcherBot : EventsBot
     {
+        protected bool connected_to_groups = false;
+        public override string GetStatus()
+        {
+            if(connected_to_groups == false)
+            {
+                if (mygroups.Keys.Count() > 0)
+                {
+                    foreach (UUID group in mygroups.Keys)
+                    {
+                        Client.Self.RequestJoinGroupChat(group);
+                    }
+                    connected_to_groups = true;
+                }
+            }
+            return base.GetStatus();
+        }
+
+        protected override void AfterBotLoginHandler()
+        {
+            base.AfterBotLoginHandler();
+            connected_to_groups = false;
+        }
+
         readonly string[] hard_blocked_agents = new string[] { "secondlife", "second life"};
         protected override void ChatInputHandler(object sender, ChatEventArgs e)
         {
