@@ -214,10 +214,17 @@ namespace BetterSecondBot.DiscordSupervisor
             IReadOnlyCollection<ICategoryChannel> found_cats = await DiscordServer.GetCategoriesAsync(CacheMode.AllowDownload);
             foreach (ICategoryChannel fcat in found_cats)
             {
-                if (required_cats.Contains(fcat.Name) == true)
+                if (catmap.ContainsKey(fcat.Name) == false)
+                {
+                    if (required_cats.Contains(fcat.Name) == true)
+                    {
+                        required_cats.Remove(fcat.Name);
+                        catmap.Add(fcat.Name, fcat);
+                    }
+                }
+                else
                 {
                     required_cats.Remove(fcat.Name);
-                    catmap.Add(fcat.Name, fcat);
                 }
             }
             foreach (string A in required_cats)
@@ -236,9 +243,12 @@ namespace BetterSecondBot.DiscordSupervisor
                 }
                 else
                 {
-                    if (chan.CategoryId == catmap["group"].Id)
+                    if (GroupChannels.Contains(chan.Name) == false)
                     {
-                        GroupChannels.Add(chan.Name);
+                        if (chan.CategoryId == catmap["group"].Id)
+                        {
+                            GroupChannels.Add(chan.Name);
+                        }
                     }
                 }
             }

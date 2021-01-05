@@ -62,7 +62,15 @@ namespace BetterSecondBot.DiscordSupervisor
                             await TTSchannel.SendMessageAsync(message, true);
                         }
                     }
+                    else
+                    {
+                        await base.DiscordIMMessage(sender_uuid, sender_name, message);
+                    }
                 }
+            }
+            else
+            {
+                await base.DiscordIMMessage(sender_uuid, sender_name, message);
             }
         }
     }

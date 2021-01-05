@@ -12,7 +12,6 @@ namespace BSB.bottypes
 
         protected override void AfterBotLoginHandler()
         {
-            base.AfterBotLoginHandler();
             if (reconnect == false)
             {
                 Client.Groups.GroupRoleDataReply += GroupRolesData;
@@ -20,6 +19,7 @@ namespace BSB.bottypes
                 Client.Groups.GroupMembersReply += GroupMembersReplyHandler;
                 Client.Parcels.ParcelObjectOwnersReply += ObjectOwnersHandler;
             }
+            base.AfterBotLoginHandler();
         }
         protected override void GroupMembersReplyHandler(object sender, GroupMembersReplyEventArgs e)
         {

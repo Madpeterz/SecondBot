@@ -11,11 +11,11 @@ namespace BSB.bottypes
 
         protected override void AfterBotLoginHandler()
         {
-            base.AfterBotLoginHandler();
             if (reconnect == false)
             {
                 Client.Avatars.AvatarAnimation += AvatarAnimationHandler;
             }
+            base.AfterBotLoginHandler();
         }
 
         public override void ResetAnimations()

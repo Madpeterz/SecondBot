@@ -23,6 +23,8 @@ namespace BetterSecondBot.DiscordSupervisor
 
         protected virtual async Task<Task> DiscordClientReady()
         {
+            await DiscordClient.SetStatusAsync(Discord.UserStatus.Idle);
+            await DiscordClient.SetGameAsync("Not connected", null, ActivityType.CustomStatus);
             DiscordServer = DiscordClient.GetGuild(myconfig.DiscordFull_ServerID);
             if (DiscordServer != null)
             {

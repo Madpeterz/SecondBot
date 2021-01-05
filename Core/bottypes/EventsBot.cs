@@ -45,12 +45,12 @@ namespace BSB.bottypes
 
         protected override void AfterBotLoginHandler()
         {
-            base.AfterBotLoginHandler();
             if (reconnect == false)
             {
                 Client.Network.RegisterCallback(PacketType.SetFollowCamProperties, SetFollowCamPropertiesPacketHandler);
             }
             delay_appearence_update = 0; // reset Appearance helper
+            base.AfterBotLoginHandler();
         }
 
         protected void SetFollowCamPropertiesPacketHandler(object sender, PacketReceivedEventArgs e)
@@ -59,6 +59,26 @@ namespace BSB.bottypes
         }
 
 
+    }
+    public class StatusMessageEvent : EventArgs
+    {
+        public bool connected  { get; }
+        public string sim { get; }
+
+        public StatusMessageEvent(bool connected,string sim)
+        {
+            this.connected = connected;
+            this.sim = sim;
+        }
+    }
+    public class GroupEventArgs : EventArgs
+    {
+        public bool ready { get; }
+
+        public GroupEventArgs(bool ready)
+        {
+            this.ready = ready;
+        }
     }
 
     public class MessageEventArgs : EventArgs
@@ -88,19 +108,44 @@ namespace BSB.bottypes
     public class EventsBot : VoidEventBot
     {
         private EventHandler<MessageEventArgs> _MessageEvent;
+        private EventHandler<StatusMessageEvent> _StatusMessageEvent;
+        private EventHandler<GroupEventArgs> _GroupsEvent;
 
         private readonly object _MessageEventLock = new object();
+        private readonly object _StatusMessageEventlock = new object();
+        private readonly object _GroupsEventLock = new object();
 
-        /// <summary>Raised when a request we sent to friend another agent is accepted or declined</summary>
         public event EventHandler<MessageEventArgs> MessageEvent
         {
             add { lock (_MessageEventLock) { _MessageEvent += value; } }
             remove { lock (_MessageEventLock) { _MessageEvent -= value; } }
         }
+        public event EventHandler<StatusMessageEvent> StatusMessageEvent
+        {
+            add { lock (_StatusMessageEventlock) { _StatusMessageEvent += value; } }
+            remove { lock (_StatusMessageEventlock) { _StatusMessageEvent -= value; } }
+        }
+        public event EventHandler<GroupEventArgs> GroupsReadyEvent
+        {
+            add { lock (_GroupsEventLock) { _GroupsEvent += value; } }
+            remove { lock (_GroupsEventLock) { _GroupsEvent -= value; } }
+        }
 
         protected  void On_MessageEvent(MessageEventArgs e)
         {
             EventHandler<MessageEventArgs> handler = _MessageEvent;
+            handler?.Invoke(this, e);
+        }
+
+        protected void On_StatusMessageEvent(StatusMessageEvent e)
+        {
+            EventHandler<StatusMessageEvent> handler = _StatusMessageEvent;
+            handler?.Invoke(this, e);
+        }
+
+        protected void On_GroupsReadyEvent(GroupEventArgs e)
+        {
+            EventHandler<GroupEventArgs> handler = _GroupsEvent;
             handler?.Invoke(this, e);
         }
 
@@ -201,8 +246,22 @@ namespace BSB.bottypes
                     }
                 }
             }
+            if (Client.Network.CurrentSim != null)
+            {
+                On_StatusMessageEvent(new StatusMessageEvent(true, Client.Network.CurrentSim.Name));
+            }
+            else
+            {
+                On_StatusMessageEvent(new StatusMessageEvent(true, "None"));
+            }
             return base.GetStatus();
         }
+        public override void KillMePlease()
+        {
+            On_StatusMessageEvent(new StatusMessageEvent(false, "None"));
+            base.KillMePlease();
+        }
+
         protected string login_status = "Waiting to login";
         protected override void LoginHandler(object o, LoginProgressEventArgs e)
         {
@@ -252,11 +311,12 @@ namespace BSB.bottypes
             {
                 Client.Self.RequestJoinGroupChat(entry.Value.ID);
             }
+            On_GroupsReadyEvent(new GroupEventArgs(true));
+
         }
 
         protected override void AfterBotLoginHandler()
         {
-            base.AfterBotLoginHandler();
             if (reconnect == false)
             {
                 Client.Self.ChatFromSimulator += ChatInputHandler;
@@ -266,6 +326,7 @@ namespace BSB.bottypes
                 Client.Friends.FriendshipResponse += FriendshipResponse;
                 delay_group_fetch = helpers.UnixTimeNow() + 10;
             }
+            base.AfterBotLoginHandler();
         }
 
         protected virtual void FriendshipResponse(object o, FriendshipResponseEventArgs E)

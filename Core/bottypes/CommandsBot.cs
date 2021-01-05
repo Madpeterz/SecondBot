@@ -191,12 +191,12 @@ namespace BSB.bottypes
 
         protected override void AfterBotLoginHandler()
         {
-            base.AfterBotLoginHandler();
             if (reconnect == false)
             {
                 CommandsInterface = new Commands.CoreCommandsInterface(this);
             }
             Client.Self.RequestBalance();
+            base.AfterBotLoginHandler();
         }
 
         protected override void CoreCommandLib(UUID fromUUID, bool from_accepted_avatar, string command, string arg, string signing_code, string signed_with)

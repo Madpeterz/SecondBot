@@ -124,7 +124,7 @@ namespace BetterSecondBotShared.bottypes
         public bool GetAllowFunds { get { return myconfig.Setting_AllowFunds; } }
         public string LastStatusMessage { get; set; }
 
-        public bool KillMe { get { return killMe; } }
+        public virtual bool KillMe { get { return killMe; } }
 
         protected bool teleported;
         public void SetTeleported()

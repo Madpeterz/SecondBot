@@ -1,4 +1,5 @@
 ﻿using OpenMetaverse;
+using System;
 
 namespace BetterSecondBot.DiscordSupervisor
 {
@@ -67,6 +68,5 @@ namespace BetterSecondBot.DiscordSupervisor
             }
             return reply;
         }
-
     }
 }

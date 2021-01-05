@@ -27,8 +27,8 @@ namespace BSB.bottypes
 
         protected override void AfterBotLoginHandler()
         {
-            base.AfterBotLoginHandler();
             connected_to_groups = false;
+            base.AfterBotLoginHandler();
         }
 
         readonly string[] hard_blocked_agents = new string[] { "secondlife", "second life"};
