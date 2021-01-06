@@ -77,8 +77,9 @@ namespace BSB.bottypes
             }
             return commands.ToArray();
         }
-        public virtual void SendIM(UUID avatar,string message)
+        public override void SendIM(UUID avatar,string message)
         {
+            base.SendIM(avatar, message);
             AddToIMchat(avatar, GetClient.Self.Name, message);
             Client.Self.InstantMessage(avatar, message);
         }

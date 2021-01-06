@@ -184,16 +184,18 @@ namespace BetterSecondBot.DiscordSupervisor
                 }
                 else
                 {
+                    await MarkMessage(message, "⏳").ConfigureAwait(true);
+                    Thread.Sleep(200);
                     string[] bits = Chan.Topic.Split(':');
                     if (bits.Length >= 2)
                     {
                         if (bits[0] == "IM")
                         {
                             if (UUID.TryParse(bits[1], out UUID avatar) == true)
-                            {
-                                IGuildUser user = (IGuildUser)message.Author;
-                                controler.Bot.GetClient.Self.InstantMessage(avatar, message.Content);
-                                await MarkMessage(message, "✅");
+                            { 
+                                string content = message.Content;
+                                await message.DeleteAsync().ConfigureAwait(true);
+                                SendIM(avatar, content);
                             }
                         }
                     }

@@ -12,10 +12,22 @@ namespace BetterSecondBot.DiscordSupervisor
         {
             controler.Bot.MessageEvent += BotChatControlerHandler;
             controler.Bot.StatusMessageEvent += StatusMessageHandler;
-            controler.Bot.GroupsReadyEvent += GroupsReady;
+            controler.Bot.GroupsReadyEvent += GroupsReadyHandler;
+            controler.Bot.SendImEvent += SendImHandler;
         }
 
-        protected async void GroupsReady(object sender, GroupEventArgs e)
+        protected void SendImHandler(object sender, ImSendArgs e)
+        {
+            if (controler.Bot.AvatarKey2Name.ContainsKey(e.avataruuid) == true)
+            {
+                if (DiscordClientConnected == true)
+                {
+                    _ = SendMessageToChannelAsync(controler.Bot.AvatarKey2Name[e.avataruuid], "Bot/Script: " + e.message + "", "im", e.avataruuid, "IM").ConfigureAwait(false);
+                }
+            }
+        }
+
+        protected async void GroupsReadyHandler(object sender, GroupEventArgs e)
         {
             await DiscordRebuildChannels();
         }

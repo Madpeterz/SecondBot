@@ -81,6 +81,18 @@ namespace BSB.bottypes
         }
     }
 
+    public class ImSendArgs : EventArgs
+    {
+        public UUID avataruuid { get; }
+        public string message { get;  }
+
+        public ImSendArgs(UUID avataruuid, string message)
+        {
+            this.avataruuid = avataruuid;
+            this.message = message;
+        }
+    }
+
     public class MessageEventArgs : EventArgs
     {
         public string message { get; }
@@ -110,10 +122,13 @@ namespace BSB.bottypes
         private EventHandler<MessageEventArgs> _MessageEvent;
         private EventHandler<StatusMessageEvent> _StatusMessageEvent;
         private EventHandler<GroupEventArgs> _GroupsEvent;
+        private EventHandler<ImSendArgs> _SendImEvent;
 
         private readonly object _MessageEventLock = new object();
         private readonly object _StatusMessageEventlock = new object();
         private readonly object _GroupsEventLock = new object();
+        private readonly object _SendImEventLock = new object();
+
 
         public event EventHandler<MessageEventArgs> MessageEvent
         {
@@ -130,8 +145,18 @@ namespace BSB.bottypes
             add { lock (_GroupsEventLock) { _GroupsEvent += value; } }
             remove { lock (_GroupsEventLock) { _GroupsEvent -= value; } }
         }
+        public event EventHandler<ImSendArgs> SendImEvent
+        {
+            add { lock (_SendImEventLock) { _SendImEvent += value; } }
+            remove { lock (_SendImEventLock) { _SendImEvent -= value; } }
+        }
 
-        protected  void On_MessageEvent(MessageEventArgs e)
+        protected void On_SendImEvent(ImSendArgs e)
+        {
+            EventHandler<ImSendArgs> handler = _SendImEvent;
+            handler?.Invoke(this, e);
+        }
+        protected void On_MessageEvent(MessageEventArgs e)
         {
             EventHandler<MessageEventArgs> handler = _MessageEvent;
             handler?.Invoke(this, e);
@@ -147,6 +172,11 @@ namespace BSB.bottypes
         {
             EventHandler<GroupEventArgs> handler = _GroupsEvent;
             handler?.Invoke(this, e);
+        }
+
+        public virtual void SendIM(UUID avatar, string message)
+        {
+            On_SendImEvent(new ImSendArgs(avatar, message));
         }
 
         protected virtual void BotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar, bool group, UUID group_uuid, bool localchat, bool fromme)

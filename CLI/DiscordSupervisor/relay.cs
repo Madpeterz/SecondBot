@@ -12,13 +12,6 @@ namespace BetterSecondBot.DiscordSupervisor
             if (HasBot() == true)
             {
                 controler.Bot.SendIM(avatar, message);
-                if (controler.Bot.AvatarKey2Name.ContainsKey(avatar) == true)
-                {
-                    if (DiscordClientConnected == true)
-                    {
-                        _ = SendMessageToChannelAsync(controler.Bot.AvatarKey2Name[avatar], "Bot/Script: " + message + "", "im", avatar, "IM").ConfigureAwait(false);
-                    }
-                }
             }
         }
         protected async Task DiscordGroupMessage(UUID group_uuid, string sender_name, string message)

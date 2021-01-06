@@ -17,10 +17,10 @@ namespace BetterSecondBot.DiscordSupervisor
 
                 channelname = channelname.ToLowerInvariant();
                 channelname = String.Concat(channelname.Where(char.IsLetterOrDigit));
-                ITextChannel Channel = await FindTextChannel(channelname, catmap[catmapid], sender_id, TopicType).ConfigureAwait(false);
+                ITextChannel Channel = await FindTextChannel(channelname, catmap[catmapid], sender_id, TopicType).ConfigureAwait(true);
                 if (Channel != null)
                 {
-                    return await Channel.SendMessageAsync(message);
+                    return await Channel.SendMessageAsync(message).ConfigureAwait(false);
                 }
             }
             return null;
