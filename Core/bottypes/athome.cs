@@ -255,7 +255,7 @@ namespace BSB.bottypes
                 while ((tested_sims.Count() != myconfig.Basic_HomeRegions.Length) && (UseSLurl == ""))
                 {
                     last_tested_home_id++;
-                    if (last_tested_home_id > myconfig.Basic_HomeRegions.Length)
+                    if (last_tested_home_id >= myconfig.Basic_HomeRegions.Length)
                     {
                         last_tested_home_id = 0;
                     }
