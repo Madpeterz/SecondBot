@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace BSB.Commands.DiscordAPI
 {
-    class Discord_Dm_Member : CoreCommand_3arg
+    class Discord_Dm_Member : CoreCommand_4arg
     {
-        public override string[] ArgTypes { get { return new[] { "Smart", "Number", "Text" }; } }
-        public override string[] ArgHints { get { return new[] { "Mixed [Channel|Avatar uuid|Avatar name|http url]", "Member id", "Message" }; } }
-        public override string Helpfile { get { return "Sends a message directly to the user \n This will fail if they are not friends or dont share a server!"; } }
+        public override string[] ArgTypes { get { return new[] { "Smart", "Number", "Number", "Text" }; } }
+        public override string[] ArgHints { get { return new[] { "Mixed [Channel|Avatar uuid|Avatar name|http url]", "Server id", "Member id", "Message" }; } }
+        public override string Helpfile { get { return "Sends a message directly to the user [They must be in the server]\n This command requires the SERVER MEMBERS INTENT found in discord app dev"; } }
         public override bool CallFunction(string[] args)
         {
             if (base.CallFunction(args) == true)
@@ -33,11 +33,31 @@ namespace BSB.Commands.DiscordAPI
         protected async Task<bool> MessageMember(string[] args)
         {
             DiscordSocketClient Discord = bot.getDiscordClient();
-            if (ulong.TryParse(args[1], out ulong memberid) == true)
+            if (ulong.TryParse(args[1], out ulong serverid) == true)
             {
-                SocketUser user = Discord.GetUser(memberid);
-                await user.SendMessageAsync(args[2]);
-                return true;
+                if (ulong.TryParse(args[2], out ulong memberid) == true)
+                {
+                    try
+                    {
+                        SocketGuild server = Discord.GetGuild(serverid);
+                        IEnumerable<IGuildUser> users = await server.GetUsersAsync().FlattenAsync().ConfigureAwait(true);
+                        bool sent = false;
+                        foreach(IGuildUser user in users)
+                        {
+                            if(user.Id == memberid)
+                            {
+                                sent = true;
+                                await user.SendMessageAsync(args[3]);
+                                break;
+                            }
+                        }
+                        return sent;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
             }
             return false;
         }
