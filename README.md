@@ -20,7 +20,7 @@ Secondbot is a CommandLine based bot for SecondLife based on libremetaverse reta
 
 #### Helpfull stuff
 ---
-[Commands Wiki](https://magicmadpeter.xyz/wiki/index.html)
+[Commands Wiki](https://wiki.magicmadpeter.xyz/)
 
 ## Releases
 These are pre compiled versions for the most upto date please use docker or compile it yourself.
