@@ -1,17 +1,43 @@
 ﻿using BetterSecondBotShared.logs;
+using Discord.WebSocket;
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Discord;
 
 namespace BSB.bottypes
 {
     public abstract class VirtualsBot : Log2FileBot
     {
         #region DiscordOutputTarget
-        public virtual bool send_to_discord(string command,string message)
+        protected DiscordSocketClient DiscordLink = null;
+        protected string DiscordReadyWhyFailed = "";
+        public void setDiscordClient(DiscordSocketClient GivenDiscordLink)
         {
-            return false;
+            DiscordLink = GivenDiscordLink;
+        }
+        public DiscordSocketClient getDiscordClient()
+        {
+            return DiscordLink;
+        }
+        public string getDiscordWhyFailed()
+        {
+            return DiscordReadyWhyFailed;
+        }
+        public bool discordReady()
+        {
+            if (DiscordLink == null)
+            {
+                DiscordReadyWhyFailed = "No client";
+                return false;
+            }
+            if (DiscordLink.ConnectionState != ConnectionState.Connected)
+            {
+                DiscordReadyWhyFailed = "Not connected";
+                return false;
+            }
+            return true;
         }
         #endregion
         public virtual Dictionary<UUID, string> GetIMChatWindowKeyNames()

@@ -69,6 +69,7 @@ namespace BetterSecondBot.DiscordSupervisor
         protected override void login_bot(bool self_keep_alive)
         {
             controler = new CliExitOnLogout(myconfig, running_as_docker, self_keep_alive);
+            controler.Bot.setDiscordClient(DiscordClient);
             attach_events();
         }
 

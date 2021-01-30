@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace BSB.Commands.Avatars
 {
-    class NearMe : CoreCommand_SmartReply_1arg
+    class RoleCreate : CoreCommand_SmartReply_1arg
     {
         public override string Helpfile { get { return "Gets a list of avatars near the bot"; } }
         public override bool CallFunction(string[] args)
