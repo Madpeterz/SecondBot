@@ -40,6 +40,8 @@ namespace BetterSecondBotShared.Json
         public string DiscordFull_Token { get; set; }
         public ulong DiscordFull_ServerID { get; set; }
 
+        public bool DiscordFull_Keep_GroupChat { get; set; }
+
         // HTTP interface
         public bool Http_Enable { get; set; }
         public int Http_Port { get; set; }

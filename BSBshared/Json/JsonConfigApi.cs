@@ -113,6 +113,10 @@ namespace BetterSecondBotShared.Json
             {
                 return "UUID of a object the bot should attempt to sit on after logging in";
             }
+            else if (cmd == "DiscordFull_Keep_GroupChat")
+            {
+                return "When set to true discord group chat messages will not be removed";
+            }
             return "";
         }
         protected string GetHelp_HTTP(string cmd)

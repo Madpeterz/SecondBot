@@ -17,7 +17,7 @@ namespace BetterSecondBot.DiscordSupervisor
 
                 channelname = channelname.ToLowerInvariant();
                 channelname = String.Concat(channelname.Where(char.IsLetterOrDigit));
-                ITextChannel Channel = await FindTextChannel(channelname, catmap[catmapid], sender_id, TopicType).ConfigureAwait(true);
+                ITextChannel Channel = await FindTextChannel(channelname, catmap[catmapid], sender_id, TopicType, false).ConfigureAwait(true);
                 if (Channel != null)
                 {
                     return await Channel.SendMessageAsync(message).ConfigureAwait(false);
@@ -26,17 +26,33 @@ namespace BetterSecondBot.DiscordSupervisor
             return null;
         }
 
-        protected async Task<ITextChannel> FindTextChannel(string channelname, ICategoryChannel cat, UUID sender, string TopicType)
+        protected async Task<ITextChannel> FindTextChannel(string channelname, ICategoryChannel cat, UUID sender, string TopicType, bool CleanChannel)
         {
-            return await FindTextChannel(DiscordServer, channelname, cat, sender, TopicType);
+            return await FindTextChannel(DiscordServer, channelname, cat, sender, TopicType, true, CleanChannel);
         }
+
 
         protected async Task<ITextChannel> FindTextChannel(IGuild onserver, string channelname)
         {
-            return await FindTextChannel(onserver, channelname, null, UUID.Zero, "notUSED", false);
+            return await FindTextChannel(onserver, channelname, null, UUID.Zero, "notUSED");
         }
 
-        protected async Task<ITextChannel> FindTextChannel(IGuild onserver,string channelname, ICategoryChannel cat, UUID sender, string TopicType,bool create_channel=true)
+        protected async Task<ITextChannel> FindTextChannel(IGuild onserver, string channelname, ICategoryChannel cat)
+        {
+            return await FindTextChannel(onserver, channelname, cat, UUID.Zero, "notUSED", true);
+        }
+
+        protected async Task<ITextChannel> FindTextChannel(IGuild onserver, string channelname, ICategoryChannel cat, UUID sender, string TopicType)
+        {
+            return await FindTextChannel(onserver, channelname, cat, sender, TopicType, true);
+        }
+
+        protected async Task<ITextChannel> FindTextChannel(IGuild onserver, string channelname, ICategoryChannel cat, UUID sender, string TopicType, bool create_channel)
+        {
+            return await FindTextChannel(onserver, channelname, cat, sender, TopicType, create_channel, true);
+        }
+
+        protected async Task<ITextChannel> FindTextChannel(IGuild onserver,string channelname, ICategoryChannel cat, UUID sender, string TopicType,bool create_channel, bool CleanChannel)
         {
             await WaitForUnlock().ConfigureAwait(false);
             channelname = channelname.ToLowerInvariant();
@@ -74,7 +90,10 @@ namespace BetterSecondBot.DiscordSupervisor
                 }
                 else
                 {
-                    await CleanDiscordChannel(result, 24).ConfigureAwait(false);
+                    if (CleanChannel == true)
+                    {
+                        await CleanDiscordChannel(result, 24).ConfigureAwait(false);
+                    }
                 }
             }
             DiscordLock = false;
@@ -256,7 +275,7 @@ namespace BetterSecondBot.DiscordSupervisor
                 }
                 foreach (string A in required_channels)
                 {
-                    _ = await FindTextChannel(A, catmap["bot"], UUID.Zero, "bot").ConfigureAwait(false);
+                    _ = await FindTextChannel(A, catmap["bot"], UUID.Zero, "bot", true).ConfigureAwait(false);
                 }
 
                 if (HasBot() == true)
@@ -267,7 +286,7 @@ namespace BetterSecondBot.DiscordSupervisor
                         groupname = String.Concat(groupname.Where(char.IsLetterOrDigit));
                         if (GroupChannels.Contains(groupname) == false)
                         {
-                            _ = await FindTextChannel(groupname, catmap["group"], G.ID, "Group").ConfigureAwait(false);
+                            _ = await FindTextChannel(groupname, catmap["group"], G.ID, "Group", !myconfig.DiscordFull_Keep_GroupChat).ConfigureAwait(false);
                         }
                     }
                 }
