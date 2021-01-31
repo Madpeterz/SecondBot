@@ -126,17 +126,9 @@ namespace BetterSecondBotShared.Json
             {
                 return "Allow the bot to start a HTTP interface (Required for web UI and Post commands)";
             }
-            else if (cmd == "Http_Port")
-            {
-                return "The port the HTTP interface should be running on";
-            }
             else if (cmd == "Http_Host")
             {
-                return "The URL the interface is on example use \"docker\" for auto or \"http://localhost:portnum\"";
-            }
-            else if (cmd == "Http_PublicUrl")
-            {
-                return "The public url used to access the web ui";
+                return "The URL the interface is on example use \"docker\" for auto or \"http://*:8080\" to listen on port 8080<br/>Note: for windows you might need to accept a firewall alert and restart the app!";
             }
             return "";
         }
@@ -265,15 +257,14 @@ namespace BetterSecondBotShared.Json
             else if (cmd == "DiscordFull_Enable") { return "False"; }
             else if (cmd == "DiscordFull_Token") { return ""; }
             else if (cmd == "DiscordFull_ServerID") { return ""; }
+            else if (cmd == "DiscordFull_Keep_GroupChat") { return "False"; }
             return "";
         }
         protected string GetValueHint_HTTP(string cmd)
         {
             // HTTP
             if (cmd == "Http_Enable") { return "False"; }
-            else if (cmd == "Http_Port") { return "80"; }
-            else if (cmd == "Http_Host") { return "http://localhost:80"; }
-            else if (cmd == "Http_PublicUrl") { return "http://localhost/"; }
+            else if (cmd == "Http_Host") { return "http://*:8080"; }
             return "";
         }
         protected string GetValueHint_DiscordTTS(string cmd)
@@ -409,13 +400,13 @@ namespace BetterSecondBotShared.Json
                         {
                             LogFormater.Warn("Http disabled: Security_WebUIKey length must be 12 or more");
                         }
-                        else if (jsonConfig.Http_Port < 80)
-                        {
-                            LogFormater.Warn("Http disabled: Httpport range below protected range - Given: (" + jsonConfig.Http_Port + ")");
-                        }
                         else if ((jsonConfig.Http_Host != "docker") && (jsonConfig.Http_Host.StartsWith("http") == false))
                         {
-                            LogFormater.Warn("Http disabled: Http_Host must be vaild: http://XXXXXX or \"docker\" - Given: (" + jsonConfig.Http_Host + ")");
+                            LogFormater.Warn("Http disabled: Http_Host must be vaild or \"docker\" - Given: (" + jsonConfig.Http_Host + ")");
+                        }
+                        else if (jsonConfig.Http_Host == "docker")
+                        {
+                            jsonConfig.Http_Host = "http://*:8080";
                         }
                         else
                         {

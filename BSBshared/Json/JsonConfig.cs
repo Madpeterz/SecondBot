@@ -44,9 +44,7 @@ namespace BetterSecondBotShared.Json
 
         // HTTP interface
         public bool Http_Enable { get; set; }
-        public int Http_Port { get; set; }
         public string Http_Host { get; set; }
-        public string Http_PublicUrl { get; set; }
 
         // Name2Key DB
         public bool Name2Key_Enable { get; set; }

@@ -16,7 +16,7 @@ namespace BetterSecondBot.DiscordSupervisor
                 }
             }
         }
-        string DiscordBotStatus_laststatus = "";
+
         public string GetStatus()
         {
             string reply = "";

@@ -106,7 +106,7 @@ namespace BetterSecondBot.DiscordSupervisor
                             else
                             {
                                 controler.Bot.Debug("DiscordBotChatControler - Localchat:" + sender_name + ":" + message);
-                                await SendMessageToChannelAsync("localchat", "" + sender_name + ":" + message, "bot", UUID.Zero, "bot").ConfigureAwait(false);
+                                await SendMessageToChannelAsync("localchat", "" + sender_name + ": " + message, "bot", UUID.Zero, "bot").ConfigureAwait(false);
                             }
                         }
                         else

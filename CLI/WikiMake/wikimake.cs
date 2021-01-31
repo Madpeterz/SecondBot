@@ -17,7 +17,7 @@ namespace BetterSecondBot.WikiMake
         protected string html_footer = "";
         protected string buildVersion = "";
         protected SimpleIO io;
-        protected Dictionary<string,string> seen_command_names = new Dictionary<string, string>();
+        protected Dictionary<string, string> seen_command_names = new Dictionary<string, string>();
 
 
         public string CreateRoot()
@@ -28,7 +28,7 @@ namespace BetterSecondBot.WikiMake
             sb.Append(buildVersion);
             sb.Append("</h3><br/>");
             sb.Append("<table class='table table-striped table-bordered'><thead><tr><th>Interface</th><th>Commands</th><th>Status</th></tr></thead><tbody>");
-            foreach (KeyValuePair<string,KeyValuePair<int, string>> entry in api_reports)
+            foreach (KeyValuePair<string, KeyValuePair<int, string>> entry in api_reports)
             {
                 sb.Append("<tr>");
                 sb.Append("<td><a href='[[SUBFOLDER]]");
@@ -51,7 +51,7 @@ namespace BetterSecondBot.WikiMake
             return sb.ToString();
         }
 
-        protected static StringBuilder MenuActive(StringBuilder index,string area)
+        protected static StringBuilder MenuActive(StringBuilder index, string area)
         {
             Dictionary<string, string> active_swaps = new Dictionary<string, string>
             {
@@ -59,18 +59,17 @@ namespace BetterSecondBot.WikiMake
                 { "CLIActive", "" },
                 { "JSONActive", "" },
                 { "RLVapiActive", "" },
-                { "HTTPgetActive", "" },
-                { "HTTPpostActive", "" }
+                { "HTTPActive", "" }
             };
             active_swaps["" + area + "Active"] = "Active";
-            foreach(KeyValuePair<string,string> pair in active_swaps)
+            foreach (KeyValuePair<string, string> pair in active_swaps)
             {
-                index = index.Replace("[["+ pair.Key+"]]", pair.Value);
+                index = index.Replace("[[" + pair.Key + "]]", pair.Value);
             }
             return index;
         }
 
-        protected void InterfaceCommands(string area, API_supported_interface shared_interface,bool track_commands=false)
+        protected void InterfaceCommands(string area, API_supported_interface shared_interface, bool track_commands = false)
         {
             string[] cmds = shared_interface.GetCommandsList();
             string interface_name = shared_interface.GetType().Name;
@@ -84,7 +83,7 @@ namespace BetterSecondBot.WikiMake
                     }
                     else
                     {
-                        LogFormater.Debug("command " + c + " from " + interface_name + " overlaps an ready loaded command from "+ seen_command_names[c]+"");
+                        LogFormater.Debug("command " + c + " from " + interface_name + " overlaps an ready loaded command from " + seen_command_names[c] + "");
                     }
                 }
                 string workspace = shared_interface.GetCommandWorkspace(c);
@@ -94,7 +93,7 @@ namespace BetterSecondBot.WikiMake
                 sb.Append(buildVersion);
                 sb.Append("</h3><br/>");
                 sb.Append("<h4>Interface: <a href='[[AREA]].html'>[[AREA]]</a>");
-                if(workspace != "")
+                if (workspace != "")
                 {
                     sb.Append(" / <a href='[[AREA]][[WORKSPACE]].html'>[[WORKSPACE]]</a>");
                 }
@@ -103,7 +102,7 @@ namespace BetterSecondBot.WikiMake
                 int minargs = shared_interface.GetCommandArgs(c);
                 string[] arg_types = shared_interface.GetCommandArgTypes(c);
                 string[] arg_hints = shared_interface.GetCommandArgHints(c);
-                if(area == "Core")
+                if (area == "Core")
                 {
                     StringBuilder ExampleCall = new StringBuilder();
                     ExampleCall.Append("Example: [[COMMAND]]");
@@ -194,9 +193,9 @@ namespace BetterSecondBot.WikiMake
                 sb.Append(buildVersion);
                 sb.Append("</h4><br/>");
                 sb.Append("<table class='datatable table table-striped table-bordered'><thead><tr><th>Command</th><th>Min args</th></tr></thead><tbody>");
-                foreach(string c in cmds)
+                foreach (string c in cmds)
                 {
-                    if(shared_interface.GetCommandWorkspace(c) == workspace)
+                    if (shared_interface.GetCommandWorkspace(c) == workspace)
                     {
                         int args = shared_interface.GetCommandArgs(c);
                         sb.Append("<tr><td><a href='[[AREA]]");
@@ -257,9 +256,9 @@ namespace BetterSecondBot.WikiMake
             sb.Replace("[[AREA]]", area);
             sb.Append(html_footer);
             sb = DebugModeCreateWiki.MenuActive(sb, area);
-            io.writefile(""+ area+".html", sb.ToString());
+            io.writefile("" + area + ".html", sb.ToString());
         }
-        protected void InterfaceWiki(string area,API_supported_interface shared_interface, bool track_commands = false)
+        protected void InterfaceWiki(string area, API_supported_interface shared_interface, bool track_commands = false)
         {
             LogFormater.Info("[WIKI] Starting area " + area + "");
             // create index 
@@ -289,21 +288,494 @@ namespace BetterSecondBot.WikiMake
 
             // CMD 
             BSB.Commands.CoreCommandsInterface cmd = new BSB.Commands.CoreCommandsInterface(null);
-            api_reports.Add("Core", new KeyValuePair<int, string>(cmd.ApiCommandsCount, "Basic"));
-            InterfaceWiki("Core", cmd,true);
+            api_reports.Add("Core", new KeyValuePair<int, string>(cmd.ApiCommandsCount, "Good"));
+            InterfaceWiki("Core", cmd, true);
 
             // RLVapi
             BSB.RLV.RLVcontrol RLVapi = new BSB.RLV.RLVcontrol(null);
-            api_reports.Add("RLVapi", new KeyValuePair<int, string>(RLVapi.ApiCommandsCount, "Basic"));
+            api_reports.Add("RLVapi", new KeyValuePair<int, string>(RLVapi.ApiCommandsCount, "Limited"));
             InterfaceWiki("RLVapi", RLVapi, true);
 
-            // HTTP post
-            BetterSecondBot.HttpServer.HTTPCommandsInterface http_post = new BetterSecondBot.HttpServer.HTTPCommandsInterface(null,null);
-            api_reports.Add("HTTPpost", new KeyValuePair<int, string>(http_post.ApiCommandsCount, "Limited"));
-            InterfaceWiki("HTTPpost", http_post);
+            // HTTP
+            HTTPWiki();
 
             io.ChangeRoot("wiki");
             io.writefile("index.html", CreateRoot());
         }
+
+        protected void HTTPWiki()
+        {
+            LogFormater.Info("[WIKI] Starting area HTTP endpoint");
+            HTTPendpoint HTTP = new HTTPendpoint();
+
+            HTTPmenu("HTTP", HTTP);
+
+            // create workspaces
+            HTTPWorkspaces("HTTP", HTTP);
+
+            // create commands
+            HTTPCommands("HTTP", HTTP);
+
+            HTTP = null;
+            LogFormater.Info("[WIKI] Done with area");
+        }
+
+        protected string getURLargs(Dictionary<string, KeyValuePair<string, string>> values)
+        {
+            List<string> urlargs = new List<string>();
+            foreach (KeyValuePair<string, KeyValuePair<string, string>> entry in values)
+            {
+                if (entry.Value.Key == "URLARG")
+                {
+                    urlargs.Add("{"+entry.Key+"}");
+                }
+            }
+            return String.Join('/', urlargs);
+        }
+
+        protected void HTTPCommands(string area, HTTPendpoint HTTP)
+        {
+            foreach (string workspace in HTTP.getEndPoints())
+            {
+
+                foreach (string c in HTTP.getEndpointCommands(workspace))
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(html_header);
+                    sb.Append("<h3>Build: ");
+                    sb.Append(buildVersion);
+                    sb.Append("</h3><br/>");
+                    sb.Append("<h4>Interface: <a href='[[AREA]].html'>[[AREA]]</a>");
+                    if (workspace != "")
+                    {
+                        sb.Append(" / <a href='[[AREA]][[WORKSPACE]].html'>[[WORKSPACE]]</a>");
+                    }
+                    sb.Append("</h4><hr/><h3>[[COMMAND]]</h3>");
+                    sb.Append("[[URLENDPOINT]]/[[WORKSPACE]]/[[COMMAND]]/[[URLADDON]]<br/>");
+                    sb.Append("Method: [[APIMETHOD]]");
+                    sb.Append("<hr style='border-top: 1px dashed #dcdcdc;'>");
+                    sb.Append("[[HELP]]");
+                    Dictionary<string, KeyValuePair<string, string>> values = HTTP.getCommandArgs(workspace, c);
+                    int ValueCount = values.Count;
+
+                    if (ValueCount > 0)
+                    {
+                        sb.Append("<hr/><h4>Args helper</h4>");
+                        sb.Append("<table class='table table-striped table-bordered'><thead><tr><td>Name</td><th>Type</th><th>Hint</th></tr></thead><tbody>");
+                        foreach (KeyValuePair<string, KeyValuePair<string, string>> entry in values)
+                        {
+                            string hint = entry.Value.Value;
+                            string type = entry.Value.Key;
+                            if (entry.Value.Key.Contains("Optional") == true)
+                            {
+                                type = type.Replace("Optional", "{Optional} ");
+                            }
+                            else if (entry.Value.Key == "URLARG")
+                            {
+                                type = "URL arg";
+                            }
+                            sb.Append("<tr><td>" + entry.Key + "</td><td>" + type + "</td><td>" + hint + "</td></tr>");
+                        }
+                        sb.Append("</tbody></table>");
+                    }
+
+                    string[] returnvalues = HTTP.getReturnsValues(workspace, c);
+                    if (returnvalues.Length > 0)
+                    {
+                        sb.Append("<hr/><h4>Possible replys</h4>");
+                        sb.Append("<ul>");
+                        foreach (string entry in returnvalues)
+                        {
+                            sb.Append("<li>"+entry+"</li>");
+                        }
+                        sb.Append("</ul>");
+                    }
+
+
+
+                    sb = DebugModeCreateWiki.MenuActive(sb, area);
+                    sb.Append(html_footer);
+                    sb.Replace("[[COMMAND]]", c);
+                    sb.Replace("[[URLENDPOINT]]", "http://localhost:8080");
+                    sb.Replace("[[APIMETHOD]]", HTTP.getCommandMethod(workspace, c));
+                    sb.Replace("[[URLADDON]]", getURLargs(values));
+                    sb.Replace("[[HELP]]", HTTP.getCommandAbout(workspace, c));
+                    sb.Replace("[[MINARGS]]", ValueCount.ToString());
+                    sb.Replace("[[WORKSPACE]]", workspace);
+                    sb.Replace("[[AREA]]", area);
+                    sb.Replace("[[SUBFOLDER]]", "");
+                    sb.Replace("[[RETURNROOT]]", "../");
+                    string target_file = "" + area + "" + workspace + "" + c + ".html";
+                    io.writefile(target_file, sb.ToString());
+                }
+            }
+        }
+
+        protected void HTTPmenu(string area, HTTPendpoint HTTP)
+        {
+            api_reports.Add(area, new KeyValuePair<int, string>(HTTP.getFullCount(), "Basic"));
+
+            // create index 
+            StringBuilder sb = new StringBuilder();
+            sb.Append(html_header);
+            sb.Append("<h3>Interface:");
+            sb.Append("HTTP");
+            sb.Append("</h3><br/>");
+            sb.Append("<h4>Build: ");
+            sb.Append(buildVersion);
+            sb.Append("</h4><br/>");
+            sb.Append("<table class='datatable table table-striped table-bordered'><thead><tr><th>Workspace</th><th>Commands</th></tr></thead><tbody>");
+            foreach (string workspace in HTTP.getEndPoints())
+            {
+                string workspace_link = "<a href='[[AREA]]" + workspace + ".html'>" + workspace + "</a>";
+                sb.Append("<tr><td>");
+                sb.Append(workspace_link);
+                sb.Append("</td><td>");
+                sb.Append(HTTP.getEndpointCount(workspace).ToString());
+                sb.Append("</td></tr>");
+            }
+            sb.Append("</tbody></table>");
+            sb.Replace("[[SUBFOLDER]]", "");
+            sb.Replace("[[RETURNROOT]]", "../");
+            sb.Replace("[[AREA]]", area);
+            sb.Append(html_footer);
+            sb = DebugModeCreateWiki.MenuActive(sb, area);
+            io.writefile("" + area + ".html", sb.ToString());
+        }
+
+        protected void HTTPWorkspaces(string area, HTTPendpoint HTTP)
+        {
+            foreach (string workspace in HTTP.getEndPoints())
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append(html_header);
+                sb.Append("<h3>Interface: <a href='[[AREA]].html'>[[AREA]]</a>");
+                if (workspace != "")
+                {
+                    sb.Append(" / [[WORKSPACE]]");
+                }
+                sb.Append("</h3><br/>");
+                sb.Append("<h4>Build: ");
+                sb.Append(buildVersion);
+                sb.Append("</h4><br/>");
+                sb.Append("<table class='datatable table table-striped table-bordered'><thead><tr><th>Command</th><th>Min args</th></tr></thead><tbody>");
+                foreach (string c in HTTP.getEndpointCommands(workspace))
+                {
+                    int args = HTTP.getCommandArgCount(workspace, c);
+                    sb.Append("<tr><td><a href='[[AREA]]");
+                    sb.Append(workspace);
+                    sb.Append(c);
+                    sb.Append(".html'>");
+                    sb.Append(c);
+                    sb.Append("</a></td><td>");
+                    sb.Append(args.ToString());
+                    sb.Append("</td></tr>");
+                }
+                sb.Append("</tbody></table>");
+                sb.Replace("[[SUBFOLDER]]", "");
+                sb.Replace("[[RETURNROOT]]", "../");
+                sb.Replace("[[WORKSPACE]]", workspace);
+                sb.Replace("[[AREA]]", area);
+                sb.Append(html_footer);
+                sb = DebugModeCreateWiki.MenuActive(sb, area);
+                string target_file = "" + area + "" + workspace + ".html";
+                io.writefile(target_file, sb.ToString());
+            }
+        }
     }
+
+    public class HTTPendpoint
+    {
+        protected List<Endpoint> endpoints = new List<Endpoint>();
+        public HTTPendpoint()
+        {
+            Endpoint core = new Endpoint();
+            core.name = "core";
+            core.callable.Add(new gettoken());
+            core.callable.Add(new logout());
+            core.callable.Add(new version());
+            core.callable.Add(new name());
+            core.callable.Add(new command());
+            endpoints.Add(core);
+            Endpoint inventory = new Endpoint();
+            inventory.name = "inventory";
+            inventory.callable.Add(new contents());
+            inventory.callable.Add(new folders());
+            endpoints.Add(inventory);
+        }
+
+        public string getCommandMethod(string endpoint, string command)
+        {
+            foreach (Endpoint End in endpoints)
+            {
+                if (End.name == endpoint)
+                {
+                    foreach (APIcall api in End.callable)
+                    {
+                        if (api.name == command)
+                        {
+                            return api.type;
+                        }
+                    }
+                }
+            }
+            return "?";
+        }
+
+        public string getCommandAbout(string endpoint, string command)
+        {
+            foreach (Endpoint End in endpoints)
+            {
+                if (End.name == endpoint)
+                {
+                    foreach (APIcall api in End.callable)
+                    {
+                        if (api.name == command)
+                        {
+                            return api.about;
+                        }
+                    }
+                }
+            }
+            return "?";
+        }
+
+        public string[] getReturnsValues(string endpoint, string command)
+        {
+            foreach (Endpoint End in endpoints)
+            {
+                if (End.name == endpoint)
+                {
+                    foreach (APIcall api in End.callable)
+                    {
+                        if (api.name == command)
+                        {
+                            return api.returns.ToArray();
+                        }
+                    }
+                }
+            }
+            return new string[] { };
+        }
+
+
+
+        public int getCommandArgCount(string endpoint, string command)
+        {
+            foreach (Endpoint End in endpoints)
+            {
+                if (End.name == endpoint)
+                {
+                    foreach (APIcall api in End.callable)
+                    {
+                        if (api.name == command)
+                        {
+                            return api.values.Count;
+                        }
+                    }
+                }
+            }
+            return 0;
+        }
+
+        public string[] getEndpointCommands(string endpointname)
+        {
+            List<string> commands = new List<string>();
+            foreach (Endpoint End in endpoints)
+            {
+                if (End.name == endpointname)
+                {
+                    foreach (APIcall api in End.callable)
+                    {
+                        commands.Add(api.name);
+                    }
+                }
+            }
+            return commands.ToArray();
+        }
+
+        public string[] getEndPoints()
+        {
+            List<string> names = new List<string>();
+            foreach (Endpoint End in endpoints)
+            {
+                names.Add(End.name);
+            }
+            return names.ToArray();
+        }
+
+        public int getEndpointCount(string endpointname)
+        {
+            foreach (Endpoint End in endpoints)
+            {
+                if (End.name == endpointname)
+                {
+                    return End.callable.Count;
+                }
+            }
+            return 0;
+        }
+
+        public int getFullCount()
+        {
+            int count = 0;
+            foreach (Endpoint End in endpoints)
+            {
+                count += End.callable.Count;
+            }
+            return count;
+        }
+
+        public Dictionary<string, KeyValuePair<string, string>> getCommandArgs(string endpoint, string command)
+        {
+            Dictionary<string, KeyValuePair<string, string>> empty = new Dictionary<string, KeyValuePair<string, string>>();
+            foreach (Endpoint End in endpoints)
+            {
+                if (End.name == endpoint)
+                {
+                    foreach (APIcall api in End.callable)
+                    {
+                        if (api.name == command)
+                        {
+                            return api.values;
+                        }
+                    }
+                }
+            }
+            return empty;
+
+        }
+
+    }
+
+    public class Endpoint
+    {
+        public string name = "Notset";
+        public List<APIcall> callable = new List<APIcall>();
+    }
+
+    abstract public class APIcall
+    {
+        public string name { get { return GetType().Name.ToLowerInvariant(); } }
+        public string type = "get";
+        public string about = "A API call that is missing its about value";
+        public Dictionary<string, KeyValuePair<string, string>> values = new Dictionary<string, KeyValuePair<string, string>>();
+        public List<string> returns = new List<string>();
+        public bool RequiresToken = true;
+
+        public APIcall()
+        {
+            Setup();
+        }
+        public virtual void Setup()
+        {
+            if (RequiresToken == true)
+            {
+                returns.Add("Token not accepted");
+                values.Add(
+                    "token",
+                    new KeyValuePair<string, string>(
+                        "URLARG",
+                        "the api access token")
+                );
+            }
+        }
+    }
+
+    abstract public class postAPIcall : APIcall
+    {
+        public override void Setup()
+        {
+            type = "post";
+            base.Setup();
+        }
+    }
+
+    public class gettoken : postAPIcall
+    {
+        public override void Setup()
+        {
+            RequiresToken = false;
+            about = "Requests a new token (Vaild for 10 mins) <br/>to use with all other requests";
+            values.Add("Authcode", new KeyValuePair<string, string>("string", "the first 10 chars of SHA1(unixtime+WebUIkey)<br/>unixtime can be +- 30 of the bots time."));
+            returns = new List<string>();
+            returns.Add("Authcode not accepted");
+            returns.Add("New API Token");
+            base.Setup();
+        }
+    }
+
+    public class logout : APIcall
+    {
+        public override void Setup()
+        {
+            about = "A API call that is missing its about value";
+            returns.Add("ok");
+            returns.Add("Failed to remove token");
+            base.Setup();
+        }
+    }
+
+    public class version : APIcall
+    {
+        public override void Setup()
+        {
+            about = "Gets the bots build version";
+            returns.Add("Bot build version");
+            base.Setup();
+        }
+    }
+
+    public class name : APIcall
+    {
+        public override void Setup()
+        {
+            about = "Gets the name of the bot";
+            returns.Add("Fistname Lastname");
+            base.Setup();
+        }
+    }
+
+    public class command : postAPIcall
+    {
+        public override void Setup()
+        {
+            about = "Makes a request to the core commands lib";
+            values.Add(
+                "body",
+                new KeyValuePair<string, string>(
+                    "JsonObject",
+                    "A JSON object formated as follows<br/>Command: string<br/>Args: string[]<br/>AuthCode: string<br/>========<br/>See LSL example on how to create a core command auth code")
+            );
+            returns.Add("accepted");
+            base.Setup();
+        }
+    }
+
+    public class contents : APIcall
+    {
+        public override void Setup()
+        {
+            about = "Requests the contents of a folder as an array of InventoryMapItem<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>typename: String</li></ul>";
+            values.Add(
+                "folderUUID",
+                new KeyValuePair<string, string>(
+                    "URLARG",
+                    "the folder to fetch (Found via: inventory/folders)")
+            );
+            returns.Add("array of InventoryMapItem");
+            base.Setup();
+        }
+    }
+
+    public class folders : APIcall
+    {
+        public override void Setup()
+        {
+            about = "Requests the inventory folder layout as a json object InventoryMapFolder<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>subfolders: InventoryMapFolder[]</li></ul>";
+            returns.Add("array of InventoryMapFolder");
+            base.Setup();
+        }
+    }
+
 }

@@ -1,12 +1,8 @@
-﻿using BetterSecondBot.HttpServer;
-using BetterSecondBotShared.IO;
+﻿using BetterSecondBot.HttpService;
 using BetterSecondBotShared.Json;
 using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
 using BSB.bottypes;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using static BetterSecondBot.Program;
 
@@ -51,8 +47,11 @@ namespace BetterSecondBot
                 Bot.Start();
                 if (Config.Http_Enable == true)
                 {
+                    /*
                     SecondBotHttpServer my_http_server = new SecondBotHttpServer();
                     my_http_server.StartHttpServer(Bot, Config);
+                    */
+                    new HttpAsService(Bot, Config);
                 }
                 if(use_self_keep_alive == true)
                 {

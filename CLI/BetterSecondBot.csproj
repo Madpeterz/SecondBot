@@ -26,35 +26,18 @@
     <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="HttpWebUi\theme\images\favicon.png" />
-    <None Remove="HttpWebUi\theme\images\logo.png" />
-    <None Remove="HttpWebUi\theme\layout\cdn.css.layout" />
-    <None Remove="HttpWebUi\theme\layout\cdn.js.layout" />
-    <None Remove="HttpWebUi\theme\layout\full.layout" />
-    <None Remove="HttpWebUi\theme\layout\login.block" />
-    <None Remove="HttpWebUi\theme\layout\sidemenu.layout" />
-    <None Remove="HttpWebUi\theme\site.css" />
-    <None Remove="HttpWebUi\theme\site.js" />
     <None Remove="WikiMake\wiki_footer.txt" />
     <None Remove="WikiMake\wiki_header.txt" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="EmbedIO" Version="3.4.3" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
-    <PackageReference Include="MSBuildGitHash" Version="2.0.1">
+    <PackageReference Include="MSBuildGitHash" Version="2.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="HttpWebUi\theme\images\favicon.png" />
-    <EmbeddedResource Include="HttpWebUi\theme\images\logo.png" />
-    <EmbeddedResource Include="HttpWebUi\theme\layout\cdn.css.layout" />
-    <EmbeddedResource Include="HttpWebUi\theme\layout\cdn.js.layout" />
-    <EmbeddedResource Include="HttpWebUi\theme\layout\full.layout" />
-    <EmbeddedResource Include="HttpWebUi\theme\layout\login.block" />
-    <EmbeddedResource Include="HttpWebUi\theme\layout\sidemenu.layout" />
-    <EmbeddedResource Include="HttpWebUi\theme\css\site.css" />
-    <EmbeddedResource Include="HttpWebUi\theme\js\site.js" />
     <EmbeddedResource Include="WikiMake\wiki_footer.txt" />
     <EmbeddedResource Include="WikiMake\wiki_header.txt" />
   </ItemGroup>
