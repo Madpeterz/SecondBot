@@ -57,7 +57,6 @@ namespace BetterSecondBot.DiscordSupervisor
             if (myconfig.DiscordFull_Enable == true)
             {
                 _ = StartDiscordClientService();
-                login_bot(false);
                 keep_alive();
             }
             else
@@ -68,9 +67,12 @@ namespace BetterSecondBot.DiscordSupervisor
 
         protected override void login_bot(bool self_keep_alive)
         {
-            controler = new CliExitOnLogout(myconfig, running_as_docker, self_keep_alive);
-            controler.Bot.setDiscordClient(DiscordClient);
-            attach_events();
+            if (controler != null)
+            {
+                controler = new CliExitOnLogout(myconfig, running_as_docker, self_keep_alive);
+                controler.Bot.setDiscordClient(DiscordClient);
+                attach_events();
+            }
         }
 
     }

@@ -39,6 +39,7 @@ namespace BetterSecondBot.DiscordSupervisor
                     return await MarkMessage(message, "❌");
                 }
                 controler.Bot.KillMePlease();
+                controler = null;
                 return await MarkMessage(message, "✅").ConfigureAwait(false);
             }
             else if(message.Content == "exit")

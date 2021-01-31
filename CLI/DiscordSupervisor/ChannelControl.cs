@@ -210,62 +210,65 @@ namespace BetterSecondBot.DiscordSupervisor
 
         protected async Task DiscordRebuildChannels()
         {
-            List<string> required_cats = new List<string>() { "bot", "group", "im" };
-            IReadOnlyCollection<ICategoryChannel> found_cats = await DiscordServer.GetCategoriesAsync(CacheMode.AllowDownload);
-            foreach (ICategoryChannel fcat in found_cats)
+            if (DiscordServer != null)
             {
-                if (catmap.ContainsKey(fcat.Name) == false)
+                List<string> required_cats = new List<string>() { "bot", "group", "im" };
+                IReadOnlyCollection<ICategoryChannel> found_cats = await DiscordServer.GetCategoriesAsync(CacheMode.AllowDownload);
+                foreach (ICategoryChannel fcat in found_cats)
                 {
-                    if (required_cats.Contains(fcat.Name) == true)
+                    if (catmap.ContainsKey(fcat.Name) == false)
+                    {
+                        if (required_cats.Contains(fcat.Name) == true)
+                        {
+                            required_cats.Remove(fcat.Name);
+                            catmap.Add(fcat.Name, fcat);
+                        }
+                    }
+                    else
                     {
                         required_cats.Remove(fcat.Name);
-                        catmap.Add(fcat.Name, fcat);
                     }
                 }
-                else
+                foreach (string A in required_cats)
                 {
-                    required_cats.Remove(fcat.Name);
+                    ICategoryChannel newcat = await DiscordServer.CreateCategoryAsync(A).ConfigureAwait(true);
+                    catmap.Add(A, newcat);
                 }
-            }
-            foreach (string A in required_cats)
-            {
-                ICategoryChannel newcat = await DiscordServer.CreateCategoryAsync(A).ConfigureAwait(true);
-                catmap.Add(A, newcat);
-            }
-            List<string> required_channels = new List<string>() { "status", "interface","localchat" };
-            IReadOnlyCollection<ITextChannel> found_chans = await DiscordServer.GetTextChannelsAsync(CacheMode.AllowDownload);
-            List<string> GroupChannels = new List<string>();
-            foreach (ITextChannel chan in found_chans)
-            {
-                if (chan.CategoryId == catmap["bot"].Id)
+                List<string> required_channels = new List<string>() { "status", "interface", "localchat" };
+                IReadOnlyCollection<ITextChannel> found_chans = await DiscordServer.GetTextChannelsAsync(CacheMode.AllowDownload);
+                List<string> GroupChannels = new List<string>();
+                foreach (ITextChannel chan in found_chans)
                 {
-                    required_channels.Remove(chan.Name);
-                }
-                else
-                {
-                    if (GroupChannels.Contains(chan.Name) == false)
+                    if (chan.CategoryId == catmap["bot"].Id)
                     {
-                        if (chan.CategoryId == catmap["group"].Id)
+                        required_channels.Remove(chan.Name);
+                    }
+                    else
+                    {
+                        if (GroupChannels.Contains(chan.Name) == false)
                         {
-                            GroupChannels.Add(chan.Name);
+                            if (chan.CategoryId == catmap["group"].Id)
+                            {
+                                GroupChannels.Add(chan.Name);
+                            }
                         }
                     }
                 }
-            }
-            foreach (string A in required_channels)
-            {
-                _ = await FindTextChannel(A, catmap["bot"], UUID.Zero, "bot").ConfigureAwait(false);
-            }
-
-            if (HasBot() == true)
-            {
-                foreach (Group G in controler.Bot.MyGroups.Values)
+                foreach (string A in required_channels)
                 {
-                    string groupname = G.Name.ToLowerInvariant();
-                    groupname = String.Concat(groupname.Where(char.IsLetterOrDigit));
-                    if (GroupChannels.Contains(groupname) == false)
+                    _ = await FindTextChannel(A, catmap["bot"], UUID.Zero, "bot").ConfigureAwait(false);
+                }
+
+                if (HasBot() == true)
+                {
+                    foreach (Group G in controler.Bot.MyGroups.Values)
                     {
-                        _ = await FindTextChannel(groupname, catmap["group"], G.ID, "Group").ConfigureAwait(false);
+                        string groupname = G.Name.ToLowerInvariant();
+                        groupname = String.Concat(groupname.Where(char.IsLetterOrDigit));
+                        if (GroupChannels.Contains(groupname) == false)
+                        {
+                            _ = await FindTextChannel(groupname, catmap["group"], G.ID, "Group").ConfigureAwait(false);
+                        }
                     }
                 }
             }

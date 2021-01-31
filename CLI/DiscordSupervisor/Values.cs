@@ -15,6 +15,7 @@ namespace BetterSecondBot.DiscordSupervisor
         protected bool discord_group_relay;
         protected DiscordSocketClient DiscordClient;
         protected bool DiscordClientConnected;
+
         protected IGuild DiscordServer;
         protected string LastSendDiscordStatus = "";
         protected long DiscordUnixTimeOnine;

@@ -28,6 +28,10 @@ namespace BetterSecondBot.DiscordSupervisor
             DiscordServer = DiscordClient.GetGuild(myconfig.DiscordFull_ServerID);
             if (DiscordServer != null)
             {
+                if (myconfig.DiscordFull_Enable == true)
+                {
+                    login_bot(false);
+                }
                 DiscordUnixTimeOnine = helpers.UnixTimeNow();
                 DiscordClientConnected = true;
                 await DiscordRebuildChannels();
