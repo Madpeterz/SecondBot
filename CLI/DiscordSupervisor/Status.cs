@@ -39,14 +39,6 @@ namespace BetterSecondBot.DiscordSupervisor
             {
                 reply = " " + reply;
             }
-            if(reply == DiscordBotStatus_laststatus)
-            {
-                reply = "";
-            }
-            else
-            {
-                DiscordBotStatus_laststatus = reply;
-            }
             if(HasBasicBot() == true)
             {
                 controler.Bot.LastStatusMessage = controler.Bot.GetStatus();
