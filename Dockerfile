@@ -9,9 +9,9 @@ COPY ["NuGet.Config", ""]
 COPY ["CLI/BetterSecondBot.csproj", "CLI/"]
 COPY ["Core/BSB.csproj", "Core/"]
 COPY ["BSBshared/BSBshared.csproj", "BSBshared/"]
-COPY ["libremetaverse-core/Libremetaverse/LibreMetaverse-core.csproj", "libremetaverse-core/Libremetaverse/"]
-COPY ["libremetaverse-core/Libremetaverse.structureddata/LibreMetaverse-core.StructuredData.csproj", "libremetaverse-core/Libremetaverse.structureddata/"]
-COPY ["libremetaverse-core/LibreMetaverseTypes/LibreMetaverse-core.Types.csproj", "libremetaverse-core/LibreMetaverseTypes/"]
+COPY ["libremetaverse-core/Libremetaverse/LibreMetaverse.csproj", "libremetaverse-core/Libremetaverse/"]
+COPY ["libremetaverse-core/LibreMetaverse.StructuredData/LibreMetaverse.StructuredData.csproj", "libremetaverse-core/LibreMetaverse.StructuredData/"]
+COPY ["libremetaverse-core/LibreMetaverseTypes/LibreMetaverse.Types.csproj", "libremetaverse-core/LibreMetaverseTypes/"]
 RUN dotnet restore "CLI/BetterSecondBot.csproj"
 COPY . .
 WORKDIR "/src/CLI"
@@ -48,11 +48,10 @@ ENV DiscordRelay_GroupUUID=''
 ENV DiscordFull_Enable='false'
 ENV DiscordFull_Token=''
 ENV DiscordFull_ServerID=''
+ENV DiscordFull_Keep_GroupChat='false'
 
 ENV Http_Enable='false'
-ENV Http_Port='80'
-ENV Http_Host='http://localhost:80'
-ENV Http_PublicUrl='http://localhost/'
+ENV Http_Host='docker'
 
 ENV Name2Key_Enable='false'
 ENV Name2Key_Url='http://localhost:1234'
