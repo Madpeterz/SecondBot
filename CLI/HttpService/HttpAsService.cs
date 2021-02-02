@@ -32,7 +32,7 @@ namespace BetterSecondBot.HttpService
                 server.RunAsync();
                 while(Bot.KillMe == false)
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(3000);
                 }
             }
         }
@@ -43,14 +43,26 @@ namespace BetterSecondBot.HttpService
             var server = new WebServer(o => o
                     .WithUrlPrefix(url)
                     .WithMode(HttpListenerMode.EmbedIO))
-                .WithIPBanning(o => o
-                    .WithMaxRequestsPerSecond(10)
-                    .WithRegexRules("HTTP exception 404")
-                )
+                .WithCors()
+                //.WithIPBanning(o => o
+                //    .WithMaxRequestsPerSecond(30)
+                //    .WithRegexRules("HTTP exception 404")
+                //)
                 .WithWebApi("/inventory", m => m
-                    .WithController(() => new SecondbotInventory(Bot, Tokens)))
+                    .WithController(() => new SecondbotInventory(Bot, Tokens))
+                )
+                .WithWebApi("/chat", m => m
+                    .WithController(() => new SecondbotChat(Bot, Tokens))
+                )
+                .WithWebApi("/groups", m => m
+                    .WithController(() => new SecondbotGroup(Bot, Tokens))
+                )
+                .WithWebApi("/ims", m => m
+                    .WithController(() => new SecondbotIm(Bot, Tokens))
+                )
                 .WithWebApi("/core", m => m
                     .WithController(() => new SecondbotCoreWebAPi(Config, Bot, Tokens)))
+
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" })));
             return server;
         }
@@ -100,7 +112,7 @@ namespace BetterSecondBot.HttpService
                     PurgeExpired();
                     return false;
                 }
-                if (info.IP == IPaddress)
+                if (IPaddress.Equals(info.IP) == true)
                 {
                     return true;
                 }
@@ -110,21 +122,27 @@ namespace BetterSecondBot.HttpService
 
         public string CreateToken(IPAddress IP)
         {
-            PurgeExpired();
-            bool used = true;
-            string last = "";
-            while(used == true)
+            if (IP != null)
             {
-                last = helpers.GetSHA1(last + helpers.UnixTimeNow() + new Random().Next(13256).ToString()).Substring(0, 10);
-                used = tokens.ContainsKey(last);
-                if (used == false)
+                PurgeExpired();
+                bool used = true;
+                string last = "";
+                while (used == true)
                 {
-                    tokenInfo Info = new tokenInfo();
-                    Info.IP = IP;
-                    Info.Expires = helpers.UnixTimeNow() + (60 * 10);
+                    last = helpers.GetSHA1(last + helpers.UnixTimeNow() + new Random().Next(13256).ToString()).Substring(0, 10);
+                    used = tokens.ContainsKey(last);
+                    if (used == false)
+                    {
+                        tokenInfo Info = new tokenInfo();
+                        Info.IP = IP;
+                        Info.Expires = helpers.UnixTimeNow() + (60 * 10);
+                        tokens.Add(last, Info);
+                        break;
+                    }
                 }
+                return last;
             }
-            return last;
+            return null;
         }
     }
 
@@ -132,7 +150,11 @@ namespace BetterSecondBot.HttpService
     {
         protected TokenStorage tokens;
         protected SecondBot bot;
-        
+
+        protected Object BasicReply(string input)
+        {
+            return new { reply = input };
+        }
         public WebApiControllerWithTokens(SecondBot mainbot, TokenStorage setuptokens)
         {
             bot = mainbot;

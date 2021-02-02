@@ -354,9 +354,16 @@ namespace BSB.bottypes
                 Client.Groups.CurrentGroups += GroupsHandler;
                 Client.Self.ScriptQuestion += PermissionsHandler;
                 Client.Friends.FriendshipResponse += FriendshipResponse;
+                Client.Friends.FriendNames += AvatarFriendNames;
                 delay_group_fetch = helpers.UnixTimeNow() + 10;
             }
             base.AfterBotLoginHandler();
+        }
+
+
+        protected virtual void AvatarFriendNames(object o, FriendNamesEventArgs E)
+        {
+
         }
 
         protected virtual void FriendshipResponse(object o, FriendshipResponseEventArgs E)

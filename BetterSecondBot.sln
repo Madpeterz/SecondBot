@@ -10,18 +10,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BSBshared", "BSBshared\BSBs
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libmeta-core", "Libmeta-core", "{7538B15D-152B-4A0F-A24D-A89EDC382564}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse-core.Types", "libremetaverse-core\Libremetaverse.types\LibreMetaverse-core.Types.csproj", "{EF718593-1FC7-433A-8495-5B1A7106CAF3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse-core.StructuredData", "libremetaverse-core\Libremetaverse.structureddata\LibreMetaverse-core.StructuredData.csproj", "{3928AB19-219D-4284-BFE9-6C0E779F98A3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse-core", "libremetaverse-core\Libremetaverse\LibreMetaverse-core.csproj", "{97198293-1B92-4FD2-811E-AE1F33D4B2B2}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B861AB1B-8F09-41A9-8817-CB8A2E961E4C}"
 	ProjectSection(SolutionItems) = preProject
 		Dockerfile = Dockerfile
 		NuGet.Config = NuGet.Config
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse", "libremetaverse-core\LibreMetaverse\LibreMetaverse.csproj", "{27C70F3A-0000-0000-0000-000000000000}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse.StructuredData", "libremetaverse-core\LibreMetaverse.StructuredData\LibreMetaverse.StructuredData.csproj", "{89D7A3E5-0000-0000-0000-000000000000}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse.Types", "libremetaverse-core\LibreMetaverseTypes\LibreMetaverse.Types.csproj", "{B37B02AD-0000-0000-0000-000000000000}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,41 +66,50 @@ Global
 		{42075C8C-8055-4178-8C12-AE97DAFE8484}.Release|Any CPU.ActiveCfg = Release|x64
 		{42075C8C-8055-4178-8C12-AE97DAFE8484}.Release|x64.ActiveCfg = Release|x64
 		{42075C8C-8055-4178-8C12-AE97DAFE8484}.Release|x64.Build.0 = Release|x64
-		{EF718593-1FC7-433A-8495-5B1A7106CAF3}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{EF718593-1FC7-433A-8495-5B1A7106CAF3}.Debug|x64.ActiveCfg = Debug|x64
-		{EF718593-1FC7-433A-8495-5B1A7106CAF3}.Debug|x64.Build.0 = Debug|x64
-		{EF718593-1FC7-433A-8495-5B1A7106CAF3}.DockerBuild|Any CPU.ActiveCfg = DockerBuild|x64
-		{EF718593-1FC7-433A-8495-5B1A7106CAF3}.DockerBuild|x64.ActiveCfg = DockerBuild|x64
-		{EF718593-1FC7-433A-8495-5B1A7106CAF3}.DockerBuild|x64.Build.0 = DockerBuild|x64
-		{EF718593-1FC7-433A-8495-5B1A7106CAF3}.Release|Any CPU.ActiveCfg = Release|x64
-		{EF718593-1FC7-433A-8495-5B1A7106CAF3}.Release|x64.ActiveCfg = Release|x64
-		{EF718593-1FC7-433A-8495-5B1A7106CAF3}.Release|x64.Build.0 = Release|x64
-		{3928AB19-219D-4284-BFE9-6C0E779F98A3}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{3928AB19-219D-4284-BFE9-6C0E779F98A3}.Debug|x64.ActiveCfg = Debug|x64
-		{3928AB19-219D-4284-BFE9-6C0E779F98A3}.Debug|x64.Build.0 = Debug|x64
-		{3928AB19-219D-4284-BFE9-6C0E779F98A3}.DockerBuild|Any CPU.ActiveCfg = DockerBuild|x64
-		{3928AB19-219D-4284-BFE9-6C0E779F98A3}.DockerBuild|x64.ActiveCfg = DockerBuild|x64
-		{3928AB19-219D-4284-BFE9-6C0E779F98A3}.DockerBuild|x64.Build.0 = DockerBuild|x64
-		{3928AB19-219D-4284-BFE9-6C0E779F98A3}.Release|Any CPU.ActiveCfg = Release|x64
-		{3928AB19-219D-4284-BFE9-6C0E779F98A3}.Release|x64.ActiveCfg = Release|x64
-		{3928AB19-219D-4284-BFE9-6C0E779F98A3}.Release|x64.Build.0 = Release|x64
-		{97198293-1B92-4FD2-811E-AE1F33D4B2B2}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{97198293-1B92-4FD2-811E-AE1F33D4B2B2}.Debug|x64.ActiveCfg = Debug|x64
-		{97198293-1B92-4FD2-811E-AE1F33D4B2B2}.Debug|x64.Build.0 = Debug|x64
-		{97198293-1B92-4FD2-811E-AE1F33D4B2B2}.DockerBuild|Any CPU.ActiveCfg = DockerBuild|x64
-		{97198293-1B92-4FD2-811E-AE1F33D4B2B2}.DockerBuild|x64.ActiveCfg = DockerBuild|x64
-		{97198293-1B92-4FD2-811E-AE1F33D4B2B2}.DockerBuild|x64.Build.0 = DockerBuild|x64
-		{97198293-1B92-4FD2-811E-AE1F33D4B2B2}.Release|Any CPU.ActiveCfg = Release|x64
-		{97198293-1B92-4FD2-811E-AE1F33D4B2B2}.Release|x64.ActiveCfg = Release|x64
-		{97198293-1B92-4FD2-811E-AE1F33D4B2B2}.Release|x64.Build.0 = Release|x64
+		{27C70F3A-0000-0000-0000-000000000000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27C70F3A-0000-0000-0000-000000000000}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27C70F3A-0000-0000-0000-000000000000}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{27C70F3A-0000-0000-0000-000000000000}.Debug|x64.Build.0 = Debug|Any CPU
+		{27C70F3A-0000-0000-0000-000000000000}.DockerBuild|Any CPU.ActiveCfg = Debug|Any CPU
+		{27C70F3A-0000-0000-0000-000000000000}.DockerBuild|Any CPU.Build.0 = Debug|Any CPU
+		{27C70F3A-0000-0000-0000-000000000000}.DockerBuild|x64.ActiveCfg = Debug|Any CPU
+		{27C70F3A-0000-0000-0000-000000000000}.DockerBuild|x64.Build.0 = Debug|Any CPU
+		{27C70F3A-0000-0000-0000-000000000000}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27C70F3A-0000-0000-0000-000000000000}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27C70F3A-0000-0000-0000-000000000000}.Release|x64.ActiveCfg = Release|Any CPU
+		{27C70F3A-0000-0000-0000-000000000000}.Release|x64.Build.0 = Release|Any CPU
+		{89D7A3E5-0000-0000-0000-000000000000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89D7A3E5-0000-0000-0000-000000000000}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89D7A3E5-0000-0000-0000-000000000000}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{89D7A3E5-0000-0000-0000-000000000000}.Debug|x64.Build.0 = Debug|Any CPU
+		{89D7A3E5-0000-0000-0000-000000000000}.DockerBuild|Any CPU.ActiveCfg = Debug|Any CPU
+		{89D7A3E5-0000-0000-0000-000000000000}.DockerBuild|Any CPU.Build.0 = Debug|Any CPU
+		{89D7A3E5-0000-0000-0000-000000000000}.DockerBuild|x64.ActiveCfg = Debug|Any CPU
+		{89D7A3E5-0000-0000-0000-000000000000}.DockerBuild|x64.Build.0 = Debug|Any CPU
+		{89D7A3E5-0000-0000-0000-000000000000}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89D7A3E5-0000-0000-0000-000000000000}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89D7A3E5-0000-0000-0000-000000000000}.Release|x64.ActiveCfg = Release|Any CPU
+		{89D7A3E5-0000-0000-0000-000000000000}.Release|x64.Build.0 = Release|Any CPU
+		{B37B02AD-0000-0000-0000-000000000000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B37B02AD-0000-0000-0000-000000000000}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B37B02AD-0000-0000-0000-000000000000}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B37B02AD-0000-0000-0000-000000000000}.Debug|x64.Build.0 = Debug|Any CPU
+		{B37B02AD-0000-0000-0000-000000000000}.DockerBuild|Any CPU.ActiveCfg = Debug|Any CPU
+		{B37B02AD-0000-0000-0000-000000000000}.DockerBuild|Any CPU.Build.0 = Debug|Any CPU
+		{B37B02AD-0000-0000-0000-000000000000}.DockerBuild|x64.ActiveCfg = Debug|Any CPU
+		{B37B02AD-0000-0000-0000-000000000000}.DockerBuild|x64.Build.0 = Debug|Any CPU
+		{B37B02AD-0000-0000-0000-000000000000}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B37B02AD-0000-0000-0000-000000000000}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B37B02AD-0000-0000-0000-000000000000}.Release|x64.ActiveCfg = Release|Any CPU
+		{B37B02AD-0000-0000-0000-000000000000}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{EF718593-1FC7-433A-8495-5B1A7106CAF3} = {7538B15D-152B-4A0F-A24D-A89EDC382564}
-		{3928AB19-219D-4284-BFE9-6C0E779F98A3} = {7538B15D-152B-4A0F-A24D-A89EDC382564}
-		{97198293-1B92-4FD2-811E-AE1F33D4B2B2} = {7538B15D-152B-4A0F-A24D-A89EDC382564}
+		{27C70F3A-0000-0000-0000-000000000000} = {7538B15D-152B-4A0F-A24D-A89EDC382564}
+		{89D7A3E5-0000-0000-0000-000000000000} = {7538B15D-152B-4A0F-A24D-A89EDC382564}
+		{B37B02AD-0000-0000-0000-000000000000} = {7538B15D-152B-4A0F-A24D-A89EDC382564}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {39A7E333-AFC1-4BA8-9EBC-9298791FDC78}

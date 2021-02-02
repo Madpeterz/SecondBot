@@ -25,6 +25,32 @@ namespace BSB.bottypes
         protected bool show_av_storage_info_in_status = true;
         protected string AVstorageBot_laststatus = "";
 
+
+        protected Dictionary<UUID, string> FriendNames = new Dictionary<UUID, string>();
+        protected override void AvatarFriendNames(object o, FriendNamesEventArgs E)
+        {
+            FriendNames = E.Names;
+        }
+
+        public string getJsonFriendlist()
+        {
+            Dictionary<UUID, friendreplyobject> Friends = new Dictionary<UUID, friendreplyobject>();
+            Dictionary<UUID, FriendInfo> friendscopy = GetClient.Friends.FriendList.Copy();
+            foreach (KeyValuePair<UUID, FriendInfo> av in friendscopy)
+            {
+                string name = FindAvatarKey2Name(av.Key);
+                if (name != "loopup")
+                {
+                    friendreplyobject entry = new friendreplyobject();
+                    entry.name = name;
+                    entry.id = av.Key.ToString();
+                    entry.online = av.Value.IsOnline;
+                    Friends.Add(av.Key, entry);
+                }
+            }
+            return JsonConvert.SerializeObject(Friends);
+        }
+
         public override string GetStatus()
         {
             cleanupAvatarStorage();
@@ -46,6 +72,7 @@ namespace BSB.bottypes
                     }
                     reply += AvatarStorageLastUsed.Count.ToString() + " loaded";
                 }
+                reply += " - " + FriendNames.Count() + " Friends";
                 if (reply != "")
                 {
                     reply = " (AVStorage: " + reply + ")";
@@ -299,6 +326,19 @@ namespace BSB.bottypes
                 AvatarStorageLastUsed[avatar_name] = helpers.UnixTimeNow();
                 return AvatarName2Key[avatar_name].ToString();
             }
+            else if (FriendNames.ContainsValue(avatar_name) == true)
+            {
+                string returnvalue = "";
+                foreach(UUID entry in FriendNames.Keys)
+                {
+                    if(FriendNames[entry] == avatar_name)
+                    {
+                        returnvalue = entry.ToString();
+                        break;
+                    }
+                }
+                return returnvalue;
+            }
             return "";
         }
 
@@ -335,6 +375,10 @@ namespace BSB.bottypes
             {
                 AvatarStorageLastUsed[AvatarKey2Name[avatar_uuid]] = helpers.UnixTimeNow();
                 return AvatarKey2Name[avatar_uuid];
+            }
+            else if(FriendNames.ContainsKey(avatar_uuid) == true)
+            {
+                return FriendNames[avatar_uuid];
             }
             return "";
         }
@@ -406,5 +450,12 @@ namespace BSB.bottypes
         public bool found { get; set; }
         public bool status { get; set; }
         public string message { get; set; }
+    }
+
+    public class friendreplyobject
+    {
+        public string name;
+        public string id;
+        public bool online;
     }
 }

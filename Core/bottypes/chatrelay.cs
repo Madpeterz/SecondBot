@@ -50,13 +50,22 @@ namespace BSB.bottypes
         }
         public override void AddToIMchat(UUID avatar, string name, string message)
         {
+            string sendername = name;
+            if(sendername == GetClient.Self.Name)
+            {
+                name = FindAvatarKey2Name(avatar);
+            }
             if (im_chat_history.ContainsKey(avatar) == false)
             {
+                if(im_chat_history_to_name.ContainsKey(avatar) == false)
+                {
+                    im_chat_history_to_name.Add(avatar, name);
+                }
                 im_chat_history.Add(avatar, new List<string>());
                 im_chat_unread.Add(avatar, false);
             }
             var date = DateTime.Now;
-            im_chat_history[avatar].Add("[" + date.Hour.ToString() + ":" + date.Minute.ToString() + "] " + name + ":" + message + "");
+            im_chat_history[avatar].Add("[" + date.Hour.ToString() + ":" + date.Minute.ToString() + "] " + sendername + ":" + message + "");
             if (im_chat_history[avatar].Count > imchatlimit)
             {
                 im_chat_history[avatar].RemoveAt(0);
@@ -110,6 +119,11 @@ namespace BSB.bottypes
                     }
                 }
             }
+        }
+
+        public override bool HasUnreadGroupchats()
+        {
+            return group_chat_unread.ContainsValue(true);
         }
 
         public override bool GroupHasUnread(UUID group)

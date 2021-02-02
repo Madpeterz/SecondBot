@@ -3,14 +3,16 @@ using BetterSecondBotShared.Static;
 using BSB.bottypes;
 using OpenMetaverse;
 using System.Threading.Tasks;
-
 using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
-
+using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace BetterSecondBot.HttpService
 {
+
     public class SecondbotCoreWebAPi : WebApiControllerWithTokens
     {
         
@@ -21,61 +23,92 @@ namespace BetterSecondBot.HttpService
         }
 
         [Route(HttpVerbs.Post, "/gettoken")]
-        public string GetToken([FormField] string authcode)
+        public Object GetToken([FormField] string authcode, [FormField] string unixtimegiven)
         {
-            long now = helpers.UnixTimeNow() + 120;
-            int loop = 0;
-            bool accepted = false;
-            while(loop <= 30)
+            long now = helpers.UnixTimeNow();
+            long dif = 0;
+            if(long.TryParse(unixtimegiven,out long given) == true)
             {
-                string hashA = helpers.GetSHA1((now + loop) + "" + config.Security_WebUIKey).Substring(0, 10);
-                string hashB = helpers.GetSHA1((now - loop) + "" + config.Security_WebUIKey).Substring(0, 10);
-                if ((authcode == hashA) || (authcode == hashB))
+                dif = now - given;
+                now = given;
+            }
+            if((dif < 30) && (dif > -30))
+            {
+                var raw = now.ToString() + config.Security_WebUIKey;
+                string hash = helpers.GetSHA1(raw).Substring(0, 10);
+                if (hash == authcode)
                 {
-                    accepted = true;
-                    break;
+                    string newtoken = tokens.CreateToken(getClientIP());
+                    if(newtoken != null) return BasicReply(newtoken);
                 }
-                loop++;
             }
-            if(accepted == true)
+            return BasicReply("Authcode not accepted");
+        }
+
+        [Route(HttpVerbs.Get, "/friends/{token}")]
+        public object friends(string token)
+        {
+            return BasicReply(bot.getJsonFriendlist());
+        }
+
+
+        [Route(HttpVerbs.Get, "/nearme/{token}")]
+        public object nearme(string token)
+        {
+            if (bot.GetClient.Network.CurrentSim != null)
             {
-                return tokens.CreateToken(HttpContext.Request.RemoteEndPoint.Address);
+                Dictionary<UUID, string> NearMe = new Dictionary<UUID, string>();
+                Dictionary<uint, Avatar> avcopy = bot.GetClient.Network.CurrentSim.ObjectsAvatars.Copy();
+                foreach (Avatar av in avcopy.Values)
+                {
+                    if (av.ID != bot.GetClient.Self.AgentID)
+                    {
+                        NearMe.Add(av.ID, av.Name);
+                    }
+                }
+                return BasicReply(JsonConvert.SerializeObject(NearMe));
             }
-            return "Authcode not accepted";
+            return BasicReply("Error");
+        }
+
+        [Route(HttpVerbs.Get, "/hello")]
+        public object Hello()
+        {
+            return BasicReply("world");
         }
 
         [Route(HttpVerbs.Get, "/logout/{token}")]
-        public string Logout(string token)
+        public object Logout(string token)
         {
             if (tokens.Allow(token, getClientIP()) == true)
             {
                 return tokens.Expire(token);
             }
-            return "Token not accepted";
+            return BasicReply("Token not accepted");
         }
 
         [Route(HttpVerbs.Get, "/version/{token}")]
-        public string Version(string token)
+        public object Version(string token)
         {
             if (tokens.Allow(token, getClientIP()) == true)
             {
-                return bot.MyVersion;
+                return BasicReply(bot.MyVersion);
             }
-            return "Token not accepted";
+            return BasicReply("Token not accepted");
         }
 
         [Route(HttpVerbs.Get, "/name/{token}")]
-        public string Name(string token)
+        public object Name(string token)
         {
             if (tokens.Allow(token, getClientIP()) == true)
             {
-                return bot.GetClient.Self.FirstName + " " + bot.GetClient.Self.LastName;
+                return BasicReply(bot.GetClient.Self.FirstName + " " + bot.GetClient.Self.LastName);
             }
-            return "Token not accepted";
+            return BasicReply("Token not accepted");
         }
 
         [Route(HttpVerbs.Post, "/command/{token}")]
-        public async Task<string> command(string token)
+        public async Task<object> command(string token)
         {
             if (tokens.Allow(token, getClientIP()) == true)
             {
@@ -88,11 +121,11 @@ namespace BetterSecondBot.HttpService
                     bool status = bot.GetCommandsInterface.Call(data.Command, compressedArgs, UUID.Zero, "~#~");
                     if (status == true)
                     {
-                        return "accepted";
+                        return BasicReply("accepted");
                     }
                 }
             }
-            return "Token not accepted";
+            return BasicReply("Token not accepted");
         }
     }
 

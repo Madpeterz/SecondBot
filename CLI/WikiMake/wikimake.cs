@@ -496,12 +496,40 @@ namespace BetterSecondBot.WikiMake
             core.callable.Add(new version());
             core.callable.Add(new name());
             core.callable.Add(new command());
+            core.callable.Add(new friends());
+            core.callable.Add(new nearme());
+            core.callable.Add(new hello());
             endpoints.Add(core);
             Endpoint inventory = new Endpoint();
             inventory.name = "inventory";
             inventory.callable.Add(new contents());
             inventory.callable.Add(new folders());
+            inventory.callable.Add(new rename());
+            inventory.callable.Add(new realuuid());
+            inventory.callable.Add(new send());
+            inventory.callable.Add(new delete());
             endpoints.Add(inventory);
+            Endpoint im = new Endpoint();
+            im.name = "im";
+            im.callable.Add(new chatwindows());
+            im.callable.Add(new listwithunread());
+            im.callable.Add(new haveunreadims());
+            im.callable.Add(new getimchat());
+            im.callable.Add(new sendimchat());
+            endpoints.Add(im);
+            Endpoint group = new Endpoint();
+            group.name = "group";
+            group.callable.Add(new listgroups());
+            group.callable.Add(new listgroupswithunread());
+            group.callable.Add(new haveunreadgroupchat());
+            group.callable.Add(new getgroupchat());
+            group.callable.Add(new sendgroupchat());
+            endpoints.Add(group);
+            Endpoint chat = new Endpoint();
+            chat.name = "chat";
+            chat.callable.Add(new localchathistory());
+            chat.callable.Add(new localchatsay());
+            endpoints.Add(chat);
         }
 
         public string getCommandMethod(string endpoint, string command)
@@ -726,6 +754,37 @@ namespace BetterSecondBot.WikiMake
         }
     }
 
+    public class friends : APIcall
+    {
+        public override void Setup()
+        {
+            about = "Gets the friendslist <br/>Formated as follows<br/>friendreplyobject<br/><ul><li>name: String</li><li>id: String</li><li>online: bool</li></ul>";
+            returns.Add("array UUID = friendreplyobject");
+            base.Setup();
+        }
+    }
+
+    public class nearme : APIcall
+    {
+        public override void Setup()
+        {
+            about = "returns a list of all known avatars near (same sim)>";
+            returns.Add("array UUID = Name");
+            base.Setup();
+        }
+    }
+
+    public class hello : APIcall
+    {
+        public override void Setup()
+        {
+            RequiresToken = false;
+            about = "used to test you can talk to the api but mostly pointless.";
+            returns.Add("world");
+            base.Setup();
+        }
+    }
+
     public class name : APIcall
     {
         public override void Setup()
@@ -774,6 +833,186 @@ namespace BetterSecondBot.WikiMake
         {
             about = "Requests the inventory folder layout as a json object InventoryMapFolder<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>subfolders: InventoryMapFolder[]</li></ul>";
             returns.Add("array of InventoryMapFolder");
+            base.Setup();
+        }
+    }
+
+    public class rename : postAPIcall
+    {
+        public override void Setup()
+        {
+            about = "renames a folder or inventory item";
+            returns.Add("true|false");
+            values.Add("item", new KeyValuePair<string, string>("URLARG", "UUID of the item/folder we are working on"));
+            values.Add("newname", new KeyValuePair<string, string>("string", "What we are setting"));
+            base.Setup();
+        }
+    }
+
+    public class realuuid : APIcall
+    {
+        public override void Setup()
+        {
+            about = "converts a inventory uuid to a realworld uuid<br/>Needed for texture preview";
+            returns.Add("Failed");
+            returns.Add("UUID");
+            values.Add("item", new KeyValuePair<string, string>("URLARG", "UUID of the item/folder we are working on"));
+            base.Setup();
+        }
+    }
+
+    public class send : APIcall
+    {
+        public override void Setup()
+        {
+            about = "sends a item to an avatar";
+            returns.Add("Failed");
+            returns.Add("UUID");
+            values.Add("item", new KeyValuePair<string, string>("URLARG", "UUID of the item we are working on"));
+            values.Add("avatar", new KeyValuePair<string, string>("URLARG", "a UUID or Firstname Lastname"));
+            base.Setup();
+        }
+    }
+
+    public class delete : APIcall
+    {
+        public override void Setup()
+        {
+            about = "Removes a item/folder from inventory (Make sure you set the isfolder flag correctly!)";
+            returns.Add("Failed");
+            returns.Add("UUID");
+            values.Add("item", new KeyValuePair<string, string>("URLARG", "UUID of the item/folder we are working on"));
+            values.Add("isfolder", new KeyValuePair<string, string>("URLARG", "true or false if this is a folder"));
+            base.Setup();
+        }
+    }
+
+    public class chatwindows : APIcall
+    {
+        public override void Setup()
+        {
+            about = "gets a full list of all chat windows";
+            returns.Add("array UUID = Name");
+            base.Setup();
+        }
+    }
+
+    public class listwithunread : APIcall
+    {
+        public override void Setup()
+        {
+            about = "gets a list of chat windows with unread messages";
+            returns.Add("array of UUID");
+            base.Setup();
+        }
+    }
+
+    public class haveunreadims : APIcall
+    {
+        public override void Setup()
+        {
+            about = "gets if there are any unread im messages at all";
+            returns.Add("true|false");
+            base.Setup();
+        }
+    }
+
+    public class getimchat : APIcall
+    {
+        public override void Setup()
+        {
+            about = "gets the chat from the selected window";
+            values.Add("window", new KeyValuePair<string, string>("URLARG", "the UUID of the chat window"));
+            returns.Add("Chat contents");
+            returns.Add("Window UUID invaild");
+            base.Setup();
+        }
+    }
+
+    public class sendimchat : postAPIcall
+    {
+        public override void Setup()
+        {
+            about = "sends a im to the selected avatar";
+            values.Add("avatar", new KeyValuePair<string, string>("URLARG", "a UUID or Firstname Lastname"));
+            values.Add("message", new KeyValuePair<string, string>("string", "the message to send"));
+            returns.Add("ok");
+            base.Setup();
+        }
+    }
+
+    public class listgroups : APIcall
+    {
+        public override void Setup()
+        {
+            about = "fetchs a list of all groups known to the bot";
+            returns.Add("array UUID=name");
+            base.Setup();
+        }
+    }
+
+    public class listgroupswithunread : APIcall
+    {
+        public override void Setup()
+        {
+            about = "fetchs a list of all groups with unread messages";
+            returns.Add("array UUID");
+            base.Setup();
+        }
+    }
+
+    public class haveunreadgroupchat : APIcall
+    {
+        public override void Setup()
+        {
+            about = "checks if there are any groups with unread messages";
+            returns.Add("true|false");
+            base.Setup();
+        }
+    }
+
+    public class getgroupchat : APIcall
+    {
+        public override void Setup()
+        {
+            about = "fetchs the groupchat history";
+            values.Add("group ", new KeyValuePair<string, string>("URLARG", "UUID of the group"));
+            returns.Add("Group UUID invaild");
+            returns.Add("Group Chat");
+            base.Setup();
+        }
+    }
+
+    public class sendgroupchat : postAPIcall
+    {
+        public override void Setup()
+        {
+            about = "sends a message to the groupchat";
+            values.Add("group ", new KeyValuePair<string, string>("URLARG", "UUID of the group"));
+            values.Add("message ", new KeyValuePair<string, string>("string", "the message to send"));
+            returns.Add("Group UUID invaild");
+            returns.Add("Processing");
+            base.Setup();
+        }
+    }
+
+    public class localchathistory : APIcall
+    {
+        public override void Setup()
+        {
+            about = "fetchs the last 20 localchat messages";
+            returns.Add("array string");
+            base.Setup();
+        }
+    }
+
+    public class localchatsay : postAPIcall
+    {
+        public override void Setup()
+        {
+            about = "sends a message to localchat";
+            values.Add("message ", new KeyValuePair<string, string>("string", "the message to send"));
+            returns.Add("see->localchathistory");
             base.Setup();
         }
     }

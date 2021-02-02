@@ -23,7 +23,7 @@ namespace BSB.Commands.Inventory
                         InventoryItem itm = bot.GetClient.Inventory.FetchItem(targetitem, bot.GetClient.Self.AgentID, (search_delay_time * 1000));
                         if (itm != null)
                         {
-                            bot.GetClient.Inventory.GiveItem(itm.AssetUUID, itm.Name, itm.AssetType, targetavatar, false);
+                            bot.GetClient.Inventory.GiveItem(itm.UUID, itm.Name, itm.AssetType, targetavatar, false);
                             return true;
                         }
                         else

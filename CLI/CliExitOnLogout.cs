@@ -51,7 +51,10 @@ namespace BetterSecondBot
                     SecondBotHttpServer my_http_server = new SecondBotHttpServer();
                     my_http_server.StartHttpServer(Bot, Config);
                     */
-                    new HttpAsService(Bot, Config);
+                    new Thread(() =>
+                    {
+                        new HttpAsService(Bot, Config);
+                    }).Start();
                 }
                 if(use_self_keep_alive == true)
                 {

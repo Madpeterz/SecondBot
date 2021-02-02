@@ -22,6 +22,19 @@ namespace BSB.Static
 
     public static class HelperInventory
     {
+        public static InventoryItem getItemByInventoryUUID(CommandsBot bot, UUID target)
+        {
+            return bot.GetClient.Inventory.FetchItem(target, bot.GetClient.Self.AgentID, 3000);
+        }
+        public static UUID GetAssetUUID(CommandsBot bot, UUID target)
+        {
+            InventoryItem A = getItemByInventoryUUID(bot, target);
+            if (A != null)
+            {
+                return A.AssetUUID;
+            }
+            return UUID.Zero;
+        }
         public static InventoryBase FindFolder(CommandsBot bot, InventoryFolder current,UUID target)
         {
             List<InventoryBase> T = bot.GetClient.Inventory.Store.GetContents(current);
@@ -102,7 +115,14 @@ namespace BSB.Static
 
         public static string MapFolderJson(CommandsBot bot)
         {
-            return JsonConvert.SerializeObject(DoMapFolderJson(bot, bot.GetClient.Inventory.Store.RootFolder)).Replace("\\\"","\"");
+            if (bot.GetClient.Inventory.Store != null)
+            {
+                if (bot.GetClient.Inventory.Store.RootFolder != null)
+                {
+                    return JsonConvert.SerializeObject(DoMapFolderJson(bot, bot.GetClient.Inventory.Store.RootFolder));
+                }
+            }
+            return null;
         }
 
         public static InventoryMapFolder DoMapFolderJson(CommandsBot bot, InventoryFolder folder)
