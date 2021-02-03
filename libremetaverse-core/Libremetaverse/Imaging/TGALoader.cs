@@ -628,8 +628,9 @@ namespace OpenMetaverse.Imaging
                     {
                         return LoadTGA(f);
                     }
+                    
                 }
-                return null; // file stream error
+                return null;
             }
             catch (System.IO.DirectoryNotFoundException)
             {

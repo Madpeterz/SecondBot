@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>LibreMetaverse-core</id>
+    <version>$version$</version>
+    <authors>Madpeterz</authors>
+    <owners>Madpeterz</owners>
+    <licenseUrl>https://github.com/Madpeterz/libremetaverse-core/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/Madpeterz/libremetaverse-core</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A port of LibreMetaverse to .net core cleaned up</description>
+    <copyright>Copyright 2020</copyright>
+    <tags>SecondLife Docker Linux Windows Secondbot CLI</tags>
+  </metadata>
+</package>

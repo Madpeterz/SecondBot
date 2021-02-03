@@ -26,9 +26,6 @@
     <PackageReference Include="RestSharp" Version="106.11.2" />
   </ItemGroup>  <ItemGroup>
   <ProjectReference Include="..\BSBshared\BSBshared.csproj" />
-  <ProjectReference Include="..\libremetaverse-core\LibreMetaverse.StructuredData\LibreMetaverse.StructuredData.csproj" />
-  <ProjectReference Include="..\libremetaverse-core\LibreMetaverseTypes\LibreMetaverse.Types.csproj" />
-  <ProjectReference Include="..\libremetaverse-core\LibreMetaverse\LibreMetaverse.csproj" />
 </ItemGroup>
 
 </Project>

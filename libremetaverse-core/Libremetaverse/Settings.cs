@@ -340,24 +340,12 @@ namespace OpenMetaverse
 
         #region Logging Configuration
 
-        /// <summary>
-        /// Get or set the minimum log level to output to the console by default
-        /// 
-        /// If the library is not compiled with DEBUG defined and this level is set to DEBUG
-        /// You will get no output on the console. This behavior can be overriden by creating
-        /// a logger configuration file for log4net
-        /// </summary>
-        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.Debug;
-
-        /// <summary>Attach avatar names to log messages</summary>
+        public string LOG_WRITER = "Console";
         public bool LOG_NAMES = true;
+        public bool LOG_DISKCACHE = false;
+        public bool LOG_RESENDS = false;
+        public Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.Info;
 
-        /// <summary>Log packet retransmission info</summary>
-        public bool LOG_RESENDS = true;
-
-        /// <summary>Log disk cache misses and other info</summary>
-        public bool LOG_DISKCACHE = true;
-        
         #endregion
         #region Private Fields
 
@@ -387,5 +375,6 @@ namespace OpenMetaverse
         }
 
         #endregion
+
     }
 }
