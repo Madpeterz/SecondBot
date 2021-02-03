@@ -9,7 +9,7 @@ COPY ["NuGet.Config", ""]
 COPY ["CLI/BetterSecondBot.csproj", "CLI/"]
 COPY ["Core/BSB.csproj", "Core/"]
 COPY ["BSBshared/BSBshared.csproj", "BSBshared/"]
-COPY ["libremetaverse-core/Libremetaverse/LibreMetaverse.csproj", "libremetaverse-core/Libremetaverse/"]
+COPY ["libremetaverse-core/LibreMetaverse/LibreMetaverse.csproj", "libremetaverse-core/LibreMetaverse/"]
 COPY ["libremetaverse-core/LibreMetaverse.StructuredData/LibreMetaverse.StructuredData.csproj", "libremetaverse-core/LibreMetaverse.StructuredData/"]
 COPY ["libremetaverse-core/LibreMetaverseTypes/LibreMetaverse.Types.csproj", "libremetaverse-core/LibreMetaverseTypes/"]
 RUN dotnet restore "CLI/BetterSecondBot.csproj"
@@ -23,7 +23,6 @@ RUN dotnet publish "BetterSecondBot.csproj" -c DockerBuild -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
 # --- Update your settings ---
 
 ENV Basic_BotUserName=''
