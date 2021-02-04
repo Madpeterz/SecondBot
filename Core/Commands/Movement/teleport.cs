@@ -17,6 +17,7 @@ namespace BSB.Commands.Movement
         {
             if(base.CallFunction(args) == true)
             {
+                bot.GetClient.Self.AutoPilotCancel();
                 if (args[0].Contains("http://maps.secondlife.com/secondlife/") == true)
                 {
                     bot.TeleportWithSLurl(args[0]);

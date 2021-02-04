@@ -15,6 +15,18 @@ namespace BetterSecondBot.HttpService
         public SecondbotInventory(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
 
+        [Route(HttpVerbs.Get, "/rezobject/{item}/{token}")]
+        public object rezobject(string item, string token, [FormField] string newname)
+        {
+            if (tokens.Allow(token, getClientIP()) == true)
+            {
+                bool status = bot.GetCommandsInterface.Call("RezObject", item);
+                return BasicReply(status.ToString());
+            }
+            return BasicReply("Token not accepted");
+        }
+
+
         [Route(HttpVerbs.Post, "/rename/{item}/{token}")]
         public object rename(string item, string token, [FormField] string newname)
         {

@@ -404,12 +404,12 @@ namespace BetterSecondBotShared.Json
                         {
                             LogFormater.Warn("Http disabled: Http_Host must be vaild or \"docker\" - Given: (" + jsonConfig.Http_Host + ")");
                         }
-                        else if (jsonConfig.Http_Host == "docker")
-                        {
-                            jsonConfig.Http_Host = "http://*:8080";
-                        }
                         else
                         {
+                            if (jsonConfig.Http_Host == "docker")
+                            {
+                                jsonConfig.Http_Host = "http://*:80";
+                            }
                             jsonConfig.Http_Enable = true;
                         }
                     }

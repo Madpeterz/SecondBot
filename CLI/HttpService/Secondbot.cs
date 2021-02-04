@@ -46,29 +46,129 @@ namespace BetterSecondBot.HttpService
         }
 
         [Route(HttpVerbs.Get, "/friends/{token}")]
-        public object friends(string token)
+        public object Friends(string token)
         {
-            return BasicReply(bot.getJsonFriendlist());
+            if (tokens.Allow(token, getClientIP()) == true)
+            {
+                return BasicReply(bot.getJsonFriendlist());
+            }
+            return BasicReply("Token not accepted");
         }
 
+        [Route(HttpVerbs.Get, "/walkto/{x}/{y}/{z}/{token}")]
+        public object WalkTo(string x, string y, string z, string token)
+        {
+            if (tokens.Allow(token, getClientIP()) == true)
+            {
+                bool status = bot.GetCommandsInterface.Call("AutoPilot", "<"+x+","+y+","+z+">");
+                if (status == true)
+                {
+                    return BasicReply("Accepted");
+                }
+                return BasicReply("Error Unable to AutoPilot to location");
+            }
+            return BasicReply("Token not accepted");
+        }
 
-        [Route(HttpVerbs.Get, "/nearme/{token}")]
-        public object nearme(string token)
+        
+        [Route(HttpVerbs.Get, "/gesture/{gesture}/{token}")]
+        public object Gesture(string gesture, string token)
+        {
+            if (tokens.Allow(token, getClientIP()) == true)
+            {
+                bool status = bot.GetCommandsInterface.Call("PlayGesture", gesture);
+                if (status == true)
+                {
+                    return BasicReply("Accepted");
+                }
+                return BasicReply("Error with gesture");
+            }
+            return BasicReply("Token not accepted");
+        }
+
+        [Route(HttpVerbs.Get, "/teleport/{region}/{x}/{y}/{z}/{token}")]
+        public object Teleport(string region,string x, string y, string z, string token)
+        {
+            if (tokens.Allow(token, getClientIP()) == true)
+            {
+                bool status = bot.GetCommandsInterface.Call("Teleport", ""+region+"/" + x + "/" + y + "/" + z + "");
+                if (status == true)
+                {
+                    return BasicReply("Accepted");
+                }
+                return BasicReply("Error Unable to Teleport to location");
+            }
+            return BasicReply("Token not accepted");
+        }
+
+        
+
+        [Route(HttpVerbs.Get, "/regiontile/{regionname}/{token}")]
+        public object Regiontile(string regionname, string token)
+        {
+            if (tokens.Allow(token, getClientIP()) == true)
+            {
+                if (bot.GetClient.Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region))
+                {
+                    return BasicReply(region.MapImageID.ToString());
+                }
+                else
+                {
+                    return BasicReply("Unable to find region");
+                }
+            }
+            return BasicReply("Token not accepted");
+        }
+
+        [Route(HttpVerbs.Get, "/nearmewithdetails/{token}")]
+        public object NearmeWithDetails(string token)
         {
             if (bot.GetClient.Network.CurrentSim != null)
             {
-                Dictionary<UUID, string> NearMe = new Dictionary<UUID, string>();
+                List<NearMeDetails> BetterNearMe = new List<NearMeDetails>();
+
                 Dictionary<uint, Avatar> avcopy = bot.GetClient.Network.CurrentSim.ObjectsAvatars.Copy();
                 foreach (Avatar av in avcopy.Values)
                 {
                     if (av.ID != bot.GetClient.Self.AgentID)
                     {
-                        NearMe.Add(av.ID, av.Name);
+                        NearMeDetails details = new NearMeDetails();
+                        details.id = av.ID.ToString();
+                        details.name = av.Name;
+                        details.x = (int)Math.Round(av.Position.X);
+                        details.y = (int)Math.Round(av.Position.Y);
+                        details.z = (int)Math.Round(av.Position.Z);
+                        details.range = (int)Math.Round(Vector3.Distance(av.Position,bot.GetClient.Self.SimPosition));
+                        BetterNearMe.Add(details);
                     }
                 }
-                return BasicReply(JsonConvert.SerializeObject(NearMe));
+                return BasicReply(JsonConvert.SerializeObject(BetterNearMe));
             }
-            return BasicReply("Error");
+            return BasicReply("Token not accepted");
+        }
+
+
+        [Route(HttpVerbs.Get, "/nearme/{token}")]
+        public object Nearme(string token)
+        {
+            if (tokens.Allow(token, getClientIP()) == true)
+            {
+                if (bot.GetClient.Network.CurrentSim != null)
+                {
+                    Dictionary<UUID, string> NearMe = new Dictionary<UUID, string>();
+                    Dictionary<uint, Avatar> avcopy = bot.GetClient.Network.CurrentSim.ObjectsAvatars.Copy();
+                    foreach (Avatar av in avcopy.Values)
+                    {
+                        if (av.ID != bot.GetClient.Self.AgentID)
+                        {
+                            NearMe.Add(av.ID, av.Name);
+                        }
+                    }
+                    return BasicReply(JsonConvert.SerializeObject(NearMe));
+                }
+                return BasicReply("Error not in a sim");
+            }
+            return BasicReply("Token not accepted");
         }
 
         [Route(HttpVerbs.Get, "/hello")]
@@ -107,6 +207,32 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [Route(HttpVerbs.Get, "/regionname/{token}")]
+        public object Regionname(string token)
+        {
+            if (tokens.Allow(token, getClientIP()) == true)
+            {
+                return BasicReply(bot.GetClient.Network.CurrentSim.Name);
+            }
+            return BasicReply("Token not accepted");
+        }
+
+
+        [Route(HttpVerbs.Get, "/location/{token}")]
+        public object Location(string token)
+        {
+            if (tokens.Allow(token, getClientIP()) == true)
+            {
+                Dictionary<string, int> pos = new Dictionary<string, int>();
+                pos.Add("x",(int)Math.Round(bot.GetClient.Self.SimPosition.X));
+                pos.Add("y", (int)Math.Round(bot.GetClient.Self.SimPosition.Y));
+                pos.Add("z", (int)Math.Round(bot.GetClient.Self.SimPosition.Z));
+                return BasicReply(JsonConvert.SerializeObject(pos));
+            }
+            return BasicReply("Token not accepted");
+        }
+
+
         [Route(HttpVerbs.Post, "/command/{token}")]
         public async Task<object> command(string token)
         {
@@ -134,6 +260,17 @@ namespace BetterSecondBot.HttpService
         public string Command { get; set; }
         public string[] Args { get; set; }
         public string AuthCode { get; set; }
+    }
+
+    public class NearMeDetails
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+        public int x { get; set; }
+        public int y { get; set; }
+        public int z { get; set; }
+        public int range { get; set; }
+
     }
 
 

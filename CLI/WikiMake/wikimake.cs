@@ -499,6 +499,12 @@ namespace BetterSecondBot.WikiMake
             core.callable.Add(new friends());
             core.callable.Add(new nearme());
             core.callable.Add(new hello());
+            core.callable.Add(new regiontile());
+            core.callable.Add(new location());
+            core.callable.Add(new regionname());
+            core.callable.Add(new nearmewithdetails());
+            core.callable.Add(new walkto());
+            core.callable.Add(new teleport());
             endpoints.Add(core);
             Endpoint inventory = new Endpoint();
             inventory.name = "inventory";
@@ -508,6 +514,7 @@ namespace BetterSecondBot.WikiMake
             inventory.callable.Add(new realuuid());
             inventory.callable.Add(new send());
             inventory.callable.Add(new delete());
+            inventory.callable.Add(new rezobject());
             endpoints.Add(inventory);
             Endpoint im = new Endpoint();
             im.name = "im";
@@ -795,6 +802,18 @@ namespace BetterSecondBot.WikiMake
         }
     }
 
+    public class gesture : APIcall
+    {
+        public override void Setup()
+        {
+            about = "Attempts to play a gesture";
+            values.Add("gesture", new KeyValuePair<string, string>("URLARG", "UUID of the gesture"));
+            returns.Add("Accepted");
+            returns.Add("Invaild gesture UUID for arg 1");
+            base.Setup();
+        }
+    }
+
     public class command : postAPIcall
     {
         public override void Setup()
@@ -976,7 +995,7 @@ namespace BetterSecondBot.WikiMake
         public override void Setup()
         {
             about = "fetchs the groupchat history";
-            values.Add("group ", new KeyValuePair<string, string>("URLARG", "UUID of the group"));
+            values.Add("group", new KeyValuePair<string, string>("URLARG", "UUID of the group"));
             returns.Add("Group UUID invaild");
             returns.Add("Group Chat");
             base.Setup();
@@ -988,7 +1007,7 @@ namespace BetterSecondBot.WikiMake
         public override void Setup()
         {
             about = "sends a message to the groupchat";
-            values.Add("group ", new KeyValuePair<string, string>("URLARG", "UUID of the group"));
+            values.Add("group", new KeyValuePair<string, string>("URLARG", "UUID of the group"));
             values.Add("message ", new KeyValuePair<string, string>("string", "the message to send"));
             returns.Add("Group UUID invaild");
             returns.Add("Processing");
@@ -1006,6 +1025,92 @@ namespace BetterSecondBot.WikiMake
         }
     }
 
+    public class location : APIcall
+    {
+        public override void Setup()
+        {
+            about = "Fetchs the current location of the bot";
+            returns.Add("array of X,Y,Z values");
+            base.Setup();
+        }
+    }
+
+    public class walkto : APIcall
+    {
+        public override void Setup()
+        {
+            about = "uses the AutoPilot to move to a location";
+            values.Add("x", new KeyValuePair<string, string>("URLARG", "X location to AutoPilot to"));
+            values.Add("y", new KeyValuePair<string, string>("URLARG", "Y location to AutoPilot to"));
+            values.Add("z", new KeyValuePair<string, string>("URLARG", "Z location to AutoPilot to"));
+            returns.Add("Error Unable to AutoPilot to location");
+            returns.Add("Accepted");
+            base.Setup();
+        }
+    }
+
+
+    public class teleport : APIcall
+    {
+        public override void Setup()
+        {
+            about = "uses the AutoPilot to move to a location";
+            values.Add("region", new KeyValuePair<string, string>("URLARG", "the name of the region we are going to"));
+            values.Add("x", new KeyValuePair<string, string>("URLARG", "X location"));
+            values.Add("y", new KeyValuePair<string, string>("URLARG", "Y location"));
+            values.Add("z", new KeyValuePair<string, string>("URLARG", "Z location"));
+            returns.Add("Error Unable to Teleport to location");
+            returns.Add("Accepted");
+            base.Setup();
+        }
+    }
+
+    public class regionname : APIcall
+    {
+        public override void Setup()
+        {
+            about = "Fetchs the current region name";
+            returns.Add("string regionname");
+            base.Setup();
+        }
+    }
+
+    public class nearmewithdetails : APIcall
+    {
+        public override void Setup()
+        {
+            about = "an improved version of near me with extra details<br/>NearMeDetails is a object formated as follows<br/><ul><li>id</li><li>name</li><li>x</li><li>y</li><li>z</li><li>range</li></ul>";
+            returns.Add("array NearMeDetails");
+            base.Setup();
+        }
+    }
+
+
+
+    public class regiontile : APIcall
+    {
+        public override void Setup()
+        {
+            about = "Fetchs the regions map tile";
+            values.Add("region", new KeyValuePair<string, string>("URLARG", "string name of region"));
+            returns.Add("Unable to find region");
+            returns.Add("Texture UUID");
+            base.Setup();
+        }
+    }
+
+    public class rezobject : APIcall
+    {
+        public override void Setup()
+        {
+            about = "rezs the item at the bots current location";
+            values.Add("item", new KeyValuePair<string, string>("URLARG", "UUID of item to rez"));
+            returns.Add("true|false");
+            base.Setup();
+        }
+    }
+
+
     public class localchatsay : postAPIcall
     {
         public override void Setup()
@@ -1016,5 +1121,7 @@ namespace BetterSecondBot.WikiMake
             base.Setup();
         }
     }
+
+
 
 }

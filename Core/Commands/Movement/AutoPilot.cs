@@ -23,6 +23,7 @@ namespace BSB.Commands.Movement
                         {
                             if (helpers.inrange(pos.Z, 0, 5000) == true)
                             {
+                                bot.GetClient.Self.AutoPilotCancel();
                                 bot.GetClient.Self.Movement.TurnToward(pos, true);
                                 Thread.Sleep(500);
                                 uint Globalx, Globaly;

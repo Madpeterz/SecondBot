@@ -65,7 +65,7 @@ namespace BSB.bottypes
                 im_chat_unread.Add(avatar, false);
             }
             var date = DateTime.Now;
-            im_chat_history[avatar].Add("[" + date.Hour.ToString() + ":" + date.Minute.ToString() + "] " + sendername + ":" + message + "");
+            im_chat_history[avatar].Add("[" + date.Hour.ToString() + ":" + date.Minute.ToString() + "] " + sendername + ": " + message + "");
             if (im_chat_history[avatar].Count > imchatlimit)
             {
                 im_chat_history[avatar].RemoveAt(0);
@@ -78,7 +78,7 @@ namespace BSB.bottypes
         public override void AddToLocalChat(string name, string message)
         {
             var date = DateTime.Now;
-            LocalChat_history.Add("[" + date.Hour.ToString() + ":" + date.Minute.ToString() + "] " + name + ":" + message + "");
+            LocalChat_history.Add("[" + date.Hour.ToString() + ":" + date.Minute.ToString() + "] " + name + ": " + message + "");
             if (LocalChat_history.Count > localchatlimit)
             {
                 LocalChat_history.RemoveAt(0);
@@ -163,7 +163,7 @@ namespace BSB.bottypes
                 group_chat_unread.Add(group, false);
             }
             var date = DateTime.Now;
-            group_chat_history[group].Add("[" + date.Hour.ToString() + ":" + date.Minute.ToString() + "] " + name + ":" + message + "");
+            group_chat_history[group].Add("[" + date.Hour.ToString() + ":" + date.Minute.ToString() + "] " + name + ": " + message + "");
             if (group_chat_history[group].Count > groupchatlimit)
             {
                 group_chat_history[group].RemoveAt(0);

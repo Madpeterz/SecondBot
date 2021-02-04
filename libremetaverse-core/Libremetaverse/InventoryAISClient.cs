@@ -20,11 +20,16 @@ namespace LibreMetaverse
         [NonSerialized]
         private readonly GridClient Client;
 
-        private static readonly HttpClient httpClient = new HttpClient();
+        private static HttpClient httpClient;
 
         public InventoryAISClient(GridClient client)
         {
             Client = client;
+
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            httpClient = new HttpClient(clientHandler);
+            
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Add("User-Agent", "LibreMetaverse AIS Client");
         }
