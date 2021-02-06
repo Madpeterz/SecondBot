@@ -505,6 +505,7 @@ namespace BetterSecondBot.WikiMake
             core.callable.Add(new nearmewithdetails());
             core.callable.Add(new walkto());
             core.callable.Add(new teleport());
+            core.callable.Add(new gesture());
             endpoints.Add(core);
             Endpoint inventory = new Endpoint();
             inventory.name = "inventory";
