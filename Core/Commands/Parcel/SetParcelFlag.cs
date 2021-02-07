@@ -55,7 +55,7 @@ namespace BSB.Commands.CMD_Parcel
                     int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
                     if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                     {
-                        Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
+                        OpenMetaverse.Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
                         if (parcel_static.has_parcel_perm(p, bot) == true)
                         {
                             foreach (KeyValuePair<string, bool> cfg in setflags)

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using OpenMetaverse;
+using BetterSecondBotShared.Static;
 
 namespace BSB.bottypes
 {
@@ -111,6 +112,24 @@ namespace BSB.bottypes
         {
             if(await_events.ContainsKey("grouproles") == true)
             {
+                // update group role storage
+                List<GroupRole> entrys = new List<GroupRole>();
+                foreach(GroupRole gr in e.Roles.Values)
+                {
+                    entrys.Add(gr);
+                }
+
+                KeyValuePair<long, List<GroupRole>> storage = new KeyValuePair<long, List<GroupRole>>(helpers.UnixTimeNow(), entrys);
+                if (mygrouprolesstorage.ContainsKey(e.GroupID) == false)
+                {
+                    mygrouprolesstorage.Add(e.GroupID, storage);
+                }
+                else
+                {
+                    mygrouprolesstorage[e.GroupID] = storage;
+                }
+
+
                 List<string> PurgeAwaiters = new List<string>();
                 foreach(KeyValuePair<string, KeyValuePair<CoreCommand, string[]>> await_reply in await_events["grouproles"])
                 {

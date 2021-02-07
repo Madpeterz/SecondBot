@@ -133,8 +133,10 @@ namespace BetterSecondBotShared.bottypes
         }
 
         protected Dictionary<UUID, Group> mygroups = new Dictionary<UUID, Group>();
+        protected Dictionary<UUID, KeyValuePair<long, List<GroupRole>>> mygrouprolesstorage = new Dictionary<UUID, KeyValuePair<long, List<GroupRole>>>();
 
         public Dictionary<UUID, Group> MyGroups { get { return mygroups; } }
+        public Dictionary<UUID, KeyValuePair<long, List<GroupRole>>> MyGroupRolesStorage { get { return mygrouprolesstorage; } }
 
         protected GridClient Client;
         public GridClient GetClient { get { return Client; } }

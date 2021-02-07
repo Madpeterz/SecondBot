@@ -55,7 +55,7 @@ namespace BSB.Commands.CMD_Parcel
                     int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
                     if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == true)
                     {
-                        Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
+                        OpenMetaverse.Parcel p = bot.GetClient.Network.CurrentSim.Parcels[localid];
                         Dictionary<string, string> collection = new Dictionary<string, string>();
                         foreach (string cfg in get_flags)
                         {

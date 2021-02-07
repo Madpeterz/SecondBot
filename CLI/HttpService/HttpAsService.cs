@@ -61,8 +61,11 @@ namespace BetterSecondBot.HttpService
                     .WithController(() => new HttpApiIM(Bot, Tokens))
                 )
                 .WithWebApi("/core", m => m
-                    .WithController(() => new HttpApiCore(Config, Bot, Tokens)))
-
+                    .WithController(() => new HttpApiCore(Config, Bot, Tokens))
+                )
+                .WithWebApi("/parcelestate", m => m
+                    .WithController(() => new HttpApiParcelEstate(Bot,Tokens))
+                )
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" })));
             return server;
         }

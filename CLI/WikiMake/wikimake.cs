@@ -566,6 +566,7 @@ namespace BetterSecondBot.WikiMake
             createEndpoint("im", typeof(HttpApiIM));
             createEndpoint("groups", typeof(HttpApiGroup));
             createEndpoint("chat", typeof(HttpApiLocalchat));
+            createEndpoint("parcelestate", typeof(HttpApiParcelEstate));
         }
 
         public string getCommandMethod(string endpoint, string command)
