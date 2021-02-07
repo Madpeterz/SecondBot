@@ -49,25 +49,74 @@ namespace BetterSecondBot.HttpService
                 //    .WithRegexRules("HTTP exception 404")
                 //)
                 .WithWebApi("/inventory", m => m
-                    .WithController(() => new SecondbotInventory(Bot, Tokens))
+                    .WithController(() => new HttpApiInventory(Bot, Tokens))
                 )
                 .WithWebApi("/chat", m => m
-                    .WithController(() => new SecondbotChat(Bot, Tokens))
+                    .WithController(() => new HttpApiLocalchat(Bot, Tokens))
                 )
                 .WithWebApi("/groups", m => m
-                    .WithController(() => new SecondbotGroup(Bot, Tokens))
+                    .WithController(() => new HttpApiGroup(Bot, Tokens))
                 )
                 .WithWebApi("/ims", m => m
-                    .WithController(() => new SecondbotIm(Bot, Tokens))
+                    .WithController(() => new HttpApiIM(Bot, Tokens))
                 )
                 .WithWebApi("/core", m => m
-                    .WithController(() => new SecondbotCoreWebAPi(Config, Bot, Tokens)))
+                    .WithController(() => new HttpApiCore(Config, Bot, Tokens)))
 
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" })));
             return server;
         }
  
     }
+
+
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class About : Attribute
+    {
+        public string about = "";
+        public About(string about)
+        {
+            this.about = about;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class NeedsToken : Attribute
+    {
+        public bool needsToken = true;
+        public NeedsToken(bool needsToken)
+        {
+            this.needsToken = needsToken;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class ReturnHints : Attribute
+    {
+        public string hint = "";
+        public ReturnHints(string hint)
+        {
+            this.hint = hint;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class ArgHints : Attribute
+    {
+        public string name = "";
+        public string typename = "";
+        public string about = "";
+
+        public ArgHints(string name,string typename, string about)
+        {
+            this.name = name;
+            this.typename = typename;
+            this.about = about;
+        }
+    }
+
+
 
     public class TokenStorage
     {
@@ -150,6 +199,8 @@ namespace BetterSecondBot.HttpService
     {
         protected TokenStorage tokens;
         protected SecondBot bot;
+        public bool needsToken { get; set; }
+
 
         protected Object BasicReply(string input)
         {

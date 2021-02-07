@@ -11,10 +11,13 @@ using Newtonsoft.Json;
 
 namespace BetterSecondBot.HttpService
 {
-    public class SecondbotIm : WebApiControllerWithTokens
+    public class HttpApiIM : WebApiControllerWithTokens
     {
-        public SecondbotIm(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+        public HttpApiIM(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
+
+        [About("gets a full list of all chat windows")]
+        [ReturnHints("array UUID = Name")]
         [Route(HttpVerbs.Get, "/chatwindows/{token}")]
         public object chatwindows(string token)
         {
@@ -25,6 +28,8 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("gets a list of chat windows with unread messages")]
+        [ReturnHints("array of UUID")]
         [Route(HttpVerbs.Get, "/listwithunread/{token}")]
         public object listwithunread(string group, string token)
         {
@@ -43,6 +48,8 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("gets if there are any unread im messages at all")]
+        [ReturnHints("True|False")]
         [Route(HttpVerbs.Get, "/haveunreadims/{token}")]
         public object haveunreadims(string token)
         {
@@ -62,6 +69,10 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("gets the chat from the selected window")]
+        [ArgHints("window", "URLARG", "the UUID of the chat window")]
+        [ReturnHints("Window UUID invaild")]
+        [ReturnHints("Array of text")]
         [Route(HttpVerbs.Get, "/getimchat/{window}/{token}")]
         public object getimchat(string window, string token)
         {
@@ -76,8 +87,12 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("sends a im to the selected avatar")]
+        [ArgHints("avatar", "URLARG", "a UUID or Firstname Lastname")]
+        [ArgHints("message", "Text", "the message to send")]
+        [ReturnHints("ok")]
         [Route(HttpVerbs.Post, "/sendimchat/{avatar}/{token}")]
-        public object sendgroupchat(string avatar, string token, [FormField] string message)
+        public object sendimchat(string avatar, string token, [FormField] string message)
         {
             if (tokens.Allow(token, getClientIP()) == true)
             {

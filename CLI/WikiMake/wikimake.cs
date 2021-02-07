@@ -1,8 +1,10 @@
-﻿using BetterSecondBotShared.API;
+﻿using BetterSecondBot.HttpService;
+using BetterSecondBotShared.API;
 using BetterSecondBotShared.IO;
 using BetterSecondBotShared.Json;
 using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
+using EmbedIO;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -487,57 +489,83 @@ namespace BetterSecondBot.WikiMake
     public class HTTPendpoint
     {
         protected List<Endpoint> endpoints = new List<Endpoint>();
+
+
+        public void createEndpoint(string name, Type Api)
+        {
+            Endpoint Endpoint = new Endpoint();
+            Endpoint.name = name;
+            foreach (MethodInfo M in Api.GetMethods())
+            {
+                APIcall C = new APIcall();
+                CustomAttributeData httpverb = null;
+                CustomAttributeData NeedsToken = null;
+                CustomAttributeData About = null;
+                List<CustomAttributeData> ArgHints = new List<CustomAttributeData>();
+                List<CustomAttributeData> ReturnValues = new List<CustomAttributeData>();
+
+                foreach (CustomAttributeData At in M.CustomAttributes)
+                {
+                    if (At.AttributeType.Name == "RouteAttribute")
+                    {
+                        httpverb = At;
+                    }
+                    else if (At.AttributeType.Name == "NeedsToken")
+                    {
+                        NeedsToken = At;
+                    }
+                    else if (At.AttributeType.Name == "About")
+                    {
+                        About = At;
+                    }
+                    else if (At.AttributeType.Name == "ArgHints")
+                    {
+                        ArgHints.Add(At);
+                    }
+                    else if (At.AttributeType.Name == "ReturnHints")
+                    {
+                        ReturnValues.Add(At);
+                    }
+                }
+                if (httpverb != null)
+                {
+                    C.name = M.Name.ToLowerInvariant();
+                    C.type = "Post";
+                    C.about = "Http interface command about missing";
+                    if (About != null)
+                    {
+                        C.about = About.ConstructorArguments[0].Value.ToString();
+                    }
+                    if (httpverb.ConstructorArguments[0].Value is HttpVerbs.Get)
+                    {
+                        C.type = "Get";
+                    }
+                    C.RequiresToken = true;
+                    if (NeedsToken != null)
+                    {
+                        C.RequiresToken = (bool)NeedsToken.ConstructorArguments[0].Value;
+                    }
+                    foreach (CustomAttributeData cad in ArgHints)
+                    {
+                        C.values.Add(cad.ConstructorArguments[0].Value.ToString(), new KeyValuePair<string, string>(cad.ConstructorArguments[1].Value.ToString(), cad.ConstructorArguments[2].Value.ToString()));
+                    }
+                    foreach (CustomAttributeData cad in ReturnValues)
+                    {
+                        C.returns.Add(cad.ConstructorArguments[0].Value.ToString());
+                    }
+                    C.Setup();
+                    Endpoint.callable.Add(C);
+                }
+            }
+            endpoints.Add(Endpoint);
+        }
         public HTTPendpoint()
         {
-            Endpoint core = new Endpoint();
-            core.name = "core";
-            core.callable.Add(new gettoken());
-            core.callable.Add(new logout());
-            core.callable.Add(new version());
-            core.callable.Add(new name());
-            core.callable.Add(new command());
-            core.callable.Add(new friends());
-            core.callable.Add(new nearme());
-            core.callable.Add(new hello());
-            core.callable.Add(new regiontile());
-            core.callable.Add(new location());
-            core.callable.Add(new regionname());
-            core.callable.Add(new nearmewithdetails());
-            core.callable.Add(new walkto());
-            core.callable.Add(new teleport());
-            core.callable.Add(new gesture());
-            endpoints.Add(core);
-            Endpoint inventory = new Endpoint();
-            inventory.name = "inventory";
-            inventory.callable.Add(new contents());
-            inventory.callable.Add(new folders());
-            inventory.callable.Add(new rename());
-            inventory.callable.Add(new realuuid());
-            inventory.callable.Add(new send());
-            inventory.callable.Add(new delete());
-            inventory.callable.Add(new rezobject());
-            endpoints.Add(inventory);
-            Endpoint im = new Endpoint();
-            im.name = "im";
-            im.callable.Add(new chatwindows());
-            im.callable.Add(new listwithunread());
-            im.callable.Add(new haveunreadims());
-            im.callable.Add(new getimchat());
-            im.callable.Add(new sendimchat());
-            endpoints.Add(im);
-            Endpoint group = new Endpoint();
-            group.name = "group";
-            group.callable.Add(new listgroups());
-            group.callable.Add(new listgroupswithunread());
-            group.callable.Add(new haveunreadgroupchat());
-            group.callable.Add(new getgroupchat());
-            group.callable.Add(new sendgroupchat());
-            endpoints.Add(group);
-            Endpoint chat = new Endpoint();
-            chat.name = "chat";
-            chat.callable.Add(new localchathistory());
-            chat.callable.Add(new localchatsay());
-            endpoints.Add(chat);
+            createEndpoint("core", typeof(HttpApiCore));
+            createEndpoint("inventory", typeof(HttpApiInventory));
+            createEndpoint("im", typeof(HttpApiIM));
+            createEndpoint("group", typeof(HttpApiGroup));
+            createEndpoint("chat", typeof(HttpApiLocalchat));
         }
 
         public string getCommandMethod(string endpoint, string command)
@@ -690,19 +718,15 @@ namespace BetterSecondBot.WikiMake
         public List<APIcall> callable = new List<APIcall>();
     }
 
-    abstract public class APIcall
+    public class APIcall
     {
-        public string name { get { return GetType().Name.ToLowerInvariant(); } }
+        public string name { get; set; }
         public string type = "get";
         public string about = "A API call that is missing its about value";
         public Dictionary<string, KeyValuePair<string, string>> values = new Dictionary<string, KeyValuePair<string, string>>();
         public List<string> returns = new List<string>();
         public bool RequiresToken = true;
 
-        public APIcall()
-        {
-            Setup();
-        }
         public virtual void Setup()
         {
             if (RequiresToken == true)
@@ -717,412 +741,4 @@ namespace BetterSecondBot.WikiMake
             }
         }
     }
-
-    abstract public class postAPIcall : APIcall
-    {
-        public override void Setup()
-        {
-            type = "post";
-            base.Setup();
-        }
-    }
-
-    public class gettoken : postAPIcall
-    {
-        public override void Setup()
-        {
-            RequiresToken = false;
-            about = "Requests a new token (Vaild for 10 mins) <br/>to use with all other requests";
-            values.Add("Authcode", new KeyValuePair<string, string>("string", "the first 10 chars of SHA1(unixtime+WebUIkey)<br/>unixtime can be +- 30 of the bots time."));
-            returns = new List<string>();
-            returns.Add("Authcode not accepted");
-            returns.Add("New API Token");
-            base.Setup();
-        }
-    }
-
-    public class logout : APIcall
-    {
-        public override void Setup()
-        {
-            about = "A API call that is missing its about value";
-            returns.Add("ok");
-            returns.Add("Failed to remove token");
-            base.Setup();
-        }
-    }
-
-    public class version : APIcall
-    {
-        public override void Setup()
-        {
-            about = "Gets the bots build version";
-            returns.Add("Bot build version");
-            base.Setup();
-        }
-    }
-
-    public class friends : APIcall
-    {
-        public override void Setup()
-        {
-            about = "Gets the friendslist <br/>Formated as follows<br/>friendreplyobject<br/><ul><li>name: String</li><li>id: String</li><li>online: bool</li></ul>";
-            returns.Add("array UUID = friendreplyobject");
-            base.Setup();
-        }
-    }
-
-    public class nearme : APIcall
-    {
-        public override void Setup()
-        {
-            about = "returns a list of all known avatars near (same sim)>";
-            returns.Add("array UUID = Name");
-            base.Setup();
-        }
-    }
-
-    public class hello : APIcall
-    {
-        public override void Setup()
-        {
-            RequiresToken = false;
-            about = "used to test you can talk to the api but mostly pointless.";
-            returns.Add("world");
-            base.Setup();
-        }
-    }
-
-    public class name : APIcall
-    {
-        public override void Setup()
-        {
-            about = "Gets the name of the bot";
-            returns.Add("Fistname Lastname");
-            base.Setup();
-        }
-    }
-
-    public class gesture : APIcall
-    {
-        public override void Setup()
-        {
-            about = "Attempts to play a gesture";
-            values.Add("gesture", new KeyValuePair<string, string>("URLARG", "UUID of the gesture"));
-            returns.Add("Accepted");
-            returns.Add("Invaild gesture UUID for arg 1");
-            base.Setup();
-        }
-    }
-
-    public class command : postAPIcall
-    {
-        public override void Setup()
-        {
-            about = "Makes a request to the core commands lib";
-            values.Add(
-                "body",
-                new KeyValuePair<string, string>(
-                    "JsonObject",
-                    "A JSON object formated as follows<br/>Command: string<br/>Args: string[]<br/>AuthCode: string<br/>========<br/>See LSL example on how to create a core command auth code")
-            );
-            returns.Add("accepted");
-            base.Setup();
-        }
-    }
-
-    public class contents : APIcall
-    {
-        public override void Setup()
-        {
-            about = "Requests the contents of a folder as an array of InventoryMapItem<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>typename: String</li></ul>";
-            values.Add(
-                "folderUUID",
-                new KeyValuePair<string, string>(
-                    "URLARG",
-                    "the folder to fetch (Found via: inventory/folders)")
-            );
-            returns.Add("array of InventoryMapItem");
-            base.Setup();
-        }
-    }
-
-    public class folders : APIcall
-    {
-        public override void Setup()
-        {
-            about = "Requests the inventory folder layout as a json object InventoryMapFolder<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>subfolders: InventoryMapFolder[]</li></ul>";
-            returns.Add("array of InventoryMapFolder");
-            base.Setup();
-        }
-    }
-
-    public class rename : postAPIcall
-    {
-        public override void Setup()
-        {
-            about = "renames a folder or inventory item";
-            returns.Add("true|false");
-            values.Add("item", new KeyValuePair<string, string>("URLARG", "UUID of the item/folder we are working on"));
-            values.Add("newname", new KeyValuePair<string, string>("string", "What we are setting"));
-            base.Setup();
-        }
-    }
-
-    public class realuuid : APIcall
-    {
-        public override void Setup()
-        {
-            about = "converts a inventory uuid to a realworld uuid<br/>Needed for texture preview";
-            returns.Add("Failed");
-            returns.Add("UUID");
-            values.Add("item", new KeyValuePair<string, string>("URLARG", "UUID of the item/folder we are working on"));
-            base.Setup();
-        }
-    }
-
-    public class send : APIcall
-    {
-        public override void Setup()
-        {
-            about = "sends a item to an avatar";
-            returns.Add("Failed");
-            returns.Add("UUID");
-            values.Add("item", new KeyValuePair<string, string>("URLARG", "UUID of the item we are working on"));
-            values.Add("avatar", new KeyValuePair<string, string>("URLARG", "a UUID or Firstname Lastname"));
-            base.Setup();
-        }
-    }
-
-    public class delete : APIcall
-    {
-        public override void Setup()
-        {
-            about = "Removes a item/folder from inventory (Make sure you set the isfolder flag correctly!)";
-            returns.Add("Failed");
-            returns.Add("UUID");
-            values.Add("item", new KeyValuePair<string, string>("URLARG", "UUID of the item/folder we are working on"));
-            values.Add("isfolder", new KeyValuePair<string, string>("URLARG", "true or false if this is a folder"));
-            base.Setup();
-        }
-    }
-
-    public class chatwindows : APIcall
-    {
-        public override void Setup()
-        {
-            about = "gets a full list of all chat windows";
-            returns.Add("array UUID = Name");
-            base.Setup();
-        }
-    }
-
-    public class listwithunread : APIcall
-    {
-        public override void Setup()
-        {
-            about = "gets a list of chat windows with unread messages";
-            returns.Add("array of UUID");
-            base.Setup();
-        }
-    }
-
-    public class haveunreadims : APIcall
-    {
-        public override void Setup()
-        {
-            about = "gets if there are any unread im messages at all";
-            returns.Add("true|false");
-            base.Setup();
-        }
-    }
-
-    public class getimchat : APIcall
-    {
-        public override void Setup()
-        {
-            about = "gets the chat from the selected window";
-            values.Add("window", new KeyValuePair<string, string>("URLARG", "the UUID of the chat window"));
-            returns.Add("Chat contents");
-            returns.Add("Window UUID invaild");
-            base.Setup();
-        }
-    }
-
-    public class sendimchat : postAPIcall
-    {
-        public override void Setup()
-        {
-            about = "sends a im to the selected avatar";
-            values.Add("avatar", new KeyValuePair<string, string>("URLARG", "a UUID or Firstname Lastname"));
-            values.Add("message", new KeyValuePair<string, string>("string", "the message to send"));
-            returns.Add("ok");
-            base.Setup();
-        }
-    }
-
-    public class listgroups : APIcall
-    {
-        public override void Setup()
-        {
-            about = "fetchs a list of all groups known to the bot";
-            returns.Add("array UUID=name");
-            base.Setup();
-        }
-    }
-
-    public class listgroupswithunread : APIcall
-    {
-        public override void Setup()
-        {
-            about = "fetchs a list of all groups with unread messages";
-            returns.Add("array UUID");
-            base.Setup();
-        }
-    }
-
-    public class haveunreadgroupchat : APIcall
-    {
-        public override void Setup()
-        {
-            about = "checks if there are any groups with unread messages";
-            returns.Add("true|false");
-            base.Setup();
-        }
-    }
-
-    public class getgroupchat : APIcall
-    {
-        public override void Setup()
-        {
-            about = "fetchs the groupchat history";
-            values.Add("group", new KeyValuePair<string, string>("URLARG", "UUID of the group"));
-            returns.Add("Group UUID invaild");
-            returns.Add("Group Chat");
-            base.Setup();
-        }
-    }
-
-    public class sendgroupchat : postAPIcall
-    {
-        public override void Setup()
-        {
-            about = "sends a message to the groupchat";
-            values.Add("group", new KeyValuePair<string, string>("URLARG", "UUID of the group"));
-            values.Add("message ", new KeyValuePair<string, string>("string", "the message to send"));
-            returns.Add("Group UUID invaild");
-            returns.Add("Processing");
-            base.Setup();
-        }
-    }
-
-    public class localchathistory : APIcall
-    {
-        public override void Setup()
-        {
-            about = "fetchs the last 20 localchat messages";
-            returns.Add("array string");
-            base.Setup();
-        }
-    }
-
-    public class location : APIcall
-    {
-        public override void Setup()
-        {
-            about = "Fetchs the current location of the bot";
-            returns.Add("array of X,Y,Z values");
-            base.Setup();
-        }
-    }
-
-    public class walkto : APIcall
-    {
-        public override void Setup()
-        {
-            about = "uses the AutoPilot to move to a location";
-            values.Add("x", new KeyValuePair<string, string>("URLARG", "X location to AutoPilot to"));
-            values.Add("y", new KeyValuePair<string, string>("URLARG", "Y location to AutoPilot to"));
-            values.Add("z", new KeyValuePair<string, string>("URLARG", "Z location to AutoPilot to"));
-            returns.Add("Error Unable to AutoPilot to location");
-            returns.Add("Accepted");
-            base.Setup();
-        }
-    }
-
-
-    public class teleport : APIcall
-    {
-        public override void Setup()
-        {
-            about = "uses the AutoPilot to move to a location";
-            values.Add("region", new KeyValuePair<string, string>("URLARG", "the name of the region we are going to"));
-            values.Add("x", new KeyValuePair<string, string>("URLARG", "X location"));
-            values.Add("y", new KeyValuePair<string, string>("URLARG", "Y location"));
-            values.Add("z", new KeyValuePair<string, string>("URLARG", "Z location"));
-            returns.Add("Error Unable to Teleport to location");
-            returns.Add("Accepted");
-            base.Setup();
-        }
-    }
-
-    public class regionname : APIcall
-    {
-        public override void Setup()
-        {
-            about = "Fetchs the current region name";
-            returns.Add("string regionname");
-            base.Setup();
-        }
-    }
-
-    public class nearmewithdetails : APIcall
-    {
-        public override void Setup()
-        {
-            about = "an improved version of near me with extra details<br/>NearMeDetails is a object formated as follows<br/><ul><li>id</li><li>name</li><li>x</li><li>y</li><li>z</li><li>range</li></ul>";
-            returns.Add("array NearMeDetails");
-            base.Setup();
-        }
-    }
-
-
-
-    public class regiontile : APIcall
-    {
-        public override void Setup()
-        {
-            about = "Fetchs the regions map tile";
-            values.Add("region", new KeyValuePair<string, string>("URLARG", "string name of region"));
-            returns.Add("Unable to find region");
-            returns.Add("Texture UUID");
-            base.Setup();
-        }
-    }
-
-    public class rezobject : APIcall
-    {
-        public override void Setup()
-        {
-            about = "rezs the item at the bots current location";
-            values.Add("item", new KeyValuePair<string, string>("URLARG", "UUID of item to rez"));
-            returns.Add("true|false");
-            base.Setup();
-        }
-    }
-
-
-    public class localchatsay : postAPIcall
-    {
-        public override void Setup()
-        {
-            about = "sends a message to localchat";
-            values.Add("message ", new KeyValuePair<string, string>("string", "the message to send"));
-            returns.Add("see->localchathistory");
-            base.Setup();
-        }
-    }
-
-
-
 }

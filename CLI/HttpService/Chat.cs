@@ -11,10 +11,12 @@ using Newtonsoft.Json;
 
 namespace BetterSecondBot.HttpService
 {
-    public class SecondbotChat : WebApiControllerWithTokens
+    public class HttpApiLocalchat : WebApiControllerWithTokens
     {
-        public SecondbotChat(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+        public HttpApiLocalchat(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
+        [About("fetchs the last 20 localchat messages")]
+        [ReturnHints("array string")]
         [Route(HttpVerbs.Get, "/localchathistory/{token}")]
         public object localchatHistory(string token)
         {
@@ -25,6 +27,9 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("sends a message to localchat")]
+        [ArgHints("message","Text", "the message to send")]
+        [ReturnHints("array string")]
         [Route(HttpVerbs.Post, "/localchatsay/{token}")]
         public object localchatSay(string token, [FormField] string message)
         {

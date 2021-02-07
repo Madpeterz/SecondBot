@@ -11,10 +11,12 @@ using Newtonsoft.Json;
 
 namespace BetterSecondBot.HttpService
 {
-    public class SecondbotGroup : WebApiControllerWithTokens
+    public class HttpApiGroup : WebApiControllerWithTokens
     {
-        public SecondbotGroup(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+        public HttpApiGroup(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
+        [About("fetchs a list of all groups known to the bot")]
+        [ReturnHints("array UUID=name")]
         [Route(HttpVerbs.Get, "/listgroups/{token}")]
         public object listgroups(string token)
         {
@@ -30,6 +32,8 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("fetchs a list of all groups with unread messages")]
+        [ReturnHints("array UUID")]
         [Route(HttpVerbs.Get, "/listgroupswithunread/{token}")]
         public object listgroupswithunread(string group, string token)
         {
@@ -40,6 +44,8 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("checks if there are any groups with unread messages")]
+        [ReturnHints("True|False")]
         [Route(HttpVerbs.Get, "/haveunreadgroupchat/{token}")]
         public object haveunreadgroupchat(string token)
         {
@@ -50,6 +56,10 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("fetchs the groupchat history")]
+        [ArgHints("group", "URLARG", "UUID of the group")]
+        [ReturnHints("Group UUID invaild")]
+        [ReturnHints("Group Chat")]
         [Route(HttpVerbs.Get, "/getgroupchat/{group}/{token}")]
         public object getgroupchat(string group, string token)
         {
@@ -64,6 +74,11 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("sends a message to the groupchat")]
+        [ArgHints("group", "URLARG", "UUID of the group")]
+        [ArgHints("message", "Text", "the message to send")]
+        [ReturnHints("Group UUID invaild")]
+        [ReturnHints("Processing")]
         [Route(HttpVerbs.Post, "/sendgroupchat/{group}/{token}")]
         public object sendgroupchat(string group, string token, [FormField] string message)
         {

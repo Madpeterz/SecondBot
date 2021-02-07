@@ -13,15 +13,23 @@ using Newtonsoft.Json;
 namespace BetterSecondBot.HttpService
 {
 
-    public class SecondbotCoreWebAPi : WebApiControllerWithTokens
+
+
+    public class HttpApiCore : WebApiControllerWithTokens
     {
         
         protected JsonConfig config;
-        public SecondbotCoreWebAPi(JsonConfig myconfig, SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens)
+        public HttpApiCore(JsonConfig myconfig, SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens)
         {
             config = myconfig;
         }
 
+
+        [About("Requests a new token (Vaild for 10 mins) <br/>to use with all other requests")]
+        [NeedsToken(false)]
+        [ReturnHints("A new token with full system scope")]
+        [ArgHints("authcode", "text", "the first 10 chars of SHA1(unixtime+WebUIkey)<br/>unixtime can be +- 30 of the bots time.")]
+        [ArgHints("unixtimegiven", "number", "the unixtime you made this request")]
         [Route(HttpVerbs.Post, "/gettoken")]
         public Object GetToken([FormField] string authcode, [FormField] string unixtimegiven)
         {
@@ -45,6 +53,9 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Authcode not accepted");
         }
 
+
+        [About("Gets the friendslist <br/>Formated as follows<br/>friendreplyobject<br/><ul><li>name: String</li><li>id: String</li><li>online: bool</li></ul>")]
+        [ReturnHints("array UUID = friendreplyobject")]
         [Route(HttpVerbs.Get, "/friends/{token}")]
         public object Friends(string token)
         {
@@ -55,6 +66,12 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("uses the AutoPilot to move to a location")]
+        [ReturnHints("Error Unable to AutoPilot to location")]
+        [ReturnHints("Accepted")]
+        [ArgHints("x", "URLARG", "X location to AutoPilot to")]
+        [ArgHints("y", "URLARG", "y location to AutoPilot to")]
+        [ArgHints("z", "URLARG", "z location to AutoPilot to")]
         [Route(HttpVerbs.Get, "/walkto/{x}/{y}/{z}/{token}")]
         public object WalkTo(string x, string y, string z, string token)
         {
@@ -70,7 +87,10 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
-        
+        [About("Attempts to play a gesture")]
+        [ReturnHints("Invaild gesture UUID for arg 1")]
+        [ReturnHints("Accepted")]
+        [ArgHints("gesture", "URLARG", "Inventory UUID of the gesture")]
         [Route(HttpVerbs.Get, "/gesture/{gesture}/{token}")]
         public object Gesture(string gesture, string token)
         {
@@ -86,6 +106,13 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("Attempt to teleport to a new region")]
+        [ReturnHints("Error Unable to Teleport to location")]
+        [ReturnHints("Accepted")]
+        [ArgHints("region", "URLARG", "the name of the region we are going to")]
+        [ArgHints("x", "URLARG", "X location to teleport to")]
+        [ArgHints("y", "URLARG", "y location to teleport to")]
+        [ArgHints("z", "URLARG", "z location to teleport to")]
         [Route(HttpVerbs.Get, "/teleport/{region}/{x}/{y}/{z}/{token}")]
         public object Teleport(string region,string x, string y, string z, string token)
         {
@@ -101,8 +128,10 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
-        
-
+        [About("Fetchs the regions map tile")]
+        [ReturnHints("Unable to find region")]
+        [ReturnHints("Texture UUID")]
+        [ArgHints("regionname", "URLARG", "the name of the region we are fetching")]
         [Route(HttpVerbs.Get, "/regiontile/{regionname}/{token}")]
         public object Regiontile(string regionname, string token)
         {
@@ -120,34 +149,42 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("an improved version of near me with extra details<br/>NearMeDetails is a object formated as follows<br/><ul><li>id</li><li>name</li><li>x</li><li>y</li><li>z</li><li>range</li></ul>")]
+        [ReturnHints("array NearMeDetails")]
+        [ReturnHints("Error not in a sim")]
         [Route(HttpVerbs.Get, "/nearmewithdetails/{token}")]
         public object NearmeWithDetails(string token)
         {
-            if (bot.GetClient.Network.CurrentSim != null)
+            if (tokens.Allow(token, getClientIP()) == true)
             {
-                List<NearMeDetails> BetterNearMe = new List<NearMeDetails>();
-
-                Dictionary<uint, Avatar> avcopy = bot.GetClient.Network.CurrentSim.ObjectsAvatars.Copy();
-                foreach (Avatar av in avcopy.Values)
+                if (bot.GetClient.Network.CurrentSim != null)
                 {
-                    if (av.ID != bot.GetClient.Self.AgentID)
+                    List<NearMeDetails> BetterNearMe = new List<NearMeDetails>();
+                    Dictionary<uint, Avatar> avcopy = bot.GetClient.Network.CurrentSim.ObjectsAvatars.Copy();
+                    foreach (Avatar av in avcopy.Values)
                     {
-                        NearMeDetails details = new NearMeDetails();
-                        details.id = av.ID.ToString();
-                        details.name = av.Name;
-                        details.x = (int)Math.Round(av.Position.X);
-                        details.y = (int)Math.Round(av.Position.Y);
-                        details.z = (int)Math.Round(av.Position.Z);
-                        details.range = (int)Math.Round(Vector3.Distance(av.Position,bot.GetClient.Self.SimPosition));
-                        BetterNearMe.Add(details);
+                        if (av.ID != bot.GetClient.Self.AgentID)
+                        {
+                            NearMeDetails details = new NearMeDetails();
+                            details.id = av.ID.ToString();
+                            details.name = av.Name;
+                            details.x = (int)Math.Round(av.Position.X);
+                            details.y = (int)Math.Round(av.Position.Y);
+                            details.z = (int)Math.Round(av.Position.Z);
+                            details.range = (int)Math.Round(Vector3.Distance(av.Position, bot.GetClient.Self.SimPosition));
+                            BetterNearMe.Add(details);
+                        }
                     }
+                    return BasicReply(JsonConvert.SerializeObject(BetterNearMe));
                 }
-                return BasicReply(JsonConvert.SerializeObject(BetterNearMe));
+                return BasicReply("Error not in a sim");
             }
             return BasicReply("Token not accepted");
         }
 
-
+        [About("returns a list of all known avatars nearby")]
+        [ReturnHints("array UUID = Name")]
+        [ReturnHints("Error not in a sim")]
         [Route(HttpVerbs.Get, "/nearme/{token}")]
         public object Nearme(string token)
         {
@@ -171,12 +208,19 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("Used to check HTTP connections")]
+        [ReturnHints("world")]
+        [NeedsToken(false)]
         [Route(HttpVerbs.Get, "/hello")]
         public object Hello()
         {
             return BasicReply("world");
         }
 
+
+        [About("Removes the given token from the accepted token pool")]
+        [ReturnHints("Failed to remove token")]
+        [ReturnHints("ok")]
         [Route(HttpVerbs.Get, "/logout/{token}")]
         public object Logout(string token)
         {
@@ -187,6 +231,10 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+
+
+        [About("Fetchs the current bot")]
+        [ReturnHints("The build ID of the bot")]
         [Route(HttpVerbs.Get, "/version/{token}")]
         public object Version(string token)
         {
@@ -197,6 +245,8 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("Fetchs the name of the bot")]
+        [ReturnHints("Firstname Lastname")]
         [Route(HttpVerbs.Get, "/name/{token}")]
         public object Name(string token)
         {
@@ -207,32 +257,48 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+        [About("Fetchs the current region name")]
+        [ReturnHints("Regionname")]
+        [ReturnHints("Error not in a sim")]
         [Route(HttpVerbs.Get, "/regionname/{token}")]
         public object Regionname(string token)
         {
             if (tokens.Allow(token, getClientIP()) == true)
             {
-                return BasicReply(bot.GetClient.Network.CurrentSim.Name);
+                if(bot.GetClient.Network.CurrentSim != null)
+                {
+                    return BasicReply(bot.GetClient.Network.CurrentSim.Name);
+                }
+                return BasicReply("Error not in a sim");
             }
             return BasicReply("Token not accepted");
         }
 
-
+        [About("Fetchs the current location of the bot")]
+        [ReturnHints("array of X,Y,Z values")]
+        [ReturnHints("Error not in a sim")]
         [Route(HttpVerbs.Get, "/location/{token}")]
         public object Location(string token)
         {
             if (tokens.Allow(token, getClientIP()) == true)
             {
-                Dictionary<string, int> pos = new Dictionary<string, int>();
-                pos.Add("x",(int)Math.Round(bot.GetClient.Self.SimPosition.X));
-                pos.Add("y", (int)Math.Round(bot.GetClient.Self.SimPosition.Y));
-                pos.Add("z", (int)Math.Round(bot.GetClient.Self.SimPosition.Z));
-                return BasicReply(JsonConvert.SerializeObject(pos));
+                if (bot.GetClient.Network.CurrentSim != null)
+                {
+                    Dictionary<string, int> pos = new Dictionary<string, int>();
+                    pos.Add("x", (int)Math.Round(bot.GetClient.Self.SimPosition.X));
+                    pos.Add("y", (int)Math.Round(bot.GetClient.Self.SimPosition.Y));
+                    pos.Add("z", (int)Math.Round(bot.GetClient.Self.SimPosition.Z));
+                    return BasicReply(JsonConvert.SerializeObject(pos));
+                }
+                return BasicReply("Error not in a sim");
             }
             return BasicReply("Token not accepted");
         }
 
 
+        [About("Makes a request to the core commands lib<br/>See LSL example on how to create a core command auth code")]
+        [ArgHints("Request Body", "JsonObject", "Command: string<br/>Args: string[]<br/>AuthCode: string")]
+        [ReturnHints("accepted")]
         [Route(HttpVerbs.Post, "/command/{token}")]
         public async Task<object> command(string token)
         {
