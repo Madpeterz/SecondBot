@@ -110,26 +110,25 @@ namespace BSB.bottypes
         }
         protected void GroupRolesData(object sender,GroupRolesDataReplyEventArgs e)
         {
-            if(await_events.ContainsKey("grouproles") == true)
+            // update group role storage
+            List<GroupRole> entrys = new List<GroupRole>();
+            foreach (GroupRole gr in e.Roles.Values)
             {
-                // update group role storage
-                List<GroupRole> entrys = new List<GroupRole>();
-                foreach(GroupRole gr in e.Roles.Values)
-                {
-                    entrys.Add(gr);
-                }
+                entrys.Add(gr);
+            }
 
-                KeyValuePair<long, List<GroupRole>> storage = new KeyValuePair<long, List<GroupRole>>(helpers.UnixTimeNow(), entrys);
-                if (mygrouprolesstorage.ContainsKey(e.GroupID) == false)
-                {
-                    mygrouprolesstorage.Add(e.GroupID, storage);
-                }
-                else
-                {
-                    mygrouprolesstorage[e.GroupID] = storage;
-                }
-
-
+            KeyValuePair<long, List<GroupRole>> storage = new KeyValuePair<long, List<GroupRole>>(helpers.UnixTimeNow(), entrys);
+            if (mygrouprolesstorage.ContainsKey(e.GroupID) == false)
+            {
+                mygrouprolesstorage.Add(e.GroupID, storage);
+            }
+            else
+            {
+                mygrouprolesstorage[e.GroupID] = storage;
+            }
+            // trigger events
+            if (await_events.ContainsKey("grouproles") == true)
+            {
                 List<string> PurgeAwaiters = new List<string>();
                 foreach(KeyValuePair<string, KeyValuePair<CoreCommand, string[]>> await_reply in await_events["grouproles"])
                 {
