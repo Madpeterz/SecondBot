@@ -112,7 +112,8 @@ namespace BetterSecondBot.HttpService
                         }
                         if(reply.UpdateUnderway == true)
                         {
-                            if(reply.Roles.Count == 0)
+                            bot.GetClient.Groups.RequestGroupRoles(groupuuid);
+                            if (reply.Roles.Count == 0)
                             {
                                 return BasicReply("Updating");
                             }
