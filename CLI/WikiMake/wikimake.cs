@@ -536,7 +536,7 @@ namespace BetterSecondBot.WikiMake
                     {
                         C.about = About.ConstructorArguments[0].Value.ToString();
                     }
-                    if (httpverb.ConstructorArguments[0].Value is HttpVerbs.Get)
+                    if ((int)httpverb.ConstructorArguments[0].Value == 2)
                     {
                         C.type = "Get";
                     }
