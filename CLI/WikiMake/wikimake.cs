@@ -564,7 +564,7 @@ namespace BetterSecondBot.WikiMake
             createEndpoint("core", typeof(HttpApiCore));
             createEndpoint("inventory", typeof(HttpApiInventory));
             createEndpoint("im", typeof(HttpApiIM));
-            createEndpoint("group", typeof(HttpApiGroup));
+            createEndpoint("groups", typeof(HttpApiGroup));
             createEndpoint("chat", typeof(HttpApiLocalchat));
         }
 
