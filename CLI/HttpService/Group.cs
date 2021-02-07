@@ -100,10 +100,10 @@ namespace BetterSecondBot.HttpService
                         else
                         {
                             long dif = helpers.UnixTimeNow() - bot.MyGroupRolesStorage[groupuuid].Key;
-                            if(dif >= 120)
+                            reply.RoleDataAge = dif;
+                            if (dif >= 120)
                             {
                                 reply.UpdateUnderway = true;
-                                reply.RoleDataAge = dif;
                             }
                             foreach(GroupRole gr in bot.MyGroupRolesStorage[groupuuid].Value)
                             {
