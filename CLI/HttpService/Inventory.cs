@@ -20,7 +20,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/rezobject/{item}/{token}")]
         public object rezobject(string item, string token, [FormField] string newname)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "inventory", "rezobject", getClientIP()) == true)
             {
                 bool status = bot.GetCommandsInterface.Call("RezObject", item);
                 return BasicReply(status.ToString());
@@ -35,7 +35,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/rename/{item}/{token}")]
         public object rename(string item, string token, [FormField] string newname)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "inventory", "rename", getClientIP()) == true)
             {
                 bool status = bot.GetCommandsInterface.Call("RenameInventory", "12~#~" + item + "~#~" + newname);
                 return BasicReply(status.ToString());
@@ -50,7 +50,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/realuuid/{item}/{token}")]
         public object realuuid(string item, string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "inventory", "realuuid", getClientIP()) == true)
             {
                 if (UUID.TryParse(item, out UUID itemUUID) == true)
                 {
@@ -73,7 +73,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/send/{item}/{avatar}/{token}")]
         public object send(string item, string avatar, string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "inventory", "send", getClientIP()) == true)
             {
                 if (UUID.TryParse(item, out UUID itemUUID) == true)
                 {
@@ -94,7 +94,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/delete/{item}/{isfolder}/{token}")]
         public object delete(string item,string isfolder, string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "inventory", "delete", getClientIP()) == true)
             {
                 if (UUID.TryParse(item, out UUID itemUUID) == true)
                 {
@@ -118,7 +118,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/folders/{token}")]
         public object folders(string token)
         {
-            if(tokens.Allow(token, getClientIP()) == true)
+            if(tokens.Allow(token, "inventory", "folders", getClientIP()) == true)
             {
                 string reply = HelperInventory.MapFolderJson(bot);
                 if(reply != null) return BasicReply(reply);
@@ -134,7 +134,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/contents/{folderUUID}/{token}")]
         public object Contents(string folderUUID, string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "inventory", "contents", getClientIP()) == true)
             {
                 if (UUID.TryParse(folderUUID, out UUID folder) == true)
                 {

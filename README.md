@@ -25,9 +25,7 @@ Secondbot is a CommandLine based bot for SecondLife based on libremetaverse reta
 ## Releases
 These are pre compiled versions for the most upto date please use docker or compile it yourself.
 
-[Windows x64](https://github.com/Madpeterz/SecondBot/releases/tag/windows-x64)
-
-[Linux (Tested on Deb) x64](https://github.com/Madpeterz/SecondBot/releases/tag/linux-x64)
+[View releases](https://github.com/Madpeterz/SecondBot/releases)
  
  
 ### Starting multiple bots from the same executable in windows
@@ -66,5 +64,77 @@ and the command would look something like this
 
     sayexample!!!say|||Hello [C_ARG_1]{-}delay|||2500{-}say|||Bye [C_ARG_2]
 
+### HTTP web interface
+
+by setting
+
+> Http_Enable to true
+> Http_Host to http://*:8080
+> Security_WebUIKey to a vaild code (12 letters+numbers long or more)
+
+you will be able to connect to the bot via HTTP and use the webUI
+to control the bot!
+
+[Dev server UI](http://webui.magicmadpeter.xyz/)
+or 
+[Host it yourself](https://github.com/Madpeterz/secondbot_web_folders)
+
+###  HTTP scoped tokens
+---
+Scoped tokens allow you to hardcode access to the HTTP interface (if enabled)
+and set more detailed control over what areas can be accessed
+plus no need to give the full http 
+
+> Security_WebUIKey 
+
+You get set these tokens up by file or Environment Variables.
+##### File
+
+> {   
+> "ScopedTokens": [
+>     "t:[10charcode],ws:core,ws:group",
+>     "t:[10charcode],cm:chat/localchathistory",   
+>     ]
+>   }
 
 
+##### Environment Variables
+|Name  |  Value|
+|--|--|
+| scoped_token_1 |  "t:[10charcode],ws:core,ws:group" |
+| scoped_token_2 |  "t:[10charcode],cg:chat" |
+| scoped_token_3 |  "t:[10charcode],cm:chat/localchathistory" |
+
+
+###  HTTP scoped tokens (info)
+---
+
+    command [cm] "example: `cm:chat/localchathistory`
+    
+    workspaces [ws] "example: ws: core, ws: groups"
+    
+    commandgroups [cg] "example: `cg:chat`"
+    	chat
+    		chat/localchathistory
+    		chat/localchatsay
+    		groups/getgroupchat	
+    		groups/sendgroupchat
+    		groups/listgroups
+    		im/chatwindows
+    		im/listwithunread
+    		im/getimchat
+    		im/sendimchat
+    
+    	giver
+    		inventory/send
+    		inventory/folders
+    		inventory/contents
+    
+    
+    	groupinvite
+    		[WIP]
+    
+    	movement
+    		core/walkto
+    		core/teleport
+    		core/gesture

@@ -23,7 +23,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/parcelbanlist/{token}")]
         public object parcelbanlist(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "parcelestate", "parcelbanlist", getClientIP()) == true)
             {
                 if (bot.GetClient.Network.CurrentSim != null)
                 {

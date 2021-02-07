@@ -4,10 +4,18 @@ using System.Text;
 
 namespace BetterSecondBotShared.Json
 {
+
+    public class JsonScopedTokens
+    {
+        public string[] ScopedTokens { get; set; }
+    }
+
     public class JsonCommandsfile
     {
         public string[] CustomCommands { get; set; }
     }
+
+
     public class JsonConfig
     {
         // Basics

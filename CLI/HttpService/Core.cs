@@ -59,7 +59,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/friends/{token}")]
         public object Friends(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "friends", getClientIP()) == true)
             {
                 return BasicReply(bot.getJsonFriendlist());
             }
@@ -75,7 +75,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/walkto/{x}/{y}/{z}/{token}")]
         public object WalkTo(string x, string y, string z, string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "walkto", getClientIP()) == true)
             {
                 bool status = bot.GetCommandsInterface.Call("AutoPilot", "<"+x+","+y+","+z+">");
                 if (status == true)
@@ -94,7 +94,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/gesture/{gesture}/{token}")]
         public object Gesture(string gesture, string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "gesture", getClientIP()) == true)
             {
                 bool status = bot.GetCommandsInterface.Call("PlayGesture", gesture);
                 if (status == true)
@@ -116,7 +116,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/teleport/{region}/{x}/{y}/{z}/{token}")]
         public object Teleport(string region,string x, string y, string z, string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "teleport", getClientIP()) == true)
             {
                 bool status = bot.GetCommandsInterface.Call("Teleport", ""+region+"/" + x + "/" + y + "/" + z + "");
                 if (status == true)
@@ -135,7 +135,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/regiontile/{regionname}/{token}")]
         public object Regiontile(string regionname, string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "regiontile", getClientIP()) == true)
             {
                 if (bot.GetClient.Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region))
                 {
@@ -155,7 +155,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/nearmewithdetails/{token}")]
         public object NearmeWithDetails(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "nearmewithdetails", getClientIP()) == true)
             {
                 if (bot.GetClient.Network.CurrentSim != null)
                 {
@@ -188,7 +188,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/nearme/{token}")]
         public object Nearme(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "nearme", getClientIP()) == true)
             {
                 if (bot.GetClient.Network.CurrentSim != null)
                 {
@@ -224,7 +224,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/logout/{token}")]
         public object Logout(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "logout", getClientIP()) == true)
             {
                 return tokens.Expire(token);
             }
@@ -238,7 +238,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/version/{token}")]
         public object Version(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "version", getClientIP()) == true)
             {
                 return BasicReply(bot.MyVersion);
             }
@@ -250,7 +250,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/name/{token}")]
         public object Name(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "name", getClientIP()) == true)
             {
                 return BasicReply(bot.GetClient.Self.FirstName + " " + bot.GetClient.Self.LastName);
             }
@@ -263,7 +263,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/regionname/{token}")]
         public object Regionname(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "regionname", getClientIP()) == true)
             {
                 if(bot.GetClient.Network.CurrentSim != null)
                 {
@@ -280,7 +280,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/location/{token}")]
         public object Location(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "location", getClientIP()) == true)
             {
                 if (bot.GetClient.Network.CurrentSim != null)
                 {
@@ -302,7 +302,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/command/{token}")]
         public async Task<object> command(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "core", "command", getClientIP()) == true)
             {
                 CommandLibCall data = await HttpContext.GetRequestDataAsync<CommandLibCall>();
                 string compressedArgs = string.Join("~#~", data.Args);

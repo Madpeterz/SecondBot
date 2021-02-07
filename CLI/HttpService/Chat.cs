@@ -20,7 +20,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/localchathistory/{token}")]
         public object localchatHistory(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "chat", "localchathistory", getClientIP()) == true)
             {
                 return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()));
             }
@@ -33,7 +33,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/localchatsay/{token}")]
         public object localchatSay(string token, [FormField] string message)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "chat", "localchatsay", getClientIP()) == true)
             {
                 bot.GetCommandsInterface.Call("say", message);
                 return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()));

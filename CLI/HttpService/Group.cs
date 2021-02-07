@@ -26,7 +26,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/ismember/{group}/{avatar}/{token}")]
         public object ismember(string group,string avatar,string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "ismember", getClientIP()) == true)
             {
                 if (UUID.TryParse(group, out UUID groupuuid) == true)
                 {
@@ -62,7 +62,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/listgroups/{token}")]
         public object listgroups(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "listgroups", getClientIP()) == true)
             {
                 Dictionary<string, string> grouppackage = new Dictionary<string, string>();
                 foreach(KeyValuePair<UUID,Group> entry in bot.MyGroups)
@@ -83,7 +83,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/listgrouproles/{group}/{token}")]
         public object listgrouproles(string group, string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "listgrouproles", getClientIP()) == true)
             {
                 if (UUID.TryParse(group, out UUID groupuuid) == true)
                 {
@@ -132,7 +132,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/listgroupswithunread/{token}")]
         public object listgroupswithunread(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "listgroupswithunread", getClientIP()) == true)
             {
                 return BasicReply(JsonConvert.SerializeObject(bot.UnreadGroupchatGroups()));
             }
@@ -144,7 +144,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/haveunreadgroupchat/{token}")]
         public object haveunreadgroupchat(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "haveunreadgroupchat", getClientIP()) == true)
             {
                 return BasicReply(bot.HasUnreadGroupchats().ToString());
             }
@@ -158,7 +158,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/getgroupchat/{group}/{token}")]
         public object getgroupchat(string group, string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "getgroupchat", getClientIP()) == true)
             {
                 if (UUID.TryParse(group, out UUID groupUUID) == true)
                 {
@@ -177,7 +177,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/sendgroupchat/{group}/{token}")]
         public object sendgroupchat(string group, string token, [FormField] string message)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "sendgroupchat", getClientIP()) == true)
             {
                 if (UUID.TryParse(group, out UUID groupUUID) == true)
                 {

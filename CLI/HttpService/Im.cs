@@ -21,7 +21,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/chatwindows/{token}")]
         public object chatwindows(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "im", "chatwindows", getClientIP()) == true)
             {
                 return BasicReply(JsonConvert.SerializeObject(bot.GetIMChatWindowKeyNames()));
             }
@@ -33,7 +33,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/listwithunread/{token}")]
         public object listwithunread(string group, string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "im", "listwithunread", getClientIP()) == true)
             {
                 List<UUID> unreadimwindows = new List<UUID>();
                 foreach (UUID window in bot.IMChatWindows())
@@ -53,7 +53,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/haveunreadims/{token}")]
         public object haveunreadims(string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "im", "haveunreadims", getClientIP()) == true)
             {
                 bool reply = false;
                 foreach(UUID window in bot.IMChatWindows())
@@ -76,7 +76,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/getimchat/{window}/{token}")]
         public object getimchat(string window, string token)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "im", "getimchat", getClientIP()) == true)
             {
                 if (UUID.TryParse(window, out UUID windowUUID) == true)
                 {
@@ -94,7 +94,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/sendimchat/{avatar}/{token}")]
         public object sendimchat(string avatar, string token, [FormField] string message)
         {
-            if (tokens.Allow(token, getClientIP()) == true)
+            if (tokens.Allow(token, "im", "sendimchat", getClientIP()) == true)
             {
                 bot.GetCommandsInterface.Call("im", avatar + "~#~" + message, UUID.Zero, "~#~");
                 return BasicReply("ok");

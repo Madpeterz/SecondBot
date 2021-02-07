@@ -53,7 +53,7 @@ namespace BetterSecondBot
                     */
                     new Thread(() =>
                     {
-                        new HttpAsService(Bot, Config);
+                        new HttpAsService(Bot, Config, as_docker);
                     }).Start();
                 }
                 if(use_self_keep_alive == true)
