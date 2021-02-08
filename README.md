@@ -143,11 +143,12 @@ You get set these tokens up by file or Environment Variables.
 
 ###  BetterRelay system
 ---
-this is to replace the old broken relay thats currently built into the bot
+This is to replace the old broken relay thats currently built into the bot
 
 
-> customrelay_1  = "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:4"
-> customrelay_2  = "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:4"
+> customrelay_1 = "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:4"
+
+> customrelay_2 = "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:4"
 
 or via the config file
 customrelays
@@ -158,7 +159,7 @@ customrelays
 >]
 }
 
-to config the relay please use the settings below
+To config the relay please use the settings below.
 
 
     source-type
@@ -178,7 +179,7 @@ to config the relay please use the settings below
 		    source-filter: group uuid or "all"
 
 
-    source-type
+    target-type
 	    discord
 		    target-config: serverid@serverchannel
 	
