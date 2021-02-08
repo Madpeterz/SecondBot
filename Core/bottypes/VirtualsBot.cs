@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Discord;
+using System.Threading.Tasks;
 
 namespace BSB.bottypes
 {
@@ -13,6 +14,35 @@ namespace BSB.bottypes
         #region DiscordOutputTarget
         protected DiscordSocketClient DiscordLink = null;
         protected string DiscordReadyWhyFailed = "";
+        public async Task<bool> SendMessageToDiscord(string target_serverid, string target_channelid, string message, bool useTTS)
+        {
+            if (discordReady() == true)
+            {
+                DiscordSocketClient Discord = getDiscordClient();
+                if (ulong.TryParse(target_serverid, out ulong serverid) == true)
+                {
+                    if (ulong.TryParse(target_channelid, out ulong channelid) == true)
+                    {
+                        SocketGuild server = Discord.GetGuild(serverid);
+                        SocketTextChannel Channel = null;
+                        foreach (SocketTextChannel channel in server.TextChannels)
+                        {
+                            if (channel.Id == channelid)
+                            {
+                                Channel = channel;
+                                break;
+                            }
+                        }
+                        if (Channel != null)
+                        {
+                            await Channel.SendMessageAsync(message, useTTS);
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
         public void setDiscordClient(DiscordSocketClient GivenDiscordLink)
         {
             DiscordLink = GivenDiscordLink;

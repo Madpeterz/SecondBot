@@ -15,6 +15,11 @@ namespace BetterSecondBotShared.Json
         public string[] CustomCommands { get; set; }
     }
 
+    public class JsonCustomRelays
+    {
+        public string[] CustomRelays { get; set; }
+    }
+
 
     public class JsonConfig
     {

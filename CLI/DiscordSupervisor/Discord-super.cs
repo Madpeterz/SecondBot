@@ -1,4 +1,5 @@
-﻿using BetterSecondBotShared.Json;
+﻿using BetterSecondBot.BetterRelayService;
+using BetterSecondBotShared.Json;
 using BetterSecondBotShared.logs;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace BetterSecondBot.DiscordSupervisor
     public class Discord_super : DiscordEvents
     {
         protected int warmup = 0;
+        protected BetterRelay relayService;
         protected override void keep_alive()
         {
             while (exit_super == false)
@@ -67,12 +69,21 @@ namespace BetterSecondBot.DiscordSupervisor
 
         protected override void login_bot(bool self_keep_alive)
         {
-            if (controler == null)
+            if(relayService != null)
             {
-                controler = new CliExitOnLogout(myconfig, running_as_docker, self_keep_alive);
-                controler.Bot.setDiscordClient(DiscordClient);
-                attach_events();
+                relayService.unattach_events();
+                relayService = null;
             }
+            if (controler != null)
+            {
+                unattach_events();
+                controler.Bot.KillMePlease();
+                controler = null;
+            }
+            controler = new CliExitOnLogout(myconfig, running_as_docker, self_keep_alive);
+            controler.Bot.setDiscordClient(DiscordClient);
+            relayService = new BetterRelay(controler, this, running_as_docker);
+            attach_events();
         }
 
     }

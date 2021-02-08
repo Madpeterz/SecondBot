@@ -9,8 +9,39 @@ using System.Threading;
 
 namespace BetterSecondBot.DiscordSupervisor
 {
+
+    public class DiscordMessageEvent : EventArgs
+    {
+        public ulong channel { get; }
+        public ulong server { get; }
+        public string name { get; }
+        public string message { get; }
+
+        public DiscordMessageEvent(ulong server, ulong channel, string name,string message)
+        {
+            this.channel = channel;
+            this.server = server;
+            this.name = name;
+            this.message = message;
+        }
+    }
+
     public abstract class DiscordInbound : DiscordRelay
     {
+        private EventHandler<DiscordMessageEvent> _MessageEvent;
+        private readonly object _MessageEventLock = new object();
+        public event EventHandler<DiscordMessageEvent> MessageEvent
+        {
+            add { lock (_MessageEventLock) { _MessageEvent += value; } }
+            remove { lock (_MessageEventLock) { _MessageEvent -= value; } }
+        }
+        protected void On_MessageEvent(DiscordMessageEvent e)
+        {
+            EventHandler<DiscordMessageEvent> handler = _MessageEvent;
+            handler?.Invoke(this, e);
+        }
+
+
         protected async Task<Task> InboundLocalchatMessage(IUserMessage message)
         {
             if (HasBot() == true)
@@ -275,6 +306,7 @@ namespace BetterSecondBot.DiscordSupervisor
                 if (message.Author.IsBot == false)
                 {
                     ITextChannel Chan = (ITextChannel)message.Channel;
+                    On_MessageEvent(new DiscordMessageEvent(Chan.GuildId, Chan.Id, message.Author.Username, message.Content));
                     if (message.Content.StartsWith("!clear") == true)
                     {
                         await CleanDiscordChannel(Chan, 0, true).ConfigureAwait(false);

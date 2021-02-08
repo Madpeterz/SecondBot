@@ -138,3 +138,55 @@ You get set these tokens up by file or Environment Variables.
     		core/walkto
     		core/teleport
     		core/gesture
+
+
+
+###  BetterRelay system
+---
+this is to replace the old broken relay thats currently built into the bot
+
+
+> customrelay_1  = "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:4"
+> customrelay_2  = "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:4"
+
+or via the config file
+customrelays
+
+>{
+>"CustomRelays": [
+>	source-type:discord,source-filter:123451231235@12351312321,target-type:chat,target-config:4
+>]
+}
+
+to config the relay please use the settings below
+
+
+    source-type
+	    discord
+		    source-filter: serverid@serverchannel
+	
+	    localchat
+		    source-filter: talker uuid or "all"
+
+	    avatarim
+		    source-filter: avatar uuid or "all"
+
+	    objectim
+		    source-filter: object uuid or "all"
+
+	    groupchat
+		    source-filter: group uuid or "all"
+
+
+    source-type
+	    discord
+		    target-config: serverid@serverchannel
+	
+	    localchat
+		    target-config: channel (default is 0)
+
+	    avatarchat
+		    target-config: avatar uuid
+
+	    groupchat
+		    target-config: group uuid

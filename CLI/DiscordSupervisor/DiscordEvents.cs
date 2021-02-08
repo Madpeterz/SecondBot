@@ -16,6 +16,14 @@ namespace BetterSecondBot.DiscordSupervisor
             controler.Bot.SendImEvent += SendImHandler;
         }
 
+        protected void unattach_events()
+        {
+            controler.Bot.MessageEvent -= BotChatControlerHandler;
+            controler.Bot.StatusMessageEvent -= StatusMessageHandler;
+            controler.Bot.GroupsReadyEvent -= GroupsReadyHandler;
+            controler.Bot.SendImEvent -= SendImHandler;
+        }
+
         protected void SendImHandler(object sender, ImSendArgs e)
         {
             if (controler.Bot.AvatarKey2Name.ContainsKey(e.avataruuid) == true)

@@ -32,34 +32,12 @@ namespace BSB.Commands.DiscordAPI
 
         protected async Task<bool> MessageChannel(string[] args)
         {
-            DiscordSocketClient Discord = bot.getDiscordClient();
-            if (ulong.TryParse(args[1], out ulong serverid) == true)
+            bool useTTS = false;
+            if (args.Length == 5)
             {
-                if (ulong.TryParse(args[2], out ulong channelid) == true)
-                {
-                    bool useTTS = false;
-                    if(args.Length == 5)
-                    {
-                        bool.TryParse(args[4], out useTTS);
-                    }
-                    SocketGuild server = Discord.GetGuild(serverid);
-                    SocketTextChannel Channel = null;
-                    foreach (SocketTextChannel channel in server.TextChannels)
-                    {
-                        if(channel.Id == channelid)
-                        {
-                            Channel = channel;
-                            break;
-                        }
-                    }
-                    if(Channel != null)
-                    {
-                        await Channel.SendMessageAsync(args[3], useTTS);
-                        return true;
-                    }
-                }
+                bool.TryParse(args[4], out useTTS);
             }
-            return false;
+            return await bot.SendMessageToDiscord(args[1], args[2], args[3], useTTS);
         }
     }
 }
