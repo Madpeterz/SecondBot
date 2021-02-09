@@ -21,11 +21,11 @@ namespace BSB.RLV
             last_caller_uuid = callerUUID;
         }
 
-        public RLVcontrol(RLVbot linktobot)
+        public RLVcontrol(RLVbot linktobot, bool wikimode)
         {
             bot = linktobot;
             API_type = typeof(RLV_command);
-            LoadCommandsList();
+            LoadCommandsList(wikimode);
         }
 
         protected List<string> suppress_warning = new List<string>();

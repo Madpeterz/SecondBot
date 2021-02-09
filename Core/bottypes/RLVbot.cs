@@ -21,7 +21,7 @@ namespace BSB.bottypes
                 if (myconfig.Setting_AllowRLV == true)
                 {
                     Info("RLV: Enabled");
-                    RLVinterface = new RLV.RLVcontrol(this);
+                    RLVinterface = new RLV.RLVcontrol(this,false);
                 }
             }
         }

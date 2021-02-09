@@ -125,11 +125,11 @@ namespace BSB.Commands
             }
         }
 
-        public CoreCommandsInterface(CommandsBot linktobot)
+        public CoreCommandsInterface(CommandsBot linktobot, bool wikimode)
         {
             bot = linktobot;
             API_type = typeof(CoreCommand);
-            LoadCommandsList();
+            LoadCommandsList(wikimode);
         }
         protected HttpClient HTTPclient = new HttpClient();
 

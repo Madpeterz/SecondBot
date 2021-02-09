@@ -14,7 +14,7 @@ namespace BSB.bottypes
     {
         protected CommandsBot()
         {
-            CommandsInterface = new Commands.CoreCommandsInterface(this);
+            CommandsInterface = new Commands.CoreCommandsInterface(this,false);
         }
 
         protected List<string> CommandHistory = new List<string>();
@@ -194,7 +194,7 @@ namespace BSB.bottypes
         {
             if (reconnect == false)
             {
-                CommandsInterface = new Commands.CoreCommandsInterface(this);
+                CommandsInterface = new Commands.CoreCommandsInterface(this,false);
             }
             Client.Self.RequestBalance();
             base.AfterBotLoginHandler();

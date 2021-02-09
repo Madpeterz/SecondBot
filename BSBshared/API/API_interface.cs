@@ -36,7 +36,7 @@ namespace BetterSecondBotShared.API
             }
             return null;
         }
-        protected virtual void LoadCommandsList()
+        protected virtual void LoadCommandsList(bool wikimode)
         {
             foreach (var com in GetAPICommandClasses())
             {
@@ -47,7 +47,12 @@ namespace BetterSecondBotShared.API
                         API_interface D = (API_interface)Activator.CreateInstance(com);
                         if (D != null)
                         {
-                            if (subtype_map.ContainsKey(D.CommandNameLower) == false)
+                            string name = D.CommandNameLower;
+                            if(wikimode == true)
+                            {
+                                name = D.CommandName;
+                            }
+                            if (subtype_map.ContainsKey(name) == false)
                             {
                                 string worknamespace = com.Namespace;
                                 worknamespace = worknamespace.Replace("BSB.Commands.", "");
@@ -57,8 +62,8 @@ namespace BetterSecondBotShared.API
                                 worknamespace = worknamespace.Replace("BetterSecondBot.HttpServer.Control.", "");
                                 worknamespace = worknamespace.Replace("BetterSecondBot.HttpServer.control.", "");
                                 worknamespace = worknamespace.Replace("CMD_", "");
-                                subtype_map.Add(D.CommandNameLower, D.GetType());
-                                subtype_workspace_map.Add(D.CommandNameLower, worknamespace);
+                                subtype_map.Add(name, D.GetType());
+                                subtype_workspace_map.Add(name, worknamespace);
                             }
                             else
                             {
@@ -102,7 +107,7 @@ namespace BetterSecondBotShared.API
         {
             if (subtype_map.Count() == 0)
             {
-                LoadCommandsList();
+                LoadCommandsList(false);
             }
             return subtype_map.ContainsKey(command);
         }
