@@ -407,7 +407,7 @@ namespace BetterSecondBot.WikiMake
                     sb.Replace("[[AREA]]", area);
                     sb.Replace("[[SUBFOLDER]]", "");
                     sb.Replace("[[RETURNROOT]]", "../");
-                    string target_file = "" + area + "" + workspace + "" + c + ".html";
+                    string target_file = "" + area + "" + workspace + "" + c.ToLowerInvariant() + ".html";
                     io.writefile(target_file, sb.ToString());
                 }
             }
@@ -466,7 +466,7 @@ namespace BetterSecondBot.WikiMake
                     int args = HTTP.getCommandArgCount(workspace, c);
                     sb.Append("<tr><td><a href='[[AREA]]");
                     sb.Append(workspace);
-                    sb.Append(c);
+                    sb.Append(c.ToLowerInvariant());
                     sb.Append(".html'>");
                     sb.Append(c);
                     sb.Append("</a></td><td>");
