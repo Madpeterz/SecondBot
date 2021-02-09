@@ -143,6 +143,7 @@ namespace BetterSecondBotShared.bottypes
         public virtual void KillMePlease()
         {
             killMe = true;
+            Client.Network.BeginLogout(); 
         }
         public virtual void Setup(JsonConfig config, string Version)
         {

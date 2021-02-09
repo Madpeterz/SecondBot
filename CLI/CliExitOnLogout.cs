@@ -30,7 +30,6 @@ namespace BetterSecondBot
                 }
                 Thread.Sleep(1000);
             }
-            Bot.GetClient.Network.Logout();
         }
         public CliExitOnLogout(JsonConfig Config, bool as_docker, bool use_self_keep_alive)
         {
