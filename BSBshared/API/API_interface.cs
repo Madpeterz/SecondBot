@@ -9,7 +9,9 @@ namespace BetterSecondBotShared.API
 {
     public abstract class API_interface
     {
-        public string CommandName { get { return GetType().Name.ToLowerInvariant(); } }
+        public string CommandName { get { return GetType().Name; } }
+
+        public string CommandNameLower { get { return GetType().Name.ToLowerInvariant(); } }
         public virtual int Min_Required_args { get { return 0; } }
         public virtual string Helpfile { get { return "No help given"; } }
         public virtual string[] ArgTypes { get { return new string[] { }; } }
@@ -45,7 +47,7 @@ namespace BetterSecondBotShared.API
                         API_interface D = (API_interface)Activator.CreateInstance(com);
                         if (D != null)
                         {
-                            if (subtype_map.ContainsKey(D.CommandName) == false)
+                            if (subtype_map.ContainsKey(D.CommandNameLower) == false)
                             {
                                 string worknamespace = com.Namespace;
                                 worknamespace = worknamespace.Replace("BSB.Commands.", "");
@@ -55,8 +57,8 @@ namespace BetterSecondBotShared.API
                                 worknamespace = worknamespace.Replace("BetterSecondBot.HttpServer.Control.", "");
                                 worknamespace = worknamespace.Replace("BetterSecondBot.HttpServer.control.", "");
                                 worknamespace = worknamespace.Replace("CMD_", "");
-                                subtype_map.Add(D.CommandName, D.GetType());
-                                subtype_workspace_map.Add(D.CommandName, worknamespace);
+                                subtype_map.Add(D.CommandNameLower, D.GetType());
+                                subtype_workspace_map.Add(D.CommandNameLower, worknamespace);
                             }
                             else
                             {
