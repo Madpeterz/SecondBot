@@ -162,7 +162,7 @@ namespace BSB.bottypes
                 }
                 else
                 {
-                    long dif = last_tp_attempt_unixtime - helpers.UnixTimeNow();
+                    long dif = helpers.UnixTimeNow() - last_tp_attempt_unixtime;
                     if (dif > 0)
                     {
                         addon = "Waiting for TP cooldown";
@@ -182,6 +182,7 @@ namespace BSB.bottypes
 
 
         protected long login_failed_retry_at = 0;
+        protected long connection_lost_at = 0;
         public string AtHomeReconnect()
         {
             if (attempted_first_login == true)
@@ -199,11 +200,12 @@ namespace BSB.bottypes
                     }
                     else
                     {
-                        long dif = login_failed_retry_at - helpers.UnixTimeNow();
+                        long dif = helpers.UnixTimeNow() - login_failed_retry_at;
                         if(dif > 0)
                         {
                             login_failed_retry_at = 0;
                             attempted_first_login = false;
+                            login_failed = false;
                             Start(true);
                             return "Attempting reconnect";
                         }
@@ -216,7 +218,27 @@ namespace BSB.bottypes
             }
             else
             {
-                return "Waiting";
+                if(connection_lost_at == 0)
+                {
+                    connection_lost_at = helpers.UnixTimeNow() + 30;
+                    return "Connection lost reconnect in 30 secs";
+                }
+                else
+                {
+                    long dif = helpers.UnixTimeNow() - connection_lost_at;
+                    if(dif > 0)
+                    {
+                        login_failed_retry_at = 0;
+                        attempted_first_login = false;
+                        login_failed = false;
+                        Start(true);
+                        return "Attempting reconnect";
+                    }
+                    else
+                    {
+                        return "Connection lost reconnect in "+ dif.ToString()+" secs";
+                    }
+                }
             }
 
         }
@@ -299,6 +321,7 @@ namespace BSB.bottypes
             string reply = "Disconnected: No action";
             if (Client.Network.Connected == true)
             {
+                connection_lost_at = 0;
                 if (Client.Network.CurrentSim != null)
                 {
                     if(after_login_fired == false)

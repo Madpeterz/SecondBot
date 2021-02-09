@@ -22,6 +22,7 @@ namespace BetterSecondBot.HttpService
         protected JsonConfig Config;
         protected SecondBot Bot;
         protected TokenStorage Tokens;
+        protected bool killedLogger = false;
 
         protected void loadScopedTokensFromENV()
         {
@@ -139,15 +140,26 @@ namespace BetterSecondBot.HttpService
             }
 
             // Our web server is disposable
-            Logger.UnregisterLogger<ConsoleLogger>();
-            using (var server = CreateWebServer(Config.Http_Host))
+            try
             {
-                // Once we've registered our modules and configured them, we call the RunAsync() method.
-                server.RunAsync();
-                while(Bot.KillMe == false)
+                if (killedLogger == false)
                 {
-                    Thread.Sleep(3000);
+                    killedLogger = true;
+                    Logger.UnregisterLogger<ConsoleLogger>();
                 }
+                using (var server = CreateWebServer(Config.Http_Host))
+                {
+                    // Once we've registered our modules and configured them, we call the RunAsync() method.
+                    server.RunAsync();
+                    while (Bot.KillMe == false)
+                    {
+                        Thread.Sleep(3000);
+                    }
+                }
+            }
+            catch
+            { 
+
             }
         }
 
