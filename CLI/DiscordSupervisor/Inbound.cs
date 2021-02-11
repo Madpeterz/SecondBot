@@ -306,7 +306,8 @@ namespace BetterSecondBot.DiscordSupervisor
                 if (message.Author.IsBot == false)
                 {
                     ITextChannel Chan = (ITextChannel)message.Channel;
-                    On_MessageEvent(new DiscordMessageEvent(Chan.GuildId, Chan.Id, message.Author.Username, message.Content));
+                    IGuildUser user = await Chan.Guild.GetUserAsync(message.Author.Id).ConfigureAwait(true);
+                    On_MessageEvent(new DiscordMessageEvent(Chan.GuildId, Chan.Id, user.Nickname, message.Content));
                     if (message.Content.StartsWith("!clear") == true)
                     {
                         await CleanDiscordChannel(Chan, 0, true).ConfigureAwait(false);

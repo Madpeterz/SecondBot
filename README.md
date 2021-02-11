@@ -146,9 +146,9 @@ You get set these tokens up by file or Environment Variables.
 This is to replace the old broken relay thats currently built into the bot
 
 
-> customrelay_1 = "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:4"
+> CustomRelay_1 = "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:4"
 
-> customrelay_2 = "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:4"
+> CustomRelay_2 = "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:4"
 
 or via the config file
 customrelays

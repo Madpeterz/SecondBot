@@ -92,9 +92,9 @@ namespace BetterSecondBot.BetterRelayService
             bool found = true;
             while (found == true)
             {
-                if (helpers.notempty(Environment.GetEnvironmentVariable("customrelay_" + loop.ToString())) == true)
+                if (helpers.notempty(Environment.GetEnvironmentVariable("CustomRelay_" + loop.ToString())) == true)
                 {
-                    ApplyRelayConfig(Environment.GetEnvironmentVariable("customrelay_" + loop.ToString()));
+                    ApplyRelayConfig(Environment.GetEnvironmentVariable("CustomRelay_" + loop.ToString()));
                 }
                 else
                 {
