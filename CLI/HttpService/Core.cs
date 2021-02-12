@@ -299,6 +299,8 @@ namespace BetterSecondBot.HttpService
         [About("Makes a request to the core commands lib<br/>See LSL example on how to create a core command auth code")]
         [ArgHints("Request Body", "JsonObject", "Command: string<br/>Args: string[]<br/>AuthCode: string")]
         [ReturnHints("accepted")]
+        [ReturnHints("Auth not accepted")]
+        [ReturnHints("Failed")]
         [Route(HttpVerbs.Post, "/command/{token}")]
         public async Task<object> command(string token)
         {
@@ -315,7 +317,9 @@ namespace BetterSecondBot.HttpService
                     {
                         return BasicReply("accepted");
                     }
+                    return BasicReply("Failed");
                 }
+                return BasicReply("Auth not accepted");
             }
             return BasicReply("Token not accepted");
         }
