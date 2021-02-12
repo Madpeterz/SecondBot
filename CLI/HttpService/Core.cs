@@ -312,7 +312,7 @@ namespace BetterSecondBot.HttpService
                 string cooked = helpers.GetSHA1(raw + config.Security_SignedCommandkey);
                 if (cooked == data.AuthCode)
                 {
-                    bool status = bot.GetCommandsInterface.Call(data.Command, compressedArgs, UUID.Zero, "~#~");
+                    bool status = bot.GetCommandsInterface.Call(data.Command.ToLowerInvariant(), compressedArgs, UUID.Zero, "~#~");
                     if (status == true)
                     {
                         return BasicReply("accepted");
