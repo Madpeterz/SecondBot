@@ -389,6 +389,7 @@ namespace BSB.Commands
         public bool Failed(string why_failed)
         {
             InfoBlob = why_failed;
+            LogFormater.Warn("Called failed because: " + why_failed);
             return false;
         }
     }
