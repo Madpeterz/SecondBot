@@ -1,6 +1,7 @@
 ﻿using BetterSecondBot.DiscordSupervisor;
 using BetterSecondBotShared.IO;
 using BetterSecondBotShared.Json;
+using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
 using BSB.bottypes;
 using Newtonsoft.Json;
@@ -176,6 +177,8 @@ namespace BetterSecondBot.BetterRelayService
                 return;
             }
             message = "[relay] " + sourcetype + " # " + name + ": " + message;
+
+
             foreach (relay_config cfg in Dataset)
             {
                 relay_packet packet = new relay_packet();
@@ -194,11 +197,13 @@ namespace BetterSecondBot.BetterRelayService
                         packet.discord_messageid = discordMessageid;
                     }
                     sendmessage = JsonConvert.SerializeObject(packet);
+                    LogFormater.Info("Created json packet");
                 }
 
-
+                LogFormater.Info("Attempting to check if: "+ cfg.sourcevalue+" == "+filtervalue+"");
                 if (((cfg.sourcevalue == "all") && (sourcetype != "discordchat")) || (cfg.sourcevalue == filtervalue))
                 {
+                    LogFormater.Info("passed source filter");
                     if (cfg.targetname == "discord")
                     {
                         string[] cfga = cfg.targetvalue.Split("@");
@@ -206,7 +211,12 @@ namespace BetterSecondBot.BetterRelayService
                         {
                             if ((cfga[0] + "@" + cfga[1]) != filtervalue)
                             {
+                                LogFormater.Info("sending via discord");
                                 await controler.Bot.SendMessageToDiscord(cfga[0], cfga[1], sendmessage, false);
+                            }
+                            else
+                            {
+                                LogFormater.Info("Blocked - source is the same as target");
                             }
                         }
                     }
@@ -214,6 +224,7 @@ namespace BetterSecondBot.BetterRelayService
                     {
                         int chan = 0;
                         int.TryParse(cfg.targetvalue, out chan);
+                        LogFormater.Info("sending via localchat");
                         controler.Bot.GetClient.Self.Chat(sendmessage, chan, ChatType.Normal);
                     }
                     else if (cfg.targetname == "avatarchat")
@@ -222,17 +233,32 @@ namespace BetterSecondBot.BetterRelayService
                         {
                             if (UUID.TryParse(cfg.targetvalue, out UUID target) == true)
                             {
+                                LogFormater.Info("sending via im");
                                 controler.Bot.SendIM(target, sendmessage);
                             }
-                         }
+                            else
+                            {
+                                LogFormater.Info("Blocked - source is the same as target");
+                            }
+                        }
                     }
                     else if (cfg.targetname == "groupchat")
                     {
+                        LogFormater.Info("processing as groupchat");
                         if (cfg.targetvalue != filtervalue)
                         {
+                            LogFormater.Info("sending via groupchat");
                             controler.Bot.GetCommandsInterface.Call("Groupchat", cfg.targetvalue + "~#~" + sendmessage, UUID.Zero, "~#~");
                         }
+                        else
+                        {
+                            LogFormater.Info("Blocked - source is the same as target");
+                        }
                     }
+                }
+                else
+                {
+                    LogFormater.Info("Did not pass source filter");
                 }
             }
         }
