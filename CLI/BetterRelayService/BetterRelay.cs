@@ -72,6 +72,13 @@ namespace BetterSecondBot.BetterRelayService
                             have_target_filter = true;
                             relay.targetvalue = subbits[1];
                         }
+                        else if(subbits[0] == "encode-as-json")
+                        {
+                            if(bool.TryParse(subbits[1],out bool use_json_encode) == true)
+                            {
+                                relay.encode_as_json = use_json_encode;
+                            }
+                        }
                     }
                 }
                 List<bool> tests = new List<bool>() { have_source_type, have_source_filter, have_target_type, have_target_filter };
@@ -156,7 +163,7 @@ namespace BetterSecondBot.BetterRelayService
             superV.MessageEvent += DiscordMessageHandler;
         }
 
-        protected async void TriggerRelay(string sourcetype, string name,string message, string filtervalue)
+        protected async void TriggerRelay(string sourcetype, string name,string message, string filtervalue, string discordServerid, string discordMessageid)
         {
             List<relay_config> Dataset = new List<relay_config>();
             if (sourcetype == "localchat") Dataset = LocalchatRelay;
@@ -171,6 +178,25 @@ namespace BetterSecondBot.BetterRelayService
             message = "[relay] " + sourcetype + " # " + name + ": " + message;
             foreach (relay_config cfg in Dataset)
             {
+                relay_packet packet = new relay_packet();
+                string sendmessage = message;
+                if(cfg.encode_as_json == true)
+                {
+                    packet.source_message = message;
+                    packet.source_name = sourcetype;
+                    packet.source_user = name;
+                    packet.target_name = cfg.targetname;
+                    packet.target_value = cfg.targetvalue;
+                    packet.unixtime = helpers.UnixTimeNow().ToString();
+                    if (sourcetype == "discord")
+                    {
+                        packet.discord_serverid = discordServerid;
+                        packet.discord_messageid = discordMessageid;
+                    }
+                    sendmessage = JsonConvert.SerializeObject(packet);
+                }
+
+
                 if (((cfg.sourcevalue == "all") && (sourcetype != "discordchat")) || (cfg.sourcevalue == filtervalue))
                 {
                     if (cfg.targetname == "discord")
@@ -180,7 +206,7 @@ namespace BetterSecondBot.BetterRelayService
                         {
                             if ((cfga[0] + "@" + cfga[1]) != filtervalue)
                             {
-                                await controler.Bot.SendMessageToDiscord(cfga[0], cfga[1], message, false);
+                                await controler.Bot.SendMessageToDiscord(cfga[0], cfga[1], sendmessage, false);
                             }
                         }
                     }
@@ -188,7 +214,7 @@ namespace BetterSecondBot.BetterRelayService
                     {
                         int chan = 0;
                         int.TryParse(cfg.targetvalue, out chan);
-                        controler.Bot.GetClient.Self.Chat(message, chan, ChatType.Normal);
+                        controler.Bot.GetClient.Self.Chat(sendmessage, chan, ChatType.Normal);
                     }
                     else if (cfg.targetname == "avatarchat")
                     {
@@ -196,7 +222,7 @@ namespace BetterSecondBot.BetterRelayService
                         {
                             if (UUID.TryParse(cfg.targetvalue, out UUID target) == true)
                             {
-                                controler.Bot.SendIM(target, message);
+                                controler.Bot.SendIM(target, sendmessage);
                             }
                          }
                     }
@@ -204,7 +230,7 @@ namespace BetterSecondBot.BetterRelayService
                     {
                         if (cfg.targetvalue != filtervalue)
                         {
-                            controler.Bot.GetCommandsInterface.Call("Groupchat", cfg.targetvalue + "~#~" + message, UUID.Zero, "~#~");
+                            controler.Bot.GetCommandsInterface.Call("Groupchat", cfg.targetvalue + "~#~" + sendmessage, UUID.Zero, "~#~");
                         }
                     }
                 }
@@ -213,7 +239,7 @@ namespace BetterSecondBot.BetterRelayService
 
         protected void DiscordMessageHandler(object sender, DiscordMessageEvent e)
         {
-            TriggerRelay("discord", e.name, e.message, "" + e.server.ToString() + "@" + e.channel.ToString());
+            TriggerRelay("discord", e.name, e.message, "" + e.server.ToString() + "@" + e.channel.ToString(),e.server.ToString(),e.channel.ToString());
         }
 
         protected void SLMessageHandler(object sender, MessageEventArgs e)
@@ -222,19 +248,19 @@ namespace BetterSecondBot.BetterRelayService
             {
                 if (e.localchat == true)
                 {
-                    TriggerRelay("localchat", e.sender_name, e.message, e.sender_uuid.ToString());
+                    TriggerRelay("localchat", e.sender_name, e.message, e.sender_uuid.ToString(), "", "");
                 }
                 else if (e.avatar == false)
                 {
-                    TriggerRelay("objectim", e.sender_name, e.message, e.sender_uuid.ToString());
+                    TriggerRelay("objectim", e.sender_name, e.message, e.sender_uuid.ToString(), "", "");
                 }
                 else if (e.group == true)
                 {
-                    TriggerRelay("groupchat", e.sender_name, e.message, e.group_uuid.ToString());
+                    TriggerRelay("groupchat", e.sender_name, e.message, e.group_uuid.ToString(), "", "");
                 }
                 else if (e.avatar == true)
                 {
-                    TriggerRelay("avatarim", e.sender_name, e.message, e.sender_uuid.ToString());
+                    TriggerRelay("avatarim", e.sender_name, e.message, e.sender_uuid.ToString(), "", "");
                 }
             }
 
@@ -249,5 +275,18 @@ namespace BetterSecondBot.BetterRelayService
         public string sourcevalue = "";
         public string targetname = "";
         public string targetvalue = "";
+        public bool encode_as_json = false;
+    }
+
+    public class relay_packet
+    {
+        public string source_name = "";
+        public string source_user = "";
+        public string source_message = "";
+        public string target_name = "";
+        public string target_value = "";
+        public string discord_serverid = "notused";
+        public string discord_messageid = "notused";
+        public string unixtime = "";
     }
 }
