@@ -45,7 +45,7 @@ namespace BetterSecondBot.BetterRelayService
             bool have_source_filter = false;
             bool have_target_type = false;
             bool have_target_filter = false;
-            if(bits.Length == 4)
+            if(bits.Length >= 4)
             {
                 relay_config relay = new relay_config();
                 foreach (string a in bits)
