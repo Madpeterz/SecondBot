@@ -181,10 +181,10 @@ namespace BetterSecondBot.BetterRelayService
 
             foreach (relay_config cfg in Dataset)
             {
-                relay_packet packet = new relay_packet();
                 string sendmessage = message;
                 if(cfg.encode_as_json == true)
                 {
+                    relay_packet packet = new relay_packet();
                     packet.source_message = message;
                     packet.source_name = sourcetype;
                     packet.source_user = name;
