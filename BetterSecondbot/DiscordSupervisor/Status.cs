@@ -45,7 +45,10 @@ namespace BetterSecondBot.DiscordSupervisor
                 reply = controler.Bot.LastStatusMessage + reply;
                 if (controler.Bot.KillMe == true)
                 {
-                    controler.Bot.GetClient.Network.Logout();
+                    if (controler.Bot.GetClient.Network.Connected == true)
+                    {
+                        controler.Bot.GetClient.Network.Logout();
+                    }
                     controler = null;
                     reply = "[Discord-V: connected] (Logging out)";
                 }
