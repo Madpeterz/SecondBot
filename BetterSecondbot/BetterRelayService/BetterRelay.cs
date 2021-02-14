@@ -9,6 +9,7 @@ using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Net.Http;
 
 namespace BetterSecondBot.BetterRelayService
 {
@@ -164,6 +165,8 @@ namespace BetterSecondBot.BetterRelayService
             superV.MessageEvent += DiscordMessageHandler;
         }
 
+        protected HttpClient HTTPclient = new HttpClient();
+
         protected async void TriggerRelay(string sourcetype, string name,string message, string filtervalue, string discordServerid, string discordChannelid)
         {
             List<relay_config> Dataset = new List<relay_config>();
@@ -186,14 +189,9 @@ namespace BetterSecondBot.BetterRelayService
                 {
                     relay_packet packet = new relay_packet();
                     packet.source_message = message;
-                    packet.source_name = sourcetype;
                     packet.source_user = name;
-                    packet.target_name = cfg.targetname;
-                    packet.target_value = cfg.targetvalue;
-                    packet.unixtime = helpers.UnixTimeNow().ToString();
                     if (sourcetype == "discord")
                     {
-                        packet.discord_serverid = discordServerid;
                         packet.discord_channelid = discordChannelid;
                     }
                     sendmessage = JsonConvert.SerializeObject(packet);
@@ -210,6 +208,23 @@ namespace BetterSecondBot.BetterRelayService
                             {
                                 await controler.Bot.SendMessageToDiscord(cfga[0], cfga[1], sendmessage, false);
                             }
+                        }
+                    }
+                    else if (cfg.targetname == "http")
+                    {
+                        Dictionary<string, string> values = new Dictionary<string, string>
+                        {
+                            { "reply", sendmessage },
+                        };
+
+                        var content = new FormUrlEncodedContent(values);
+                        try
+                        {
+                            await HTTPclient.PostAsync(cfg.targetvalue, content).ConfigureAwait(true);
+                        }
+                        catch (Exception e)
+                        {
+                            LogFormater.Crit("[BetterRelay] HTTP failed: " + e.Message + "");
                         }
                     }
                     else if (cfg.targetname == "localchat")
@@ -290,13 +305,8 @@ namespace BetterSecondBot.BetterRelayService
 
     public class relay_packet
     {
-        public string source_name = "";
         public string source_user = "";
         public string source_message = "";
-        public string target_name = "";
-        public string target_value = "";
-        public string discord_serverid = "notused";
         public string discord_channelid = "notused";
-        public string unixtime = "";
     }
 }

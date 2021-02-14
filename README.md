@@ -191,3 +191,6 @@ To config the relay please use the settings below.
 
 	    groupchat
 		    target-config: group uuid
+
+        http
+            target-config: full url

@@ -131,7 +131,7 @@ namespace BetterSecondbot.BetterAtHome
                 return;
             }
             long dif = helpers.UnixTimeNow() - LastLoginEvent;
-            if (dif < 60)
+            if (dif < 25)
             {
                 controler.Bot.SetBetterAtHomeAction("Waiting for login lockout");
                 return;
@@ -150,7 +150,7 @@ namespace BetterSecondbot.BetterAtHome
                 return;
             }
             long dif = helpers.UnixTimeNow() - LastLoginEvent;
-            if (dif < 60)
+            if (dif < 25)
             {
                 controler.Bot.SetBetterAtHomeAction("Waiting for Login cooldown");
                 return;
