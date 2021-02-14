@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.Animation
+﻿namespace BetterSecondBot.Commands.Animation
 {
     public class ResetAnimations : CoreCommand
     {

@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.Notecard
+﻿namespace BetterSecondBot.Commands.Notecard
 {
     class NotecardClear : CoreCommand_1arg
     {

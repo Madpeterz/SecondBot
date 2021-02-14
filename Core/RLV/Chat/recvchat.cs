@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using OpenMetaverse;
 
-namespace BSB.RLV.Chat
+namespace BetterSecondBot.RLV.Chat
 {
     public class RecvChat : RLV_command_1arg
     {

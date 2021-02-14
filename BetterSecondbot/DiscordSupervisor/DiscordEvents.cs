@@ -1,4 +1,4 @@
-﻿using BSB.bottypes;
+﻿using BetterSecondBot.bottypes;
 using System;
 using System.Collections.Generic;
 using System.Text;

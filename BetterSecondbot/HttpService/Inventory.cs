@@ -1,5 +1,5 @@
-﻿using BSB.bottypes;
-using BSB.Static;
+﻿using BetterSecondBot.bottypes;
+using BetterSecondBot.Static;
 using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;

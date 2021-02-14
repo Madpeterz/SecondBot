@@ -4,7 +4,7 @@ using System.Text;
 using System.Linq;
 using OpenMetaverse;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
     public abstract class MessageSwitcherBot : EventsBot
     {

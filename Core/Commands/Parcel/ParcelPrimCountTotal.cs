@@ -2,7 +2,7 @@
 using System;
 using System.Text;
 
-namespace BSB.Commands.CMD_Parcel
+namespace BetterSecondBot.Commands.CMD_Parcel
 {
     class ParcelPrimCountTotal : CoreCommand_SmartReply_1arg
     {

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BSB.Commands.Group
+namespace BetterSecondBot.Commands.Group
 {
     class GroupInviteNoLimiter: CoreCommand_2arg
     {

@@ -1,7 +1,7 @@
 ﻿using OpenMetaverse;
 using BetterSecondBotShared.Static;
 
-namespace BSB.Commands.Chat
+namespace BetterSecondBot.Commands.Chat
 {
     class IM : CoreCommand_2arg
     {

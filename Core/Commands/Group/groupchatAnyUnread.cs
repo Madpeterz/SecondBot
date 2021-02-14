@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.Group
+﻿namespace BetterSecondBot.Commands.Group
 {
     class GroupchatAnyUnread : CoreGroupCommand_SmartReply_auto
     {

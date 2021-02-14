@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BSB.RLV.Movement
+namespace BetterSecondBot.RLV.Movement
 {
     public class AdjustHeight : RLV_command_3arg
     {

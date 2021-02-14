@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace BSB.Commands.CMD_Parcel
+namespace BetterSecondBot.Commands.CMD_Parcel
 {
     class ParcelReturnObjects : CoreCommand
     {

@@ -4,7 +4,7 @@ using BetterSecondBotShared.Static;
 using RestSharp;
 using Newtonsoft.Json;
 
-namespace BSB.Commands.StreamAdmin
+namespace BetterSecondBot.Commands.StreamAdmin
 {
     public class FetchNextNotecard : CoreCommand_2arg
     {

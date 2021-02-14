@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.CMD_Parcel
+﻿namespace BetterSecondBot.Commands.CMD_Parcel
 {
     public class SetParcelName : ParcelCommand_RequirePerms_1arg
     {

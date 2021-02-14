@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BSB.Commands.Self
+namespace BetterSecondBot.Commands.Self
 {
     public class SetPermFlag : CoreCommand_3arg
     {

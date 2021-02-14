@@ -4,7 +4,7 @@ using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
 using OpenMetaverse;
 
-namespace BSB.Commands.CMD_Parcel
+namespace BetterSecondBot.Commands.CMD_Parcel
 {
     public class GetParcelFlags : CoreCommand_1arg
     {

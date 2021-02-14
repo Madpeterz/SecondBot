@@ -1,7 +1,7 @@
 ﻿using OpenMetaverse;
 using System.Collections.Generic;
 
-namespace BSB.Commands.Group
+namespace BetterSecondBot.Commands.Group
 {
     public abstract class CoreGroupCommand_SmartReply_auto : CoreCommand_SmartReply_1arg
     {

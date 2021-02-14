@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.Self
+﻿namespace BetterSecondBot.Commands.Self
 {
     public class Stand : CoreCommand
     {

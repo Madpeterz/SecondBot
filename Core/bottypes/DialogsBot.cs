@@ -10,7 +10,7 @@ using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
     public abstract class DialogsBot : ChatRelay
     {

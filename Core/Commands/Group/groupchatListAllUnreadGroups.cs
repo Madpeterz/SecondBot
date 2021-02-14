@@ -1,7 +1,7 @@
 ﻿using OpenMetaverse;
 using System.Text;
 
-namespace BSB.Commands.Group
+namespace BetterSecondBot.Commands.Group
 {
     public class GroupchatListAllUnreadGroups : CoreGroupCommand_SmartReply_auto
     {

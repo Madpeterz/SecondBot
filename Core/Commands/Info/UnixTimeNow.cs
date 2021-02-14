@@ -1,6 +1,6 @@
 ﻿using BetterSecondBotShared.Static;
 
-namespace BSB.Commands.Info
+namespace BetterSecondBot.Commands.Info
 {
     public class UnixTimeNow : CoreCommand_SmartReply_1arg
     {

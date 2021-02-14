@@ -1,7 +1,7 @@
 ﻿using System;
 using BetterSecondBotShared.Static;
 using OpenMetaverse;
-namespace BSB.Commands.Movement
+namespace BetterSecondBot.Commands.Movement
 {
     public class RotateToFaceVector : CoreCommand_1arg
     {

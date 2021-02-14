@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace BSB.Commands.CMD_Parcel
+namespace BetterSecondBot.Commands.CMD_Parcel
 {
     public class ParcelDeedToGroup : ParcelCommand_RequirePerms_1arg_Group
     {

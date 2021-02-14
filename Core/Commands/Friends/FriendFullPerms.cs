@@ -1,6 +1,6 @@
 ﻿using System;
 using OpenMetaverse;
-namespace BSB.Commands.Friends
+namespace BetterSecondBot.Commands.Friends
 {
     public class FriendFullPerms : CoreCommand_2arg
     {

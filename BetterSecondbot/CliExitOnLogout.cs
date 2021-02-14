@@ -2,7 +2,7 @@
 using BetterSecondBotShared.Json;
 using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
-using BSB.bottypes;
+using BetterSecondBot.bottypes;
 using System.Threading;
 using static BetterSecondBot.Program;
 

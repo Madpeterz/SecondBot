@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
     public abstract class ChatRelay : RLVbot
     {

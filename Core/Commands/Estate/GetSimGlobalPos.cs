@@ -1,6 +1,6 @@
 ﻿using OpenMetaverse;
 
-namespace BSB.Commands.Estate
+namespace BetterSecondBot.Commands.Estate
 {
     public class GetSimGlobalPos : CoreCommand_SmartReply_2arg
     {

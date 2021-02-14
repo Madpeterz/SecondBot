@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.Info
+﻿namespace BetterSecondBot.Commands.Info
 {
     public class SimName : CoreCommand_SmartReply_1arg
     {

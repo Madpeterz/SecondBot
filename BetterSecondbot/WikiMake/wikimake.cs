@@ -289,12 +289,12 @@ namespace BetterSecondBot.WikiMake
             InterfaceWiki("JSON", defaultJson);
 
             // CMD 
-            BSB.Commands.CoreCommandsInterface cmd = new BSB.Commands.CoreCommandsInterface(null);
+            BetterSecondBot.Commands.CoreCommandsInterface cmd = new BetterSecondBot.Commands.CoreCommandsInterface(null);
             api_reports.Add("Core", new KeyValuePair<int, string>(cmd.ApiCommandsCount, "Good"));
             InterfaceWiki("Core", cmd, true);
 
             // RLVapi
-            BSB.RLV.RLVcontrol RLVapi = new BSB.RLV.RLVcontrol(null);
+            BetterSecondBot.RLV.RLVcontrol RLVapi = new BetterSecondBot.RLV.RLVcontrol(null);
             api_reports.Add("RLVapi", new KeyValuePair<int, string>(RLVapi.ApiCommandsCount, "Limited"));
             InterfaceWiki("RLVapi", RLVapi, true);
 

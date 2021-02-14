@@ -1,10 +1,8 @@
-﻿using System;
+﻿using BetterSecondBotShared.Static;
 using OpenMetaverse;
-using BetterSecondBotShared.Static;
-using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace BSB.Commands.Movement
+namespace BetterSecondBot.Commands.Movement
 {
     public class AutoPilot : CoreCommand_1arg
     {

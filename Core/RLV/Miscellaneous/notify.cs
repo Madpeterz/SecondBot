@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BSB.RLV.Miscellaneous
+namespace BetterSecondBot.RLV.Miscellaneous
 {
     public class Notify : RLV_command_2arg
     {

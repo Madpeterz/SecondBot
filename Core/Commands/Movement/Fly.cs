@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace BSB.Commands.Movement
+namespace BetterSecondBot.Commands.Movement
 {
     public class BotFly : CoreCommand_1arg
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using static OpenMetaverse.ParcelManager;
 
-namespace BSB.Commands.Parcel
+namespace BetterSecondBot.Commands.Parcel
 {
     class GetParcelBanlist : ParcelCommand_CheckParcel_1arg_smart
     {

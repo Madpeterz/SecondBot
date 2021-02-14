@@ -1,6 +1,6 @@
 ﻿using OpenMetaverse;
 
-namespace BSB.Commands.Self
+namespace BetterSecondBot.Commands.Self
 {
     public class BotSit : CoreCommand_1arg
     {

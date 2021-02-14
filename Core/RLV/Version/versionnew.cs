@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BSB.RLV.Version
+namespace BetterSecondBot.RLV.Version
 {
     public class VersionNew : RLV_command
     {

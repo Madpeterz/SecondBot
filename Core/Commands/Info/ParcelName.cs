@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.Info
+﻿namespace BetterSecondBot.Commands.Info
 {
     public class ParcelName : ParcelCommand_CheckParcel_1arg_smart
     {

@@ -3,7 +3,7 @@ using System.Linq;
 using OpenMetaverse;
 using RestSharp;
 
-namespace BSB.Commands.Script
+namespace BetterSecondBot.Commands.Script
 {
     public class ScriptHttp : CoreCommand_2arg
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 using OpenMetaverse;
-namespace BSB.Commands.Movement
+namespace BetterSecondBot.Commands.Movement
 {
     public class RotateToFace : CoreCommand_1arg
     {

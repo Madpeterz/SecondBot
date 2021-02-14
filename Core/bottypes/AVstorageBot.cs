@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
     public abstract class AVstorageBot : AtHome
     {

@@ -5,7 +5,7 @@ using BetterSecondBotShared.Json;
 using OpenMetaverse;
 using BetterSecondBotShared.logs;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
     public abstract class RLVbot : RLVbotHelper
     {

@@ -1,6 +1,6 @@
 ﻿using OpenMetaverse;
 
-namespace BSB.Commands.Dialogs
+namespace BetterSecondBot.Commands.Dialogs
 {
     class DialogRelay : CoreCommand_1arg
     {

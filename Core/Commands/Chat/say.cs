@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using OpenMetaverse;
 
-namespace BSB.Commands.Chat
+namespace BetterSecondBot.Commands.Chat
 {
     class Say : CoreCommand_1arg
     {

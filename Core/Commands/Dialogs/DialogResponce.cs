@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.Dialogs
+﻿namespace BetterSecondBot.Commands.Dialogs
 {
     class DialogResponce : CoreCommand_2arg
     {

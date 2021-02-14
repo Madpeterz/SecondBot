@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using OpenMetaverse;
 
-namespace BSB.Commands.Inventory
+namespace BetterSecondBot.Commands.Inventory
 {
     public class Outfit : CoreCommand_1arg
     {

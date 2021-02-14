@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BSB.Commands.Group
+namespace BetterSecondBot.Commands.Group
 {
     class GroupActiveGroup : CoreCommand_1arg
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BSB.RLV.Blacklist
+namespace BetterSecondBot.RLV.Blacklist
 {
     public class VersionNumBL : RLV_command_1arg
     {

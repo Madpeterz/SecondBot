@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenMetaverse;
 
-namespace BSB.Commands.Inventory
+namespace BetterSecondBot.Commands.Inventory
 {
     public class DeleteInventoryItem : CoreCommand_1arg
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using OpenMetaverse;
 
-namespace BSB.RLV.Movement
+namespace BetterSecondBot.RLV.Movement
 {
     public class SetRot : RLV_command_2arg
     {

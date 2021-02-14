@@ -1,7 +1,7 @@
 ﻿using BetterSecondBotShared.Static;
 using OpenMetaverse;
 
-namespace BSB.Commands.Group
+namespace BetterSecondBot.Commands.Group
 {
     class Groupnotice : CoreCommand_2arg
     {

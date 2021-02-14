@@ -1,7 +1,7 @@
 ﻿using BetterSecondBotShared.Static;
 using OpenMetaverse;
 
-namespace BSB.Commands.Notecard
+namespace BetterSecondBot.Commands.Notecard
 {
     class NotecardSend : CoreCommand_2arg
     {

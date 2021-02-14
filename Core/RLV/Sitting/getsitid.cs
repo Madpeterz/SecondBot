@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BSB.RLV.Sitting
+namespace BetterSecondBot.RLV.Sitting
 {
     class GetSitId : RLV_command_1arg
     {

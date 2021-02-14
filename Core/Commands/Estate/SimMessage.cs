@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.Estate
+﻿namespace BetterSecondBot.Commands.Estate
 {
     public class SimMessage : CoreCommand_1arg
     {

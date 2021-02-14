@@ -5,7 +5,7 @@ using OpenMetaverse;
 using BetterSecondBotShared.Static;
 using BetterSecondBotShared.logs;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
     public class NextHomeRegionArgs: EventArgs
     {

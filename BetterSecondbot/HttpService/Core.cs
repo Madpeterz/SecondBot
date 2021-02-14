@@ -1,6 +1,6 @@
 ﻿using BetterSecondBotShared.Json;
 using BetterSecondBotShared.Static;
-using BSB.bottypes;
+using BetterSecondBot.bottypes;
 using OpenMetaverse;
 using System.Threading.Tasks;
 using EmbedIO;

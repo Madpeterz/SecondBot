@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.VisualBasic.CompilerServices;
 using OpenMetaverse;
 
-namespace BSB.Commands.Group
+namespace BetterSecondBot.Commands.Group
 {
     class GroupchatHistory : CoreGroupCommand_SmartReply_Group_auto
     {

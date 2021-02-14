@@ -4,13 +4,13 @@ using System.Text;
 using System.Linq;
 using OpenMetaverse;
 using System.Net.Http;
-using BSB.bottypes;
+using BetterSecondBot.bottypes;
 using BetterSecondBotShared.API;
 using BetterSecondBotShared.Static;
 using BetterSecondBotShared.logs;
 using Newtonsoft.Json;
 
-namespace BSB.Commands
+namespace BetterSecondBot.Commands
 {
     public class pending_avatar_lookup
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BSB.RLV.PrivateChannels
+namespace BetterSecondBot.RLV.PrivateChannels
 {
     public class SendChannel_Except : RLV_UUID_flag_arg_yn
     {

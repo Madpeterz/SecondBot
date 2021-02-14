@@ -7,7 +7,7 @@ using System.Text;
 using Discord;
 using System.Threading.Tasks;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
     public abstract class VirtualsBot : Log2FileBot
     {

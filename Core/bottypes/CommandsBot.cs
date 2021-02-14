@@ -8,7 +8,7 @@ using BetterSecondBotShared.Static;
 using BetterSecondBotShared.logs;
 using System.Threading;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
     public abstract class CommandsBot : AVstorageBot
     {

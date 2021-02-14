@@ -9,7 +9,7 @@ using Microsoft.VisualBasic.CompilerServices;
 using System.IO;
 using System.IO.Compression;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
     public abstract class Log2FileBot : ActionsAutoAcceptBot
 	{

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BSB.RLV.InstantMessages
+namespace BetterSecondBot.RLV.InstantMessages
 {
     public class SendIm_Sec : RLV_command_1arg
     {

@@ -7,7 +7,7 @@ using Discord.Webhook;
 using BetterSecondBotShared.Json;
 using BetterSecondBotShared.Static;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
     public class SecondBot : DialogsBot
     {

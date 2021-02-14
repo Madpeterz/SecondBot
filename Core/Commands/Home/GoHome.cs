@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.Home
+﻿namespace BetterSecondBot.Commands.Home
 {
     public class GoHome : CoreCommand
     {

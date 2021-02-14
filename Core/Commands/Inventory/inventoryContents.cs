@@ -1,10 +1,10 @@
 ﻿using System;
 using OpenMetaverse;
-using BSB.Static;
+using BetterSecondBot.Static;
 using BetterSecondBotShared.Static;
 using System.Collections.Generic;
 
-namespace BSB.Commands.Inventory
+namespace BetterSecondBot.Commands.Inventory
 {
 
     public class InventoryContents : CoreCommand_2arg

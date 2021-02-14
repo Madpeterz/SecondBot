@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.CMD_Parcel
+﻿namespace BetterSecondBot.Commands.CMD_Parcel
 {
     public class GetParcelDesc : ParcelCommand_CheckParcel_1arg_smart
     {

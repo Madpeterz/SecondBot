@@ -1,6 +1,6 @@
 ﻿using OpenMetaverse;
 
-namespace BSB.Commands.Group
+namespace BetterSecondBot.Commands.Group
 {
     class GroupchatGroupHasUnread : CoreGroupCommand_SmartReply_Group_auto
     {

@@ -1,6 +1,6 @@
 ﻿using OpenMetaverse;
 
-namespace BSB.Commands.Animation
+namespace BetterSecondBot.Commands.Animation
 {
     public class AddToAllowAnimations : CoreCommand_1arg
     {

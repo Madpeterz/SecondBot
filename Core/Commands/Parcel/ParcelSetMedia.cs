@@ -1,7 +1,7 @@
 ﻿using BetterSecondBotShared.Static;
 using OpenMetaverse;
 
-namespace BSB.Commands.CMD_Parcel
+namespace BetterSecondBot.Commands.CMD_Parcel
 {
     class ParcelSetMedia : ParcelCommand_RequirePerms_1arg
     {

@@ -1,11 +1,11 @@
-﻿using BSB.Commands;
+﻿using BetterSecondBot.Commands;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using OpenMetaverse;
 using BetterSecondBotShared.Static;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
     public abstract class AwaitReplyEventBot : CommandsBot
     {

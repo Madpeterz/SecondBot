@@ -3,6 +3,7 @@ using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace BetterSecondBotShared.API
@@ -49,12 +50,12 @@ namespace BetterSecondBotShared.API
                             if (subtype_map.ContainsKey(name) == false)
                             {
                                 string worknamespace = com.Namespace;
-                                worknamespace = worknamespace.Replace("BSB.Commands.", "");
-                                worknamespace = worknamespace.Replace("BSB.RLV.", "");
-                                worknamespace = worknamespace.Replace("BetterSecondBot.HttpServer.View.", "");
-                                worknamespace = worknamespace.Replace("BetterSecondBot.HttpServer.view.", "");
-                                worknamespace = worknamespace.Replace("BetterSecondBot.HttpServer.Control.", "");
-                                worknamespace = worknamespace.Replace("BetterSecondBot.HttpServer.control.", "");
+                                worknamespace = worknamespace.Replace("BetterSecondBot.Commands.", "");
+                                worknamespace = worknamespace.Replace("BetterSecondBot.RLV.", "");
+                                worknamespace = worknamespace.Replace("BetterSecondbot.HttpServer.View.", "");
+                                worknamespace = worknamespace.Replace("BetterSecondbot.HttpServer.view.", "");
+                                worknamespace = worknamespace.Replace("BetterSecondbot.HttpServer.Control.", "");
+                                worknamespace = worknamespace.Replace("BetterSecondbot.HttpServer.control.", "");
                                 worknamespace = worknamespace.Replace("CMD_", "");
                                 subtype_map.Add(name, D.GetType());
                                 subtype_workspace_map.Add(name, worknamespace);
@@ -71,13 +72,39 @@ namespace BetterSecondBotShared.API
         protected IEnumerable<Type> GetAPICommandClasses()
         {
             if (API_type != null)
-            { 
-                return AppDomain.CurrentDomain.GetAssemblies().Where(Ass => {
-                    bool reply = false;
-                    if (Ass.FullName.StartsWith("BSB") == true) { reply = true; }
-                    else if (Ass.FullName.StartsWith("BetterSecondBot") == true){ reply = true; }
-                    return reply;
-                    }).SelectMany(assembly => assembly.GetTypes()).Where(type => type.IsSubclassOf(API_type));
+            {
+
+                Assembly[] asses = AppDomain.CurrentDomain.GetAssemblies();
+
+                List<Assembly> GoodLooking = new List<Assembly>();
+                foreach (Assembly Ass in asses)
+                {
+                    if (Ass.FullName.StartsWith("BetterSecondbot") == true) 
+                    {
+                        GoodLooking.Add(Ass);
+                    }
+                    else if (Ass.FullName.StartsWith("Core") == true)
+                    {
+                        GoodLooking.Add(Ass);
+                    }
+                    else if (Ass.FullName.StartsWith("Shared") == true) 
+                    {
+                        GoodLooking.Add(Ass);
+                    }
+                }
+
+                List<Type> reply = new List<Type>();
+                foreach (Assembly Ass in GoodLooking)
+                {
+                    foreach(Type ClassType in Ass.GetTypes())
+                    {
+                        if(ClassType.IsSubclassOf(API_type) == true)
+                        {
+                            reply.Add(ClassType);
+                        }
+                    }
+                }
+                return reply;
             }
             else
             {
@@ -87,6 +114,10 @@ namespace BetterSecondBotShared.API
         }
         public virtual string[] GetCommandsList()
         {
+            if (subtype_map.Count() == 0)
+            {
+                LoadCommandsList();
+            }
             return subtype_map.Keys.ToArray<string>();
         }
         public virtual string GetCommandWorkspace(string cmd)

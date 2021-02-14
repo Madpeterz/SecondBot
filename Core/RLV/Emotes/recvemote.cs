@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using OpenMetaverse;
 
-namespace BSB.RLV.Emotes
+namespace BetterSecondBot.RLV.Emotes
 {
     public class RecvEmote : RLV_UUID_flag_optional_arg_yn
     {

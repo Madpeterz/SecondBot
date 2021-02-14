@@ -2,7 +2,7 @@
 using System.Threading;
 using OpenMetaverse;
 
-namespace BSB.Commands.Helpers
+namespace BetterSecondBot.Commands.Helpers
 {
     public class Delay : CoreCommand_1arg
     {

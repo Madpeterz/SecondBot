@@ -1,5 +1,5 @@
 ﻿using BetterSecondBotShared.Json;
-using BSB.bottypes;
+using BetterSecondBot.bottypes;
 using System;
 using EmbedIO;
 using EmbedIO.Actions;

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using OpenMetaverse;
 
-namespace BSB.Commands.Self
+namespace BetterSecondBot.Commands.Self
 {
     public class Help : CoreCommand
     {

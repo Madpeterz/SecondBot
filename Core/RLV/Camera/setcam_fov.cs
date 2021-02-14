@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BSB.RLV.Camera
+namespace BetterSecondBot.RLV.Camera
 {
     public class SetCam_Fov : RLV_UUID_flag_arg_yn
     {

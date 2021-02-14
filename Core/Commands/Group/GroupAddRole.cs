@@ -2,7 +2,7 @@
 using OpenMetaverse;
 using BetterSecondBotShared.logs;
 
-namespace BSB.Commands.Group
+namespace BetterSecondBot.Commands.Group
 {
     class GroupAddRole : CoreCommand_3arg
     {

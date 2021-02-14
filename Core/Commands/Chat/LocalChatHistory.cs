@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using OpenMetaverse;
 
-namespace BSB.Commands.Chat
+namespace BetterSecondBot.Commands.Chat
 {
     class LocalChatHistory : CoreCommand_SmartReply_1arg
     {

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using OpenMetaverse;
-using BSB.bottypes;
+using BetterSecondBot.bottypes;
 using BetterSecondBotShared.API;
 using BetterSecondBotShared.logs;
 
-namespace BSB.RLV
+namespace BetterSecondBot.RLV
 {
     public class RLVcontrol : API_supported_interface
     {

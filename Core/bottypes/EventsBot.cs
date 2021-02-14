@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using BetterSecondBotShared.Static;
-using BSB.Commands;
+using BetterSecondBot.Commands;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
 using OpenMetaverse.Packets;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
     public abstract class VoidEventBot : AnimationsBot
     {

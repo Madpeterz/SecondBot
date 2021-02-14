@@ -4,7 +4,7 @@ using System.Text;
 using Newtonsoft.Json;
 using OpenMetaverse;
 
-namespace BSB.Commands.Group
+namespace BetterSecondBot.Commands.Group
 {
     public class IsGroupMember : CoreCommand_3arg
     {

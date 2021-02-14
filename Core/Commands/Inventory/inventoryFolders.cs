@@ -1,7 +1,7 @@
 ﻿using OpenMetaverse;
-using BSB.Static;
+using BetterSecondBot.Static;
 
-namespace BSB.Commands.Inventory
+namespace BetterSecondBot.Commands.Inventory
 {
     public class InventoryFolders : CoreCommand_1arg
     {

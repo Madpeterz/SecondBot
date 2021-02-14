@@ -1,6 +1,6 @@
 ﻿using OpenMetaverse;
 
-namespace BSB.Commands.Inventory
+namespace BetterSecondBot.Commands.Inventory
 {
     public class SendItem : CoreCommand_2arg
     {

@@ -1,7 +1,7 @@
-﻿using BSB.Static;
+﻿using BetterSecondBot.Static;
 using OpenMetaverse;
 
-namespace BSB.Commands.Inventory
+namespace BetterSecondBot.Commands.Inventory
 {
     public class getRealUUID : CoreCommand_2arg
     {

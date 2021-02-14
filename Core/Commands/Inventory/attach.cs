@@ -2,7 +2,7 @@
 using System.Linq;
 using OpenMetaverse;
 
-namespace BSB.Commands.Inventory
+namespace BetterSecondBot.Commands.Inventory
 {
     public class Attach : CoreCommand_2arg
     {

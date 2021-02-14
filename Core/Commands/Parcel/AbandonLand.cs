@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.CMD_Parcel
+﻿namespace BetterSecondBot.Commands.CMD_Parcel
 {
     public class AbandonLand : ParcelCommand_RequirePerms
     {

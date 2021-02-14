@@ -1,7 +1,7 @@
 ﻿using OpenMetaverse;
 using System;
 
-namespace BSB.Commands.Group
+namespace BetterSecondBot.Commands.Group
 {
     class Groupchat : CoreCommand_2arg
     {

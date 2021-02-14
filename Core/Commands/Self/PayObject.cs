@@ -5,7 +5,7 @@ using System.Linq;
 using OpenMetaverse;
 
 
-namespace BSB.Commands.Self
+namespace BetterSecondBot.Commands.Self
 {
     public class PayObject : CoreCommand_3arg
     {

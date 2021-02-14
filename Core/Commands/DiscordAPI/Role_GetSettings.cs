@@ -9,7 +9,7 @@ using Discord;
 using Discord.Rest;
 using System.Threading.Tasks;
 
-namespace BSB.Commands.DiscordAPI
+namespace BetterSecondBot.Commands.DiscordAPI
 {
     class Discord_Role_GetSettings : CoreCommand_SmartReply_3arg
     {

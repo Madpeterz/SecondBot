@@ -5,7 +5,7 @@ using System.Linq;
 using OpenMetaverse;
 
 
-namespace BSB.Commands.Avatars
+namespace BetterSecondBot.Commands.Avatars
 {
     public class PayAvatar : CoreCommand_2arg
     {

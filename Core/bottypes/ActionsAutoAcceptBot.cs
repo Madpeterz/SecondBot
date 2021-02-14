@@ -3,7 +3,7 @@ using BetterSecondBotShared.Static;
 using OpenMetaverse;
 using System.Collections.Generic;
 
-namespace BSB.bottypes
+namespace BetterSecondBot.bottypes
 {
 	public abstract class ActionsAutoAcceptBot : BasicBot
 	{

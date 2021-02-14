@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BSB.Commands.Self
+namespace BetterSecondBot.Commands.Self
 {
     public class GetLastCommands : CoreCommand_SmartReply_1arg
     {

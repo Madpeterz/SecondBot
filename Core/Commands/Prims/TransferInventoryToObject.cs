@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BSB.Commands.Prims
+namespace BetterSecondBot.Commands.Prims
 {
     class TransferInventoryToObject : CoreCommand_2arg
     {

@@ -1,6 +1,6 @@
 ﻿using OpenMetaverse;
 
-namespace BSB.Commands.Movement
+namespace BetterSecondBot.Commands.Movement
 {
     public class RequestTeleport : CoreCommand_1arg
     {

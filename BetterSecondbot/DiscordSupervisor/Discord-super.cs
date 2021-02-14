@@ -20,7 +20,7 @@ namespace BetterSecondBot.DiscordSupervisor
             {
                 if (HasBasicBot() == false)
                 {
-                    StatusMessageHandler(null, new BSB.bottypes.StatusMessageEvent(false, "None"));
+                    StatusMessageHandler(null, new BetterSecondBot.bottypes.StatusMessageEvent(false, "None"));
                 }
                 string NewStatusMessage = GetStatus();
                 if (NewStatusMessage != LastStatusMessage)

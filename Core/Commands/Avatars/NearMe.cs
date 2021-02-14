@@ -5,7 +5,7 @@ using System.Linq;
 using OpenMetaverse;
 using Newtonsoft.Json;
 
-namespace BSB.Commands.Avatars
+namespace BetterSecondBot.Commands.Avatars
 {
     class RoleCreate : CoreCommand_SmartReply_1arg
     {

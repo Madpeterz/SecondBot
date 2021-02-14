@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.Self
+﻿namespace BetterSecondBot.Commands.Self
 {
     class BotVersion : CoreCommand_SmartReply_1arg
     {

@@ -1,7 +1,7 @@
 ﻿using BetterSecondBotShared.Static;
 using OpenMetaverse;
 
-namespace BSB.Commands.Script
+namespace BetterSecondBot.Commands.Script
 {
     class ScriptSend : CoreCommand_2arg
     {

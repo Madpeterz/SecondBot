@@ -1,6 +1,6 @@
 ﻿using OpenMetaverse;
 
-namespace BSB.Commands
+namespace BetterSecondBot.Commands
 {
     public abstract class ParcelCommand_RequirePerms_1arg_Group : ParcelCommand_RequirePerms_1arg
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using OpenMetaverse;
 using BetterSecondBotShared.logs;
 
-namespace BSB.Commands.Group
+namespace BetterSecondBot.Commands.Group
 {
     public class GroupInvite : CoreCommand_2arg
     {

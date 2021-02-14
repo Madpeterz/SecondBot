@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using OpenMetaverse;
 
-namespace BSB.RLV.Miscellaneous
+namespace BetterSecondBot.RLV.Miscellaneous
 {
     public class GetStatusAll : RLV_command_1arg
     {

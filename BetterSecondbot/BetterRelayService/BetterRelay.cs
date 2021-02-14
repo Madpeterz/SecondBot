@@ -3,7 +3,7 @@ using BetterSecondBotShared.IO;
 using BetterSecondBotShared.Json;
 using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
-using BSB.bottypes;
+using BetterSecondBot.bottypes;
 using Newtonsoft.Json;
 using OpenMetaverse;
 using System;

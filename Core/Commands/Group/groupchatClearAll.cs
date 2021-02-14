@@ -1,4 +1,4 @@
-﻿namespace BSB.Commands.Group
+﻿namespace BetterSecondBot.Commands.Group
 {
     class GroupchatClearAll : CoreCommand
     {

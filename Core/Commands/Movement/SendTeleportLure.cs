@@ -1,6 +1,6 @@
 ﻿using OpenMetaverse;
 
-namespace BSB.Commands.Movement
+namespace BetterSecondBot.Commands.Movement
 {
     public class SendTeleportLure : CoreCommand_1arg
     {

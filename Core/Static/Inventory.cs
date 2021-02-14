@@ -1,11 +1,11 @@
-﻿using BSB.bottypes;
+﻿using BetterSecondBot.bottypes;
 using Newtonsoft.Json;
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BSB.Static
+namespace BetterSecondBot.Static
 {
     public class InventoryMapFolder
     {

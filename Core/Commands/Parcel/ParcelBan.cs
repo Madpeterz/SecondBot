@@ -1,7 +1,7 @@
 ﻿using OpenMetaverse;
 using static OpenMetaverse.ParcelManager;
 
-namespace BSB.Commands.CMD_Parcel
+namespace BetterSecondBot.Commands.CMD_Parcel
 {
     public class ParcelBan : CoreCommand_1arg
     {
