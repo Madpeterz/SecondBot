@@ -40,10 +40,106 @@
     <None Update="openjpeg-dotnet.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="openmetaverse_data\attentions.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\attentionsN.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\aux_base.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_eye.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_eyelashes.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_eye_1.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_hair.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_hair_1.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_hair_2.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_hair_3.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_hair_4.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_hair_5.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_head.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_head_1.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_head_2.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_head_3.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_head_4.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="openmetaverse_data\avatar_lad.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="openmetaverse_data\avatar_lower_body.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_lower_body_1.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_lower_body_2.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_lower_body_3.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_lower_body_4.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="openmetaverse_data\avatar_skeleton.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_skirt.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_skirt_1.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_skirt_2.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_skirt_3.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_skirt_4.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_upper_body.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_upper_body_1.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_upper_body_2.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_upper_body_3.llm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\avatar_upper_body_4.llm">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="openmetaverse_data\blush_alpha.tga">
@@ -71,6 +167,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="openmetaverse_data\bump_upperbody_base.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\checkerboard.tga">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="openmetaverse_data\eyebrows_alpha.tga">
@@ -103,6 +202,9 @@
     <None Update="openmetaverse_data\freckles_alpha.tga">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="openmetaverse_data\genepool.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="openmetaverse_data\gloves_fingers_alpha.tga">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -125,6 +227,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="openmetaverse_data\head_skingrain.tga">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openmetaverse_data\invisible_head.tga">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="openmetaverse_data\jacket_length_lower_alpha.tga">
