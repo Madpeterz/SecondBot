@@ -685,7 +685,6 @@ namespace OpenMetaverse
 
             List<UUID> load_items = new List<UUID>();
             List<UUID> owner_ids = new List<UUID>();
-
             if (objects != null)
             {
                 foreach (InventoryBase o in objects)

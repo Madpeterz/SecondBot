@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "BetterSecondbot": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
