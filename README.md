@@ -146,16 +146,16 @@ You get set these tokens up by file or Environment Variables.
 This is to replace the old broken relay thats currently built into the bot
 
 
-> CustomRelay_1 = "encode-as-json:true,source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:4"
+> CustomRelay_1 = "encode-as-json::true,source-type::discord,source-filter::123451231235@12351312321,target-type::localchat,target-config::4"
 
-> CustomRelay_2 = "encode-as-json:false,source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:4"
+> CustomRelay_2 = "encode-as-json::false,source-type::discord,source-filter::123451231235@12351312321,target-type::localchat,target-config::4"
 
 or via the config file
 customrelays
 
 >{
 >"CustomRelays": [
->	encode-as-json:false,source-type:discord,source-filter:123451231235@12351312321,target-type:chat,target-config:4
+>	encode-as-json::false,source-type::discord,source-filter::123451231235@12351312321,target-type::chat,target-config::4
 >]
 }
 

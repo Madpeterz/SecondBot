@@ -51,7 +51,7 @@ namespace BetterSecondBot.BetterRelayService
                 relay_config relay = new relay_config();
                 foreach (string a in bits)
                 {
-                    string[] subbits = a.Split(":");
+                    string[] subbits = a.Split("::");
                     if(subbits.Length == 2)
                     {
                         if(subbits[0] == "source-type")
@@ -220,7 +220,7 @@ namespace BetterSecondBot.BetterRelayService
                         var content = new FormUrlEncodedContent(values);
                         try
                         {
-                            await HTTPclient.PostAsync(cfg.targetvalue, content).ConfigureAwait(true);
+                            await HTTPclient.PostAsync(cfg.targetvalue, content);
                         }
                         catch (Exception e)
                         {
