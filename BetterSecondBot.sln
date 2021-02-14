@@ -21,6 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetterSecondbot", "Secondbo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project Items", "{C343303B-F9BF-46B3-BBB5-5596823EC71C}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		Dockerfile = Dockerfile
 		NuGet.Config = NuGet.Config
 		README.md = README.md

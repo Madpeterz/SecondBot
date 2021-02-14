@@ -4,7 +4,6 @@ compile.bat
 *.suo
 *.cache
 *.pfx
-
 [Oo]bj/
 [Bb]in/
 packages/
@@ -16,9 +15,4 @@ LICENSE.txt
 mapgen.bat
 PrimMesher/
 Programs/
-BetterSecondBot/publish
-Publish/
-secondbotr5.json
-CLI/settings.env
-CLI/Dockerfile
 libremetaverse-core/.gitignore
