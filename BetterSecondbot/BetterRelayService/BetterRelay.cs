@@ -164,7 +164,7 @@ namespace BetterSecondBot.BetterRelayService
             superV.MessageEvent += DiscordMessageHandler;
         }
 
-        protected async void TriggerRelay(string sourcetype, string name,string message, string filtervalue, string discordServerid, string discordMessageid)
+        protected async void TriggerRelay(string sourcetype, string name,string message, string filtervalue, string discordServerid, string discordChannelid)
         {
             List<relay_config> Dataset = new List<relay_config>();
             if (sourcetype == "localchat") Dataset = LocalchatRelay;
@@ -194,7 +194,7 @@ namespace BetterSecondBot.BetterRelayService
                     if (sourcetype == "discord")
                     {
                         packet.discord_serverid = discordServerid;
-                        packet.discord_messageid = discordMessageid;
+                        packet.discord_channelid = discordChannelid;
                     }
                     sendmessage = JsonConvert.SerializeObject(packet);
                 }
@@ -296,7 +296,7 @@ namespace BetterSecondBot.BetterRelayService
         public string target_name = "";
         public string target_value = "";
         public string discord_serverid = "notused";
-        public string discord_messageid = "notused";
+        public string discord_channelid = "notused";
         public string unixtime = "";
     }
 }

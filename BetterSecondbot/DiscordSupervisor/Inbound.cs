@@ -311,7 +311,7 @@ namespace BetterSecondBot.DiscordSupervisor
                     if(username == null) {
                         username = message.Author.Username;
                     }
-                    On_MessageEvent(new DiscordMessageEvent(Chan.GuildId, Chan.Id, username, message.Content));
+                    On_MessageEvent(new DiscordMessageEvent(Chan.GuildId, message.Channel.Id, username, message.Content));
                     if (message.Content.StartsWith("!clear") == true)
                     {
                         await CleanDiscordChannel(Chan, 0, true).ConfigureAwait(false);
