@@ -69,4 +69,4 @@ ENV ASPNETCORE_URLS http://+:80
 
 # --- End of settings ---
 
-ENTRYPOINT ["/app/BetterSecondBot"]
+ENTRYPOINT ["/app/BetterSecondbot"]
