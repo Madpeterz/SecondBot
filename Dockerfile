@@ -5,15 +5,15 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["Secondbot/BetterSecondbot/BetterSecondbot.csproj", "Secondbot/BetterSecondbot/"]
-COPY ["Secondbot/Core/Core.csproj", "Secondbot/Core/"]
-COPY ["Secondbot/Shared/Shared.csproj", "Secondbot/Shared/"]
+COPY ["BetterSecondbot/BetterSecondbot.csproj", "BetterSecondbot/"]
+COPY ["Core/Core.csproj", "Core/"]
+COPY ["Shared/Shared.csproj", "Shared/"]
+COPY ["libremetaverse-core/LibreMetaverseTypes/LibreMetaverse.Types.csproj", "libremetaverse-core/LibreMetaverseTypes/"]
 COPY ["libremetaverse-core/LibreMetaverse/LibreMetaverse.csproj", "libremetaverse-core/LibreMetaverse/"]
 COPY ["libremetaverse-core/LibreMetaverse.StructuredData/LibreMetaverse.StructuredData.csproj", "libremetaverse-core/LibreMetaverse.StructuredData/"]
-COPY ["libremetaverse-core/LibreMetaverseTypes/LibreMetaverse.Types.csproj", "libremetaverse-core/LibreMetaverseTypes/"]
-RUN dotnet restore "Secondbot/BetterSecondbot/BetterSecondbot.csproj"
+RUN dotnet restore "BetterSecondbot/BetterSecondbot.csproj"
 COPY . .
-WORKDIR "/src/Secondbot/BetterSecondbot"
+WORKDIR "/src/BetterSecondbot"
 RUN dotnet build "BetterSecondbot.csproj" -c Release -o /app/build
 
 FROM build AS publish
@@ -22,7 +22,6 @@ RUN dotnet publish "BetterSecondbot.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
 # --- Update your settings ---
 
 ENV Basic_BotUserName=''
