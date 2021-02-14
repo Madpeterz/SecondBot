@@ -5,11 +5,24 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
+	  <MSBuildGitHashCommand>git rev-parse --short HEAD</MSBuildGitHashCommand>
+	  <MSBuildGitHashValidate>False</MSBuildGitHashValidate>
+	  <MSBuildGitHashSuppressDirtyWarning>False</MSBuildGitHashSuppressDirtyWarning>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>5</WarningLevel>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="WikiMake\wiki_footer.txt" />
+    <None Remove="WikiMake\wiki_header.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="WikiMake\wiki_footer.txt" />
+    <EmbeddedResource Include="WikiMake\wiki_header.txt" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="EmbedIO" Version="3.4.3" />
