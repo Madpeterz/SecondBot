@@ -17,8 +17,6 @@ namespace BetterSecondBotShared.bottypes
             LastStatusMessage = "No status";
         }
         protected List<string> SubMasters = new List<string>();
-        protected bool attempted_first_login = false;
-        protected bool login_failed = false;
         public bool Is_avatar_master(string name)
         {
             if (name == myconfig.Security_MasterUsername)
@@ -339,7 +337,7 @@ namespace BetterSecondBotShared.bottypes
             Debug("LoginHandler proc not overridden");
         }
 
-        protected virtual void AfterBotLoginHandler()
+        public virtual void AfterBotLoginHandler()
         {
             Debug("AfterBotLoginHandler proc not overridden");
         }

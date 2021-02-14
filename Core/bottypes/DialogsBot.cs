@@ -75,7 +75,7 @@ namespace BSB.bottypes
             return base.GetStatus();
         }
 
-        protected override void AfterBotLoginHandler()
+        public override void AfterBotLoginHandler()
         {
             base.AfterBotLoginHandler();
             if (reconnect == false)

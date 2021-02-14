@@ -12,19 +12,28 @@ using OpenMetaverse.StructuredData;
 
 namespace LibreMetaverse
 {
+
     public class InventoryAISClient
     {
         public const string INVENTORY_CAP_NAME = "InventoryAPIv3";
         public const string LIBRARY_CAP_NAME = "LibraryAPIv3";
 
+
         [NonSerialized]
         private readonly GridClient Client;
 
-        private static readonly HttpClient httpClient = new HttpClient();
+        // Create an HttpClientHandler object and set to use default credentials
+        HttpClientHandler clientHandler = new HttpClientHandler();
+
+        // Create an HttpClient object
+        HttpClient httpClient;
+
 
         public InventoryAISClient(GridClient client)
         {
             Client = client;
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            httpClient = new HttpClient(clientHandler);
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Add("User-Agent", "LibreMetaverse AIS Client");
         }

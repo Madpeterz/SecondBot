@@ -25,7 +25,7 @@ namespace BSB.bottypes
             return base.GetStatus();
         }
 
-        protected override void AfterBotLoginHandler()
+        public override void AfterBotLoginHandler()
         {
             connected_to_groups = false;
             base.AfterBotLoginHandler();

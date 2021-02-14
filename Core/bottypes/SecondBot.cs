@@ -14,6 +14,7 @@ namespace BSB.bottypes
         protected bool friendslist_ready;
         protected bool masteruuid_ready;
         protected bool started_friendship_hug;
+        protected bool sentFriendHugIM;
 
         protected virtual void FriendsListReady(object sender,FriendsReadyEventArgs e)
         {
@@ -29,12 +30,8 @@ namespace BSB.bottypes
                 if (Client.Friends.FriendList.ContainsKey(master_uuid) == false)
                 {
                     CommandsInterface.Call("IM", String.Join("~#~", new string[] { myconfig.Security_MasterUsername, "Hello master, I am sending you a friend request now!" }));
-                    CommandsInterface.Call("FriendRequest", myconfig.Security_MasterUsername, Client.Self.AgentID);
                 }
-                else
-                {
-                    CommandsInterface.Call("FriendFullPerms", String.Join("~#~", new string[] { myconfig.Security_MasterUsername, "true" }), Client.Self.AgentID);
-                }
+                CommandsInterface.Call("FriendFullPerms", String.Join("~#~", new string[] { master_uuid.ToString(), "true" }), Client.Self.AgentID);
             }
         }
 

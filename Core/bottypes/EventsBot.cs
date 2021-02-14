@@ -43,7 +43,7 @@ namespace BSB.bottypes
             return base.GetStatus();
         }
 
-        protected override void AfterBotLoginHandler()
+        public override void AfterBotLoginHandler()
         {
             if (reconnect == false)
             {
@@ -292,48 +292,6 @@ namespace BSB.bottypes
             base.KillMePlease();
         }
 
-        protected string login_status = "Waiting to login";
-        protected override void LoginHandler(object o, LoginProgressEventArgs e)
-        {
-            attempted_first_login = true;
-            login_failed = false;
-            if (e.Status == LoginStatus.Success)
-            {
-                login_status = "Ok";
-            }
-            else if(e.Status == LoginStatus.Failed)
-            {
-                login_failed = true;
-                login_status = "Login failed <"+e.Message+">";
-                login_auto_logout = true;
-                if (e.FailReason == "presence")
-                {
-                    login_status = "Login failed <Clear AV>";
-                }
-            }
-            else if(e.Status == LoginStatus.None)
-            {
-                login_status = "None :/";
-            }
-            else if(e.Status == LoginStatus.ConnectingToLogin)
-            {
-                login_status = "Starting login";
-            }
-            else if(e.Status == LoginStatus.ReadingResponse)
-            {
-                login_status = "Busy";
-            }
-            else if(e.Status == LoginStatus.ConnectingToSim)
-            {
-                login_status = "Joining sim";
-            }
-            else if(e.Status == LoginStatus.Redirecting)
-            {
-                login_status = "Redirecting";
-            }
-            Info("Login status -> " + login_status);
-
-        }
         public virtual void GroupsHandler(object sender, CurrentGroupsEventArgs e)
         {
             mygroups = e.Groups;
@@ -345,7 +303,7 @@ namespace BSB.bottypes
 
         }
 
-        protected override void AfterBotLoginHandler()
+        public override void AfterBotLoginHandler()
         {
             if (reconnect == false)
             {

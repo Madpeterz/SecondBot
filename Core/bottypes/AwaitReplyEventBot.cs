@@ -11,7 +11,7 @@ namespace BSB.bottypes
     {
         public override List<UUID> GetActiveGroupchatSessions { get { return active_group_chat_sessions; } }
 
-        protected override void AfterBotLoginHandler()
+        public override void AfterBotLoginHandler()
         {
             if (reconnect == false)
             {

@@ -215,7 +215,7 @@ namespace BSB.bottypes
             }
         }
 
-        protected override void AfterBotLoginHandler()
+        public override void AfterBotLoginHandler()
         {
             if (reconnect == false)
             {

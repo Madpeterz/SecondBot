@@ -9,7 +9,7 @@ namespace BSB.bottypes
     {
         protected List<UUID> active_animations = new List<UUID>();
 
-        protected override void AfterBotLoginHandler()
+        public override void AfterBotLoginHandler()
         {
             if (reconnect == false)
             {

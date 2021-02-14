@@ -2255,7 +2255,10 @@ namespace OpenMetaverse
                 MyVisualParameters = new byte[set.VisualParam.Length];
                 for (int i = 0; i < set.VisualParam.Length; i++)
                 {
-                    MyVisualParameters[i] = set.VisualParam[i].ParamValue;
+                    if (set.VisualParam[i] != null)
+                    {
+                        MyVisualParameters[i] = set.VisualParam[i].ParamValue;
+                    }
                 }
 
                 #endregion VisualParam

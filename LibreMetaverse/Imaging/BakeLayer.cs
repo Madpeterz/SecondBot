@@ -40,7 +40,6 @@ namespace OpenMetaverse.Imaging
     /// </summary>
     public class Baker
     {
-        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         #region Properties
         /// <summary>Final baked texture</summary>
         public AssetTexture BakedTexture => bakedTexture;
@@ -333,7 +332,7 @@ namespace OpenMetaverse.Imaging
             }
 
             // Apply any alpha wearable textures to make parts of the avatar disappear
-            m_log.DebugFormat("[XBakes]: Number of alpha wearable textures: {0}", alphaWearableTextures.Count);
+            Logger.Log("[XBakes]: Number of alpha wearable textures: " + alphaWearableTextures.Count.ToString(), Helpers.LogLevel.Debug);
             foreach (ManagedImage img in alphaWearableTextures)
                 AddAlpha(bakedTexture.Image, img);
 
@@ -465,15 +464,24 @@ namespace OpenMetaverse.Imaging
                 {
                     if (sourceHasAlpha)
                     {
-                        alpha = sourceAlpha[i];
-                        alphaInv = (byte)(Byte.MaxValue - alpha);
+                        if (sourceAlpha.Length > i)
+                        {
+                            alpha = sourceAlpha[i];
+                            alphaInv = (byte)(Byte.MaxValue - alpha);
+                        }
                     }
 
                     if (sourceHasColor)
                     {
-                        bakedRed[i] = (byte)((bakedRed[i] * alphaInv + sourceRed[i] * alpha) >> 8);
-                        bakedGreen[i] = (byte)((bakedGreen[i] * alphaInv + sourceGreen[i] * alpha) >> 8);
-                        bakedBlue[i] = (byte)((bakedBlue[i] * alphaInv + sourceBlue[i] * alpha) >> 8);
+                        if ((bakedRed.Length > i) && (bakedGreen.Length > i) && (bakedBlue.Length > i))
+                        {
+                            if ((sourceRed.Length > i) && (sourceGreen.Length > i) && (sourceBlue.Length > i))
+                            {
+                                bakedRed[i] = (byte)((bakedRed[i] * alphaInv + sourceRed[i] * alpha) >> 8);
+                                bakedGreen[i] = (byte)((bakedGreen[i] * alphaInv + sourceGreen[i] * alpha) >> 8);
+                                bakedBlue[i] = (byte)((bakedBlue[i] * alphaInv + sourceBlue[i] * alpha) >> 8);
+                            }
+                        }
                     }
 
                     if (addSourceAlpha)
