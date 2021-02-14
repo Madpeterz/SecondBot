@@ -10,9 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\libremetaverse-core\LibreMetaverse.StructuredData\LibreMetaverse.StructuredData.csproj" />
-    <ProjectReference Include="..\libremetaverse-core\LibreMetaverseTypes\LibreMetaverse.Types.csproj" />
-    <ProjectReference Include="..\libremetaverse-core\LibreMetaverse\LibreMetaverse.csproj" />
+    <ProjectReference Include="..\LibreMetaverse.StructuredData\LibreMetaverse.StructuredData.csproj" />
+    <ProjectReference Include="..\LibreMetaverseTypes\LibreMetaverse.Types.csproj" />
+    <ProjectReference Include="..\LibreMetaverse\LibreMetaverse.csproj" />
   </ItemGroup>
 
 </Project>
