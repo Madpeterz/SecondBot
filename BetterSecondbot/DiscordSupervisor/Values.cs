@@ -49,7 +49,13 @@ namespace BetterSecondBot.DiscordSupervisor
             {
                 if (controler.Bot != null)
                 {
-                    return true;
+                    if (controler.Bot.GetClient != null)
+                    {
+                        if (controler.Bot.GetClient.Network != null)
+                        {
+                            return true;
+                        }
+                    }
                 }
             }
             return false;
