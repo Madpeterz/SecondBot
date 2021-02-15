@@ -46,7 +46,7 @@ namespace BetterSecondBot.DiscordSupervisor
                         }
                     }
                 }
-                Thread.Sleep(1000);
+                Thread.Sleep(1500);
             }
         }
         public Discord_super(JsonConfig configfile, bool as_docker)
@@ -82,7 +82,7 @@ namespace BetterSecondBot.DiscordSupervisor
                 controler.Bot.KillMePlease();
                 controler = null;
             }
-            controler = new CliExitOnLogout(myconfig, running_as_docker, self_keep_alive);
+            controler = new Cli(myconfig, running_as_docker, self_keep_alive);
             controler.Bot.setDiscordClient(DiscordClient);
             relayService = new BetterRelay(controler, this, running_as_docker);
             attach_events();

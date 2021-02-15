@@ -174,7 +174,7 @@ namespace BetterSecondBot.WikiMake
                 sb.Replace("[[SUBFOLDER]]", "");
                 sb.Replace("[[RETURNROOT]]", "../");
                 sb = DebugModeCreateWiki.MenuActive(sb, area);
-                string target_file = "" + area + "" + workspace + "" + c.ToLowerInvariant() + ".html";
+                string target_file = "" + area + "" + workspace + "" + c + ".html";
                 io.writefile(target_file, sb.ToString());
             }
         }
@@ -392,9 +392,6 @@ namespace BetterSecondBot.WikiMake
                         }
                         sb.Append("</ul>");
                     }
-
-
-
                     sb = DebugModeCreateWiki.MenuActive(sb, area);
                     sb.Append(html_footer);
                     sb.Replace("[[COMMAND]]", c);
@@ -566,7 +563,8 @@ namespace BetterSecondBot.WikiMake
             createEndpoint("im", typeof(HttpApiIM));
             createEndpoint("groups", typeof(HttpApiGroup));
             createEndpoint("chat", typeof(HttpApiLocalchat));
-            createEndpoint("parcelestate", typeof(HttpApiParcelEstate));
+            createEndpoint("parcel", typeof(HttpApiParcel));
+            createEndpoint("estate", typeof(HttpAPIEstate));
         }
 
         public string getCommandMethod(string endpoint, string command)

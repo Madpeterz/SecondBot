@@ -16,7 +16,7 @@ namespace BetterSecondBot.BetterRelayService
     public class BetterRelay
     {
         Discord_super superV = null;
-        CliExitOnLogout controler = null;
+        Cli controler = null;
 
         List<relay_config> DiscordRelay = new List<relay_config>();
         List<relay_config> LocalchatRelay = new List<relay_config>();
@@ -24,7 +24,7 @@ namespace BetterSecondBot.BetterRelayService
         List<relay_config> AvatarIMRelay = new List<relay_config>();
         List<relay_config> GroupChatRelay = new List<relay_config>();
 
-        public BetterRelay(CliExitOnLogout setcontroler, Discord_super setdiscord, bool running_in_docker)
+        public BetterRelay(Cli setcontroler, Discord_super setdiscord, bool running_in_docker)
         {
             controler = setcontroler;
             superV = setdiscord;

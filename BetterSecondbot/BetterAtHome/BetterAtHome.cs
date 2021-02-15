@@ -9,7 +9,7 @@ namespace BetterSecondbot.BetterAtHome
 {
     public class BetterAtHome
     {
-        protected CliExitOnLogout controler = null;
+        protected Cli controler = null;
         protected JsonConfig configfile;
 
         protected bool LoginFailed = false;
@@ -21,7 +21,7 @@ namespace BetterSecondbot.BetterAtHome
         protected long LastTeleportEvent = 0;
         protected List<string> homeRegions = new List<string>();
 
-        public BetterAtHome(CliExitOnLogout setcontroler, JsonConfig configfile)
+        public BetterAtHome(Cli setcontroler, JsonConfig configfile)
         {
             controler = setcontroler;
             this.configfile = configfile;

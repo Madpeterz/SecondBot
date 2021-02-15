@@ -119,16 +119,45 @@ namespace BetterSecondBot.bottypes
 
     public class EventsBot : VoidEventBot
     {
+        private EventHandler<SimChangedEventArgs> _ChangeSim;
+        private EventHandler<AlertMessageEventArgs> _AlertMessage;
+        private EventHandler<LoginProgressEventArgs> _LoginProgess;
+        private EventHandler<NextHomeRegionArgs> _NextHomeRegion;
         private EventHandler<MessageEventArgs> _MessageEvent;
         private EventHandler<StatusMessageEvent> _StatusMessageEvent;
         private EventHandler<GroupEventArgs> _GroupsEvent;
         private EventHandler<ImSendArgs> _SendImEvent;
 
+        private readonly object _ChangeSimLock = new object();
+        private readonly object _AlertMessageLock = new object();
+        private readonly object _LoginProgressLock = new object();
+        private readonly object _NextHomeRegionLock = new object();
         private readonly object _MessageEventLock = new object();
         private readonly object _StatusMessageEventlock = new object();
         private readonly object _GroupsEventLock = new object();
         private readonly object _SendImEventLock = new object();
 
+
+        public event EventHandler<SimChangedEventArgs> ChangeSimEvent
+        {
+            add { lock (_ChangeSimLock) { _ChangeSim += value; } }
+            remove { lock (_ChangeSimLock) { _ChangeSim -= value; } }
+        }
+        public event EventHandler<AlertMessageEventArgs> AlertMessage
+        {
+            add { lock (_AlertMessageLock) { _AlertMessage += value; } }
+            remove { lock (_AlertMessageLock) { _AlertMessage -= value; } }
+        }
+        public event EventHandler<LoginProgressEventArgs> LoginProgess
+        {
+            add { lock (_LoginProgressLock) { _LoginProgess += value; } }
+            remove { lock (_LoginProgressLock) { _LoginProgess -= value; } }
+        }
+        public event EventHandler<NextHomeRegionArgs> NextHomeRegion
+        {
+            add { lock (_NextHomeRegionLock) { _NextHomeRegion += value; } }
+            remove { lock (_NextHomeRegionLock) { _NextHomeRegion -= value; } }
+        }
 
         public event EventHandler<MessageEventArgs> MessageEvent
         {
@@ -185,6 +214,32 @@ namespace BetterSecondBot.bottypes
             {
                 On_MessageEvent(new MessageEventArgs(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme));
             }
+        }
+
+        protected override void LoginHandler(object o, LoginProgressEventArgs e)
+        {
+            base.LoginHandler(o, e);
+            EventHandler<LoginProgressEventArgs> handler = _LoginProgess;
+            handler?.Invoke(this, e);
+        }
+
+        protected void ChangeSim(object sender, SimChangedEventArgs e)
+        {
+            EventHandler<SimChangedEventArgs> handler = _ChangeSim;
+            handler?.Invoke(this, e);
+        }
+
+        protected void AlertEvent(object sender, AlertMessageEventArgs e)
+        {
+            EventHandler<AlertMessageEventArgs> handler = _AlertMessage;
+            handler?.Invoke(this, e);
+        }
+
+        public void GotoNextHomeRegion()
+        {
+            NextHomeRegionArgs e = new NextHomeRegionArgs();
+            EventHandler<NextHomeRegionArgs> handler = _NextHomeRegion;
+            handler?.Invoke(this, e);
         }
 
         protected bool login_auto_logout;

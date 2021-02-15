@@ -9,7 +9,7 @@ using System.Text;
 
 namespace BetterSecondBot.bottypes
 {
-    public abstract class AVstorageBot : AtHome
+    public abstract class AVstorageBot : AttachableBot
     {
         protected UUID master_uuid = UUID.Zero;
         public UUID getMaster_uuid { get { return master_uuid; } }

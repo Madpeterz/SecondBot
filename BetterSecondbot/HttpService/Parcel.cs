@@ -12,18 +12,18 @@ using static OpenMetaverse.ParcelManager;
 
 namespace BetterSecondBot.HttpService
 {
-    class HttpApiParcelEstate: WebApiControllerWithTokens
+    class HttpApiParcel : WebApiControllerWithTokens
     {
-        public HttpApiParcelEstate(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+        public HttpApiParcel(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("Fetchs the parcel ban list of the parcel the bot is currently on<br/>If the name returned is lookup the bot is currently requesting the avatar name")]
         [ReturnHints("array of UUID=Name")]
         [ReturnHints("Error not in a sim")]
         [ReturnHints("Parcel data not ready")]
-        [Route(HttpVerbs.Get, "/parcelbanlist/{token}")]
+        [Route(HttpVerbs.Get, "/banlist/{token}")]
         public object parcelbanlist(string token)
         {
-            if (tokens.Allow(token, "parcelestate", "parcelbanlist", getClientIP()) == true)
+            if (tokens.Allow(token, "parcel", "banlist", getClientIP()) == true)
             {
                 if (bot.GetClient.Network.CurrentSim != null)
                 {

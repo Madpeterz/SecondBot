@@ -9,7 +9,7 @@ namespace BetterSecondBot.DiscordSupervisor
     {
         protected JsonConfig myconfig;
         protected bool exit_super = false;
-        protected CliExitOnLogout controler;
+        protected Cli controler;
         protected bool running_as_docker = false;
 
         protected bool discord_group_relay;
