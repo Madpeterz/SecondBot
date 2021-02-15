@@ -5,6 +5,7 @@ using BetterSecondBotShared.Static;
 using BetterSecondBot.bottypes;
 using System.Threading;
 using static BetterSecondBot.Program;
+using BetterSecondbot.BetterAtHome;
 
 namespace BetterSecondBot
 {
@@ -13,15 +14,16 @@ namespace BetterSecondBot
         public bool Exited { get { return exitBot; } }
         protected bool exitBot = false;
         public SecondBot Bot;
+        protected BetterAtHome betterAtHomeService;
 
         protected void keep_alive()
         {
             while (Bot.KillMe == false)
             {
                 string NewStatusMessage = Bot.GetStatus();
+                NewStatusMessage = NewStatusMessage.Trim();
                 if (NewStatusMessage != Bot.LastStatusMessage)
                 {
-                    NewStatusMessage = NewStatusMessage.Trim();
                     if (NewStatusMessage.Replace(" ", "") != "")
                     {
                         Bot.LastStatusMessage = NewStatusMessage;
@@ -30,6 +32,7 @@ namespace BetterSecondBot
                 }
                 Thread.Sleep(1000);
             }
+            betterAtHomeService = null;
         }
         public CliExitOnLogout(JsonConfig Config, bool as_docker, bool use_self_keep_alive)
         {
@@ -39,7 +42,8 @@ namespace BetterSecondBot
             {
                 Bot = new SecondBot();
                 Bot.Setup(Config, AssemblyInfo.GetGitHash());
-                if(as_docker == true)
+                betterAtHomeService = new BetterAtHome(this, Config);
+                if (as_docker == true)
                 {
                     Bot.AsDocker();
                 }
