@@ -202,7 +202,7 @@ namespace BetterSecondBot.WikiMake
                         int args = shared_interface.GetCommandArgs(c);
                         sb.Append("<tr><td><a href='[[AREA]]");
                         sb.Append(workspace);
-                        sb.Append(c.ToLowerInvariant());
+                        sb.Append(c);
                         sb.Append(".html'>");
                         sb.Append(c);
                         sb.Append("</a></td><td>");
