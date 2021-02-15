@@ -179,6 +179,7 @@ namespace BetterSecondBot.BetterRelayService
             {
                 return;
             }
+            string message_no_name = "[relay]" + message;
             message = "[relay] " + sourcetype + " # " + name + ": " + message;
 
 
@@ -188,7 +189,7 @@ namespace BetterSecondBot.BetterRelayService
                 if(cfg.encode_as_json == true)
                 {
                     relay_packet packet = new relay_packet();
-                    packet.source_message = message;
+                    packet.source_message = message_no_name;
                     packet.source_user = name;
                     if (sourcetype == "discord")
                     {
