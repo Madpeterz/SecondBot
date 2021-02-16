@@ -28,7 +28,7 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("sends a message to localchat")]
-        [ArgHints("message","Text", "the message to send")]
+        [ArgHints("message", "URLARG", "the message to send")]
         [ReturnHints("array string")]
         [Route(HttpVerbs.Post, "/localchatsay/{token}")]
         public object localchatSay(string token, [FormField] string message)

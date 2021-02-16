@@ -23,6 +23,8 @@ namespace BetterSecondBot.HttpService
         [ReturnHints("Unknown group")]
         [ReturnHints("Invaild group UUID")]
         [ReturnHints("Unable to find avatar UUID")]
+        [ArgHints("group", "URLARG", "the UUID of the group")]
+        [ArgHints("avatar", "URLARG", "the UUID of the avatar you wish to check with")]
         [Route(HttpVerbs.Get, "/ismember/{group}/{avatar}/{token}")]
         public object ismember(string group,string avatar,string token)
         {
@@ -75,11 +77,11 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Requests the roles for the selected group<br/>Replys with GroupRoleDetails object formated as follows <ul><li>UpdateUnderway (Bool)</li><li>RoleDataAge (Int) [default -1]</li><li>Roles (KeyPair array of UUID=Name)</li></ul><br/>")]
-        [ArgHints("group", "URLARG", "UUID of the group")]
         [ReturnHints("GroupRoleDetails object")]
         [ReturnHints("Group is not currently known")]
         [ReturnHints("Invaild group UUID")]
         [ReturnHints("Updating")]
+        [ArgHints("group", "URLARG", "the UUID of the group")]
         [Route(HttpVerbs.Get, "/listgrouproles/{group}/{token}")]
         public object listgrouproles(string group, string token)
         {
@@ -152,9 +154,9 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("fetchs the groupchat history")]
-        [ArgHints("group", "URLARG", "UUID of the group")]
         [ReturnHints("Group UUID invaild")]
         [ReturnHints("Group Chat")]
+        [ArgHints("group", "URLARG", "the UUID of the group")]
         [Route(HttpVerbs.Get, "/getgroupchat/{group}/{token}")]
         public object getgroupchat(string group, string token)
         {

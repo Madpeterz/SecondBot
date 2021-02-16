@@ -35,9 +35,9 @@ namespace BetterSecondBot.HttpService
         [ReturnHints("Unable to find avatar UUID")]
         [ReturnHints("Unable to process global value please use true or false")]
         [ReturnHints("Not an estate manager on region {REGIONNAME}")]
-        [ArgHints("avatar", "uuid", "the avatar you wish to ban")]
-        [ArgHints("mode", "add|remove", "What action would you like to take<br/>Defaults to remove if not given \"add\"")]
-        [ArgHints("global", "true|false", "if true this the ban/unban will be applyed to all estates the bot has access to")]
+        [ArgHints("avatar", "URLARG", "the uuid avatar you wish to ban")]
+        [ArgHints("mode", "URLARG", "What action would you like to take<br/>Defaults to remove if not given \"add\"")]
+        [ArgHints("global", "URLARG", "if true this the ban/unban will be applyed to all estates the bot has access to")]
         [Route(HttpVerbs.Get, "/update-banlist/{avatar}/{mode}/{global}/{token}")]
 
         public Object UpdateBanlist(string avatar, string mode, string global, string token)
