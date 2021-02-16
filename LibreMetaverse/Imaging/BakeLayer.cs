@@ -30,7 +30,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Drawing;
 using OpenMetaverse.Assets;
-using log4net;
 
 namespace OpenMetaverse.Imaging
 {
@@ -462,6 +461,8 @@ namespace OpenMetaverse.Imaging
             {
                 for (int x = 0; x < bakeWidth; x++)
                 {
+                    alpha = 0;
+                    alphaInv = 0;
                     if (sourceHasAlpha)
                     {
                         if (sourceAlpha.Length > i)
@@ -486,14 +487,22 @@ namespace OpenMetaverse.Imaging
 
                     if (addSourceAlpha)
                     {
-                        if (sourceAlpha[i] < bakedAlpha[i])
+                        if ((sourceAlpha.Length > i) && (bakedAlpha.Length > i))
                         {
-                            bakedAlpha[i] = sourceAlpha[i];
+                            if (sourceAlpha[i] < bakedAlpha[i])
+                            {
+                                bakedAlpha[i] = sourceAlpha[i];
+                            }
                         }
                     }
 
                     if (sourceHasBump)
-                        bakedBump[i] = sourceBump[i];
+                    {
+                        if (sourceBump.Length > i)
+                        {
+                            bakedBump[i] = sourceBump[i];
+                        }
+                    }
 
                     ++i;
                 }
