@@ -1,4 +1,3 @@
-﻿SecondBot -> DialogsBot -> ChatRelay -> RLVbot -> RLVbotHelper -> 
-AwaitReplyEventBot -> CommandsBot -> AVstorageBot -> AttachableBot ->
+﻿SecondBot -> DialogsBot -> ChatRelay -> AwaitReplyEventBot -> CommandsBot -> AVstorageBot -> AttachableBot ->
 MessageSwitcherBot -> EventsBot -> VoidEventBot -> AnimationsBot ->
 VirtualsBot -> Log2FileBot -> ActionsAutoAcceptBot -> BasicBot

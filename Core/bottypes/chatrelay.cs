@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace BetterSecondBot.bottypes
 {
-    public abstract class ChatRelay : RLVbot
+    public abstract class ChatRelay : AwaitReplyEventBot
     {
         #region GroupIMs
         protected int localchatlimit = 20;

@@ -20,8 +20,8 @@ namespace BetterSecondBot.HttpService
 
         [About("Requests the estate banlist")]
         [ReturnHints("")]
-        [Route(HttpVerbs.Get, "/banlist/{token}")]
-        public Object Banlist(string token)
+        [Route(HttpVerbs.Get, "/GetEstateBanList/{token}")]
+        public Object GetEstateBanList(string token)
         {
             if (tokens.Allow(token, "estate", "banlist", getClientIP()) == true)
             {
@@ -38,9 +38,9 @@ namespace BetterSecondBot.HttpService
         [ArgHints("avatar", "URLARG", "the uuid avatar you wish to ban")]
         [ArgHints("mode", "URLARG", "What action would you like to take<br/>Defaults to remove if not given \"add\"")]
         [ArgHints("global", "URLARG", "if true this the ban/unban will be applyed to all estates the bot has access to")]
-        [Route(HttpVerbs.Get, "/update-banlist/{avatar}/{mode}/{global}/{token}")]
+        [Route(HttpVerbs.Get, "/UpdateEstateBanlist/{avatar}/{mode}/{global}/{token}")]
 
-        public Object UpdateBanlist(string avatar, string mode, string global, string token)
+        public Object UpdateEstateBanlist(string avatar, string mode, string global, string token)
         {
             if (tokens.Allow(token, "estate", "banlist-add", getClientIP()) == true)
             {

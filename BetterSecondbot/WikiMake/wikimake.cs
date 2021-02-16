@@ -293,11 +293,6 @@ namespace BetterSecondBot.WikiMake
             api_reports.Add("Core", new KeyValuePair<int, string>(cmd.ApiCommandsCount, "Good"));
             InterfaceWiki("Core", cmd, true);
 
-            // RLVapi
-            BetterSecondBot.RLV.RLVcontrol RLVapi = new BetterSecondBot.RLV.RLVcontrol(null);
-            api_reports.Add("RLVapi", new KeyValuePair<int, string>(RLVapi.ApiCommandsCount, "Limited"));
-            InterfaceWiki("RLVapi", RLVapi, true);
-
             // HTTP
             HTTPWiki();
 

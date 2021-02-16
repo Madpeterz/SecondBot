@@ -287,38 +287,6 @@ namespace BetterSecondBot.bottypes
             }
         }
 
-        protected string httpLookupKey(string avatar_name)
-        {
-            if (myconfig.Name2Key_Enable == true)
-            {
-                var client = new RestClient(myconfig.Name2Key_Url);
-                var request = new RestRequest("name2key/" + avatar_name + "/" + myconfig.Name2Key_Key + "", Method.GET);
-                client.Timeout = 3000; // ? does this even do anything
-                request.Timeout = 3000;
-                IRestResponse endpoint_checks = client.Get(request);
-                if (endpoint_checks.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    try
-                    {
-                        namekeyservicereply server_reply = JsonConvert.DeserializeObject<namekeyservicereply>(endpoint_checks.Content);
-                        if (server_reply.status == true)
-                        {
-                            if (server_reply.found == true)
-                            {
-                                AddAvatarToDB((UUID)server_reply.uuid, server_reply.name);
-                                return server_reply.uuid;
-                            }
-                        }
-                    }
-                    catch
-                    {
-
-                    }
-                }
-            }
-            return "";
-        }
-
         protected string FindAvatarUUIDInStorage(string avatar_name)
         {
             if (AvatarStorageLastUsed.ContainsKey(avatar_name) == true)
@@ -355,11 +323,6 @@ namespace BetterSecondBot.bottypes
             {
                 return uuid;
             }
-            uuid = httpLookupKey(avatar_name);
-            if (uuid != "")
-            {
-                return uuid;
-            }
             if (PendingAvatarFinds_vianame.ContainsKey(avatar_name) == false)
             {
                 PendingAvatarFinds_vianame.Add(avatar_name, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 0));
@@ -383,47 +346,10 @@ namespace BetterSecondBot.bottypes
             return "";
         }
 
-        protected string httpLookupName(UUID avatar_uuid)
-        {
-            if (myconfig.Name2Key_Enable == true)
-            {
-                var client = new RestClient(myconfig.Name2Key_Url);
-                var request = new RestRequest("key2name/" + avatar_uuid.ToString() + "/" + myconfig.Name2Key_Key + "", Method.GET);
-                client.Timeout = 3000; // ? does this even do anything
-                request.Timeout = 3000;
-                IRestResponse endpoint_checks = client.Get(request);
-                if (endpoint_checks.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    try
-                    {
-                        namekeyservicereply server_reply = JsonConvert.DeserializeObject<namekeyservicereply>(endpoint_checks.Content);
-                        if (server_reply.status == true)
-                        {
-                            if (server_reply.found == true)
-                            {
-                                AddAvatarToDB((UUID)server_reply.uuid, server_reply.name);
-                                return server_reply.name;
-                            }
-                        }
-                    }
-                    catch
-                    {
-
-                    }
-                }
-            }
-            return "";
-        }
-
 
         public string FindAvatarKey2Name(UUID avatar_uuid)
         {
             string avatar_name = FindAvatarNameInStorage(avatar_uuid);
-            if (avatar_name != "")
-            {
-                return avatar_name;
-            }
-            avatar_name = httpLookupName(avatar_uuid);
             if (avatar_name != "")
             {
                 return avatar_name;
@@ -440,16 +366,6 @@ namespace BetterSecondBot.bottypes
         {
 
         }
-    }
-
-    public class namekeyservicereply
-    {
-        public string lookingfor { get; set; }
-        public string uuid { get; set; }
-        public string name { get; set; }
-        public bool found { get; set; }
-        public bool status { get; set; }
-        public string message { get; set; }
     }
 
     public class friendreplyobject

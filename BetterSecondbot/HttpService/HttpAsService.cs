@@ -14,6 +14,9 @@ using EmbedIO.Routing;
 using BetterSecondBotShared.logs;
 using BetterSecondBotShared.IO;
 using Newtonsoft.Json;
+using OpenMetaverse;
+using System.Reflection;
+using System.Linq;
 
 namespace BetterSecondBot.HttpService
 {
@@ -145,7 +148,7 @@ namespace BetterSecondBot.HttpService
                 if (killedLogger == false)
                 {
                     killedLogger = true;
-                    Logger.UnregisterLogger<ConsoleLogger>();
+                    Swan.Logging.Logger.UnregisterLogger<ConsoleLogger>();
                 }
                 using (var server = CreateWebServer(Config.Http_Host))
                 {
@@ -259,6 +262,24 @@ namespace BetterSecondBot.HttpService
         protected Dictionary<string, scopedTokenInfo> scopedtokens = new Dictionary<string, scopedTokenInfo>();
 
 
+        protected List<string> OneTimeTokens = new List<string>();
+
+        public string OneTimeToken()
+        {
+            bool known = true;
+            string last = "";
+            while (known == true)
+            {
+                last = helpers.GetSHA1(last + helpers.UnixTimeNow() + new Random().Next(13256).ToString()).Substring(0, 10);
+                if(OneTimeTokens.Contains(last) == false)
+                {
+                    known = false;
+                    OneTimeTokens.Add(last);
+                }
+            }
+            return last;
+        }
+
         public void AddScopedToken(string code, scopedTokenInfo info)
         {
             scopedtokens.Add(code, info);
@@ -307,6 +328,11 @@ namespace BetterSecondBot.HttpService
                 {
                     return true;
                 }
+            }
+            if(OneTimeTokens.Contains(code) == true)
+            {
+                OneTimeTokens.Remove(code);
+                return true;
             }
             return ScopeAllow(code, workgroup, command);
         }
@@ -370,7 +396,43 @@ namespace BetterSecondBot.HttpService
         protected TokenStorage tokens;
         protected SecondBot bot;
         public bool needsToken { get; set; }
+        protected UUID avataruuid = UUID.Zero;
 
+        protected string CallMethod(string name,string[] args)
+        {
+            MethodInfo[] methods = this.GetType().GetMethods();
+            MethodInfo found = null;
+            foreach(MethodInfo M in methods)
+            {
+                if(M.Name == name)
+                {
+                    found = M;
+                    break;
+                }
+            }
+            if(found == null)
+            {
+                return "Failed:Not Found";
+            }
+            List<string> settings = new List<string>(args);
+            settings.Add(tokens.OneTimeToken());
+            if(found.GetParameters().Length != settings.Count)
+            {
+                return "Failed:Incorrect args";
+            }
+            string reply = (string)found.Invoke(this, settings.Cast<object>().ToArray());
+            return "Passed:"+ reply;
+        }
+        protected void ProcessAvatar(string avatar)
+        {
+            string[] bits = avatar.Split(' ');
+            avataruuid = UUID.Zero;
+            if (bits.Length == 2)
+            {
+                avatar = bot.FindAvatarName2Key(avatar);
+            }
+            UUID.TryParse(avatar, out avataruuid);
+        }
 
         protected Object BasicReply(string input)
         {
