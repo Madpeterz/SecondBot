@@ -436,8 +436,15 @@ namespace BetterSecondBot.HttpService
 
         protected Object BasicReply(string input)
         {
-            return new { reply = input };
+            return new { reply = input, status=true };
         }
+
+        protected Object Failure(string input)
+        {
+            return new { reply = input, status = false };
+        }
+
+
         public WebApiControllerWithTokens(SecondBot mainbot, TokenStorage setuptokens)
         {
             bot = mainbot;

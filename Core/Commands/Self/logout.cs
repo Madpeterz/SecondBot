@@ -27,8 +27,7 @@ namespace BetterSecondBot.Commands.Self
         public override string Helpfile { get { return "Makes the bot kill itself you monster"; } }
         public override bool CallFunction(string[] args)
         {
-            bot.GetClient.Self.Chat("Laters im out", 0, ChatType.Normal);
-            bot.KillMePlease();
+
             return true;
         }
     }

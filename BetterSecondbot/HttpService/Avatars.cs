@@ -76,37 +76,6 @@ namespace BetterSecondBot.HttpService
         }
 
 
-        [About("Makes the bot pay a avatar")]
-        [ReturnHints("Accepted")]
-        [ReturnHints("avatar lookup")]
-        [ReturnHints("Invaild amount")]
-        [ReturnHints("Transfer funds to avatars disabled")]
-        [Route(HttpVerbs.Get, "/PayAvatar/{avatar}/{amount}/{token}")]
-        public object PayAvatar(string avatar,string amount,string token)
-        {
-            if (tokens.Allow(token, "avatars", "payavatar", getClientIP()) == false)
-            {
-                return BasicReply("Token not accepted");
-            }
-            if (bot.GetAllowFunds == false)
-            {
-                return BasicReply("Transfer funds to avatars disabled");
-            }
-            ProcessAvatar(avatar);
-            if (avataruuid == UUID.Zero)
-            {
-                return BasicReply("avatar lookup");
-            }
-            if (int.TryParse(amount, out int amountvalue) == false)
-            {
-                return BasicReply("Invaild amount");
-            }
-            if(amountvalue < 1)
-            {
-                return BasicReply("Invaild amount");
-            }
-            bot.GetClient.Self.GiveAvatarMoney(avataruuid, amountvalue);
-            return BasicReply("Accepted");
-        }
+
     }
 }

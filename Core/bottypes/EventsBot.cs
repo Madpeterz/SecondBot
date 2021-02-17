@@ -250,6 +250,15 @@ namespace BetterSecondBot.bottypes
 
         }
 
+        public List<UUID> GetGroupMembers(UUID group)
+        {
+            if (group_members_storage.ContainsKey(group) == false)
+            {
+                return null;
+            }
+            return group_members_storage[group].Value;
+        }
+
         public bool FastCheckInGroup(UUID group,UUID avatar)
         {
             if(NeedReloadGroupData(group) == false)
