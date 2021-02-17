@@ -12,9 +12,9 @@ using BetterSecondBotShared.Static;
 
 namespace BetterSecondBot.HttpService
 {
-    public class Http_Info : WebApiControllerWithTokens
+    public class HTTP_Info : WebApiControllerWithTokens
     {
-        public Http_Info(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+        public HTTP_Info(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("Fetchs the current bot")]
         [ReturnHints("The build ID of the bot")]

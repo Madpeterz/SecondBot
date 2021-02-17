@@ -554,12 +554,12 @@ namespace BetterSecondBot.WikiMake
         public HTTPendpoint()
         {
             createEndpoint("core", typeof(HttpApiCore));
-            createEndpoint("inventory", typeof(HttpApiInventory));
+            createEndpoint("inventory", typeof(HTTP_Inventory));
             createEndpoint("im", typeof(HttpApiIM));
-            createEndpoint("groups", typeof(HttpApiGroup));
-            createEndpoint("chat", typeof(HttpApiLocalchat));
-            createEndpoint("parcel", typeof(HttpApiParcel));
-            createEndpoint("estate", typeof(HttpAPIEstate));
+            createEndpoint("groups", typeof(HTTP_Group));
+            createEndpoint("chat", typeof(HTTP_Chat));
+            createEndpoint("parcel", typeof(HTTP_Parcel));
+            createEndpoint("estate", typeof(HTTP_Estate));
         }
 
         public string getCommandMethod(string endpoint, string command)

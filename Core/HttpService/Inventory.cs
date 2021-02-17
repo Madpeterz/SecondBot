@@ -10,17 +10,17 @@ using OpenMetaverse;
 
 namespace BetterSecondBot.HttpService
 {
-    public class HttpApiInventory : WebApiControllerWithTokens
+    public class HTTP_Inventory : WebApiControllerWithTokens
     {
-        public HttpApiInventory(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+        public HTTP_Inventory(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("rezs the item at the bots current location")]
         [ReturnHints("True|False")]
         [ArgHints("item", "URLARG", "UUID of item to rez")]
-        [Route(HttpVerbs.Get, "/rezobject/{item}/{token}")]
-        public object rezobject(string item, string token, [FormField] string newname)
+        [Route(HttpVerbs.Get, "/RezObject/{item}/{token}")]
+        public object RezObject(string item, string token)
         {
-            if (tokens.Allow(token, "inventory", "rezobject", getClientIP()) == true)
+            if (tokens.Allow(token, "inventory", "RezObject", getClientIP()) == true)
             {
                 bool status = bot.GetCommandsInterface.Call("RezObject", item);
                 return BasicReply(status.ToString());
@@ -28,14 +28,15 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Token not accepted");
         }
 
+
         [About("renames a folder or inventory item")]
         [ReturnHints("True|False")]
         [ArgHints("item", "URLARG", "UUID of item/folder to name")]
         [ArgHints("newname", "Text", "What we are changing it to")]
-        [Route(HttpVerbs.Post, "/rename/{item}/{token}")]
-        public object rename(string item, string token, [FormField] string newname)
+        [Route(HttpVerbs.Post, "/Rename/{item}/{token}")]
+        public object Rename(string item, string token, [FormField] string newname)
         {
-            if (tokens.Allow(token, "inventory", "rename", getClientIP()) == true)
+            if (tokens.Allow(token, "inventory", "Rename", getClientIP()) == true)
             {
                 bool status = bot.GetCommandsInterface.Call("RenameInventory", "12~#~" + item + "~#~" + newname);
                 return BasicReply(status.ToString());
@@ -84,6 +85,72 @@ namespace BetterSecondBot.HttpService
             }
             return BasicReply("Token not accepted");
         }
+
+        [About("Transfers a item [ARG 2] to a objects inventory [ARG 1] (And if set with the script running state [ARG 3])")]
+        [ReturnHints("Transfering running script")]
+        [ReturnHints("Transfering inventory")]
+        [ReturnHints("Invaild item uuid")]
+        [ReturnHints("Invaild object uuid")]
+        [ReturnHints("Unable to find inventory")]
+        [ReturnHints("Unable to find object")]
+        [ReturnHints("Invaild running")]
+        [ArgHints("item", "URLARG", "UUID of item")]
+        [ArgHints("object", "URLARG", "the uuid of the object")]
+        [ArgHints("running", "URLARG", "true if you wish the transfered script to be running otherwise false")]
+
+        [Route(HttpVerbs.Get, "/TransferInventoryToObject/{item}/{objectuuid}/{running}/{token}")]
+        public object TransferInventoryToObject(string item, string objectuuid, string running, string token)
+        {
+            if (tokens.Allow(token, "inventory", "TransferInventoryToObject", getClientIP()) == true)
+            {
+                return Failure("Token not accepted");
+            }
+            if (UUID.TryParse(item, out UUID itemuuid) == false)
+            {
+                return Failure("Invaild item uuid");
+            }
+            if (UUID.TryParse(objectuuid, out UUID objectUUID) == false)
+            {
+                return Failure("Invaild object uuid");
+            }
+            if (bool.TryParse(running, out bool runscript) == false)
+            {
+                return Failure("Invaild running");
+            }
+
+            InventoryItem itm = bot.GetClient.Inventory.FetchItem(itemuuid, bot.GetClient.Self.AgentID, (3 * 1000));
+            if (itm == null)
+            {
+                return Failure("Unable to find inventory");
+            }
+            Dictionary<uint, Primitive> objects_copy = bot.GetClient.Network.CurrentSim.ObjectsPrimitives.Copy();
+            KeyValuePair<uint, Primitive> RealObject = new KeyValuePair<uint, Primitive>(0,null);
+            foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
+            {
+                if (Obj.Value.ID == objectUUID)
+                {
+                    RealObject = Obj;
+                    break;
+                }
+            }
+            if (RealObject.Value == null)
+            {
+                return Failure("Unable to find object");
+            }
+            bool scriptState = runscript;
+            if (itm.AssetType != AssetType.LSLText)
+            {
+                scriptState = false;
+            }
+            if (itm.AssetType == AssetType.LSLText)
+            {
+                bot.GetClient.Inventory.CopyScriptToTask(RealObject.Key, itm, scriptState);
+                return BasicReply("Transfering script [state: "+scriptState.ToString()+"]");
+            }
+            bot.GetClient.Inventory.UpdateTaskInventory(RealObject.Key, itm);
+            return BasicReply("Transfering inventory");
+        }
+
 
         [About("Removes a item/folder from inventory (Make sure you set the isfolder flag correctly!)")]
         [ReturnHints("True|False")]

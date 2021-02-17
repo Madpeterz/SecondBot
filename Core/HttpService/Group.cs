@@ -12,9 +12,9 @@ using BetterSecondBotShared.Static;
 
 namespace BetterSecondBot.HttpService
 {
-    public class HttpApiGroup : WebApiControllerWithTokens
+    public class HTTP_Group : WebApiControllerWithTokens
     {
-        public HttpApiGroup(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+        public HTTP_Group(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
 
         [About("Checks if the given UUID is in the given group<br/>Note: if group membership data is more than 60 secs old this will return Updating<br/>Please wait and retry later")]

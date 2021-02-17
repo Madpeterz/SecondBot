@@ -14,9 +14,9 @@ namespace BetterSecondBot.HttpService
 
 
 
-    public class HttpAPIEstate : WebApiControllerWithTokens
+    public class HTTP_Estate : WebApiControllerWithTokens
     {
-        public HttpAPIEstate(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens)
+        public HTTP_Estate(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens)
         {
 
         }

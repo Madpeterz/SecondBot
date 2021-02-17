@@ -12,9 +12,9 @@ using BetterSecondBotShared.Static;
 
 namespace BetterSecondBot.HttpService
 {
-    public class Http_Home : WebApiControllerWithTokens
+    public class HTTP_Home : WebApiControllerWithTokens
     {
-        public Http_Home(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+        public HTTP_Home(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("Makes the bot teleport to its home region")]
         [ReturnHints("ok")]

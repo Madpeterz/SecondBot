@@ -9,12 +9,13 @@ using System.Text;
 using OpenMetaverse;
 using Newtonsoft.Json;
 using BetterSecondBotShared.Static;
+using System.Linq;
 
 namespace BetterSecondBot.HttpService
 {
-    public class Http_Self : WebApiControllerWithTokens
+    public class HTTP_Self : WebApiControllerWithTokens
     {
-        public Http_Self(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+        public HTTP_Self(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("Makes the bot turn to face avatar and point at them (if found)")]
         [ReturnHints("ok")]
@@ -109,7 +110,7 @@ namespace BetterSecondBot.HttpService
             return BasicReply(found_object.ToString());
         }
 
-        [About("Makes the bot sit on the ground or on a object if it can see it")]
+        [About("Makes the bot kill itself you monster")]
         [ReturnHints("ok")]
         [Route(HttpVerbs.Get, "/Logoff/{token}")]
         public object Logoff(string token)
@@ -125,6 +126,97 @@ namespace BetterSecondBot.HttpService
             }
             return BasicReply("ok");
         }
+
+        [About("Makes the bot kill itself you monster")]
+        [ReturnHints("ok")]
+        [Route(HttpVerbs.Get, "/Logout/{token}")]
+        public object Logout(string token)
+        {
+            if (tokens.Allow(token, "self", "Logout", getClientIP()) == false)
+            {
+                return Failure("Token not accepted");
+            }
+            if (bot.KillMe == false)
+            {
+                bot.GetClient.Self.Chat("Laters im out", 0, ChatType.Normal);
+                bot.KillMePlease();
+            }
+            return BasicReply("ok");
+        }
+
+        [About("Makes the bot kill itself you monster - without making a sound")]
+        [ReturnHints("ok")]
+        [Route(HttpVerbs.Get, "/Bye/{token}")]
+        public object Bye(string token)
+        {
+            if (tokens.Allow(token, "self", "Bye", getClientIP()) == false)
+            {
+                return Failure("Token not accepted");
+            }
+            if (bot.KillMe == false)
+            {
+                bot.KillMePlease();
+            }
+            return BasicReply("ok");
+        }
+
+        [About("Gets the last 5 commands issued to the bot")]
+        [ReturnHints("list of commands")]
+        [Route(HttpVerbs.Get, "/GetLastCommands/{token}")]
+        public object GetLastCommands(string token)
+        {
+            if (tokens.Allow(token, "self", "GetLastCommands", getClientIP()) == false)
+            {
+                return Failure("Token not accepted");
+            }
+            return bot.GetLastCommands(5);
+        }
+
+        [About("Gets the last 5 commands issued to the bot")]
+        [ReturnHints("avatar lookup")]
+        [ReturnHints("Invaild state")]
+        [ReturnHints("Invaild sticky")]
+        [ReturnHints("Invaild flag")]
+        [ArgHints("avatar", "URLARG", "avatar uuid or Firstname Lastname")]
+        [ArgHints("flag", "URLARG", "friend, group, animation, teleport or command")]
+        [ArgHints("state", "URLARG", "State to set the flag to true or false")]
+        [ArgHints("sticky", "URLARG", "if true the permissing will not expire after the first use otherwise false")]
+        [Route(HttpVerbs.Get, "/SetPermFlag/{avatar}/{flag}/{state}/{sticky}/{token}")]
+        public object SetPermFlag(string avatar, string flag, string state, string sticky, string token)
+        {
+            if (tokens.Allow(token, "self", "SetPermFlag", getClientIP()) == false)
+            {
+                return Failure("Token not accepted");
+            }
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("avatar lookup");
+            }
+            bool stateflag = false;
+            bool stickyflag = false;
+            if(bool.TryParse(state,out stateflag) == false)
+            {
+                return Failure("Invaild state");
+            }
+            if (bool.TryParse(sticky, out stickyflag) == false)
+            {
+                return Failure("Invaild sticky");
+            }
+            string[] AcceptedFlags = new string[] { "friend", "group", "animation", "teleport", "command" };
+            if (AcceptedFlags.Contains(flag) == true)
+            {
+                return Failure("Invaild flag");
+            }
+            if (stateflag == true)
+            {
+                bot.Add_action_from(flag, avataruuid, stickyflag);
+                return BasicReply("Added perm: " + flag + " Sticky: " + stickyflag.ToString());
+            }
+            bot.Remove_action_from(flag, avataruuid, stickyflag);
+            return BasicReply("Removed perm: " + flag + " Sticky: " + stickyflag.ToString());
+        }
+
 
 
     }

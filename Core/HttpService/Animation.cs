@@ -12,9 +12,9 @@ using System.Reflection;
 
 namespace BetterSecondBot.HttpService
 {
-    public class HttpApiAnimation : WebApiControllerWithTokens
+    public class HTTP_Animation : WebApiControllerWithTokens
     {
-        public HttpApiAnimation(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+        public HTTP_Animation(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("Toggles if animation requests from this avatar (used for remote poseballs) are accepted")]
         [ReturnHints("Granted perm animation")]

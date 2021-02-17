@@ -12,9 +12,9 @@ using BetterSecondBotShared.Static;
 
 namespace BetterSecondBot.HttpService
 {
-    public class HttpApiLocalchat : WebApiControllerWithTokens
+    public class HTTP_Chat : WebApiControllerWithTokens
     {
-        public HttpApiLocalchat(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+        public HTTP_Chat(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("fetchs the last 20 localchat messages")]
         [ReturnHints("array string")]
@@ -29,7 +29,8 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("sends a message to localchat")]
-        [ArgHints("message", "URLARG", "the message to send")]
+        [ArgHints("channel", "URLARG", "the channel to output on (>=0)")]
+        [ArgHints("message", "Text", "the message to send")]
         [ReturnHints("array string")]
         [ReturnHints("Message empty")]
         [ReturnHints("Invaild channel")]
@@ -45,6 +46,10 @@ namespace BetterSecondBot.HttpService
                 return BasicReply("Message empty");
             }
             if(int.TryParse(channel,out int channelnum) == false)
+            {
+                return BasicReply("Invaild channel");
+            }
+            if(channelnum < 0)
             {
                 return BasicReply("Invaild channel");
             }

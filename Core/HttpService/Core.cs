@@ -53,50 +53,7 @@ namespace BetterSecondBot.HttpService
 
 
 
-        [About("uses the AutoPilot to move to a location")]
-        [ReturnHints("Error Unable to AutoPilot to location")]
-        [ReturnHints("Accepted")]
-        [ArgHints("x", "URLARG", "X location to AutoPilot to")]
-        [ArgHints("y", "URLARG", "y location to AutoPilot to")]
-        [ArgHints("z", "URLARG", "z location to AutoPilot to")]
-        [Route(HttpVerbs.Get, "/WalkTo/{x}/{y}/{z}/{token}")]
-        public object WalkTo(string x, string y, string z, string token)
-        {
-            if (tokens.Allow(token, "core", "walkto", getClientIP()) == true)
-            {
-                bool status = bot.GetCommandsInterface.Call("AutoPilot", "<"+x+","+y+","+z+">");
-                if (status == true)
-                {
-                    return BasicReply("Accepted");
-                }
-                return Failure("Error Unable to AutoPilot to location");
-            }
-            return Failure("Token not accepted");
-        }
 
-
-
-        [About("Attempt to teleport to a new region")]
-        [ReturnHints("Error Unable to Teleport to location")]
-        [ReturnHints("Accepted")]
-        [ArgHints("region", "URLARG", "the name of the region we are going to")]
-        [ArgHints("x", "URLARG", "X location to teleport to")]
-        [ArgHints("y", "URLARG", "y location to teleport to")]
-        [ArgHints("z", "URLARG", "z location to teleport to")]
-        [Route(HttpVerbs.Get, "/Teleport/{region}/{x}/{y}/{z}/{token}")]
-        public object Teleport(string region,string x, string y, string z, string token)
-        {
-            if (tokens.Allow(token, "core", "teleport", getClientIP()) == true)
-            {
-                bool status = bot.GetCommandsInterface.Call("Teleport", ""+region+"/" + x + "/" + y + "/" + z + "");
-                if (status == true)
-                {
-                    return BasicReply("Accepted");
-                }
-                return Failure("Error Unable to Teleport to location");
-            }
-            return Failure("Token not accepted");
-        }
 
 
         [About("Used to check HTTP connections")]

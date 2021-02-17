@@ -178,13 +178,13 @@ namespace BetterSecondBot.HttpService
                 //    .WithRegexRules("HTTP exception 404")
                 //)
                 .WithWebApi("/inventory", m => m
-                    .WithController(() => new HttpApiInventory(Bot, Tokens))
+                    .WithController(() => new HTTP_Inventory(Bot, Tokens))
                 )
                 .WithWebApi("/chat", m => m
-                    .WithController(() => new HttpApiLocalchat(Bot, Tokens))
+                    .WithController(() => new HTTP_Chat(Bot, Tokens))
                 )
                 .WithWebApi("/groups", m => m
-                    .WithController(() => new HttpApiGroup(Bot, Tokens))
+                    .WithController(() => new HTTP_Group(Bot, Tokens))
                 )
                 .WithWebApi("/ims", m => m
                     .WithController(() => new HttpApiIM(Bot, Tokens))
@@ -193,10 +193,10 @@ namespace BetterSecondBot.HttpService
                     .WithController(() => new HttpApiCore(Config, Bot, Tokens))
                 )
                 .WithWebApi("/parcel", m => m
-                    .WithController(() => new HttpApiParcel(Bot,Tokens))
+                    .WithController(() => new HTTP_Parcel(Bot,Tokens))
                 )
                 .WithWebApi("/estate", m => m
-                    .WithController(() => new HttpAPIEstate(Bot, Tokens))
+                    .WithController(() => new HTTP_Estate(Bot, Tokens))
                 )
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" })));
             return server;
@@ -397,6 +397,7 @@ namespace BetterSecondBot.HttpService
         protected SecondBot bot;
         public bool needsToken { get; set; }
         protected UUID avataruuid = UUID.Zero;
+        protected Parcel targetparcel = null;
 
         protected string CallMethod(string name,string[] args)
         {
@@ -422,6 +423,24 @@ namespace BetterSecondBot.HttpService
             }
             string reply = (string)found.Invoke(this, settings.Cast<object>().ToArray());
             return "Passed:"+ reply;
+        }
+        protected KeyValuePair<bool,string> SetupCurrentParcel(string token,string usenamespace,string command)
+        {
+            if (tokens.Allow(token, usenamespace, command, getClientIP()) == false)
+            {
+                return new KeyValuePair<bool, string>(false, "Token not accepted");
+            }
+            if (bot.GetClient.Network.CurrentSim == null)
+            {
+                return new KeyValuePair<bool, string>(false, "Error not in a sim");
+            }
+            int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
+            if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == false)
+            {
+                return new KeyValuePair<bool, string>(false, "Parcel data not ready");
+            }
+            Parcel targetparcel = bot.GetClient.Network.CurrentSim.Parcels[localid];
+            return new KeyValuePair<bool, string>(true, "");
         }
         protected void ProcessAvatar(string avatar)
         {
