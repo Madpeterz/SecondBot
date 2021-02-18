@@ -78,11 +78,13 @@ namespace BetterSecondbot.BetterAtHome
             {
                 if (e.Status == LoginStatus.ConnectingToLogin)
                 {
+                    LoginFailed = false;
                     LoggingIn = true;
                     SetBetterAtHomeAction("Waiting for login to finish");
                 }
                 else if (e.Status == LoginStatus.ConnectingToSim)
                 {
+                    LoginFailed = false;
                     if (LoggedIn == false)
                     {
                         resetSwitchs();
