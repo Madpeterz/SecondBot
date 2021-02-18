@@ -51,6 +51,7 @@ namespace BetterSecondbot.BetterAtHome
 
         protected void resetSwitchs()
         {
+            whyloggedout = ""
             StartingLogin = false;
             LoginFailed = false;
             LoggingIn = false;
@@ -264,6 +265,7 @@ namespace BetterSecondbot.BetterAtHome
                 return;
             }
             SetBetterAtHomeAction("[DC] Attempting login");
+            resetSwitchs();
             StartingLogin = true;
             controler.Bot.Start();
         }
