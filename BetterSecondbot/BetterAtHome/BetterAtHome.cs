@@ -13,8 +13,10 @@ namespace BetterSecondbot.BetterAtHome
         protected Cli controler = null;
         protected JsonConfig configfile;
 
+
         protected bool LoginFailed = false;
         protected string whyfailed = "";
+        protected string whyloggedout = "";
         protected bool LoggingIn = true;
         protected bool LoggedIn = false;
         protected bool StartingLogin = false;
@@ -71,6 +73,7 @@ namespace BetterSecondbot.BetterAtHome
             if (e.Status == LoginStatus.Failed)
             {
                 resetSwitchs();
+                whyloggedout = "Login failed";
                 LoginFailed = true;
                 whyfailed = e.FailReason + " | "+e.Message;
             }
@@ -78,12 +81,14 @@ namespace BetterSecondbot.BetterAtHome
             {
                 if (e.Status == LoginStatus.ConnectingToLogin)
                 {
+                    whyloggedout = "";
                     LoginFailed = false;
                     LoggingIn = true;
                     SetBetterAtHomeAction("Waiting for login to finish");
                 }
                 else if (e.Status == LoginStatus.ConnectingToSim)
                 {
+                    whyloggedout = "";
                     LoginFailed = false;
                     if (LoggedIn == false)
                     {
@@ -98,10 +103,12 @@ namespace BetterSecondbot.BetterAtHome
         {
             if (controler == null)
             {
+                whyloggedout = "No control";
                 return false;
             }
             if (controler.Bot == null)
             {
+                whyloggedout = "No Bot";
                 return false;
             }
             return true;
@@ -115,10 +122,12 @@ namespace BetterSecondbot.BetterAtHome
             }
             if (controler.Bot.GetClient == null)
             {
+                whyloggedout = "No client";
                 return false;
             }
             if (controler.Bot.GetClient.Network == null)
             {
+                whyloggedout = "No network";
                 return false;
             }
             return true;
@@ -136,25 +145,41 @@ namespace BetterSecondbot.BetterAtHome
             }
             if(LoginFailed == true)
             {
+                whyloggedout = "Flag: LoginFailed set";
                 return false;
             }
             if(LoggingIn == true)
             {
+                whyloggedout = "Flag: LoggingIn set";
                 return false;
             }
             if (LoggedIn == false)
             {
+                whyloggedout = "Flag: LoggedIn not set";
                 return false;
             }
-
+            whyloggedout = "";
             return controler.Bot.GetClient.Network.Connected;
         }
+
+        protected string lastwarn = "";
 
         protected void SetBetterAtHomeAction(string message)
         {
             if(hasBasicBot() == true)
             {
-                controler.Bot.SetBetterAtHomeAction(message);
+                controler.Bot.SetBetterAtHomeAction(whyloggedout+" "+message);
+            }
+            else
+            {
+                if (lastwarn != whyloggedout)
+                {
+                    lastwarn = whyloggedout;
+                    if (whyloggedout != "")
+                    {
+                        LogFormater.Warn(whyloggedout);
+                    }
+                }
             }
         }
 
@@ -214,9 +239,9 @@ namespace BetterSecondbot.BetterAtHome
                 }
                 else
                 {
-                    if (dif < 45)
+                    if (dif < 25)
                     {
-                        SetBetterAtHomeAction("[DC] Clearing logged in avatar 45 secs");
+                        SetBetterAtHomeAction("[DC] Clearing logged in avatar 25 secs");
                         return;
                     }
                 }
