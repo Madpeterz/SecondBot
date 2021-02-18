@@ -21,7 +21,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/LocalChatHistory/{token}")]
         public object LocalChatHistory(string token)
         {
-            if (tokens.Allow(token, "chat", "localchathistory", handleGetClientIP()) == false)
+            if (tokens.Allow(token, "chat", "LocalChatHistory", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
