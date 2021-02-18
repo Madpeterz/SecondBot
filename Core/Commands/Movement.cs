@@ -254,45 +254,54 @@ namespace BetterSecondBot.HttpService
         }
 
 
+        [About("Attempt to teleport to a new region via a SL url")]
+        [ReturnHints("slurl is empty")]
+        [ReturnHints("True|False")]
+        [ArgHints("slurl", "Text", "a full SLurl")]
+        [Route(HttpVerbs.Post, "/TeleportSLURL/{token}")]
+        public object TeleportSLURL([FormField] string slurl, string token)
+        {
+            if (tokens.Allow(token, "movement", "TeleportSLURL", handleGetClientIP()) == false)
+            {
+                return Failure("Token not accepted");
+            }
+            if(helpers.notempty(slurl) == false)
+            {
+                return Failure("slurl is empty");
+            }
+            return BasicReply(TeleportRequest(new string[] { slurl }).ToString());
+        }
 
         protected bool TeleportRequest(string[] args)
         {
             bot.GetClient.Self.AutoPilotCancel();
             if (args[0].Contains("http://maps.secondlife.com/secondlife/") == true)
             {
-                bot.TeleportWithSLurl(args[0]);
-                return true;
+                if (bot.TeleportWithSLurl(args[0]) == "ok")
+                {
+                    return true;
+                }
+                return false;
             }
             else
             {
-                float posX = 128;
-                float posY = 128;
-                float posZ = 0;
-                string regionName = bot.GetClient.Network.CurrentSim.Name;
-                bool ok = true;
-                int offset = 0;
-                string[] tp_args = args[0].Split('/');
-                if ((tp_args.Length == 4) || (tp_args.Length == 1))
+                List<string> argvalues = new List<string>(args);
+                if(argvalues.Count == 3)
                 {
-                    regionName = tp_args[0];
-                    offset = 1;
+                    string regionName = bot.GetClient.Network.CurrentSim.Name;
+                    argvalues = new List<string>() { regionName };
+                    argvalues.AddRange(args);
                 }
-                if (tp_args.Length >= 3)
+                if (argvalues.Count == 4)
                 {
-                    float.TryParse(tp_args[offset + 0], out posX);
-                    float.TryParse(tp_args[offset + 1], out posY);
-                    float.TryParse(tp_args[offset + 2], out posZ);
-                }
-                else if (tp_args.Length == 2)
-                {
-                    ok = false;
-                }
-                if (ok == true)
-                {
+                    string regionName = argvalues[0];
+                    float.TryParse(argvalues[1], out float posX);
+                    float.TryParse(argvalues[2], out float posY);
+                    float.TryParse(argvalues[3], out float posZ);
                     bot.SetTeleported();
                     bool status = bot.GetClient.Self.Teleport(regionName, new Vector3(posX, posY, posZ));
                     bot.ResetAnimations();
-                    return status;
+                    return true;
                 }
                 else
                 {
