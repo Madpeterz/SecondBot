@@ -177,7 +177,7 @@ namespace BetterSecondBot.DiscordSupervisor
             string display_topic = "" + channeltopictype + ":" + sender_id + "";
             if (channelname == "interface")
             {
-                display_topic = "Actions -> !clear, !commands, !help command or command";
+                display_topic = "Actions -> !clear, !commands";
             }
             else if (channelname == "status")
             {

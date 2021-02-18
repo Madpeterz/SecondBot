@@ -185,6 +185,17 @@ namespace BetterSecondBotShared.Static
                 return false;
             }
         }
+
+        public static string create_dirty_table(Dictionary<string,string> entrys)
+        {
+            List<string> items = new List<string>();
+            foreach(KeyValuePair<string,string> e in entrys)
+            {
+                items.Add(e.Key);
+                items.Add(e.Value);
+            }
+            return create_dirty_table(items.ToArray(), 2);
+        }
         public static string create_dirty_table(string[] items)
         {
             return create_dirty_table(items, 6);

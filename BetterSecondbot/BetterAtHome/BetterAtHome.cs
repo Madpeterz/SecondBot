@@ -4,6 +4,7 @@ using BetterSecondBotShared.Static;
 using BetterSecondBot.bottypes;
 using OpenMetaverse;
 using System.Collections.Generic;
+using BetterSecondBotShared.logs;
 
 namespace BetterSecondbot.BetterAtHome
 {
@@ -20,6 +21,7 @@ namespace BetterSecondbot.BetterAtHome
         protected int homeregionIndexer = 0;
         protected long LastTeleportEvent = 0;
         protected List<string> homeRegions = new List<string>();
+        protected string LastLoginStatus = "None";
 
         public BetterAtHome(Cli setcontroler, JsonConfig configfile)
         {
@@ -62,20 +64,23 @@ namespace BetterSecondbot.BetterAtHome
 
         protected void LoginProcess(object o, LoginProgressEventArgs e)
         {
-            resetSwitchs();
-            if(e.Status == LoginStatus.Failed)
+            LastLoginStatus = e.Status.ToString();
+            if (e.Status == LoginStatus.Failed)
             {
+                resetSwitchs();
                 LoginFailed = true;
             }
             else if(e.Status == LoginStatus.ConnectingToLogin)
             {
+                resetSwitchs();
                 LoggingIn = true;
                 SetBetterAtHomeAction("Waiting for login to finish");
             }
             else if(e.Status == LoginStatus.Success)
             {
-                LoggedIn = true;
+                resetSwitchs();
                 controler.Bot.AfterBotLoginHandler();
+                LoggedIn = true;
             }
         }
 
@@ -112,6 +117,10 @@ namespace BetterSecondbot.BetterAtHome
         protected bool connected()
         {
             if(hasBot() == false)
+            {
+                return false;
+            }
+            if(hasBasicBot() == false)
             {
                 return false;
             }
@@ -154,6 +163,7 @@ namespace BetterSecondbot.BetterAtHome
         }
 
         protected string simname = "";
+        protected int void_counter = 0;
         protected void ChangedSim(object o, SimChangedEventArgs e)
         {
             simname = "";
@@ -180,13 +190,13 @@ namespace BetterSecondbot.BetterAtHome
                 return;
             }
             long dif = helpers.UnixTimeNow() - LastLoginEvent;
-            if (dif < 60)
+            if (dif < 15)
             {
                 SetBetterAtHomeAction("[DC] Waiting for login lockout");
                 return;
             }
             dif = helpers.UnixTimeNow() - LastTeleportEvent;
-            if (dif < 60)
+            if (dif < 15)
             {
                 SetBetterAtHomeAction("[DC] Waiting for Teleport lockout");
                 return;
@@ -209,6 +219,19 @@ namespace BetterSecondbot.BetterAtHome
 
         protected void LoggedInAction()
         {
+            if((simname == "") || (controler.Bot.GetClient.Self.SimPosition.Z == 0))
+            {
+                ChangedSim(null, null);
+                void_counter++;
+                SetBetterAtHomeAction("Void counter: "+ void_counter.ToString());
+                if (void_counter == 10)
+                {
+                    resetSwitchs();
+                    SetBetterAtHomeAction("Void detected - Resetting switchs");
+                }
+                return;
+            }
+            void_counter = 0;
             SetBetterAtHomeAction("Logged In Actions");
             if (controler.Bot.KillMe == true)
             {
@@ -227,7 +250,7 @@ namespace BetterSecondbot.BetterAtHome
                 SetBetterAtHomeAction("Waiting for Teleport lockout");
                 return;
             }
-            if(homeRegions.Count == 0)
+            if (homeRegions.Count == 0)
             {
                 SetBetterAtHomeAction("No home regions");
                 return;

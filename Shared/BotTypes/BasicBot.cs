@@ -12,10 +12,21 @@ namespace BetterSecondBotShared.bottypes
 {
     public abstract class BasicBot
     {
+
         protected BasicBot()
         {
             LastStatusMessage = "No status";
         }
+
+
+        protected Dictionary<UUID, Group> mygroups = new Dictionary<UUID, Group>();
+
+        protected Dictionary<UUID, KeyValuePair<long, List<GroupRole>>> mygrouprolesstorage = new Dictionary<UUID, KeyValuePair<long, List<GroupRole>>>();
+        public Dictionary<UUID, Group> MyGroups { get { return mygroups; } }
+        public Dictionary<UUID, KeyValuePair<long, List<GroupRole>>> MyGroupRolesStorage { get { return mygrouprolesstorage; } }
+
+        protected GridClient Client;
+        public GridClient GetClient { get { return Client; } }
         protected List<string> SubMasters = new List<string>();
         public bool Is_avatar_master(string name)
         {
@@ -28,6 +39,33 @@ namespace BetterSecondBotShared.bottypes
                 return SubMasters.Contains(name);
             }
         }
+
+        protected bool running_in_docker = false;
+        public void AsDocker()
+        {
+            running_in_docker = true;
+        }
+
+        protected bool killMe;
+        protected JsonConfig myconfig;
+        public JsonConfig getMyConfig { get { return myconfig; } }
+        protected string version = "NotSet V1.0.0.0";
+
+        protected bool reconnect;
+        public string MyVersion { get { return version; } }
+        public string Name { get { return myconfig.Basic_BotUserName; } }
+        public string OwnerName { get { return myconfig.Security_MasterUsername; } }
+        public bool GetAllowFunds { get { return myconfig.Setting_AllowFunds; } }
+        public string LastStatusMessage { get; set; }
+
+        public virtual bool KillMe { get { return killMe; } }
+
+        protected bool teleported;
+        public void SetTeleported()
+        {
+            teleported = true;
+        }
+
 
         protected Dictionary<string, string[]> custom_commands = new Dictionary<string, string[]>();
         public Dictionary<string, string[]> getCustomCommands { get { return custom_commands; } }
@@ -68,7 +106,7 @@ namespace BetterSecondBotShared.bottypes
                             try
                             {
                                 LoadedCommands = JsonConvert.DeserializeObject<JsonCommandsfile>(json);
-                                foreach(string loaded in LoadedCommands.CustomCommands)
+                                foreach (string loaded in LoadedCommands.CustomCommands)
                                 {
                                     string[] bits = loaded.Split(new string[] { "!!!" }, StringSplitOptions.None);
                                     if (bits.Length == 2)
@@ -99,49 +137,16 @@ namespace BetterSecondBotShared.bottypes
                     io.WriteJsonCommands(LoadedCommands, CommandsFile);
                 }
             }
-            if(custom_commands.Count > 0)
+            if (custom_commands.Count > 0)
             {
                 Info("Custom commands: " + custom_commands.Count.ToString());
             }
         }
 
-        protected bool running_in_docker = false;
-        public void AsDocker()
-        {
-            running_in_docker = true;
-        }
-
-        protected bool killMe;
-        protected JsonConfig myconfig;
-        protected string version = "NotSet V1.0.0.0";
-
-        protected bool reconnect;
-        public string MyVersion { get { return version; } }
-        public string Name { get { return myconfig.Basic_BotUserName; } }
-        public string OwnerName { get { return myconfig.Security_MasterUsername; } }
-        public bool GetAllowFunds { get { return myconfig.Setting_AllowFunds; } }
-        public string LastStatusMessage { get; set; }
-
-        public virtual bool KillMe { get { return killMe; } }
-
-        protected bool teleported;
-        public void SetTeleported()
-        {
-            teleported = true;
-        }
-
-        protected Dictionary<UUID, Group> mygroups = new Dictionary<UUID, Group>();
-        protected Dictionary<UUID, KeyValuePair<long, List<GroupRole>>> mygrouprolesstorage = new Dictionary<UUID, KeyValuePair<long, List<GroupRole>>>();
-
-        public Dictionary<UUID, Group> MyGroups { get { return mygroups; } }
-        public Dictionary<UUID, KeyValuePair<long, List<GroupRole>>> MyGroupRolesStorage { get { return mygrouprolesstorage; } }
-
-        protected GridClient Client;
-        public GridClient GetClient { get { return Client; } }
         public virtual void KillMePlease()
         {
             killMe = true;
-            Client.Network.BeginLogout(); 
+            Client.Network.BeginLogout();
         }
         public virtual void Setup(JsonConfig config, string Version)
         {
@@ -266,7 +271,7 @@ namespace BetterSecondBotShared.bottypes
                 {
                     Info("Recovery login: using home location");
                     Lp.Start = "home";
-                        
+
                 }
 
                 Lp.Start = myconfig.Basic_LoginLocation;
@@ -301,11 +306,6 @@ namespace BetterSecondBotShared.bottypes
         protected string BasicBot_laststatus = "";
         public virtual string GetStatus()
         {
-            if (loaded_custom_commands == false)
-            {
-                loaded_custom_commands = true;
-                LoadCustomCommands();
-            }
             string reply = "Info: No client";
             if (Client != null)
             {
@@ -323,13 +323,8 @@ namespace BetterSecondBotShared.bottypes
                     }
                 }
             }
-
-            if (reply != BasicBot_laststatus)
-            {
-                BasicBot_laststatus = reply;
-                return reply;
-            }
-            return "";
+            BasicBot_laststatus = reply;
+            return reply;
         }
 
         protected virtual void LoginHandler(object o, LoginProgressEventArgs e)
@@ -379,29 +374,14 @@ namespace BetterSecondBotShared.bottypes
             Debug("ChatInputHandler proc not overridden");
         }
 
-        protected virtual void CoreCommandLib(UUID fromUUID, bool from_accepted_avatar, string command, string arg)
-        {
-            CoreCommandLib(fromUUID, from_accepted_avatar, command, arg, "");
-        }
-
-        protected virtual void CoreCommandLib(UUID fromUUID, bool from_accepted_avatar, string command, string arg, string signing_code)
-        {
-            CoreCommandLib(fromUUID, from_accepted_avatar, command, arg, signing_code, "~#~");
-        }
-
-        protected virtual void CoreCommandLib(UUID fromUUID,bool from_accepted_avatar,string command,string arg,string signing_code,string signed_with)
-        {
-            Debug("CoreCommandLib proc not overridden");
-        }
-
         public virtual void ResetAnimations()
         {
-           Debug("reset_animations not enabled at this level");
+            Debug("reset_animations not enabled at this level");
         }
 
         public virtual void Warn(string message)
         {
-            Log2File(LogFormater.Warn(message,false), ConsoleLogLogLevel.Warn);
+            Log2File(LogFormater.Warn(message, false), ConsoleLogLogLevel.Warn);
         }
         public virtual void Crit(string message)
         {

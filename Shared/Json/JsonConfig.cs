@@ -40,13 +40,8 @@ namespace BetterSecondBotShared.Json
         // Settings
         public bool Setting_AllowRLV { get; set; }
         public bool Setting_AllowFunds { get; set; }
-        public string Setting_RelayImToAvatarUUID { get; set; }
         public string Setting_DefaultSit_UUID { get; set; }
         public string Setting_loginURI { get; set; }
-
-        // Discord Relay
-        public string DiscordRelay_URL { get; set; }
-        public string DiscordRelay_GroupUUID { get; set; }
 
         // Discord FullFat
         public bool DiscordFull_Enable { get; set; }
@@ -63,14 +58,6 @@ namespace BetterSecondBotShared.Json
         public bool Name2Key_Enable { get; set; }
         public string Name2Key_Url { get; set; }
         public string Name2Key_Key { get; set; }
-
-
-        // TTS
-        public bool DiscordTTS_Enable { get; set; }
-        public ulong DiscordTTS_server_id { get; set; }
-        public string DiscordTTS_channel_name { get; set; }
-        public string DiscordTTS_avatar_uuid { get; set; }
-        public string DiscordTTS_Nickname { get; set; }
 
         // Logs
         public bool Log2File_Enable { get; set; }

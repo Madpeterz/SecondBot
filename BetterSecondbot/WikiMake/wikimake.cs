@@ -4,6 +4,7 @@ using BetterSecondBotShared.IO;
 using BetterSecondBotShared.Json;
 using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
+using Core.Static;
 using EmbedIO;
 using System;
 using System.Collections.Generic;
@@ -288,16 +289,6 @@ namespace BetterSecondBot.WikiMake
             api_reports.Add("JSON", new KeyValuePair<int, string>(defaultJson.ApiCommandsCount, "Ready"));
             InterfaceWiki("JSON", defaultJson);
 
-            // CMD 
-            BetterSecondBot.Commands.CoreCommandsInterface cmd = new BetterSecondBot.Commands.CoreCommandsInterface(null);
-            api_reports.Add("Core", new KeyValuePair<int, string>(cmd.ApiCommandsCount, "Good"));
-            InterfaceWiki("Core", cmd, true);
-
-            // RLVapi
-            BetterSecondBot.RLV.RLVcontrol RLVapi = new BetterSecondBot.RLV.RLVcontrol(null);
-            api_reports.Add("RLVapi", new KeyValuePair<int, string>(RLVapi.ApiCommandsCount, "Limited"));
-            InterfaceWiki("RLVapi", RLVapi, true);
-
             // HTTP
             HTTPWiki();
 
@@ -310,13 +301,13 @@ namespace BetterSecondBot.WikiMake
             LogFormater.Info("[WIKI] Starting area HTTP endpoint");
             HTTPendpoint HTTP = new HTTPendpoint();
 
-            HTTPmenu("HTTP", HTTP);
+            HTTPmenu("Commands", HTTP);
 
             // create workspaces
-            HTTPWorkspaces("HTTP", HTTP);
+            HTTPWorkspaces("Commands", HTTP);
 
             // create commands
-            HTTPCommands("HTTP", HTTP);
+            HTTPCommands("Commands", HTTP);
 
             HTTP = null;
             LogFormater.Info("[WIKI] Done with area");
@@ -355,9 +346,27 @@ namespace BetterSecondBot.WikiMake
                     sb.Append("</h4><hr/><h3>[[COMMAND]]</h3>");
                     sb.Append("[[URLENDPOINT]]/[[WORKSPACE]]/[[COMMAND]]/[[URLADDON]]<br/>");
                     sb.Append("Method: [[APIMETHOD]]");
-                    sb.Append("<hr style='border-top: 1px dashed #dcdcdc;'>");
-                    sb.Append("[[HELP]]");
+                    sb.Append("<br/> OR <br/>");
                     Dictionary<string, KeyValuePair<string, string>> values = HTTP.getCommandArgs(workspace, c);
+                    sb.Append("[[COMMAND]]");
+                    string addon = "";
+                    List<string> argsim = new List<string>(values.Keys);
+                    argsim.Remove("token");
+                    if(argsim.Count > 0)
+                    {
+                        sb.Append("|||");
+                    }
+                    foreach (string entry in argsim)
+                    {
+                        sb.Append(addon);
+                        sb.Append("{");
+                        sb.Append(entry);
+                        sb.Append("}");
+                        addon = "~#~";
+                    }
+                    sb.Append("<br/><br/>");
+                    sb.Append("[[HELP]]");
+                    
                     int ValueCount = values.Count;
 
                     if (ValueCount > 0)
@@ -418,7 +427,7 @@ namespace BetterSecondBot.WikiMake
             StringBuilder sb = new StringBuilder();
             sb.Append(html_header);
             sb.Append("<h3>Interface:");
-            sb.Append("HTTP");
+            sb.Append("Commands");
             sb.Append("</h3><br/>");
             sb.Append("<h4>Build: ");
             sb.Append(buildVersion);
@@ -457,7 +466,7 @@ namespace BetterSecondBot.WikiMake
                 sb.Append("<h4>Build: ");
                 sb.Append(buildVersion);
                 sb.Append("</h4><br/>");
-                sb.Append("<table class='datatable table table-striped table-bordered'><thead><tr><th>Command</th><th>Min args</th></tr></thead><tbody>");
+                sb.Append("<table class='datatable table table-striped table-bordered'><thead><tr><th>Command</th><th>Min args (+1 for HTTP)</th></tr></thead><tbody>");
                 foreach (string c in HTTP.getEndpointCommands(workspace))
                 {
                     int args = HTTP.getCommandArgCount(workspace, c);
@@ -467,7 +476,7 @@ namespace BetterSecondBot.WikiMake
                     sb.Append(".html'>");
                     sb.Append(c);
                     sb.Append("</a></td><td>");
-                    sb.Append(args.ToString());
+                    sb.Append((args-1).ToString());
                     sb.Append("</td></tr>");
                 }
                 sb.Append("</tbody></table>");
@@ -486,8 +495,6 @@ namespace BetterSecondBot.WikiMake
     public class HTTPendpoint
     {
         protected List<Endpoint> endpoints = new List<Endpoint>();
-
-
         public void createEndpoint(string name, Type Api)
         {
             Endpoint Endpoint = new Endpoint();
@@ -526,7 +533,7 @@ namespace BetterSecondBot.WikiMake
                 }
                 if (httpverb != null)
                 {
-                    C.name = M.Name.ToLowerInvariant();
+                    C.name = M.Name;
                     C.type = "Post";
                     C.about = "Http interface command about missing";
                     if (About != null)
@@ -558,13 +565,11 @@ namespace BetterSecondBot.WikiMake
         }
         public HTTPendpoint()
         {
-            createEndpoint("core", typeof(HttpApiCore));
-            createEndpoint("inventory", typeof(HttpApiInventory));
-            createEndpoint("im", typeof(HttpApiIM));
-            createEndpoint("groups", typeof(HttpApiGroup));
-            createEndpoint("chat", typeof(HttpApiLocalchat));
-            createEndpoint("parcel", typeof(HttpApiParcel));
-            createEndpoint("estate", typeof(HttpAPIEstate));
+            Dictionary<string, Type> commandmodules = http_commands_helper.getCommandModules();
+            foreach (KeyValuePair<string, Type> entry in commandmodules)
+            {
+                createEndpoint(entry.Key, entry.Value);
+            }
         }
 
         public string getCommandMethod(string endpoint, string command)

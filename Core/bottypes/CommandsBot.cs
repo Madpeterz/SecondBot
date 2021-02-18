@@ -7,16 +7,16 @@ using OpenMetaverse.Assets;
 using BetterSecondBotShared.Static;
 using BetterSecondBotShared.logs;
 using System.Threading;
+using BetterSecondBot.HttpService;
+using Core.Static;
+using System.Reflection;
+using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace BetterSecondBot.bottypes
 {
     public abstract class CommandsBot : AVstorageBot
     {
-        protected CommandsBot()
-        {
-            CommandsInterface = new Commands.CoreCommandsInterface(this);
-        }
-
         protected List<string> CommandHistory = new List<string>();
         protected int commandid = 1;
         public virtual string CommandHistoryAdd(string command, string arg, bool status,string infomessage)
@@ -84,10 +84,6 @@ namespace BetterSecondBot.bottypes
             Client.Self.InstantMessage(avatar, message);
         }
 
-        public Commands.CoreCommandsInterface GetCommandsInterface { get { return CommandsInterface; } }
-        protected Commands.CoreCommandsInterface CommandsInterface;
-
-        protected Dictionary<string, string> Scripts_content = new Dictionary<string, string>();
         protected Dictionary<string, string> notecards_content = new Dictionary<string, string>();
         protected Dictionary<UUID, Dictionary<UUID, long>> group_invite_lockout_timer = new Dictionary<UUID, Dictionary<UUID, long>>();
         protected long last_cleanup_commands;
@@ -100,7 +96,6 @@ namespace BetterSecondBot.bottypes
                 last_cleanup_commands = helpers.UnixTimeNow();
                 PurgeOldGroupinviteLockouts();
             }
-            CommandsInterface.StatusTick();
             return base.GetStatus();
         }
         public bool GetAllowGroupInvite(UUID avatar, UUID group)
@@ -112,18 +107,6 @@ namespace BetterSecondBot.bottypes
             return true;
         }
 
-        public void GroupInviteLockoutArm(UUID avatar, UUID group)
-        {
-            if (group_invite_lockout_timer.ContainsKey(group) == false)
-            {
-                group_invite_lockout_timer.Add(group, new Dictionary<UUID, long>());
-            }
-            if (group_invite_lockout_timer[group].ContainsKey(avatar) == false)
-            {
-                group_invite_lockout_timer[group].Add(avatar,0);
-            }
-            group_invite_lockout_timer[group][avatar] = helpers.UnixTimeNow();
-        }
         protected void PurgeOldGroupinviteLockouts()
         {
             long now = helpers.UnixTimeNow();
@@ -145,80 +128,27 @@ namespace BetterSecondBot.bottypes
             }
         }
 
-        public void custom_commands_loop(string command,string arg,UUID caller)
-        {
-            List<string> customargs = arg.Split(new[] { "~#~" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            while(customargs.Count < 5)
-            {
-                customargs.Add("notset");
-            }
-            foreach (string A in custom_commands[command])
-            {
-                List<string> command_args_split = A.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                int loop = 1;
-                string args_passed = "";
-                if (command_args_split.Count() == 2)
-                {
-                    args_passed = command_args_split[1];
-                    while (loop <= 5)
-                    {
-                        args_passed = args_passed.Replace("[C_ARG_"+loop.ToString()+"]", customargs[loop-1]);
-                        loop++;
-                    }
-                }
-                CommandsInterface.Call(command_args_split[0], args_passed, caller, "~#~");
-            }
-        }
-        protected virtual void CallCommandLib(string command, string arg)
-        {
-            CallCommandLib(command, arg, UUID.Zero);
-        }
-        protected virtual void CallCommandLib(string command, string arg, UUID caller)
-        {
-            CallCommandLib(command, arg, caller, "~#~");
-        }
-        protected virtual void CallCommandLib(string command, string arg, UUID caller,string signed_with)
-        {
-            if(custom_commands.ContainsKey(command) == false)
-            {
-                CommandsInterface.Call(command, arg, caller, signed_with);
-            }
-            else
-            {
-                Thread t = new Thread(() => custom_commands_loop(command, arg, caller));
-                t.Start();
-            }
-        }
-
         public override void AfterBotLoginHandler()
         {
             if (reconnect == false)
             {
-                CommandsInterface = new Commands.CoreCommandsInterface(this);
+                loadCommands();
+                LoadCustomCommands();
             }
             Client.Self.RequestBalance();
             base.AfterBotLoginHandler();
         }
 
-        protected override void CoreCommandLib(UUID fromUUID, bool from_accepted_avatar, string command, string arg, string signing_code, string signed_with)
+        public string[] getFullListOfCommands()
         {
-            if (CommandsInterface != null)
+            List<string> output = new List<string>();
+            foreach(string A in endpointcommandmap.Keys)
             {
-                if (from_accepted_avatar == true)
-                {
-                    CallCommandLib(command, arg, fromUUID, signed_with);
-                }
-                else if (signing_code != "")
-                {
-                    string raw = "" + command + "" + arg + "" + myconfig.Security_SignedCommandkey + "";
-                    string hashcheck = helpers.GetSHA1(raw);
-                    if (hashcheck == signing_code)
-                    {
-                        CallCommandLib(command, arg, fromUUID, signed_with);
-                    }
-                }
+                output.Add(A.ToLowerInvariant());
             }
+            return output.ToArray();
         }
+
         public void NotecardAddContent(string target_notecard_storage_id, string content)
         {
             NotecardAddContent(target_notecard_storage_id, content, true, "\n\r");
@@ -313,92 +243,234 @@ namespace BetterSecondBot.bottypes
             );
             return returnstatus;
         }
-        public void ScriptAddContent(string target_Script_storage_id, string content)
-        {
-            ScriptAddContent(target_Script_storage_id, content, true, "\n\r");
-        }
-        public void ScriptAddContent(string target_Script_storage_id, string content, bool add_newline)
-        {
-            ScriptAddContent(target_Script_storage_id, content, add_newline, "\n\r");
-        }
-        public void ScriptAddContent(string target_Script_storage_id, string content, bool add_newline, string newlinevalue)
-        {
-            if (Scripts_content.ContainsKey(target_Script_storage_id) == false)
-            {
-                Scripts_content.Add(target_Script_storage_id, "");
-            }
-            if (add_newline == true)
-            {
-                content = "" + newlinevalue + "" + content;
-            }
-            Scripts_content[target_Script_storage_id] = Scripts_content[target_Script_storage_id] + "" + content;
-        }
-        public string GetScriptContent(string target_Script_storage_id)
-        {
-            if (Scripts_content.ContainsKey(target_Script_storage_id) == true)
-            {
-                return Scripts_content[target_Script_storage_id];
-            }
-            return null;
-        }
 
-        public void ClearScriptStorage(string target_Script_storage_id)
-        {
-            if (Scripts_content.ContainsKey(target_Script_storage_id) == true)
-            {
-                Scripts_content.Remove(target_Script_storage_id);
-            }
-        }
 
-        public bool SendScript(string name, string content, UUID sendToUUID)
+        protected Dictionary<string, WebApiControllerWithTokens> commandEndpoints = new Dictionary<string, WebApiControllerWithTokens>();
+        protected Dictionary<string, string> endpointcommandmap = new Dictionary<string, string>(); // command = endpoint
+        protected Dictionary<string, string> commandnameLowerToReal = new Dictionary<string, string>();
+        protected TokenStorage Tokens = new TokenStorage();
+        protected bool commandsLoaded = false;
+
+        protected override void BotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar, bool group, UUID group_uuid, bool localchat, bool fromme)
         {
-            bool returnstatus = true;
-            Client.Inventory.RequestCreateItem(
-                Client.Inventory.FindFolderForType(AssetType.LSLText),
-                name,
-                name,
-                AssetType.LSLText,
-                UUID.Random(),
-                InventoryType.LSL,
-                PermissionMask.All,
-                (bool Success, InventoryItem item) =>
+            base.BotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
+            if ((group == false) && (localchat == false) && (fromme == false))
+            {
+                string signing_code = "";
+                string[] input = message.Split(new[] { "@@@" }, StringSplitOptions.RemoveEmptyEntries);
+                if (input.Count() == 2)
                 {
-                    if (Success)
-                    {
-                        AssetScriptText empty = new AssetScriptText { Source = "\n" };
-                        empty.Encode();
-                        Client.Inventory.RequestUpdateScriptAgentInventory(new byte[] { }, item.UUID, true,
-                        (bool uploadSuccess, string uploadStatus, bool compileSuccess, List<string> compileMessages, UUID itemID, UUID assetID) =>
-                        {
-                            if (uploadSuccess)
-                            {
-                                empty.AssetData = Encoding.ASCII.GetBytes(content);
-                                Client.Inventory.RequestUpdateScriptAgentInventory(empty.AssetData, itemID,true,
-                                (bool finaluploadSuccess, string finaluploadStatus, bool finalcompileSuccess, List<string> finalcompileMessages, UUID finalitemID, UUID finalassetID) =>
-                                {
-                                    if (finalcompileSuccess == false)
-                                    {
-                                        Warn("Script failed to compile, sending anyway.");
-                                    }
-                                    Client.Inventory.GiveItem(finalitemID, name, AssetType.LSLText, sendToUUID, false);
+                    message = input[0];
+                    signing_code = input[1];
+                }
+                List<string> bits = message.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                if (bits.Count == 1)
+                {
+                    bits.Add("");
+                }
+                if (bits.Count == 2)
+                {
+                    bits.Add("none");
+                }
+                bool frommaster = false;
+                if ((avatar == true) && ((sender_uuid == master_uuid) || (SubMasters.Contains(sender_name) == true)))
+                {
+                    frommaster = true;
+                }
+                CoreCommandLib(sender_uuid, frommaster, bits[0], bits[1].Split("~#~"), signing_code,bits[2]);
+            }
+        }
 
-                                });
-                            }
-                            else
-                            {
-                                Crit("The fuck empty success Script create");
-                                returnstatus = false;
-                            }
-                        });
-                    }
-                    else
+        protected KeyValuePair<bool,string> callAPIcommand(string command, string[] args)
+        {
+            command = commandnameLowerToReal[command.ToLowerInvariant()];
+            try
+            {
+                string ott = Tokens.OneTimeToken();
+                WebApiControllerWithTokens Endpoint = commandEndpoints[endpointcommandmap[command]];
+                MethodInfo theMethod = Endpoint.GetType().GetMethod(command);
+                List<string> argsList = args.ToList();
+                argsList.Add(ott);
+                string reply = "Inconnect number of args";
+                bool status = false;
+                if (argsList.Count == theMethod.GetParameters().Count())
+                {
+                    status = true;
+                    object processed = theMethod.Invoke(Endpoint, argsList.ToArray<object>());
+                    reply = JsonConvert.SerializeObject(processed);
+                }
+                return new KeyValuePair<bool, string>(status, reply);
+            }
+            catch (Exception e)
+            {
+                return new KeyValuePair<bool, string>(false, e.Message);
+            }
+        }
+
+        protected void CoreCommandLib(UUID sender, bool Master, string command, string[] args, string signingcode, string targetreply)
+        {
+            bool accepted = Master;
+            if(accepted == false)
+            {
+                string raw = "" + command + "" + string.Join("~#~", args) + "" + myconfig.Security_SignedCommandkey + "";
+                string hashcheck = helpers.GetSHA1(raw);
+                if (hashcheck == signingcode)
+                {
+                    accepted = true;
+                }
+            }
+            if (accepted == true)
+            {
+                CallAPI(command, args, targetreply);
+            }
+        }
+
+        public void CallAPI(string command, string[] args)
+        {
+            CallAPI(command, args, "None");
+        }
+        public void CallAPI(string command, string[] args, string replyvia)
+        {
+            CallAPI(command, args, replyvia, false);
+        }
+        public void CallAPI(string command, string[] args, string replyvia, bool customcommand)
+        {
+            if(commandnameLowerToReal.ContainsKey(command.ToLowerInvariant()) == false)
+            {
+                if (custom_commands.ContainsKey(command) == false)
+                {
+                    SmartCommandReply(false, replyvia, "Unknown command", command);
+                    return;
+                }
+                if(customcommand == true)
+                {
+                    SmartCommandReply(false, replyvia, "Custom command lockout", command);
+                    return;
+                }
+                foreach (string A in custom_commands[command])
+                {
+                    List<string> command_args_split = A.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                    int loop = 1;
+                    string args_passed = "";
+                    if (command_args_split.Count() == 2)
                     {
-                        Warn("Unable to find default Scripts folder");
-                        returnstatus = false;
+                        args_passed = command_args_split[1];
+                        while ((loop <= 5) && (loop <= args.Length))
+                        {
+                            args_passed = args_passed.Replace("[C_ARG_" + loop.ToString() + "]", args[loop - 1]);
+                            loop++;
+                        }
+                    }
+                    CallAPI(command_args_split[0], args_passed.Split("~#~"),"None",true);
+                }
+                return;
+            }
+            KeyValuePair<bool, string> statusreply = callAPIcommand(command, args);
+            SmartCommandReply(statusreply.Key, replyvia, statusreply.Value, command);
+        }
+
+        protected HttpClient HTTPclient = new HttpClient();
+
+        protected void SmartCommandReply(bool run_status, string target, string output, string command)
+        {
+            string mode = "CHAT";
+            UUID target_avatar = UUID.Zero;
+            int target_channel = 0;
+            if (target.StartsWith("http://"))
+            {
+                mode = "HTTP";
+            }
+            else if (UUID.TryParse(target, out target_avatar) == true)
+            {
+                mode = "IM";
+            }
+            else
+            {
+                if (int.TryParse(target, out target_channel) == false)
+                {
+                    mode = "None";
+                }
+            }
+            if (mode == "CHAT")
+            {
+                if (target_channel >= 0)
+                {
+                    Client.Self.Chat(output, target_channel, ChatType.Normal);
+                }
+                else
+                {
+                    run_status = false;
+                    LogFormater.Crit("[SmartReply] output Channel must be zero or higher");
+                }
+            }
+            else if (mode == "IM")
+            {
+                Client.Self.InstantMessage(target_avatar, output);
+            }
+            else if (mode == "HTTP")
+            {
+                Dictionary<string, string> values = new Dictionary<string, string>
+                    {
+                        { "reply", output },
+                        { "command", command },
+                    };
+
+                var content = new FormUrlEncodedContent(values);
+                try
+                {
+                    HTTPclient.PostAsync(target, content);
+                }
+                catch (Exception e)
+                {
+                    LogFormater.Crit("[SmartReply] HTTP failed: " + e.Message + "");
+                }
+            }
+        }
+
+
+
+        protected void loadCommands()
+        {
+            commandsLoaded = true;
+            Dictionary<string, Type> commandmodules = http_commands_helper.getCommandModules();
+            foreach (Type entry in commandmodules.Values)
+            {
+                LoadCommandEndpoint(entry);
+            }
+        }
+
+        protected virtual void LoadCommandEndpoint(Type endpointtype)
+        {
+            WebApiControllerWithTokens controler = (WebApiControllerWithTokens)Activator.CreateInstance(endpointtype, args: new object[] { this, Tokens });
+            controler.disableIPlockout();
+            commandEndpoints.Add(endpointtype.Name, controler);
+            foreach (MethodInfo M in endpointtype.GetMethods())
+            {
+                bool isCallable = false;
+                foreach (CustomAttributeData At in M.CustomAttributes)
+                {
+                    if (At.AttributeType.Name == "RouteAttribute")
+                    {
+                        isCallable = true;
+                        break;
                     }
                 }
-            );
-            return returnstatus;
+                if (isCallable == true)
+                {
+                    if (endpointcommandmap.ContainsKey(M.Name) == true)
+                    {
+                        Warn("Namespace: "+endpointtype.Name+" / Command: " + M.Name + " already found in " + endpointcommandmap[M.Name]);
+                        continue;
+                    }
+                    if(commandnameLowerToReal.ContainsKey(M.Name.ToLowerInvariant()) == true)
+                    {
+                        Warn("Namespace: " + endpointtype.Name + " / Command: " + M.Name + " already found in " + endpointcommandmap[M.Name]);
+                        continue;
+                    }
+                    endpointcommandmap.Add(M.Name, endpointtype.Name);
+                    commandnameLowerToReal.Add(M.Name.ToLowerInvariant(), M.Name);
+                }
+            }
         }
     }
 }

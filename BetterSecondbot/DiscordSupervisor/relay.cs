@@ -60,32 +60,6 @@ namespace BetterSecondBot.DiscordSupervisor
             {
                 if (fromme == false)
                 {
-                    if (discord_group_relay == true)
-                    {
-                        // GroupChat Relay only
-                        if (group == true)
-                        {
-                            if (myconfig.DiscordRelay_URL != "")
-                            {
-                                if ((myconfig.DiscordRelay_GroupUUID == group_uuid.ToString()) || (myconfig.DiscordRelay_GroupUUID == "*") || (myconfig.DiscordRelay_GroupUUID == "all"))
-                                {
-                                    Group Gr = controler.Bot.MyGroups[group_uuid];
-                                    try
-                                    {
-                                        using var DWHclient = new DiscordWebhookClient(myconfig.DiscordRelay_URL);
-                                        string SendMessage = "(" + Gr.Name + ") @" + sender_name + ":" + message + "";
-                                        await DWHclient.SendMessageAsync(text: SendMessage).ConfigureAwait(false);
-                                        DWHclient.Dispose();
-                                    }
-                                    catch
-                                    {
-                                        controler.Bot.Info("Discord web hook has failed - marking as disabled untill next restart!");
-                                        myconfig.DiscordRelay_URL = "";
-                                    }
-                                }
-                            }
-                        }
-                    }
                     if (DiscordClientConnected == true)
                     {
                         if (avatar == true)

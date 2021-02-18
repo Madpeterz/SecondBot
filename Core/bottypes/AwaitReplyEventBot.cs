@@ -1,5 +1,4 @@
-﻿using BetterSecondBot.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using OpenMetaverse;
@@ -25,31 +24,6 @@ namespace BetterSecondBot.bottypes
         protected override void GroupMembersReplyHandler(object sender, GroupMembersReplyEventArgs e)
         {
             base.GroupMembersReplyHandler(sender, e);
-            if (await_events.ContainsKey("groupmembersreply") == true)
-            {
-                List<string> PurgeAwaiters = new List<string>();
-                foreach (KeyValuePair<string, KeyValuePair<CoreCommand, string[]>> await_reply in await_events["groupmembersreply"])
-                {
-                    // eventid
-                    // KeyValuePair<CommandLink,Args>
-                    // Args: Group, args, args
-                    if (UUID.TryParse(await_reply.Value.Value[0], out UUID test_group) == true)
-                    {
-                        if (test_group == e.GroupID)
-                        {
-                            // oh shit its for me
-                            PurgeAwaiters.Add(await_reply.Key);
-                            await_reply.Value.Key.Callback(await_reply.Value.Value, e);
-                        }
-                    }
-                }
-                foreach (string eventid in PurgeAwaiters)
-                {
-                    await_event_ages.Remove(eventid);
-                    await_event_idtolistener.Remove(eventid);
-                    await_events["groupmembersreply"].Remove(eventid);
-                }
-            }
         }
 
         protected virtual void GroupchatJoinHandler(object sender, GroupChatJoinedEventArgs e)
@@ -61,52 +35,10 @@ namespace BetterSecondBot.bottypes
                     active_group_chat_sessions.Add(e.SessionID);
                 }
             }
-            if (await_events.ContainsKey("groupchatjoin") == true)
-            {
-                List<string> PurgeAwaiters = new List<string>();
-                foreach (KeyValuePair<string, KeyValuePair<CoreCommand, string[]>> await_reply in await_events["groupchatjoin"])
-                {
-                    // eventid
-                    // KeyValuePair<CommandLink,Args>
-                    // Args: Group, Message
-                    if (await_reply.Value.Value.Length == 2)
-                    {
-                        if (UUID.TryParse(await_reply.Value.Value[0], out UUID test_group) == true)
-                        {
-                            if (test_group == e.SessionID)
-                            {
-                                // oh shit its for me
-                                PurgeAwaiters.Add(await_reply.Key);
-                                await_reply.Value.Key.Callback(await_reply.Value.Value, e);
-                            }
-                        }
-                    }
-                }
-                foreach (string eventid in PurgeAwaiters)
-                {
-                    await_event_ages.Remove(eventid);
-                    await_event_idtolistener.Remove(eventid);
-                    await_events["groupchatjoin"].Remove(eventid);
-                }
-            }
         }
         protected virtual void ObjectOwnersHandler(object sender, ParcelObjectOwnersReplyEventArgs e)
         {
-            if (await_events.ContainsKey("parcelobjectowners") == true)
-            {
-                List<string> PurgeAwaiters = new List<string>();
-                foreach (KeyValuePair<string, KeyValuePair<CoreCommand, string[]>> await_reply in await_events["parcelobjectowners"])
-                {
-                    PurgeAwaiters.Add(await_reply.Key);
-                    await_reply.Value.Key.Callback(await_reply.Value.Value, e);
-                }
-                foreach (string eventid in PurgeAwaiters)
-                {
-                    await_event_ages.Remove(eventid);
-                    await_event_idtolistener.Remove(eventid);
-                    await_events["parcelobjectowners"].Remove(eventid);
-                }
-            }
+
         }
         protected void GroupRolesData(object sender,GroupRolesDataReplyEventArgs e)
         {
@@ -126,38 +58,6 @@ namespace BetterSecondBot.bottypes
             {
                 mygrouprolesstorage[e.GroupID] = storage;
             }
-            // trigger events
-            if (await_events.ContainsKey("grouproles") == true)
-            {
-                List<string> PurgeAwaiters = new List<string>();
-                foreach(KeyValuePair<string, KeyValuePair<CoreCommand, string[]>> await_reply in await_events["grouproles"])
-                {
-                    // eventid
-                    // KeyValuePair<CommandLink,Args>
-                    // Args: ReplyConfig, GroupUUID
-                    if (await_reply.Value.Value.Length == 2)
-                    {
-                        if(UUID.TryParse(await_reply.Value.Value[1], out UUID test_group) == true)
-                        {
-                            if(test_group == e.GroupID)
-                            {
-                                // oh shit its for me
-                                PurgeAwaiters.Add(await_reply.Key);
-                                await_reply.Value.Key.Callback(await_reply.Value.Value,e);
-                            }
-                        }
-                    }
-                }
-                foreach(string eventid in PurgeAwaiters)
-                {
-                    await_event_ages.Remove(eventid);
-                    await_event_idtolistener.Remove(eventid);
-                    await_events["grouproles"].Remove(eventid);
-                }
-
-            }
         }
-
-
     }
 }
