@@ -22,7 +22,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Balance/{token}")]
         public object Balance(string token)
         {
-            if (tokens.Allow(token, "funds", "Balance", getClientIP()) == true)
+            if (tokens.Allow(token, "funds", "Balance", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -42,7 +42,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/PayAvatar/{avatar}/{amount}/{token}")]
         public object PayAvatar(string avatar, string amount, string token)
         {
-            if (tokens.Allow(token, "funds", "PayAvatar", getClientIP()) == false)
+            if (tokens.Allow(token, "funds", "PayAvatar", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
@@ -81,7 +81,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/PayObject/{object}/{primname}/{amount}/{token}")]
         public object PayObject(string objectuuid,string primname,string amount,string token)
         {
-            if (tokens.Allow(token, "funds", "PayObject", getClientIP()) == true)
+            if (tokens.Allow(token, "funds", "PayObject", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }

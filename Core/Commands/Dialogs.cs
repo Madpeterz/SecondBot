@@ -26,7 +26,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/DialogRelay/{target}/{token}")]
         public object DialogRelay(string target,string token)
         {
-            if (tokens.Allow(token, "dialogs", "DialogRelay", getClientIP()) == false)
+            if (tokens.Allow(token, "dialogs", "DialogRelay", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
@@ -65,7 +65,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/DialogResponce/{dialogid}/{buttontext}/{token}")]
         public object DialogResponce(string dialogid, string buttontext, string token)
         {
-            if (tokens.Allow(token, "dialogs", "DialogResponce", getClientIP()) == false)
+            if (tokens.Allow(token, "dialogs", "DialogResponce", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
@@ -83,7 +83,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/DialogTrack/{status}/{token}")]
         public object DialogTrack(string status, string token)
         {
-            if (tokens.Allow(token, "dialogs", "DialogTrack", getClientIP()) == false)
+            if (tokens.Allow(token, "dialogs", "DialogTrack", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }

@@ -92,61 +92,11 @@ namespace BetterSecondBot.DiscordSupervisor
                     {
                         if (message.Content == "!commands")
                         {
-                            int counter = 0;
-                            string addon = "";
-                            foreach (string a in controler.Bot.GetCommandsInterface.GetCommandsList())
-                            {
-                                output.Append(addon);
-                                addon = " , ";
-                                output.Append(a);
-                                counter++;
-                                if (counter == 5)
-                                {
-                                    output.Append("\n");
-                                    addon = "";
-                                    counter = 0;
-                                }
-                            }
-                            await SendMessageToChannelAsync("interface", output.ToString(), "bot", UUID.Zero, "bot");
+                            await SendMessageToChannelAsync("interface", "broken", "bot", UUID.Zero, "bot");
                         }
                         else if (message.Content.StartsWith("!help") == true)
                         {
-                            string[] bits = message.Content.Split(' ');
-                            if (bits.Length == 2)
-                            {
-                                string command = bits[1].ToLowerInvariant();
-
-                                if (controler.Bot.GetCommandsInterface.GetCommandsList().Contains(command) == true)
-                                {
-                                    output.Append("\n=========================\nCommand:");
-                                    output.Append(command);
-                                    output.Append("\n");
-                                    output.Append("Workspace: ");
-                                    output.Append(controler.Bot.GetCommandsInterface.GetCommandWorkspace(command));
-                                    output.Append("\n");
-                                    output.Append("Min args: ");
-                                    output.Append(controler.Bot.GetCommandsInterface.GetCommandArgs(command).ToString());
-                                    output.Append("\n");
-                                    output.Append("Arg types: ");
-                                    output.Append(String.Join(",", controler.Bot.GetCommandsInterface.GetCommandArgTypes(command)));
-                                    output.Append("\n");
-                                    output.Append("\n");
-                                    output.Append("About: ");
-                                    output.Append(controler.Bot.GetCommandsInterface.GetCommandHelp(command));
-                                    await SendMessageToChannelAsync("interface", output.ToString(), "bot", UUID.Zero, "bot");
-                                }
-                                else
-                                {
-                                    output.Append("Unable to find command: ");
-                                    output.Append(command);
-                                    output.Append(" please use !commands for a full list");
-                                    await SendMessageToChannelAsync("interface", output.ToString(), "bot", UUID.Zero, "bot");
-                                }
-                            }
-                            else
-                            {
-                                await SendMessageToChannelAsync("interface", "Please format help request as follows: !help commandname", "bot", UUID.Zero, "bot");
-                            }
+                            await SendMessageToChannelAsync("interface", "broken", "bot", UUID.Zero, "bot");
                         }
                         else
                         {
@@ -157,46 +107,7 @@ namespace BetterSecondBot.DiscordSupervisor
                     }
                     else
                     {
-                        string[] bits = message.Content.Split("|||");
-                        string command = bits[0].ToLowerInvariant();
-                        bool known_command = controler.Bot.GetCommandsInterface.GetCommandsList().Contains(command);
-                        if (known_command == false)
-                        {
-                            known_command = controler.Bot.getCustomCommands.ContainsKey(command);
-                        }
-                        if (known_command == true)
-                        {
-                            bool process_status = false;
-                            if (bits.Length == 1)
-                            {
-                                bits = new string[] { bits[0], "" };
-                            }
-                            if (controler.Bot.getCustomCommands.ContainsKey(command) == false)
-                            {
-                                process_status = controler.Bot.GetCommandsInterface.Call(command, bits[1], UUID.Zero);
-                            }
-                            else
-                            {
-                                process_status = true;
-                                Thread t = new Thread(() => controler.Bot.custom_commands_loop(command, bits[1], UUID.Zero));
-                                t.Start();
-                            }
-                            if (process_status == true)
-                            {
-                                await MarkMessage(message, "✅").ConfigureAwait(false);
-                            }
-                            else
-                            {
-                                await MarkMessage(message, "❌").ConfigureAwait(false);
-                            }
-                        }
-                        else
-                        {
-                            output.Append("Unable to find command: ");
-                            output.Append(command);
-                            output.Append(" please use !commands for a full list");
-                            await SendMessageToChannelAsync("interface", output.ToString(), "bot", UUID.Zero, "bot");
-                        }
+                        await MarkMessage(message, "❌").ConfigureAwait(false);
                     }
                 }
             }
@@ -269,14 +180,16 @@ namespace BetterSecondBot.DiscordSupervisor
                                     }
                                     Noticetitle = Noticetitle.Replace("!notice ", "");
                                     Noticetitle = Noticetitle.Trim();
-                                    controler.Bot.GetCommandsInterface.Call("GroupNotice", "" + group.ToString() + "~#~" + Noticetitle + "~#~" + Noticemessage, UUID.Zero);
-                                    await MarkMessage(message, "✅");
+                                    //controler.Bot.GetCommandsInterface.Call("GroupNotice", "" + group.ToString() + "~#~" + Noticetitle + "~#~" + Noticemessage, UUID.Zero);
+                                    //await MarkMessage(message, "✅");
+                                    await MarkMessage((IUserMessage)message, "❌").ConfigureAwait(false);
                                 }
                                 else
                                 {
                                     IGuildUser user = (IGuildUser)message.Author;
-                                    controler.Bot.GetCommandsInterface.Call("Groupchat", "" + group.ToString() + "~#~" + message.Content, UUID.Zero);
-                                    await MarkMessage(message, "✅");
+                                    //controler.Bot.GetCommandsInterface.Call("Groupchat", "" + group.ToString() + "~#~" + message.Content, UUID.Zero);
+                                    //await MarkMessage(message, "✅");
+                                    await MarkMessage((IUserMessage)message, "❌").ConfigureAwait(false);
                                 }
                             }
                         }

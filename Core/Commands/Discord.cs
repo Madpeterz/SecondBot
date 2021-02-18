@@ -30,7 +30,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Discord_AddRole/{serverid}/{roleid}/{memberid}/{token}")]
         public object Discord_AddRole(string serverid,string roleid,string memberid,string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_AddRole", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_AddRole", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -51,7 +51,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/Discord_BanMember/{serverid}/{memberid}/{token}")]
         public object Discord_BanMember(string serverid, string memberid, [FormField] string why, string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_BanMember", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_BanMember", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -74,7 +74,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Discord_BulkClear_Messages/{serverid}/{memberid}/{token}")]
         public object Discord_BulkClear_Messages(string serverid, string memberid, string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_BulkClear_Messages", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_BulkClear_Messages", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -94,7 +94,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/Discord_Dm_Member/{serverid}/{memberid}/{token}")]
         public object Discord_Dm_Member(string serverid, string memberid, [FormField] string message, string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_Dm_Member", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_Dm_Member", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -114,7 +114,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Discord_MembersList/{serverid}/{token}")]
         public object Discord_MembersList(string serverid, string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_MembersList", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_MembersList", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -135,7 +135,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/Discord_MembersList/{serverid}/{tts}/{token}")]
         public object Discord_MessageChannel(string serverid, string channelid, string tts, [FormField] string message,  string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_MessageChannel", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_MessageChannel", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -159,7 +159,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Discord_MuteMember/{serverid}/{memberid}/{mode}/{token}")]
         public object Discord_MuteMember(string serverid, string memberid, string mode, string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_MuteMember", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_MuteMember", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -179,7 +179,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Discord_Role_GetSettings/{serverid}/{roleid}/{token}")]
         public object Discord_Role_GetSettings(string serverid, string roleid, string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_Role_GetSettings", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_Role_GetSettings", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -200,7 +200,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/Discord_Role_UpdatePerms/{serverid}/{roleid}/{token}")]
         public object Discord_Role_UpdatePerms(string serverid, string roleid, [FormField] string flagscsv, string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_Role_UpdatePerms", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_Role_UpdatePerms", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -220,7 +220,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Discord_RoleCreate/{serverid}/{role}/{token}")]
         public object Discord_RoleCreate(string serverid, string role, string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_RoleCreate", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_RoleCreate", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -238,7 +238,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Discord_RoleList/{serverid}/{token}")]
         public object Discord_RoleList(string serverid, string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_RoleList", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_RoleList", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -256,7 +256,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Discord_RoleRemove/{serverid}/{roleid}/{token}")]
         public object Discord_RoleRemove(string serverid, string roleid, string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_RoleRemove", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_RoleRemove", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -274,7 +274,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Discord_TextChannels_List/{serverid}/{roleid}/{token}")]
         public object Discord_TextChannels_List(string serverid, string token)
         {
-            if (tokens.Allow(token, "discord", "Discord_TextChannels_List", getClientIP()) == false)
+            if (tokens.Allow(token, "discord", "Discord_TextChannels_List", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }

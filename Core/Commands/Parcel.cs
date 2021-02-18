@@ -135,7 +135,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/ParcelEject/{avatar}/{token}")]
         public object ParcelEject(string avatar,string token)
         {
-            if (tokens.Allow(token, "parcel", "ParcelEject", getClientIP()) == false)
+            if (tokens.Allow(token, "parcel", "ParcelEject", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
@@ -429,7 +429,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/ParcelFreeze/{avatar}/{state}/{token}")]
         public object ParcelFreeze(string avatar, string state, string token)
         {
-            if (tokens.Allow(token, "parcel", "ParcelFreeze", getClientIP()) == false)
+            if (tokens.Allow(token, "parcel", "ParcelFreeze", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -476,7 +476,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/UnRezObject/{objectuuid}/{token}")]
         public object UnRezObject(string objectuuid,string token)
         {
-            if (tokens.Allow(token, "parcel", "UnRezObject", getClientIP()) == false)
+            if (tokens.Allow(token, "parcel", "UnRezObject", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }

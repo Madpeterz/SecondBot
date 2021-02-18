@@ -248,7 +248,8 @@ namespace BetterSecondBot.BetterRelayService
                     {
                         if (cfg.targetvalue != filtervalue)
                         {
-                            bool status = controler.Bot.GetCommandsInterface.Call("groupchat", cfg.targetvalue + "~#~" + sendmessage, UUID.Zero, "~#~");
+                            bool status = false;
+                            //bool status = controler.Bot.GetCommandsInterface.Call("groupchat", cfg.targetvalue + "~#~" + sendmessage, UUID.Zero, "~#~");
                             if(status == false)
                             {
                                 LogFormater.Info("sending via groupchat to group: " + cfg.targetvalue + " [Failed]");

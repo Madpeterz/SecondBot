@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using BetterSecondBotShared.Static;
-using BetterSecondBot.Commands;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
 using OpenMetaverse.Packets;
@@ -288,6 +287,8 @@ namespace BetterSecondBot.bottypes
             return result;
         }
 
+        long last_cleanup = 0;
+
         protected void Cleanup_group_member_storage()
         {
             lock (group_members_storage)
@@ -325,7 +326,6 @@ namespace BetterSecondBot.bottypes
                         if (dif > 30)
                         {
                             last_cleanup = helpers.UnixTimeNow();
-                            Cleanup_await_events();
                             Cleanup_group_member_storage();
                         }
                         if (delay_group_fetch > 0)
@@ -532,59 +532,6 @@ namespace BetterSecondBot.bottypes
                 Client.Self.GroupInviteRespond(G.AgentID, e.IM.IMSessionID, true);
                 Client.Groups.RequestCurrentGroups();
             }
-        }
-
-        protected void Cleanup_await_events()
-        {
-            long dif;
-            List<string> purge_event_ids = new List<string>();
-            foreach (KeyValuePair<string, long> CheckEvent in await_event_ages)
-            {
-                dif = last_cleanup - CheckEvent.Value;
-                if (dif > 240)
-                {
-                    purge_event_ids.Add(CheckEvent.Key);
-                }
-            }
-            foreach (string eventid in purge_event_ids)
-            {
-                string listener = await_event_idtolistener[eventid];
-                await_event_idtolistener.Remove(eventid);
-                await_event_ages.Remove(eventid);
-                await_events[listener].Remove(eventid);
-            }
-        }
-
-        protected long last_cleanup;
-
-        protected Dictionary<string, Dictionary<string, KeyValuePair<CoreCommand, string[]>>> await_events = new Dictionary<string, Dictionary<string, KeyValuePair<CoreCommand, string[]>>>();
-        protected Dictionary<string, long> await_event_ages = new Dictionary<string, long>();
-        protected Dictionary<string, string> await_event_idtolistener = new Dictionary<string, string>();
-        protected int next_await_id = 1;
-
-
-        public bool CreateAwaitEventReply(string event_listener, CoreCommand command, string[] args)
-        {
-            string eventid = "" + event_listener + "" + next_await_id.ToString() + "";
-            next_await_id++;
-            if (await_events.ContainsKey(event_listener) == false)
-            {
-                await_events.Add(event_listener, new Dictionary<string, KeyValuePair<CoreCommand, string[]>>());
-            }
-            if (await_events[event_listener].ContainsKey(eventid) == false)
-            {
-                if (await_event_ages.ContainsKey(eventid) == false)
-                {
-                    if (await_event_idtolistener.ContainsKey(eventid) == false)
-                    {
-                        await_events[event_listener].Add(eventid, new KeyValuePair<CoreCommand, string[]>(command, args));
-                        await_event_ages.Add(eventid, helpers.UnixTimeNow());
-                        await_event_idtolistener.Add(eventid, event_listener);
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
     }
 }

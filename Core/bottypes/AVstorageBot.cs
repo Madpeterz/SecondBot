@@ -226,6 +226,7 @@ namespace BetterSecondBot.bottypes
                     FindAvatarName2Key(myconfig.Security_MasterUsername);
                 }
             }
+
             base.AfterBotLoginHandler();
         }
 

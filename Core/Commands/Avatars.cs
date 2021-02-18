@@ -22,7 +22,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/NearmeWithDetails/{token}")]
         public object NearmeWithDetails(string token)
         {
-            if (tokens.Allow(token, "avatars", "nearmewithdetails", getClientIP()) == false)
+            if (tokens.Allow(token, "avatars", "nearmewithdetails", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
@@ -55,7 +55,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Nearme/{token}")]
         public object Nearme(string token)
         {
-            if (tokens.Allow(token, "avatars", "nearme", getClientIP()) == false)
+            if (tokens.Allow(token, "avatars", "nearme", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }

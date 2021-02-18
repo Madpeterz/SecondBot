@@ -28,7 +28,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/IsGroupMember/{group}/{avatar}/{token}")]
         public object IsGroupMember(string group, string avatar, string token)
         {
-            if (tokens.Allow(token, "groups", "IsGroupMember", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "IsGroupMember", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -64,7 +64,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GetGroupMembers/{group}/{token}")]
         public object GetGroupMembers(string group, string token)
         {
-            if (tokens.Allow(token, "groups", "GetGroupMembers", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GetGroupMembers", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -96,7 +96,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupEject/{group}/{avatar}/{token}")]
         public object GroupEject(string group, string avatar, string token)
         {
-            if (tokens.Allow(token, "groups", "GroupEject", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GroupEject", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -141,7 +141,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupAddRole/{group}/{avatar}/{role}/{token}")]
         public object GroupAddRole(string group, string avatar, string role, string token)
         {
-            if (tokens.Allow(token, "groups", "GroupAddRole", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GroupAddRole", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -190,7 +190,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupInvite/{group}/{avatar}/{role}/{token}")]
         public object GroupInvite(string group, string avatar, string role, string token)
         {
-            if (tokens.Allow(token, "groups", "GroupInvite", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GroupInvite", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -241,7 +241,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/Groupnotice/{group}/{token}")]
         public object Groupnotice(string group, [FormField] string title, [FormField] string message, string token)
         {
-            if (tokens.Allow(token, "groups", "Groupnotice", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "Groupnotice", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -279,7 +279,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupActiveTitle/{group}/{token}")]
         public object GroupActiveTitle(string group, string role, string token)
         {
-            if (tokens.Allow(token, "groups", "GroupActiveTitle", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GroupActiveTitle", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -307,7 +307,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupActiveGroup/{group}/{token}")]
         public object GroupActiveGroup(string group, string role, string token)
         {
-            if (tokens.Allow(token, "groups", "GroupActiveTitle", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GroupActiveTitle", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -337,7 +337,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/Groupnotice/{group}/{attachment}/{token}")]
         public object GroupnoticeWithAttachment(string group, [FormField] string title, [FormField] string message, string attachment, string token)
         {
-            if (tokens.Allow(token, "groups", "GroupnoticeWithAttachment", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GroupnoticeWithAttachment", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -376,7 +376,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GetGroupList/{token}")]
         public object GetGroupList(string token)
         {
-            if (tokens.Allow(token, "groups", "GetGroupList", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GetGroupList", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -397,7 +397,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GetGroupRoles/{group}/{token}")]
         public object GetGroupRoles(string group, string token)
         {
-            if (tokens.Allow(token, "groups", "GetGroupRoles", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GetGroupRoles", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -446,7 +446,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupchatListAllUnreadGroups/{token}")]
         public object GroupchatListAllUnreadGroups(string token)
         {
-            if (tokens.Allow(token, "groups", "GroupchatListAllUnreadGroups", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GroupchatListAllUnreadGroups", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -462,7 +462,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupchatGroupHasUnread/{group}/{token}")]
         public object GroupchatGroupHasUnread(string group,string token)
         {
-            if (tokens.Allow(token, "groups", "GroupchatListAllUnreadGroups", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GroupchatListAllUnreadGroups", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -484,11 +484,11 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupchatAnyUnread/{token}")]
         public object haveunreadgroupchat(string token)
         {
-            if (tokens.Allow(token, "groups", "GroupchatAnyUnread", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GroupchatAnyUnread", handleGetClientIP()) == false)
             {
-                return BasicReply(bot.HasUnreadGroupchats().ToString());
+                return Failure("Token not accepted");
             }
-            return Failure("Token not accepted");
+            return BasicReply(bot.HasUnreadGroupchats().ToString());
         }
 
         [About("Clears all group chat buffers at once")]
@@ -496,12 +496,12 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupchatClearAll/{token}")]
         public object GroupchatClearAll(string token)
         {
-            if (tokens.Allow(token, "groups", "GroupchatClearAll", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GroupchatClearAll", handleGetClientIP()) == false)
             {
-                bot.ClearAllGroupchat();
-                return BasicReply("ok");
+                return Failure("Token not accepted");
             }
-            return Failure("Token not accepted");
+            bot.ClearAllGroupchat();
+            return BasicReply("ok");
         }
 
         [About("fetchs the groupchat history")]
@@ -511,15 +511,15 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupchatHistory/{group}/{token}")]
         public object GroupchatHistory(string group, string token)
         {
-            if (tokens.Allow(token, "groups", "GroupchatHistory", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GroupchatHistory", handleGetClientIP()) == false)
             {
-                if (UUID.TryParse(group, out UUID groupUUID) == true)
-                {
-                    return BasicReply(JsonConvert.SerializeObject(bot.GetGroupchat(groupUUID)));
-                }
+                return Failure("Token not accepted");
+            }
+            if (UUID.TryParse(group, out UUID groupUUID) == false)
+            {
                 return Failure("Group UUID invaild");
             }
-            return Failure("Token not accepted");
+            return BasicReply(JsonConvert.SerializeObject(bot.GetGroupchat(groupUUID)));
         }
 
         [About("sends a message to the groupchat")]
@@ -532,7 +532,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/Groupchat/{group}/{token}")]
         public object Groupchat(string group, [FormField] string message, string token)
         {
-            if (tokens.Allow(token, "groups", "Groupchat", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "Groupchat", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }

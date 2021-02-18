@@ -24,7 +24,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/AddToAllowAnimations/{avatar}/{token}")]
         public object AddToAllowAnimations(string avatar, string token)
         {
-            if (tokens.Allow(token, "animation", "addtoallowanimations", getClientIP()) == false)
+            if (tokens.Allow(token, "animation", "addtoallowanimations", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
@@ -49,7 +49,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/PlayGesture/{gesture}/{token}")]
         public object PlayGesture(string gesture, string token)
         {
-            if (tokens.Allow(token, "animation", "gesture", getClientIP()) == false)
+            if (tokens.Allow(token, "animation", "gesture", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
@@ -67,7 +67,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/ResetAnimations/{token}")]
         public object ResetAnimations(string token)
         {
-            if (tokens.Allow(token, "animation", "resetanimations", getClientIP()) == false)
+            if (tokens.Allow(token, "animation", "resetanimations", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }

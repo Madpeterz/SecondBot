@@ -21,11 +21,11 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/LocalChatHistory/{token}")]
         public object LocalChatHistory(string token)
         {
-            if (tokens.Allow(token, "chat", "localchathistory", getClientIP()) == true)
+            if (tokens.Allow(token, "chat", "localchathistory", handleGetClientIP()) == false)
             {
-                return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()));
+                return Failure("Token not accepted");
             }
-            return BasicReply("Token not accepted");
+            return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()));
         }
 
         [About("sends a message to localchat")]
@@ -37,7 +37,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/Say/{channel}/{token}")]
         public object Say(string channel,[FormField] string message,string token)
         {
-            if (tokens.Allow(token, "chat", "localchatsay", getClientIP()) == false)
+            if (tokens.Allow(token, "chat", "localchatsay", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
@@ -67,7 +67,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/IM/{avatar}/{token}")]
         public object IM(string avatar, [FormField] string message, string token)
         {
-            if (tokens.Allow(token, "chat", "im", getClientIP()) == false)
+            if (tokens.Allow(token, "chat", "im", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }

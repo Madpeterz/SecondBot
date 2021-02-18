@@ -11,16 +11,16 @@ using Newtonsoft.Json;
 
 namespace BetterSecondBot.HttpService
 {
-    public class HttpApiIM : WebApiControllerWithTokens
+    public class HTTP_IM : WebApiControllerWithTokens
     {
-        public HttpApiIM(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+        public HTTP_IM(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("gets a full list of all chat windows")]
         [ReturnHints("array UUID = Name")]
         [Route(HttpVerbs.Get, "/chatwindows/{token}")]
         public object chatwindows(string token)
         {
-            if (tokens.Allow(token, "im", "chatwindows", getClientIP()) == false)
+            if (tokens.Allow(token, "im", "chatwindows", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
@@ -32,7 +32,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/listwithunread/{token}")]
         public object listwithunread(string group, string token)
         {
-            if (tokens.Allow(token, "im", "listwithunread", getClientIP()) == false)
+            if (tokens.Allow(token, "im", "listwithunread", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
@@ -52,7 +52,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/haveunreadims/{token}")]
         public object haveunreadims(string token)
         {
-            if (tokens.Allow(token, "im", "haveunreadims", getClientIP()) == false)
+            if (tokens.Allow(token, "im", "haveunreadims", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
@@ -75,7 +75,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/getimchat/{window}/{token}")]
         public object getimchat(string window, string token)
         {
-            if (tokens.Allow(token, "im", "getimchat", getClientIP()) == false)
+            if (tokens.Allow(token, "im", "getimchat", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }

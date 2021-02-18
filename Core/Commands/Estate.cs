@@ -31,7 +31,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/SimRestart/{delay}/{mode}/{token}")]
         public object SimRestart(string delay, string mode, string token)
         {
-            if (tokens.Allow(token, "estate", "SimMessage", getClientIP()) == false)
+            if (tokens.Allow(token, "estate", "SimMessage", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -63,7 +63,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/SimMessage/{token}")]
         public object SimMessage([FormField] string message, string token)
         {
-            if (tokens.Allow(token, "estate", "SimMessage", getClientIP()) == false)
+            if (tokens.Allow(token, "estate", "SimMessage", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -86,7 +86,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GetSimTexture/{regionname}/{token}")]
         public object GetSimTexture(string regionname, string token)
         {
-            if (tokens.Allow(token, "estate", "GetSimTexture", getClientIP()) == false)
+            if (tokens.Allow(token, "estate", "GetSimTexture", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -103,7 +103,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/EstateParcelReclaim/{token}")]
         public Object EstateParcelReclaim(string token)
         {
-            if (tokens.Allow(token, "estate", "EstateParcelReclaim", getClientIP()) == false)
+            if (tokens.Allow(token, "estate", "EstateParcelReclaim", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -122,7 +122,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GetSimGlobalPos/{regionname}/{token}")]
         public Object GetSimGlobalPos(string regionname, string token)
         {
-            if (tokens.Allow(token, "estate", "GetSimGlobalPos", getClientIP()) == false)
+            if (tokens.Allow(token, "estate", "GetSimGlobalPos", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -142,7 +142,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GetEstateBanList/{token}")]
         public Object GetEstateBanList(string token)
         {
-            if (tokens.Allow(token, "estate", "banlist", getClientIP()) == false)
+            if (tokens.Allow(token, "estate", "banlist", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -162,7 +162,7 @@ namespace BetterSecondBot.HttpService
 
         public Object UpdateEstateBanlist(string avatar, string mode, string global, string token)
         {
-            if (tokens.Allow(token, "estate", "banlist-add", getClientIP()) == false)
+            if (tokens.Allow(token, "estate", "banlist-add", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }

@@ -21,7 +21,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GoHome/{token}")]
         public object GoHome(string group, string token)
         {
-            if (tokens.Allow(token, "groups", "GetGroupMembers", getClientIP()) == true)
+            if (tokens.Allow(token, "groups", "GetGroupMembers", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }

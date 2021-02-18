@@ -17,6 +17,8 @@ using Newtonsoft.Json;
 using OpenMetaverse;
 using System.Reflection;
 using System.Linq;
+using System.Threading.Tasks;
+using Core.Static;
 
 namespace BetterSecondBot.HttpService
 {
@@ -173,32 +175,14 @@ namespace BetterSecondBot.HttpService
                     .WithUrlPrefix(url)
                     .WithMode(HttpListenerMode.EmbedIO))
                 .WithCors()
-                //.WithIPBanning(o => o
-                //    .WithMaxRequestsPerSecond(30)
-                //    .WithRegexRules("HTTP exception 404")
-                //)
-                .WithWebApi("/inventory", m => m
-                    .WithController(() => new HTTP_Inventory(Bot, Tokens))
-                )
-                .WithWebApi("/chat", m => m
-                    .WithController(() => new HTTP_Chat(Bot, Tokens))
-                )
-                .WithWebApi("/groups", m => m
-                    .WithController(() => new HTTP_Group(Bot, Tokens))
-                )
-                .WithWebApi("/ims", m => m
-                    .WithController(() => new HttpApiIM(Bot, Tokens))
-                )
-                .WithWebApi("/core", m => m
-                    .WithController(() => new HttpApiCore(Config, Bot, Tokens))
-                )
-                .WithWebApi("/parcel", m => m
-                    .WithController(() => new HTTP_Parcel(Bot,Tokens))
-                )
-                .WithWebApi("/estate", m => m
-                    .WithController(() => new HTTP_Estate(Bot, Tokens))
-                )
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" })));
+            Dictionary<string, Type> commandmodules = http_commands_helper.getCommandModules();
+            foreach (KeyValuePair<string, Type> entry in commandmodules)
+            {
+                server.WithWebApi("/" + entry.Key, m => m
+                      .WithController(() => (WebApiControllerWithTokens)Activator.CreateInstance(entry.Value, args: new object[] { Bot, Tokens }))
+                );
+            }
             return server;
         }
  
@@ -260,6 +244,8 @@ namespace BetterSecondBot.HttpService
 
         // scoped access tokens
         protected Dictionary<string, scopedTokenInfo> scopedtokens = new Dictionary<string, scopedTokenInfo>();
+
+
 
 
         protected List<string> OneTimeTokens = new List<string>();
@@ -395,38 +381,34 @@ namespace BetterSecondBot.HttpService
     {
         protected TokenStorage tokens;
         protected SecondBot bot;
+
         public bool needsToken { get; set; }
         protected UUID avataruuid = UUID.Zero;
         protected Parcel targetparcel = null;
 
-        protected string CallMethod(string name,string[] args)
+        protected bool disableIPchecks = false;
+        public void disableIPlockout()
         {
-            MethodInfo[] methods = this.GetType().GetMethods();
-            MethodInfo found = null;
-            foreach(MethodInfo M in methods)
-            {
-                if(M.Name == name)
-                {
-                    found = M;
-                    break;
-                }
-            }
-            if(found == null)
-            {
-                return "Failed:Not Found";
-            }
-            List<string> settings = new List<string>(args);
-            settings.Add(tokens.OneTimeToken());
-            if(found.GetParameters().Length != settings.Count)
-            {
-                return "Failed:Incorrect args";
-            }
-            string reply = (string)found.Invoke(this, settings.Cast<object>().ToArray());
-            return "Passed:"+ reply;
+            disableIPchecks = true;
         }
+
+        public IPAddress handleGetClientIP()
+        {
+            if(disableIPchecks == true)
+            {
+                return IPAddress.Parse("127.0.0.1");
+            }
+            else
+            {
+                return HttpContext.Request.RemoteEndPoint.Address;
+            }
+        }
+
+
+
         protected KeyValuePair<bool,string> SetupCurrentParcel(string token,string usenamespace,string command)
         {
-            if (tokens.Allow(token, usenamespace, command, getClientIP()) == false)
+            if (tokens.Allow(token, usenamespace, command, handleGetClientIP()) == false)
             {
                 return new KeyValuePair<bool, string>(false, "Token not accepted");
             }
@@ -437,11 +419,18 @@ namespace BetterSecondBot.HttpService
             int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
             if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == false)
             {
-                return new KeyValuePair<bool, string>(false, "Parcel data not ready");
+                Thread.Sleep(2000);
+                localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
+                if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == false)
+                {
+                    return new KeyValuePair<bool, string>(false, "Parcel data not ready");
+                }
             }
             Parcel targetparcel = bot.GetClient.Network.CurrentSim.Parcels[localid];
             return new KeyValuePair<bool, string>(true, "");
         }
+
+
         protected void ProcessAvatar(string avatar)
         {
             string[] bits = avatar.Split(' ');
@@ -449,6 +438,11 @@ namespace BetterSecondBot.HttpService
             if (bits.Length == 2)
             {
                 avatar = bot.FindAvatarName2Key(avatar);
+                if(avatar == "lookup")
+                {
+                    Thread.Sleep(2000);
+                    avatar = bot.FindAvatarName2Key(avatar);
+                }
             }
             UUID.TryParse(avatar, out avataruuid);
         }
@@ -468,6 +462,7 @@ namespace BetterSecondBot.HttpService
         {
             bot = mainbot;
             tokens = setuptokens;
+            
         }
 
         /*
@@ -479,12 +474,9 @@ namespace BetterSecondBot.HttpService
         }
         */
 
-        public IPAddress getClientIP()
-        {
-            return HttpContext.Request.RemoteEndPoint.Address;
-        }
-
     }
+
+
 
     public class tokenInfo
     {

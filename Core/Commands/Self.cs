@@ -23,7 +23,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/PointAt/{avatar}/{token}")]
         public object PointAt(string avatar, string token)
         {
-            if (tokens.Allow(token, "self", "PointAt", getClientIP()) == false)
+            if (tokens.Allow(token, "self", "PointAt", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -49,7 +49,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Sit/{target}/{token}")]
         public object Sit(string target, string token)
         {
-            if (tokens.Allow(token, "self", "Sit", getClientIP()) == false)
+            if (tokens.Allow(token, "self", "Sit", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -71,7 +71,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Stand/{token}")]
         public object Stand(string target, string token)
         {
-            if (tokens.Allow(token, "self", "Stand", getClientIP()) == false)
+            if (tokens.Allow(token, "self", "Stand", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -88,7 +88,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/ClickObject/{object}/{token}")]
         public object ClickObject(string target, string token)
         {
-            if (tokens.Allow(token, "self", "ClickObject", getClientIP()) == false)
+            if (tokens.Allow(token, "self", "ClickObject", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -115,7 +115,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Logoff/{token}")]
         public object Logoff(string token)
         {
-            if (tokens.Allow(token, "self", "Logoff", getClientIP()) == false)
+            if (tokens.Allow(token, "self", "Logoff", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -132,7 +132,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Logout/{token}")]
         public object Logout(string token)
         {
-            if (tokens.Allow(token, "self", "Logout", getClientIP()) == false)
+            if (tokens.Allow(token, "self", "Logout", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -149,7 +149,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Bye/{token}")]
         public object Bye(string token)
         {
-            if (tokens.Allow(token, "self", "Bye", getClientIP()) == false)
+            if (tokens.Allow(token, "self", "Bye", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -165,7 +165,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GetLastCommands/{token}")]
         public object GetLastCommands(string token)
         {
-            if (tokens.Allow(token, "self", "GetLastCommands", getClientIP()) == false)
+            if (tokens.Allow(token, "self", "GetLastCommands", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -184,7 +184,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/SetPermFlag/{avatar}/{flag}/{state}/{sticky}/{token}")]
         public object SetPermFlag(string avatar, string flag, string state, string sticky, string token)
         {
-            if (tokens.Allow(token, "self", "SetPermFlag", getClientIP()) == false)
+            if (tokens.Allow(token, "self", "SetPermFlag", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }

@@ -21,7 +21,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Friendslist/{token}")]
         public object Friendslist(string token)
         {
-            if (tokens.Allow(token, "friends", "Friendslist", getClientIP()) == true)
+            if (tokens.Allow(token, "friends", "Friendslist", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -39,7 +39,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/FriendFullPerms/{avatar}/{state}/{token}")]
         public object FriendFullPerms(string avatar, string state, string token)
         {
-            if (tokens.Allow(token, "friends", "FriendFullPerms", getClientIP()) == true)
+            if (tokens.Allow(token, "friends", "FriendFullPerms", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
@@ -78,7 +78,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/FriendRequest/{avatar}/{state}/{token}")]
         public object FriendRequest(string avatar, string state, string token)
         {
-            if (tokens.Allow(token, "friends", "FriendRequest", getClientIP()) == true)
+            if (tokens.Allow(token, "friends", "FriendRequest", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }
