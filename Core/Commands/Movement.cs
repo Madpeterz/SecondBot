@@ -20,7 +20,7 @@ namespace BetterSecondBot.HttpService
 
         [About("uses the AutoPilot to move to a location")]
         [ReturnHints("Error Unable to AutoPilot to location")]
-        [ReturnHints("Accepted")]
+        [ReturnHints("ok")]
         [ReturnHints("Convert to vector has failed")]
         [ReturnHints("?  value out of range 0-?")]
         [ArgHints("x", "URLARG", "X location to AutoPilot to")]
@@ -55,7 +55,7 @@ namespace BetterSecondBot.HttpService
             uint Globalx, Globaly;
             Utils.LongToUInts(bot.GetClient.Network.CurrentSim.Handle, out Globalx, out Globaly);
             bot.GetClient.Self.AutoPilot((ulong)(Globalx + pos.X), (ulong)(Globaly + pos.Y), pos.Z);
-            return true;
+            return BasicReply("ok");
         }
 
         [About("Attempt to teleport to a new region")]
