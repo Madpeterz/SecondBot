@@ -221,12 +221,11 @@ namespace BetterSecondBot.bottypes
             {
                 Client.Avatars.UUIDNameReply += Key2NameEvent;
                 Client.Directory.DirPeopleReply += Name2KeyEvent;
-                if (helpers.notempty(myconfig.Security_MasterUsername) == true)
-                {
-                    FindAvatarName2Key(myconfig.Security_MasterUsername);
-                }
             }
-
+            if (helpers.notempty(myconfig.Security_MasterUsername) == true)
+            {
+                FindAvatarName2Key(myconfig.Security_MasterUsername);
+            }
             base.AfterBotLoginHandler();
         }
 

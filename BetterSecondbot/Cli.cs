@@ -61,7 +61,7 @@ namespace BetterSecondBot
                 {
                     Bot.AsDocker();
                 }
-                Bot.Start();
+                Bot.Start(false);
                 attachEventListenerObjects(Config, as_docker);
                 if(use_self_keep_alive == true)
                 {

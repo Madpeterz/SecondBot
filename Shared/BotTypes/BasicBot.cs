@@ -51,7 +51,8 @@ namespace BetterSecondBotShared.bottypes
         public JsonConfig getMyConfig { get { return myconfig; } }
         protected string version = "NotSet V1.0.0.0";
 
-        protected bool reconnect;
+        public bool reconnect;
+
         public string MyVersion { get { return version; } }
         public string Name { get { return myconfig.Basic_BotUserName; } }
         public string OwnerName { get { return myconfig.Security_MasterUsername; } }

@@ -15,7 +15,6 @@ namespace BetterSecondBot.bottypes
             {
                 Client.Avatars.AvatarAnimation += AvatarAnimationHandler;
             }
-            reconnect = true;
         }
 
         public override void ResetAnimations()

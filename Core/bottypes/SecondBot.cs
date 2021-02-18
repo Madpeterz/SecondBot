@@ -30,8 +30,8 @@ namespace BetterSecondBot.bottypes
                 if (Client.Friends.FriendList.ContainsKey(master_uuid) == false)
                 {
                     CallAPI("IM", new string[] { myconfig.Security_MasterUsername, "Hello master, I am sending you a friend request now!" });
+                    CallAPI("FriendRequest", new string[] { master_uuid.ToString(), "true" });
                 }
-                CallAPI("FriendRequest", new string[] { master_uuid.ToString(), "true" });
                 CallAPI("FriendFullPerms", new string[] { master_uuid.ToString(), "true" });
             }
         }
