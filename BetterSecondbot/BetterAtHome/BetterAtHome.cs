@@ -72,7 +72,7 @@ namespace BetterSecondbot.BetterAtHome
             {
                 resetSwitchs();
                 LoginFailed = true;
-                whyfailed = e.FailReason;
+                whyfailed = e.FailReason + " | "+e.Message;
             }
             if (LoginFailed == false)
             {
@@ -205,7 +205,7 @@ namespace BetterSecondbot.BetterAtHome
             long dif = helpers.UnixTimeNow() - LastLoginEvent;
             if (LoginFailed == true)
             {
-                if (whyfailed != "presence")
+                if (whyfailed.Contains("presence") == false)
                 {
                     SetBetterAtHomeAction("[DC] Unable to continue: " + whyfailed);
                     return;

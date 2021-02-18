@@ -482,7 +482,7 @@ namespace BetterSecondBot.HttpService
         [About("checks if there are any groups with unread messages")]
         [ReturnHints("True|False")]
         [Route(HttpVerbs.Get, "/GroupchatAnyUnread/{token}")]
-        public object haveunreadgroupchat(string token)
+        public object GroupchatAnyUnread(string token)
         {
             if (tokens.Allow(token, "groups", "GroupchatAnyUnread", handleGetClientIP()) == false)
             {
