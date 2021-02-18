@@ -51,7 +51,7 @@ namespace BetterSecondbot.BetterAtHome
 
         protected void resetSwitchs()
         {
-            whyloggedout = ""
+            whyloggedout = "";
             StartingLogin = false;
             LoginFailed = false;
             LoggingIn = false;
