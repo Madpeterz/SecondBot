@@ -39,6 +39,7 @@ namespace BetterSecondBot
 
         public void attachEventListenerObjects(JsonConfig Config, bool as_docker)
         {
+            LogFormater.Info("HTTP service requested:" + Config.Http_Enable.ToString());
             if (Config.Http_Enable == true)
             {
                 new Thread(() =>
@@ -61,7 +62,9 @@ namespace BetterSecondBot
                 {
                     Bot.AsDocker();
                 }
+
                 Bot.Start(false);
+                
                 attachEventListenerObjects(Config, as_docker);
                 if(use_self_keep_alive == true)
                 {

@@ -155,6 +155,7 @@ namespace BetterSecondBot.HttpService
                 using (var server = CreateWebServer(Config.Http_Host))
                 {
                     // Once we've registered our modules and configured them, we call the RunAsync() method.
+                    LogFormater.Info("Starting HTTP service: " + Config.Http_Host);
                     server.RunAsync();
                     while (Bot.KillMe == false)
                     {
@@ -162,27 +163,38 @@ namespace BetterSecondBot.HttpService
                     }
                 }
             }
-            catch
-            { 
-
+            catch (Exception e)
+            {
+                LogFormater.Info("HTTP service has ended because: " + e.Message);
             }
         }
 
         private WebServer CreateWebServer(string url)
         {
-            
+
             var server = new WebServer(o => o
                     .WithUrlPrefix(url)
                     .WithMode(HttpListenerMode.EmbedIO))
                 .WithCors()
-                .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" })));
-            Dictionary<string, Type> commandmodules = http_commands_helper.getCommandModules();
-            foreach (KeyValuePair<string, Type> entry in commandmodules)
-            {
-                server.WithWebApi("/" + entry.Key, m => m
-                      .WithController(() => (WebApiControllerWithTokens)Activator.CreateInstance(entry.Value, args: new object[] { Bot, Tokens }))
-                );
-            }
+                .WithWebApi("/animation", m => m.WithController(() => new HTTP_Animation(Bot, Tokens)))
+                .WithWebApi("/avatars", m => m.WithController(() => new HTTP_Avatars(Bot, Tokens)))
+                .WithWebApi("/chat", m => m.WithController(() => new HTTP_Chat(Bot, Tokens)))
+                .WithWebApi("/core", m => m.WithController(() => new HTTP_Core(Bot, Tokens)))
+                .WithWebApi("/dialogs", m => m.WithController(() => new HTTP_Dialogs(Bot, Tokens)))
+                .WithWebApi("/estate", m => m.WithController(() => new HTTP_Estate(Bot, Tokens)))
+                .WithWebApi("/friends", m => m.WithController(() => new HTTP_Friends(Bot, Tokens)))
+                .WithWebApi("/group", m => m.WithController(() => new HTTP_Group(Bot, Tokens)))
+                .WithWebApi("/home", m => m.WithController(() => new HTTP_Home(Bot, Tokens)))
+                .WithWebApi("/im", m => m.WithController(() => new HTTP_IM(Bot, Tokens)))
+                .WithWebApi("/info", m => m.WithController(() => new HTTP_Info(Bot, Tokens)))
+                .WithWebApi("/inventory", m => m.WithController(() => new HTTP_Inventory(Bot, Tokens)))
+                .WithWebApi("/movement", m => m.WithController(() => new HTTP_Movement(Bot, Tokens)))
+                .WithWebApi("/notecard", m => m.WithController(() => new HTTP_Notecard(Bot, Tokens)))
+                .WithWebApi("/parcel", m => m.WithController(() => new HTTP_Parcel(Bot, Tokens)))
+                .WithWebApi("/self", m => m.WithController(() => new HTTP_Self(Bot, Tokens)))
+                .WithWebApi("/streamadmin", m => m.WithController(() => new HTTP_StreamAdmin(Bot, Tokens)))
+                .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" }))
+            );
             return server;
         }
  

@@ -8,7 +8,7 @@ namespace BetterSecondbot.DataStorage
     public class Datastorage
     {
         protected Cli controler = null;
-
+        protected bool attachedClientEvents = false;
         public Datastorage(Cli setcontroler)
         {
             controler = setcontroler;
@@ -17,7 +17,6 @@ namespace BetterSecondbot.DataStorage
 
         protected void attach_events()
         {
-            controler.Bot.GetClient.Estate.EstateBansReply += EstateBansReply;
             controler.Bot.ChangeSimEvent += ChangedSim;
             controler.Bot.LoginProgess += LoginProcess;
             controler.Bot.StatusMessageEvent += StatusPing;
@@ -27,12 +26,15 @@ namespace BetterSecondbot.DataStorage
         {
             if(simname != "")
             {
-                if (controler.Bot.GetClient.Network.CurrentSim.IsEstateManager == true)
+                if (controler.Bot.GetClient.Network.CurrentSim != null)
                 {
-                    long dif = helpers.UnixTimeNow() - controler.Bot._lastUpdatedSimBlacklist.lastupdated;
-                    if(dif > 120)
+                    if (controler.Bot.GetClient.Network.CurrentSim.IsEstateManager == true)
                     {
-                        controler.Bot.GetClient.Estate.RequestInfo();
+                        long dif = helpers.UnixTimeNow() - controler.Bot._lastUpdatedSimBlacklist.lastupdated;
+                        if (dif > 120)
+                        {
+                            controler.Bot.GetClient.Estate.RequestInfo();
+                        }
                     }
                 }
             }
@@ -44,6 +46,11 @@ namespace BetterSecondbot.DataStorage
             if (e.Status == LoginStatus.Success)
             {
                 ChangedSim(null, null);
+            }
+            if(attachedClientEvents == false)
+            {
+                attachedClientEvents = true;
+                controler.Bot.GetClient.Estate.EstateBansReply += EstateBansReply;
             }
         }
 

@@ -20,9 +20,15 @@ Secondbot is a CommandLine based bot for SecondLife based on libremetaverse reta
 
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3765/badge)](https://bestpractices.coreinfrastructure.org/projects/3765)
 
+
 #### Helpfull stuff
 ---
 [Commands Wiki](https://wiki.magicmadpeter.xyz/)
+
+[Web UI](https://webui.magicmadpeter.xyz/)
+- note: if you running in windows and have HTTP enabled you will want to add HTTP support
+via a command promt with the following command where 8185 is the port you wish to use.
+"netsh http add urlacl url=http://*:8185/ user=Everyone"
 
 ## Releases
 These are pre compiled versions for the most upto date please use docker or compile it yourself.
