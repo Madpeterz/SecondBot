@@ -169,8 +169,11 @@ namespace BetterSecondbot.BetterAtHome
         {
             if(hasBasicBot() == true)
             {
-                controler.Bot.SetBetterAtHomeAction(whyloggedout+" "+message);
+                //controler.Bot.SetBetterAtHomeAction(whyloggedout+" "+message);
+                controler.Bot.SetBetterAtHomeAction(message);
             }
+            /*
+             * extra debug stuff
             else
             {
                 if (lastwarn != whyloggedout)
@@ -182,6 +185,7 @@ namespace BetterSecondbot.BetterAtHome
                     }
                 }
             }
+            */
         }
 
         protected void StatusPing(object o, StatusMessageEvent e)
