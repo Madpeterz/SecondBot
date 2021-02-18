@@ -17,7 +17,9 @@ namespace BetterSecondBot.HttpService
         public HTTP_Inventory(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("rezs the item at the bots current location")]
-        [ReturnHints("True|False")]
+        [ReturnHints("UUID of rezzed item")]
+        [ReturnHints("Invaild item UUID")]
+        [ReturnHints("Unable to find item")]
         [ArgHints("item", "URLARG", "UUID of item to rez")]
         [Route(HttpVerbs.Get, "/RezObject/{item}/{token}")]
         public object RezObject(string item, string token)
@@ -26,7 +28,17 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Token not accepted");
             }
-            return Failure("Broken awaiting repairs");
+            if (UUID.TryParse(item, out UUID targetitem) == true)
+            {
+                return Failure("Invaild item UUID");
+            }
+            InventoryItem itm = bot.GetClient.Inventory.FetchItem(targetitem, bot.GetClient.Self.AgentID, (5 * 1000));
+            if (itm == null)
+            {
+                return Failure("Unable to find item");
+            }
+            UUID rezedobject = bot.GetClient.Inventory.RequestRezFromInventory(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimRotation, bot.GetClient.Self.RelativePosition, itm);
+            return BasicReply(rezedobject.ToString());
         }
 
 

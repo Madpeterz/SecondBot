@@ -476,7 +476,12 @@ namespace BetterSecondBot.WikiMake
                     sb.Append(".html'>");
                     sb.Append(c);
                     sb.Append("</a></td><td>");
-                    sb.Append((args-1).ToString());
+                    int argcount = args - 1;
+                    if(argcount < 0)
+                    {
+                        argcount = 0;
+                    }
+                    sb.Append(argcount.ToString());
                     sb.Append("</td></tr>");
                 }
                 sb.Append("</tbody></table>");
