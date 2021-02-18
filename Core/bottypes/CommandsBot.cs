@@ -84,7 +84,6 @@ namespace BetterSecondBot.bottypes
             Client.Self.InstantMessage(avatar, message);
         }
 
-        protected Dictionary<string, string> Scripts_content = new Dictionary<string, string>();
         protected Dictionary<string, string> notecards_content = new Dictionary<string, string>();
         protected Dictionary<UUID, Dictionary<UUID, long>> group_invite_lockout_timer = new Dictionary<UUID, Dictionary<UUID, long>>();
         protected long last_cleanup_commands;
@@ -138,6 +137,16 @@ namespace BetterSecondBot.bottypes
             }
             Client.Self.RequestBalance();
             base.AfterBotLoginHandler();
+        }
+
+        public string[] getFullListOfCommands()
+        {
+            List<string> output = new List<string>();
+            foreach(string A in endpointcommandmap.Keys)
+            {
+                output.Add(A.ToLowerInvariant());
+            }
+            return output.ToArray();
         }
 
         public void NotecardAddContent(string target_notecard_storage_id, string content)

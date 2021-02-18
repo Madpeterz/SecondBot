@@ -75,32 +75,7 @@ namespace BetterSecondBot.bottypes
         {
             BotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, false);
         }
-        protected override void BotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar,bool group, UUID group_uuid, bool localchat,bool fromme)
-        {
-            base.BotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
-            if (fromme == false)
-            {
-                if (localchat == false)
-                {
-                    if(avatar == true)
-                    {
-                        if (myconfig.Setting_RelayImToAvatarUUID != null)
-                        {
-                            if (myconfig.Setting_RelayImToAvatarUUID != UUID.Zero.ToString())
-                            {
-                                if (myconfig.Setting_RelayImToAvatarUUID.Length == UUID.Zero.ToString().Length)
-                                {
-                                    if (UUID.TryParse(myconfig.Setting_RelayImToAvatarUUID, out UUID targetav) == true)
-                                    {
-                                        Client.Self.InstantMessage(targetav, "Relay-> " + sender_name + ": " + message + "");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+
         protected override void MessageHandler(object sender, InstantMessageEventArgs e)
         {
             bool fromme = false;

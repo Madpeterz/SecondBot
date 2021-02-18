@@ -92,14 +92,12 @@ namespace BetterSecondBot.DiscordSupervisor
                     {
                         if (message.Content == "!commands")
                         {
-                            await SendMessageToChannelAsync("interface", "broken", "bot", UUID.Zero, "bot");
-                        }
-                        else if (message.Content.StartsWith("!help") == true)
-                        {
-                            await SendMessageToChannelAsync("interface", "broken", "bot", UUID.Zero, "bot");
+                            string[] commands = controler.Bot.getFullListOfCommands();
+                            await SendMessageToChannelAsync("interface", string.Join("\n",commands)+ " \n For more details please see the wiki \n https://wiki.magicmadpeter.xyz/", "bot", UUID.Zero, "bot");
                         }
                         else
                         {
+                            await MarkMessage(message, "❌").ConfigureAwait(false);
                             output.Append("Unknown request: ");
                             output.Append(message.Content);
                             await SendMessageToChannelAsync("interface", output.ToString(), "bot", UUID.Zero, "bot");
@@ -107,6 +105,24 @@ namespace BetterSecondBot.DiscordSupervisor
                     }
                     else
                     {
+                        string[] bits = message.Content.Split("|||");
+                        if(bits.Length >= 2)
+                        {
+                            string target = "None";
+                            if (bits.Length == 3)
+                            {
+                                target = bits[2];
+                            }
+                            if (controler.Bot.getFullListOfCommands().Contains(bits[0].ToLowerInvariant()) == true)
+                            {
+                                controler.Bot.CallAPI(bits[0], bits[1].Split("~#~"), target);
+                                await MarkMessage(message, "✅").ConfigureAwait(false);
+                            }
+                            else
+                            {
+                                await MarkMessage(message, "❌").ConfigureAwait(false);
+                            }
+                        }
                         await MarkMessage(message, "❌").ConfigureAwait(false);
                     }
                 }
@@ -128,7 +144,7 @@ namespace BetterSecondBot.DiscordSupervisor
                 else
                 {
                     await MarkMessage(message, "⏳").ConfigureAwait(true);
-                    Thread.Sleep(200);
+                    Thread.Sleep(400);
                     string[] bits = Chan.Topic.Split(':');
                     if (bits.Length >= 2)
                     {
@@ -180,16 +196,14 @@ namespace BetterSecondBot.DiscordSupervisor
                                     }
                                     Noticetitle = Noticetitle.Replace("!notice ", "");
                                     Noticetitle = Noticetitle.Trim();
-                                    //controler.Bot.GetCommandsInterface.Call("GroupNotice", "" + group.ToString() + "~#~" + Noticetitle + "~#~" + Noticemessage, UUID.Zero);
-                                    //await MarkMessage(message, "✅");
-                                    await MarkMessage((IUserMessage)message, "❌").ConfigureAwait(false);
+                                    controler.Bot.CallAPI("Groupnotice", new string[] { Noticetitle, Noticemessage });
+                                    await MarkMessage(message, "✅");
                                 }
                                 else
                                 {
                                     IGuildUser user = (IGuildUser)message.Author;
-                                    //controler.Bot.GetCommandsInterface.Call("Groupchat", "" + group.ToString() + "~#~" + message.Content, UUID.Zero);
-                                    //await MarkMessage(message, "✅");
-                                    await MarkMessage((IUserMessage)message, "❌").ConfigureAwait(false);
+                                    controler.Bot.CallAPI("Groupchat", new string[] { group.ToString(), message.Content });
+                                    await MarkMessage(message, "✅");
                                 }
                             }
                         }

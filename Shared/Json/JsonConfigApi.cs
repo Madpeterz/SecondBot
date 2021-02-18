@@ -72,10 +72,6 @@ namespace BetterSecondBotShared.Json
             {
                 return "Allow the bot to transfer L$ and get a non zero balance";
             }
-            else if (cmd == "Setting_RelayImToAvatarUUID")
-            {
-                return "UUID of who the bot should relay IMs to in secondlife";
-            }
             else if (cmd == "Setting_DefaultSit_UUID")
             {
                 return "UUID of a object the bot should attempt to sit on after logging in";
@@ -93,15 +89,7 @@ namespace BetterSecondBotShared.Json
         protected string GetHelp_Discord(string cmd)
         {
             // Discord
-            if (cmd == "DiscordRelay_URL")
-            {
-                return "The webhook URL to send group chat to";
-            }
-            else if (cmd == "DiscordRelay_GroupUUID")
-            {
-                return "The group UUID to relay group chat for";
-            }
-            else if (cmd == "DiscordFull_Enable")
+            if (cmd == "DiscordFull_Enable")
             {
                 return "Allow the bot to fully connect to discord (Disables relay)";
             }
@@ -132,31 +120,7 @@ namespace BetterSecondBotShared.Json
             }
             return "";
         }
-        protected string GetHelp_DiscordTTS(string cmd)
-        {
-            // Discord TTS
-            if (cmd == "DiscordTTS_Enable")
-            {
-                return "Enable discord TTS helper (Requires DiscordFull_Enable set to true) ";
-            }
-            else if (cmd == "DiscordTTS_server_id")
-            {
-                return "The server ID to use for TTS";
-            }
-            else if (cmd == "DiscordTTS_channel_name")
-            {
-                return "The channel name to use (found on the server set by DiscordTTS_server_id)";
-            }
-            else if (cmd == "DiscordTTS_avatar_uuid")
-            {
-                return "The avatar UUID whos IMs will be turned into TTS";
-            }
-            else if (cmd == "DiscordTTS_Nickname")
-            {
-                return "The nickname to use on the TTS server";
-            }
-            return "";
-        }
+
         protected string GetHelp_Logs(string cmd)
         {
             // Logs
@@ -186,7 +150,6 @@ namespace BetterSecondBotShared.Json
             if (cmd.StartsWith("Basic") == true) { return GetHelp_Basic(cmd); }
             else if (cmd.StartsWith("Security") == true) { return GetHelp_Security(cmd); }
             else if (cmd.StartsWith("Settings") == true) { return GetHelp_Settings(cmd); }
-            else if (cmd.StartsWith("DiscordTTS") == true) { return GetHelp_DiscordTTS(cmd); }
             else if (cmd.StartsWith("Discord") == true) { return GetHelp_Discord(cmd); }
             else if (cmd.StartsWith("Http_") == true) { return GetHelp_HTTP(cmd); }
             else { return GetHelp_Logs(cmd); }
@@ -243,7 +206,6 @@ namespace BetterSecondBotShared.Json
             // Settings
             if (cmd == "Setting_AllowRLV") { return "False"; }
             else if (cmd == "Setting_AllowFunds") { return "True"; }
-            else if (cmd == "Setting_RelayImToAvatarUUID") { return ""; }
             else if (cmd == "Setting_DefaultSit_UUID") { return ""; }
             else if (cmd == "Setting_loginURI") { return "secondlife"; }
             else if (cmd == "Setting_LogCommands") { return "True"; }
@@ -252,9 +214,7 @@ namespace BetterSecondBotShared.Json
         protected string GetValueHint_Discord(string cmd)
         {
             // Discord
-            if (cmd == "DiscordRelay_URL") { return ""; }
-            else if (cmd == "DiscordRelay_GroupUUID") { return ""; }
-            else if (cmd == "DiscordFull_Enable") { return "False"; }
+            if (cmd == "DiscordFull_Enable") { return "False"; }
             else if (cmd == "DiscordFull_Token") { return ""; }
             else if (cmd == "DiscordFull_ServerID") { return ""; }
             else if (cmd == "DiscordFull_Keep_GroupChat") { return "False"; }
@@ -267,16 +227,7 @@ namespace BetterSecondBotShared.Json
             else if (cmd == "Http_Host") { return "http://*:8080"; }
             return "";
         }
-        protected string GetValueHint_DiscordTTS(string cmd)
-        {
-            // Discord TTS
-            if (cmd == "DiscordTTS_Enable") { return "False"; }
-            else if (cmd == "DiscordTTS_server_id") { return ""; }
-            else if (cmd == "DiscordTTS_channel_name") { return ""; }
-            else if (cmd == "DiscordTTS_avatar_uuid") { return ""; }
-            else if (cmd == "DiscordTTS_Nickname") { return ""; }
-            return "";
-        }
+
         protected string GetValueHint_Logs(string cmd)
         {
             // Logs
@@ -294,7 +245,6 @@ namespace BetterSecondBotShared.Json
             if (cmd.StartsWith("Basic") == true) { return GetValueHint_Basic(cmd); }
             else if (cmd.StartsWith("Security") == true) { return GetValueHint_Security(cmd); }
             else if (cmd.StartsWith("Setting_") == true) { return GetValueHint_Settings(cmd); }
-            else if (cmd.StartsWith("DiscordTTS_") == true) { return GetValueHint_DiscordTTS(cmd); }
             else if (cmd.StartsWith("Discord") == true) { return GetValueHint_Discord(cmd); }
             else if (cmd.StartsWith("Http_") == true) { return GetValueHint_HTTP(cmd); }
             else { return GetValueHint_Logs(cmd); }
