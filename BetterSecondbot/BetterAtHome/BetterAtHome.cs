@@ -283,7 +283,7 @@ namespace BetterSecondbot.BetterAtHome
                 return;
             }
             long dif = helpers.UnixTimeNow() - LastLoginEvent;
-            if (dif < 25)
+            if (dif < 15)
             {
                 SetBetterAtHomeAction("Waiting for Login cooldown");
                 return;
