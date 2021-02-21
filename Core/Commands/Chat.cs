@@ -37,7 +37,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/Say/{channel}/{token}")]
         public object Say(string channel,[FormField] string message,string token)
         {
-            if (tokens.Allow(token, "chat", "localchatsay", handleGetClientIP()) == false)
+            if (tokens.Allow(token, "chat", "Say", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
@@ -67,7 +67,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/IM/{avatar}/{token}")]
         public object IM(string avatar, [FormField] string message, string token)
         {
-            if (tokens.Allow(token, "chat", "im", handleGetClientIP()) == false)
+            if (tokens.Allow(token, "chat", "IM", handleGetClientIP()) == false)
             {
                 return BasicReply("Token not accepted");
             }
