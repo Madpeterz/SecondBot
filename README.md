@@ -109,44 +109,69 @@ You get set these tokens up by file or Environment Variables.
 ##### Environment Variables
 |Name  |  Value|
 |--|--|
-| scoped_token_1 |  "t:[10charcode],ws:core,ws:group" |
-| scoped_token_2 |  "t:[10charcode],cg:chat" |
-| scoped_token_3 |  "t:[10charcode],cm:chat/localchathistory" |
+| ScopedToken1 |  "t:[10charcode],ws:core,ws:group" |
+| ScopedToken2 |  "t:[10charcode],cg:chat" |
+| ScopedToken3 |  "t:[10charcode],cm:chat/LocalChatHistory" |
 
 
 ###  HTTP scoped tokens (info)
 ---
 
-    command [cm] "example: `cm:chat/localchathistory`
+    command [cm] "example: `cm:chat/LocalChatHistory`
+        "a single command, formated as cm:[workspace]/[commandname]"
     
-    workspaces [ws] "example: ws: core, ws: groups"
+    workspaces [ws] "example: ws: core, ws: group"
+        "all commands under a workspace"
+
+        "known workspaces"
+        animation
+        avatars
+        chat
+        core
+        dialogs
+        estate
+        friends
+        group
+        home
+        im
+        info
+        inventory
+        movement
+        notecard
+        parcel
+        self
+        streamadmin
+        +ALL
     
     commandgroups [cg] "example: `cg:chat`"
-    	chat
-    		chat/localchathistory
-    		chat/localchatsay
-    		groups/getgroupchat	
-    		groups/sendgroupchat
-    		groups/listgroups
-    		im/chatwindows
-    		im/listwithunread
-    		im/getimchat
-    		im/sendimchat
-    
-    	giver
-    		inventory/send
-    		inventory/folders
-    		inventory/contents
-    
-    
-    	groupinvite
-    		[WIP]
-    
-    	movement
-    		core/walkto
-    		core/teleport
-    		core/gesture
+        chat
+            chat/IM
+            chat/LocalChatHistory
+            chat/Say
+            group/Groupchat
+            group/GetGroupList
+            group/GroupchatListAllUnreadGroups
+            im/getimchat
+            im/chatwindows
+            im/haveunreadims
+            im/listwithunread
 
+        giver
+            inventory/SendItem
+            inventory/SendFolder
+            inventory/InventoryFolders
+            inventory/InventoryContents
+
+        movement
+            movement/AutoPilot
+            movement/AutoPilotStop
+            movement/Fly
+            movement/RequestTeleport
+            movement/RotateTo
+            movement/RotateToFace
+            movement/RotateToFaceVector
+            movement/SendTeleportLure
+            movement/Teleport
 
 
 ###  BetterRelay system

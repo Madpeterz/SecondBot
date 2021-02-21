@@ -31,7 +31,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/FetchNextNotecard/{token}")]
         public object FetchNextNotecard([FormField] string endpoint, [FormField] string endpointcode, string token)
         {
-            if (tokens.Allow(token, "avatars", "FetchNextNotecard", handleGetClientIP()) == false)
+            if (tokens.Allow(token, "streamadmin", "FetchNextNotecard", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted");
             }

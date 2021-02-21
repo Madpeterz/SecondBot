@@ -35,9 +35,9 @@ namespace BetterSecondBot.HttpService
             bool found = true;
             while (found == true)
             {
-                if (helpers.notempty(Environment.GetEnvironmentVariable("scoped_token_" + loop.ToString())) == true)
+                if (helpers.notempty(Environment.GetEnvironmentVariable("ScopedToken" + loop.ToString())) == true)
                 {
-                    processScopedTokenRaw(Environment.GetEnvironmentVariable("scoped_token_" + loop.ToString()));
+                    processScopedTokenRaw(Environment.GetEnvironmentVariable("ScopedToken" + loop.ToString()));
                 }
                 else
                 {
@@ -343,7 +343,7 @@ namespace BetterSecondBot.HttpService
             }
             scopedTokenInfo info = scopedtokens[code];
             string build = workgroup + "/" + command;
-            if (info.AllowWorkgroups.Contains(workgroup) == true)
+            if ((info.AllowWorkgroups.Contains(workgroup) == true) || (info.AllowWorkgroups.Contains("+ALL") == true))
             {
                 return true;
             }
@@ -512,31 +512,39 @@ namespace BetterSecondBot.HttpService
             if (permsgroupname == "chat")
             {
                 allowed = new List<string>(){
-                    "chat/localchathistory",
-                    "chat/localchatsay",
-                    "groups/getgroupchat",
-                    "groups/sendgroupchat",
-                    "groups/listgroups",
-                    "im/chatwindows",
-                    "im/listwithunread",
+                    "chat/IM",
+                    "chat/LocalChatHistory",
+                    "chat/Say",
+                    "group/Groupchat",
+                    "group/GetGroupList",
+                    "group/GroupchatListAllUnreadGroups",
                     "im/getimchat",
-                    "im/sendimchat"
+                    "im/chatwindows",
+                    "im/haveunreadims",
+                    "im/listwithunread"
                 };
             }
             else if (permsgroupname == "giver")
             {
                 allowed = new List<string>(){
-                    "inventory/send",
-                    "inventory/folders",
-                    "inventory/contents"
+                    "inventory/SendItem",
+                    "inventory/SendFolder",
+                    "inventory/InventoryFolders",
+                    "inventory/InventoryContents"
                 };
             }
             else if (permsgroupname == "movement")
             {
                 allowed = new List<string>(){
-                    "core/walkto",
-                    "core/teleport",
-                    "core/gesture"
+                    "movement/AutoPilot",
+                    "movement/AutoPilotStop",
+                    "movement/Fly",
+                    "movement/RequestTeleport",
+                    "movement/RotateTo",
+                    "movement/RotateToFace",
+                    "movement/RotateToFaceVector",
+                    "movement/SendTeleportLure",
+                    "movement/Teleport",
                 };
             }
             return allowed.Contains(build);
