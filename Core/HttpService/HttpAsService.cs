@@ -183,6 +183,7 @@ namespace BetterSecondBot.HttpService
                 .WithWebApi("/dialogs", m => m.WithController(() => new HTTP_Dialogs(Bot, Tokens)))
                 .WithWebApi("/estate", m => m.WithController(() => new HTTP_Estate(Bot, Tokens)))
                 .WithWebApi("/friends", m => m.WithController(() => new HTTP_Friends(Bot, Tokens)))
+                .WithWebApi("/funds", m => m.WithController(() => new Http_Funds(Bot, Tokens)))
                 .WithWebApi("/group", m => m.WithController(() => new HTTP_Group(Bot, Tokens)))
                 .WithWebApi("/home", m => m.WithController(() => new HTTP_Home(Bot, Tokens)))
                 .WithWebApi("/im", m => m.WithController(() => new HTTP_IM(Bot, Tokens)))
