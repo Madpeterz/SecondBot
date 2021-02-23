@@ -37,8 +37,11 @@ namespace BetterSecondBot.HttpService
         [About("Makes the bot pay a avatar")]
         [ReturnHints("Accepted")]
         [ReturnHints("avatar lookup")]
+        [ReturnHints("Amount out of range")]
         [ReturnHints("Invaild amount")]
         [ReturnHints("Transfer funds to avatars disabled")]
+        [ArgHints("avatar", "URLARG", "the avatars UUID or Firstname Lastname")]
+        [ArgHints("amount", "URLARG", "the amount to pay (from 1 to current balance)")]
         [Route(HttpVerbs.Get, "/PayAvatar/{avatar}/{amount}/{token}")]
         public object PayAvatar(string avatar, string amount, string token)
         {
@@ -59,9 +62,9 @@ namespace BetterSecondBot.HttpService
             {
                 return BasicReply("Invaild amount");
             }
-            if (amountvalue < 1)
+            if ((amountvalue < 0) || (amountvalue > bot.GetClient.Self.Balance))
             {
-                return BasicReply("Invaild amount");
+                return Failure("Amount out of range");
             }
             bot.GetClient.Self.GiveAvatarMoney(avataruuid, amountvalue);
             return BasicReply("Accepted");
