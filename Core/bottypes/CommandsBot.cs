@@ -263,21 +263,23 @@ namespace BetterSecondBot.bottypes
                     message = input[0];
                     signing_code = input[1];
                 }
-                List<string> bits = message.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                string outputto = "none";
+                List<string> bigbits = message.Split(new[] { "#|#" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                List<string> bits = bigbits[0].Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
                 if (bits.Count == 1)
                 {
                     bits.Add("");
                 }
-                if (bits.Count == 2)
+                if(bigbits.Count == 2)
                 {
-                    bits.Add("none");
+                    outputto = bigbits[1];
                 }
                 bool frommaster = false;
                 if ((avatar == true) && ((sender_uuid == master_uuid) || (SubMasters.Contains(sender_name) == true)))
                 {
                     frommaster = true;
                 }
-                CoreCommandLib(sender_uuid, frommaster, bits[0], bits[1].Split("~#~"), signing_code,bits[2]);
+                CoreCommandLib(sender_uuid, frommaster, bits[0], bits[1].Split("~#~", StringSplitOptions.RemoveEmptyEntries), signing_code, outputto);
             }
         }
 

@@ -37,6 +37,10 @@ namespace BetterSecondBot
                 Thread.Sleep(1500);
             }
             betterAtHomeService = null;
+            betterTracking = null;
+            datastorage = null;
+            Bot = null;
+            exitBot = true;
         }
 
         public void attachEventListenerObjects(JsonConfig Config, bool as_docker)

@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	<DockerfileRunEnvironmentFiles>settings.env</DockerfileRunEnvironmentFiles>
     <DockerfileContext>..\..</DockerfileContext>
 	  <MSBuildGitHashCommand>git rev-parse --short HEAD</MSBuildGitHashCommand>
 	  <MSBuildGitHashValidate>False</MSBuildGitHashValidate>

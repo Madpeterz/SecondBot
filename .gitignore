@@ -17,3 +17,6 @@ PrimMesher/
 Programs/
 libremetaverse-core/.gitignore
 BetterSecondbot/Dockerfile
+BetterSecondbot/wiki/
+BetterSecondbot/debug.json
+BetterSecondbot/settings.env

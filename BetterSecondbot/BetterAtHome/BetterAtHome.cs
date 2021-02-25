@@ -37,6 +37,7 @@ namespace BetterSecondbot.BetterAtHome
             {
                 string[] bits = helpers.ParseSLurl(a);
                 homeRegions.Add(bits[0]);
+                LogFormater.Info("Added home region: " + bits[0]);
             }
         }
 
@@ -289,7 +290,7 @@ namespace BetterSecondbot.BetterAtHome
                 return;
             }
             dif = helpers.UnixTimeNow() - LastTeleportEvent;
-            if (dif < 120)
+            if (dif < 45)
             {
                 SetBetterAtHomeAction("Waiting for Teleport lockout");
                 return;
