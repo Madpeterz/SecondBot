@@ -171,7 +171,7 @@ namespace BetterSecondbot.Tracking
                     addToSeen(avuuid);
                     string name = controler.Bot.FindAvatarKey2Name(avuuid);
                     int loop = 0;
-                    while ((loop < 8) && (name == "lookup"))
+                    while ((loop < 32) && (name == "lookup"))
                     {
                         Thread.Sleep(500);
                         name = controler.Bot.FindAvatarKey2Name(avuuid);
@@ -214,7 +214,7 @@ namespace BetterSecondbot.Tracking
                 {
                     string name = controler.Bot.FindAvatarKey2Name(avuuid);
                     int loop = 0;
-                    while ((loop < 8) && (name == "lookup"))
+                    while ((loop < 32) && (name == "lookup"))
                     {
                         Thread.Sleep(500);
                         name = controler.Bot.FindAvatarKey2Name(avuuid);
