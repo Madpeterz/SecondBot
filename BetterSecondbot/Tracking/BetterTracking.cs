@@ -72,7 +72,7 @@ namespace BetterSecondbot.Tracking
                         LogFormater.Info("Tracker - Enabled HTTP: " + controler.Bot.getMyConfig.Setting_Tracker);
                     }
                     controler.Bot.StatusMessageEvent += StatusPing;
-                    controler.Bot.GetClient.Grid.CoarseLocationUpdate += LocationUpdate;
+                    //controler.Bot.GetClient.Grid.CoarseLocationUpdate += LocationUpdate;
                 }
             }
         }
@@ -169,11 +169,13 @@ namespace BetterSecondbot.Tracking
                     if (AvatarSeen.ContainsKey(avuuid) == false)
                     {
                         string name = controler.Bot.FindAvatarKey2Name(avuuid);
-                        if (name == "lookup")
+                        int loop = 0;
+                        while((loop < 8) && (name == "lookup"))
                         {
-                            Thread.Sleep(2000);
+                            Thread.Sleep(500);
+                            name = controler.Bot.FindAvatarKey2Name(avuuid);
+                            loop++;
                         }
-                        name = controler.Bot.FindAvatarKey2Name(avuuid);
                         output(avuuid, "entry###" + name);
                         AvatarSeen.Add(avuuid, 0);
                     }
@@ -191,11 +193,13 @@ namespace BetterSecondbot.Tracking
                     lock (AvatarSeen)
                     {
                         string name = controler.Bot.FindAvatarKey2Name(avuuid);
-                        if (name == "lookup")
+                        int loop = 0;
+                        while ((loop < 8) && (name == "lookup"))
                         {
-                            Thread.Sleep(2000);
+                            Thread.Sleep(500);
+                            name = controler.Bot.FindAvatarKey2Name(avuuid);
+                            loop++;
                         }
-                        name = controler.Bot.FindAvatarKey2Name(avuuid);
                         output(avuuid, "exit###" + name + "~#~" + AvatarSeen[avuuid].ToString());
                         AvatarSeen.Remove(avuuid);
                     }
