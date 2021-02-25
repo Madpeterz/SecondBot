@@ -3,6 +3,7 @@ using BetterSecondBotShared.logs;
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -31,13 +32,13 @@ namespace BetterSecondbot.Tracking
             }
             if(int.TryParse(controler.Bot.getMyConfig.Setting_Tracker,out output_channel) == true)
             {
-                LogFormater.Info("Tracker - Enabled Chat");
+                LogFormater.Info("Tracker - Enabled Chat on channel: "+ output_channel.ToString());
                 output_to_channel = true;
                 attachEvents();
             }
             else if (controler.Bot.getMyConfig.Setting_Tracker.StartsWith("http") == true)
             {
-                LogFormater.Info("Tracker - Enabled HTTP");
+                LogFormater.Info("Tracker - Enabled HTTP: "+ controler.Bot.getMyConfig.Setting_Tracker);
                 output_to_url = true;
                 attachEvents();
             }
@@ -58,7 +59,7 @@ namespace BetterSecondbot.Tracking
             {
                 controler.Bot.GetClient.Self.Chat(output, output_channel, ChatType.Normal);
             }
-            if(output_to_url)
+            if(output_to_url == true)
             {
                 Thread newThread = new Thread(this.SendHTTPData);
                 newThread.Start(output);
@@ -87,14 +88,21 @@ namespace BetterSecondbot.Tracking
 
         protected void LocationUpdate(object o, CoarseLocationUpdateEventArgs e)
         {
-            foreach(UUID av in e.NewEntries)
+            if (e.NewEntries.Count() > 0)
             {
-                output(av, "entry");
+                foreach (UUID av in e.NewEntries)
+                {
+                    output(av, "entry");
+                }
             }
-            foreach(UUID av in e.RemovedEntries)
+            if (e.RemovedEntries.Count() > 0)
             {
-                output(av, "exit");
+                foreach (UUID av in e.RemovedEntries)
+                {
+                    output(av, "exit");
+                }
             }
+
         }
     }
 }
