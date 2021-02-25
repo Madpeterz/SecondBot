@@ -274,7 +274,7 @@ namespace BetterSecondBot.bottypes
                 if (group_members_storage.ContainsKey(group) == true)
                 {
                     long dif = last_cleanup - group_members_storage[group].Key;
-                    if (dif < 60)
+                    if (dif < 240)
                     {
                         result= false;
                     }

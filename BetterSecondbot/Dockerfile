@@ -39,6 +39,7 @@ ENV Setting_AllowFunds='false'
 ENV Setting_LogCommands='false'
 ENV Setting_DefaultSit_UUID=''
 ENV Setting_loginURI='secondlife'
+ENV Setting_Tracker='false'
 
 ENV DiscordFull_Enable='false'
 ENV DiscordFull_Token=''

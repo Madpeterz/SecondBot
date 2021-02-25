@@ -84,6 +84,10 @@ namespace BetterSecondBotShared.Json
             {
                 return "Allow the bot to send command to console and discord full if enabled";
             }
+            else if(cmd == "Setting_Tracker")
+            {
+                return "should the avatar tracker be enabled (anything but \"false\") and if so where should it go: (Channel number or a url)";
+            }
             return "";
         }
         protected string GetHelp_Discord(string cmd)
@@ -209,6 +213,7 @@ namespace BetterSecondBotShared.Json
             else if (cmd == "Setting_DefaultSit_UUID") { return ""; }
             else if (cmd == "Setting_loginURI") { return "secondlife"; }
             else if (cmd == "Setting_LogCommands") { return "True"; }
+            else if(cmd == "Setting_Tracker") { return "False"; }
             return "";
         }
         protected string GetValueHint_Discord(string cmd)

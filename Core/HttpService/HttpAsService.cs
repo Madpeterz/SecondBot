@@ -439,7 +439,7 @@ namespace BetterSecondBot.HttpService
                     return new KeyValuePair<bool, string>(false, "Parcel data not ready");
                 }
             }
-            Parcel targetparcel = bot.GetClient.Network.CurrentSim.Parcels[localid];
+            targetparcel = bot.GetClient.Network.CurrentSim.Parcels[localid];
             return new KeyValuePair<bool, string>(true, "");
         }
 

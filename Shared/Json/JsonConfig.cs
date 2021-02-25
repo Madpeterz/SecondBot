@@ -43,6 +43,8 @@ namespace BetterSecondBotShared.Json
         public string Setting_DefaultSit_UUID { get; set; }
         public string Setting_loginURI { get; set; }
 
+        public string Setting_Tracker { get; set; }
+
         // Discord FullFat
         public bool DiscordFull_Enable { get; set; }
         public string DiscordFull_Token { get; set; }
