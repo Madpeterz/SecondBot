@@ -160,23 +160,48 @@ namespace BetterSecondbot.Tracking
             }
         }
 
-        protected void TrackerEventAdd(UUID av)
+        protected void TrackerEventAdd(object av)
         {
-            if(AvatarSeen.ContainsKey(av) == false)
+            if (UUID.TryParse(av.ToString(), out UUID avuuid) == true)
             {
-                output(av, "entry|" + controler.Bot.FindAvatarKey2Name(av));
-                AvatarSeen.Add(av, 0);
+                lock (AvatarSeen)
+                {
+                    if (AvatarSeen.ContainsKey(avuuid) == false)
+                    {
+                        string name = controler.Bot.FindAvatarKey2Name(avuuid);
+                        if (name == "lookup")
+                        {
+                            Thread.Sleep(2000);
+                        }
+                        name = controler.Bot.FindAvatarKey2Name(avuuid);
+                        output(avuuid, "entry###" + name);
+                        AvatarSeen.Add(avuuid, 0);
+                    }
+                    AvatarSeen[avuuid] = helpers.UnixTimeNow();
+                }
             }
-            AvatarSeen[av] = helpers.UnixTimeNow();
         }
 
-        protected void TrackerEventRemove(UUID av)
+        protected void TrackerEventRemove(object av)
         {
-            if (AvatarSeen.ContainsKey(av) == true)
+            if (UUID.TryParse(av.ToString(), out UUID avuuid) == true)
             {
-                output(av, "exit|" + controler.Bot.FindAvatarKey2Name(av)+"|"+ AvatarSeen[av].ToString());
-                AvatarSeen.Remove(av);
+                if (AvatarSeen.ContainsKey(avuuid) == true)
+                {
+                    lock (AvatarSeen)
+                    {
+                        string name = controler.Bot.FindAvatarKey2Name(avuuid);
+                        if (name == "lookup")
+                        {
+                            Thread.Sleep(2000);
+                        }
+                        name = controler.Bot.FindAvatarKey2Name(avuuid);
+                        output(avuuid, "exit###" + name + "|" + AvatarSeen[avuuid].ToString());
+                        AvatarSeen.Remove(avuuid);
+                    }
+                }
             }
+
         }
 
 
@@ -187,7 +212,8 @@ namespace BetterSecondbot.Tracking
             {
                 foreach (UUID av in e.NewEntries)
                 {
-                    TrackerEventAdd(av);
+                    Thread newThread = new Thread(this.TrackerEventAdd);
+                    newThread.Start(av);
                 }
             }
             if (e.RemovedEntries.Count() > 0)

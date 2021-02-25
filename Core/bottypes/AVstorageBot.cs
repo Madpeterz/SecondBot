@@ -356,8 +356,11 @@ namespace BetterSecondBot.bottypes
             }
             if (PendingAvatarFinds_viauuid.ContainsKey(avatar_uuid) == false)
             {
-                PendingAvatarFinds_viauuid.Add(avatar_uuid, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 0));
-                Client.Avatars.RequestAvatarName(avatar_uuid);
+                lock (PendingAvatarFinds_viauuid)
+                {
+                    PendingAvatarFinds_viauuid.Add(avatar_uuid, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 0));
+                    Client.Avatars.RequestAvatarName(avatar_uuid);
+                }
             }
             return "lookup";
         }
