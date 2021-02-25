@@ -7,6 +7,7 @@ using System.Threading;
 using static BetterSecondBot.Program;
 using BetterSecondbot.BetterAtHome;
 using BetterSecondbot.DataStorage;
+using BetterSecondbot.Tracking;
 
 namespace BetterSecondBot
 {
@@ -16,6 +17,7 @@ namespace BetterSecondBot
         protected bool exitBot = false;
         public SecondBot Bot;
         protected BetterAtHome betterAtHomeService;
+        protected BetterTracking betterTracking;
         protected Datastorage datastorage;
 
         protected void keep_alive()
@@ -48,6 +50,7 @@ namespace BetterSecondBot
                 }).Start();
             }
             betterAtHomeService = new BetterAtHome(this, Config);
+            betterTracking = new BetterTracking(this);
             datastorage = new Datastorage(this);
         }
         public Cli(JsonConfig Config, bool as_docker, bool use_self_keep_alive)
