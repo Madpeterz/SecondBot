@@ -60,8 +60,9 @@ namespace BetterSecondbot.Tracking
             {
                 LogFormater.Info("Tracker - disconnected from login process event");
                 controler.Bot.LoginProgess -= LoginProcess;
-                if (AfterLogin == true)
+                if (AfterLogin == false)
                 {
+                    AfterLogin = true;
                     if (output_to_channel == true)
                     {
                         LogFormater.Info("Tracker - Enabled Chat on channel: " + output_channel.ToString());
