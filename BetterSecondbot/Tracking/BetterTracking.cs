@@ -110,7 +110,8 @@ namespace BetterSecondbot.Tracking
                     foreach (UUID A in avs)
                     {
                         seenavs.Add(A);
-                        TrackerEventAdd(A);
+                        Thread newThread = new Thread(this.TrackerEventAdd);
+                        newThread.Start(A);
                     }
                     foreach(UUID A in AvatarSeen.Keys)
                     {
@@ -119,7 +120,8 @@ namespace BetterSecondbot.Tracking
                             long dif = helpers.UnixTimeNow() - AvatarSeen[A];
                             if (dif > 15)
                             {
-                                TrackerEventRemove(A); // not seen in the last 15 secs
+                                Thread newThread = new Thread(this.TrackerEventRemove);
+                                newThread.Start(A);
                             }
                         }
                     }
