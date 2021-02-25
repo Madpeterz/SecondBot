@@ -59,10 +59,9 @@ namespace BetterSecondBot.bottypes
             string reply = "";
             if (show_av_storage_info_in_status == true)
             {
-                int count = PendingAvatarFinds_vianame.Count + PendingAvatarFinds_viauuid.Count;
-                if (count > 0)
+                if ((PendingAvatarFinds_vianame.Count > 0) || (PendingAvatarFinds_viauuid.Count > 0))
                 {
-                    reply = count.ToString() + " pending";
+                    reply = "Pending: "+PendingAvatarFinds_vianame.Count.ToString() + " Name2Key() - "+ PendingAvatarFinds_viauuid.Count.ToString()+" Key2Name()";
                 }
                 if (AvatarStorageLastUsed.Count > 0)
                 {
