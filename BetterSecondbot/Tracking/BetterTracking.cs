@@ -166,22 +166,38 @@ namespace BetterSecondbot.Tracking
         {
             if (UUID.TryParse(av.ToString(), out UUID avuuid) == true)
             {
-                lock (AvatarSeen)
+                string name = controler.Bot.FindAvatarKey2Name(avuuid);
+                int loop = 0;
+                while((loop < 8) && (name == "lookup"))
                 {
-                    if (AvatarSeen.ContainsKey(avuuid) == false)
-                    {
-                        string name = controler.Bot.FindAvatarKey2Name(avuuid);
-                        int loop = 0;
-                        while((loop < 8) && (name == "lookup"))
-                        {
-                            Thread.Sleep(500);
-                            name = controler.Bot.FindAvatarKey2Name(avuuid);
-                            loop++;
-                        }
-                        output(avuuid, "entry###" + name);
-                        AvatarSeen.Add(avuuid, 0);
-                    }
-                    AvatarSeen[avuuid] = helpers.UnixTimeNow();
+                    Thread.Sleep(500);
+                    name = controler.Bot.FindAvatarKey2Name(avuuid);
+                    loop++;
+                }
+                output(avuuid, "entry###" + name);
+                addToSeen(avuuid);
+            }
+        }
+
+        protected void addToSeen(UUID av)
+        {
+            lock (AvatarSeen)
+            {
+                if (AvatarSeen.ContainsKey(av) == false)
+                {
+                    AvatarSeen.Add(av, 0);
+                }
+                AvatarSeen[av] = helpers.UnixTimeNow();
+            }   
+        }
+
+        protected void removeFromSeen(UUID av)
+        {
+            lock (AvatarSeen)
+            {
+                if (AvatarSeen.ContainsKey(av) == true)
+                {
+                    AvatarSeen.Remove(av);
                 }
             }
         }
@@ -192,22 +208,21 @@ namespace BetterSecondbot.Tracking
             {
                 if (AvatarSeen.ContainsKey(avuuid) == true)
                 {
-                    lock (AvatarSeen)
+                    string name = controler.Bot.FindAvatarKey2Name(avuuid);
+                    int loop = 0;
+                    while ((loop < 8) && (name == "lookup"))
                     {
-                        string name = controler.Bot.FindAvatarKey2Name(avuuid);
-                        int loop = 0;
-                        while ((loop < 8) && (name == "lookup"))
-                        {
-                            Thread.Sleep(500);
-                            name = controler.Bot.FindAvatarKey2Name(avuuid);
-                            loop++;
-                        }
+                        Thread.Sleep(500);
+                        name = controler.Bot.FindAvatarKey2Name(avuuid);
+                        loop++;
+                    }
+                    if (AvatarSeen.ContainsKey(avuuid) == true)
+                    {
                         output(avuuid, "exit###" + name + "~#~" + AvatarSeen[avuuid].ToString());
-                        AvatarSeen.Remove(avuuid);
+                        removeFromSeen(avuuid);
                     }
                 }
             }
-
         }
 
 

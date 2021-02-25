@@ -77,7 +77,7 @@ namespace BetterSecondbot.DataStorage
             working.lastupdated = helpers.UnixTimeNow();
             foreach(UUID av in e.Banned)
             {
-                working.banned.Add(av,controler.Bot.FindAvatarKey2Name(av));
+                working.banned.Add(av,"lookup"); // controler.Bot.FindAvatarKey2Name(av)
             }
             working.regionname = controler.Bot.GetClient.Network.CurrentSim.Name;
             controler.Bot.UpdateSimBlacklist(working);
