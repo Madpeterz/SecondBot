@@ -92,14 +92,14 @@ namespace BetterSecondbot.Tracking
             {
                 foreach (UUID av in e.NewEntries)
                 {
-                    output(av, "entry");
+                    output(av, "entry|"+controler.Bot.FindAvatarKey2Name(av));
                 }
             }
             if (e.RemovedEntries.Count() > 0)
             {
                 foreach (UUID av in e.RemovedEntries)
                 {
-                    output(av, "exit");
+                    output(av, "exit|" + controler.Bot.FindAvatarKey2Name(av));
                 }
             }
 
