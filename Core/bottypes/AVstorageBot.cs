@@ -1,4 +1,5 @@
-﻿using BetterSecondBotShared.Static;
+﻿using BetterSecondBotShared.logs;
+using BetterSecondBotShared.Static;
 using Newtonsoft.Json;
 using OpenMetaverse;
 using RestSharp;
@@ -103,35 +104,38 @@ namespace BetterSecondBot.bottypes
 
         protected void ReTriggerUUIDtoName()
         {
-            long now = helpers.UnixTimeNow();
-            List<UUID> retrigger_key2name = new List<UUID>();
-            List<UUID> giveup_key2name = new List<UUID>();
-            foreach (KeyValuePair<UUID, KeyValuePair<long, int>> pair in PendingAvatarFinds_viauuid)
+            lock (PendingAvatarFinds_viauuid)
             {
-                long dif = now - pair.Value.Key;
-                if (dif > 30)
+                long now = helpers.UnixTimeNow();
+                List<UUID> retrigger_key2name = new List<UUID>();
+                List<UUID> giveup_key2name = new List<UUID>();
+                foreach (KeyValuePair<UUID, KeyValuePair<long, int>> pair in PendingAvatarFinds_viauuid)
                 {
-                    if (pair.Value.Value < max_retry_attempts)
+                    long dif = now - pair.Value.Key;
+                    if (dif > 30)
                     {
-                        retrigger_key2name.Add(pair.Key);
+                        if (pair.Value.Value < max_retry_attempts)
+                        {
+                            retrigger_key2name.Add(pair.Key);
+                        }
+                        else
+                        {
+                            giveup_key2name.Add(pair.Key);
+                        }
                     }
-                    else
-                    {
-                        giveup_key2name.Add(pair.Key);
-                    }
-                }     
-            }
-            if(retrigger_key2name.Count > 0)
-            {
-                foreach (UUID avuuid in retrigger_key2name)
-                {
-                    PendingAvatarFinds_viauuid[avuuid] = new KeyValuePair<long, int>(now, PendingAvatarFinds_viauuid[avuuid].Value + 1);
                 }
-                Client.Avatars.RequestAvatarNames(retrigger_key2name);
-            }
-            foreach (UUID avuuid in giveup_key2name)
-            {
-                PendingAvatarFinds_viauuid.Remove(avuuid);
+                if (retrigger_key2name.Count > 0)
+                {
+                    foreach (UUID avuuid in retrigger_key2name)
+                    {
+                        PendingAvatarFinds_viauuid[avuuid] = new KeyValuePair<long, int>(now, PendingAvatarFinds_viauuid[avuuid].Value + 1);
+                    }
+                    Client.Avatars.RequestAvatarNames(retrigger_key2name);
+                }
+                foreach (UUID avuuid in giveup_key2name)
+                {
+                    PendingAvatarFinds_viauuid.Remove(avuuid);
+                }
             }
         }
 
@@ -363,6 +367,7 @@ namespace BetterSecondBot.bottypes
             {
                 if (PendingAvatarFinds_viauuid.ContainsKey(avatar_uuid) == false)
                 {
+                    LogFormater.Info("Looking up: " + avatar_uuid);
                     PendingAvatarFinds_viauuid.Add(avatar_uuid, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 0));
                     Client.Avatars.RequestAvatarName(avatar_uuid);
                 }
