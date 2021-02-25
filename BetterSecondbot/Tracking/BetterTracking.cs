@@ -196,7 +196,7 @@ namespace BetterSecondbot.Tracking
                             Thread.Sleep(2000);
                         }
                         name = controler.Bot.FindAvatarKey2Name(avuuid);
-                        output(avuuid, "exit###" + name + "|" + AvatarSeen[avuuid].ToString());
+                        output(avuuid, "exit###" + name + "~#~" + AvatarSeen[avuuid].ToString());
                         AvatarSeen.Remove(avuuid);
                     }
                 }
