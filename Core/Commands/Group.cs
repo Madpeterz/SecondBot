@@ -9,6 +9,7 @@ using System.Text;
 using OpenMetaverse;
 using Newtonsoft.Json;
 using BetterSecondBotShared.Static;
+using System.Threading;
 
 namespace BetterSecondBot.HttpService
 {
@@ -43,12 +44,12 @@ namespace BetterSecondBot.HttpService
             if (bot.NeedReloadGroupData(groupuuid) == true)
             {
                 bot.GetClient.Groups.RequestGroupMembers(groupuuid);
-                return Failure("Updating");
             }
             ProcessAvatar(avatar);
-            if (avataruuid == UUID.Zero)
+            KeyValuePair<bool, string> reply = waitForReady(true, true, groupuuid);
+            if (reply.Key == false)
             {
-                return Failure("avatar lookup");
+                return Failure(reply.Value);
             }
             bool status = bot.FastCheckInGroup(groupuuid, avataruuid);
             return BasicReply(status.ToString());
@@ -79,7 +80,11 @@ namespace BetterSecondBot.HttpService
             if (bot.NeedReloadGroupData(groupuuid) == true)
             {
                 bot.GetClient.Groups.RequestGroupMembers(groupuuid);
-                return Failure("Updating");
+            }
+            KeyValuePair<bool, string> reply = waitForReady(false, true, groupuuid);
+            if (reply.Key == false)
+            {
+                return Failure(reply.Value);
             }
             return bot.GetGroupMembers(groupuuid);
         }
@@ -111,12 +116,12 @@ namespace BetterSecondBot.HttpService
             if (bot.NeedReloadGroupData(groupuuid) == true)
             {
                 bot.GetClient.Groups.RequestGroupMembers(groupuuid);
-                return Failure("Updating");
             }
             ProcessAvatar(avatar);
-            if (avataruuid == UUID.Zero)
+            KeyValuePair<bool, string> reply = waitForReady(true, true, groupuuid);
+            if (reply.Key == false)
             {
-                return Failure("avatar lookup");
+                return Failure(reply.Value);
             }
             bool status = bot.FastCheckInGroup(groupuuid, avataruuid);
             if(status == false)
@@ -160,12 +165,12 @@ namespace BetterSecondBot.HttpService
             if (bot.NeedReloadGroupData(groupuuid) == true)
             {
                 bot.GetClient.Groups.RequestGroupMembers(groupuuid);
-                return Failure("Updating");
             }
             ProcessAvatar(avatar);
-            if (avataruuid == UUID.Zero)
+            KeyValuePair<bool, string> reply = waitForReady(true, true, groupuuid);
+            if (reply.Key == false)
             {
-                return Failure("avatar lookup");
+                return Failure(reply.Value);
             }
             bool status = bot.FastCheckInGroup(groupuuid, avataruuid);
             if (status == false)
@@ -205,12 +210,12 @@ namespace BetterSecondBot.HttpService
             if (bot.NeedReloadGroupData(groupuuid) == true)
             {
                 bot.GetClient.Groups.RequestGroupMembers(groupuuid);
-                return Failure("Updating");
             }
             ProcessAvatar(avatar);
-            if (avataruuid == UUID.Zero)
+            KeyValuePair<bool,string> reply = waitForReady(true, true, groupuuid);
+            if(reply.Key == false)
             {
-                return Failure("avatar lookup");
+                return Failure(reply.Value);
             }
             bool status = bot.FastCheckInGroup(groupuuid, avataruuid);
             if (status == true)
@@ -552,6 +557,52 @@ namespace BetterSecondBot.HttpService
             }
             bot.GetClient.Self.InstantMessageGroup(groupUUID, message);
             return BasicReply("Sending");
+        }
+
+        protected KeyValuePair<bool, string> waitForReady(bool avatar, bool group, UUID groupuuid)
+        {
+            bool exit = false;
+            int sleeps = 0;
+            string failed_on = "";
+            bool allok = true;
+            while (exit == false)
+            {
+                allok = true;
+                failed_on = "";
+                if (avatar == true)
+                {
+                    if (avataruuid == UUID.Zero)
+                    {
+                        allok = false;
+                        failed_on = "avatar lookup";
+                    }
+                }
+                if ((group == true) && (allok == true))
+                {
+                    allok = !bot.NeedReloadGroupData(groupuuid);
+                    failed_on = "Updating";
+                }
+                if (allok == false)
+                {
+                    if (sleeps > 3)
+                    {
+                        exit = true;
+                    }
+                }
+                if (allok == true)
+                {
+                    exit = true;
+                }
+                else
+                {
+                    if (exit == false)
+                    {
+                        Thread.Sleep(1000);
+                        sleeps++;
+                    }
+                }
+            }
+            return new KeyValuePair<bool, string>(allok, failed_on);
         }
     }
 
