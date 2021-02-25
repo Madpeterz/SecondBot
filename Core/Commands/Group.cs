@@ -89,6 +89,57 @@ namespace BetterSecondBot.HttpService
             return bot.GetGroupMembers(groupuuid);
         }
 
+        [About("Attempts to ban/unban a given avatar from a group")]
+        [ReturnHints("? request accepted")]
+        [ReturnHints("Updating")]
+        [ReturnHints("Unknown group")]
+        [ReturnHints("Invaild group UUID")]
+        [ReturnHints("avatar lookup")]
+        [ArgHints("group", "URLARG", "the UUID of the group")]
+        [ArgHints("avatar", "URLARG", "the UUID of the avatar or Firstname Lastname")]
+        [ArgHints("state", "URLARG", "true to ban false to unban")]
+        [Route(HttpVerbs.Get, "/GroupBan/{group}/{avatar}/{state}/{token}")]
+        public object GroupBan(string group, string avatar, string state, string token)
+        {
+            if (tokens.Allow(token, "groups", "GetGroupMembers", handleGetClientIP()) == false)
+            {
+                return Failure("Token not accepted");
+            }
+            if (UUID.TryParse(group, out UUID groupuuid) == false)
+            {
+                return Failure("Invaild group UUID");
+            }
+            if (bot.MyGroups.ContainsKey(groupuuid) == false)
+            {
+                return Failure("Unknown group");
+            }
+            if (bool.TryParse(state, out bool banstate) == false)
+            {
+                return Failure("Invaild ban state");
+            }
+            if (bot.NeedReloadGroupData(groupuuid) == true)
+            {
+                bot.GetClient.Groups.RequestGroupMembers(groupuuid);
+            }
+            ProcessAvatar(avatar);
+            KeyValuePair<bool, string> reply = waitForReady(true, true, groupuuid);
+            if (reply.Key == false)
+            {
+                return Failure(reply.Value);
+            }
+            GroupBanAction action = GroupBanAction.Unban;
+            string statename = "Unban";
+            if (banstate == true)
+            {
+                action = GroupBanAction.Ban;
+                statename = "Ban";
+            }
+            bot.GetClient.Groups.RequestBanAction(groupuuid, action, new UUID[] { avataruuid });
+            return BasicReply(statename+" request accepted");
+        }
+
+
+
         [About("Eject selected avatar from group")]
         [ReturnHints("Requested")]
         [ReturnHints("Updating")]
