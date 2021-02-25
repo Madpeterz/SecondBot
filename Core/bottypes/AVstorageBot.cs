@@ -248,29 +248,32 @@ namespace BetterSecondBot.bottypes
         {
             if ((av_name != "null") && (av_name != null) && (av_name.ToLowerInvariant() != "secondlife") && (av_uuid != UUID.Zero))
             {
-                if (AvatarStorageLastUsed.ContainsKey(av_name) == false)
+                lock (AvatarStorageLastUsed) lock (AvatarKey2Name) lock (AvatarName2Key) lock (PendingAvatarFinds_viauuid) lock (PendingAvatarFinds_vianame)
                 {
-                    if (av_uuid != UUID.Zero)
+                    if (AvatarStorageLastUsed.ContainsKey(av_name) == false)
                     {
-                        if ((AvatarKey2Name.ContainsKey(av_uuid) == false) && (AvatarName2Key.ContainsKey(av_name) == false))
+                        if (av_uuid != UUID.Zero)
                         {
-                            AvatarName2Key.Add(av_name, av_uuid);
-                            AvatarKey2Name.Add(av_uuid, av_name);
-                        }
-                        AvatarStorageLastUsed.Add(av_name, helpers.UnixTimeNow());
-                        if (PendingAvatarFinds_vianame.ContainsKey(av_name) == true)
-                        {
-                            PendingAvatarFinds_vianame.Remove(av_name);
-                        }
-                        if (PendingAvatarFinds_viauuid.ContainsKey(av_uuid) == true)
-                        {
-                            PendingAvatarFinds_viauuid.Remove(av_uuid);
+                            if ((AvatarKey2Name.ContainsKey(av_uuid) == false) && (AvatarName2Key.ContainsKey(av_name) == false))
+                            {
+                                AvatarName2Key.Add(av_name, av_uuid);
+                                AvatarKey2Name.Add(av_uuid, av_name);
+                            }
+                            AvatarStorageLastUsed.Add(av_name, helpers.UnixTimeNow());
+                            if (PendingAvatarFinds_vianame.ContainsKey(av_name) == true)
+                            {
+                                PendingAvatarFinds_vianame.Remove(av_name);
+                            }
+                            if (PendingAvatarFinds_viauuid.ContainsKey(av_uuid) == true)
+                            {
+                                PendingAvatarFinds_viauuid.Remove(av_uuid);
+                            }
                         }
                     }
-                }
-                else
-                {
-                    AvatarStorageLastUsed[av_name] = helpers.UnixTimeNow();
+                    else
+                    {
+                        AvatarStorageLastUsed[av_name] = helpers.UnixTimeNow();
+                    }
                 }
                 if (helpers.notempty(myconfig.Security_MasterUsername) == true)
                 {
@@ -323,10 +326,13 @@ namespace BetterSecondBot.bottypes
             {
                 return uuid;
             }
-            if (PendingAvatarFinds_vianame.ContainsKey(avatar_name) == false)
+            lock (PendingAvatarFinds_vianame)
             {
-                PendingAvatarFinds_vianame.Add(avatar_name, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 0));
-                Client.Directory.StartPeopleSearch(avatar_name, 0);
+                if (PendingAvatarFinds_vianame.ContainsKey(avatar_name) == false)
+                {
+                    PendingAvatarFinds_vianame.Add(avatar_name, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 0));
+                    Client.Directory.StartPeopleSearch(avatar_name, 0);
+                }
             }
             return "lookup";
         }
@@ -354,9 +360,9 @@ namespace BetterSecondBot.bottypes
             {
                 return avatar_name;
             }
-            if (PendingAvatarFinds_viauuid.ContainsKey(avatar_uuid) == false)
+            lock (PendingAvatarFinds_viauuid)
             {
-                lock (PendingAvatarFinds_viauuid)
+                if (PendingAvatarFinds_viauuid.ContainsKey(avatar_uuid) == false)
                 {
                     PendingAvatarFinds_viauuid.Add(avatar_uuid, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 0));
                     Client.Avatars.RequestAvatarName(avatar_uuid);
