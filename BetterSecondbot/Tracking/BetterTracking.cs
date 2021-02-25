@@ -1,5 +1,7 @@
 ﻿using BetterSecondBot;
+using BetterSecondBot.bottypes;
 using BetterSecondBotShared.logs;
+using BetterSecondBotShared.Static;
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
@@ -21,6 +23,7 @@ namespace BetterSecondbot.Tracking
 
 
         protected Dictionary<UUID, long> AvatarSeen = new Dictionary<UUID, long>();
+        protected bool AfterLogin = false;
 
         public BetterTracking(Cli setcontroler)
         {
@@ -32,13 +35,11 @@ namespace BetterSecondbot.Tracking
             }
             if(int.TryParse(controler.Bot.getMyConfig.Setting_Tracker,out output_channel) == true)
             {
-                LogFormater.Info("Tracker - Enabled Chat on channel: "+ output_channel.ToString());
                 output_to_channel = true;
                 attachEvents();
             }
             else if (controler.Bot.getMyConfig.Setting_Tracker.StartsWith("http") == true)
             {
-                LogFormater.Info("Tracker - Enabled HTTP: "+ controler.Bot.getMyConfig.Setting_Tracker);
                 output_to_url = true;
                 attachEvents();
             }
@@ -49,7 +50,80 @@ namespace BetterSecondbot.Tracking
         }
         protected void attachEvents()
         {
-            controler.Bot.GetClient.Grid.CoarseLocationUpdate += LocationUpdate;
+            LogFormater.Info("Tracker - Connected to login process event");
+            controler.Bot.LoginProgess += LoginProcess;
+        }
+
+        protected void LoginProcess(object o, LoginProgressEventArgs e)
+        {
+            if(e.Status == LoginStatus.ConnectingToSim)
+            {
+                LogFormater.Info("Tracker - disconnected from login process event");
+                controler.Bot.LoginProgess -= LoginProcess;
+                if (AfterLogin == true)
+                {
+                    if (output_to_channel == true)
+                    {
+                        LogFormater.Info("Tracker - Enabled Chat on channel: " + output_channel.ToString());
+                    }
+                    if (output_to_url == true)
+                    {
+                        LogFormater.Info("Tracker - Enabled HTTP: " + controler.Bot.getMyConfig.Setting_Tracker);
+                    }
+                    controler.Bot.StatusMessageEvent += StatusPing;
+                    controler.Bot.GetClient.Grid.CoarseLocationUpdate += LocationUpdate;
+                }
+            }
+        }
+
+        protected bool hasBot()
+        {
+            if (controler == null)
+            {
+                return false;
+            }
+            if (controler.Bot == null)
+            {
+                return false;
+            }
+            if (controler.Bot.GetClient == null)
+            {
+                return false;
+            }
+            if (controler.Bot.GetClient.Network == null)
+            {
+                return false;
+            }
+            return controler.Bot.GetClient.Network.Connected;
+        }
+
+        protected void StatusPing(object o, StatusMessageEvent e)
+        {
+            if(hasBot() == true)
+            {
+                if(controler.Bot.GetClient.Network.CurrentSim != null)
+                {
+                    Dictionary<UUID, Vector3> entrys = controler.Bot.GetClient.Network.CurrentSim.AvatarPositions.Copy();
+                    List<UUID> avs = entrys.Keys.ToList();
+                    List<UUID> seenavs = new List<UUID>();
+                    foreach (UUID A in avs)
+                    {
+                        seenavs.Add(A);
+                        TrackerEventAdd(A);
+                    }
+                    foreach(UUID A in AvatarSeen.Keys)
+                    {
+                        if(seenavs.Contains(A) == false)
+                        {
+                            long dif = helpers.UnixTimeNow() - AvatarSeen[A];
+                            if (dif > 15)
+                            {
+                                TrackerEventRemove(A); // not seen in the last 15 secs
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         protected void output(UUID av, string mode)
@@ -71,10 +145,9 @@ namespace BetterSecondbot.Tracking
         protected void SendHTTPData(object data)
         {
             Dictionary<string, string> values = new Dictionary<string, string>
-                    {
-                        { "reply", data.ToString() },
-                    };
-
+            {
+                { "reply", data.ToString() },
+            };
             var content = new FormUrlEncodedContent(values);
             try
             {
@@ -86,20 +159,41 @@ namespace BetterSecondbot.Tracking
             }
         }
 
+        protected void TrackerEventAdd(UUID av)
+        {
+            if(AvatarSeen.ContainsKey(av) == false)
+            {
+                output(av, "entry|" + controler.Bot.FindAvatarKey2Name(av));
+                AvatarSeen.Add(av, 0);
+            }
+            AvatarSeen[av] = helpers.UnixTimeNow();
+        }
+
+        protected void TrackerEventRemove(UUID av)
+        {
+            if (AvatarSeen.ContainsKey(av) == true)
+            {
+                output(av, "exit|" + controler.Bot.FindAvatarKey2Name(av)+"|"+ AvatarSeen[av].ToString());
+                AvatarSeen.Remove(av);
+            }
+        }
+
+
+
         protected void LocationUpdate(object o, CoarseLocationUpdateEventArgs e)
         {
             if (e.NewEntries.Count() > 0)
             {
                 foreach (UUID av in e.NewEntries)
                 {
-                    output(av, "entry|"+controler.Bot.FindAvatarKey2Name(av));
+                    TrackerEventAdd(av);
                 }
             }
             if (e.RemovedEntries.Count() > 0)
             {
                 foreach (UUID av in e.RemovedEntries)
                 {
-                    output(av, "exit|" + controler.Bot.FindAvatarKey2Name(av));
+                    TrackerEventRemove(av);
                 }
             }
 
