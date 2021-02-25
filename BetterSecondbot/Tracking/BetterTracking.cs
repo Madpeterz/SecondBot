@@ -26,17 +26,24 @@ namespace BetterSecondbot.Tracking
             controler = setcontroler;
             if(controler.Bot.getMyConfig.Setting_Tracker.ToLowerInvariant() == "false")
             {
+                LogFormater.Info("Tracker - Disabled because set to false");
                 return;
             }
             if(int.TryParse(controler.Bot.getMyConfig.Setting_Tracker,out output_channel) == true)
             {
+                LogFormater.Info("Tracker - Enabled Chat");
                 output_to_channel = true;
                 attachEvents();
             }
             else if (controler.Bot.getMyConfig.Setting_Tracker.StartsWith("http") == true)
             {
+                LogFormater.Info("Tracker - Enabled HTTP");
                 output_to_url = true;
                 attachEvents();
+            }
+            else
+            {
+                LogFormater.Info("Tracker - Disabled not a vaild channel or http");
             }
         }
         protected void attachEvents()
