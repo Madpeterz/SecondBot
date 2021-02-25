@@ -153,7 +153,7 @@ namespace BetterSecondBotShared.Json
         {
             if (cmd.StartsWith("Basic") == true) { return GetHelp_Basic(cmd); }
             else if (cmd.StartsWith("Security") == true) { return GetHelp_Security(cmd); }
-            else if (cmd.StartsWith("Settings") == true) { return GetHelp_Settings(cmd); }
+            else if (cmd.StartsWith("Setting") == true) { return GetHelp_Settings(cmd); }
             else if (cmd.StartsWith("Discord") == true) { return GetHelp_Discord(cmd); }
             else if (cmd.StartsWith("Http_") == true) { return GetHelp_HTTP(cmd); }
             else { return GetHelp_Logs(cmd); }
@@ -249,7 +249,7 @@ namespace BetterSecondBotShared.Json
         {
             if (cmd.StartsWith("Basic") == true) { return GetValueHint_Basic(cmd); }
             else if (cmd.StartsWith("Security") == true) { return GetValueHint_Security(cmd); }
-            else if (cmd.StartsWith("Setting_") == true) { return GetValueHint_Settings(cmd); }
+            else if (cmd.StartsWith("Setting") == true) { return GetValueHint_Settings(cmd); }
             else if (cmd.StartsWith("Discord") == true) { return GetValueHint_Discord(cmd); }
             else if (cmd.StartsWith("Http_") == true) { return GetValueHint_HTTP(cmd); }
             else { return GetValueHint_Logs(cmd); }
