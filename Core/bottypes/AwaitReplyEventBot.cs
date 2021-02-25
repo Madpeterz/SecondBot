@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using OpenMetaverse;
 using BetterSecondBotShared.Static;
+using System.Linq;
 
 namespace BetterSecondBot.bottypes
 {
@@ -24,6 +25,14 @@ namespace BetterSecondBot.bottypes
         protected override void GroupMembersReplyHandler(object sender, GroupMembersReplyEventArgs e)
         {
             base.GroupMembersReplyHandler(sender, e);
+            lock (group_members_storage)
+            {
+                if (group_members_storage.ContainsKey(e.GroupID) == true)
+                {
+                    group_members_storage.Remove(e.GroupID);
+                }
+                group_members_storage.Add(e.GroupID, new KeyValuePair<long, List<UUID>>(helpers.UnixTimeNow(), e.Members.Keys.ToList()));
+            }
         }
 
         protected virtual void GroupchatJoinHandler(object sender, GroupChatJoinedEventArgs e)
