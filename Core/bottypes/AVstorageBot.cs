@@ -367,7 +367,6 @@ namespace BetterSecondBot.bottypes
             {
                 if (PendingAvatarFinds_viauuid.ContainsKey(avatar_uuid) == false)
                 {
-                    LogFormater.Info("Looking up: " + avatar_uuid);
                     PendingAvatarFinds_viauuid.Add(avatar_uuid, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 0));
                     Client.Avatars.RequestAvatarName(avatar_uuid);
                 }

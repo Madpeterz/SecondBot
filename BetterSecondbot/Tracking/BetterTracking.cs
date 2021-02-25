@@ -166,6 +166,7 @@ namespace BetterSecondbot.Tracking
         {
             if (UUID.TryParse(av.ToString(), out UUID avuuid) == true)
             {
+                addToSeen(avuuid);
                 string name = controler.Bot.FindAvatarKey2Name(avuuid);
                 int loop = 0;
                 while((loop < 8) && (name == "lookup"))
@@ -175,7 +176,6 @@ namespace BetterSecondbot.Tracking
                     loop++;
                 }
                 output(avuuid, "entry###" + name);
-                addToSeen(avuuid);
             }
         }
 
