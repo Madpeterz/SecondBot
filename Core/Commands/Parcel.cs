@@ -462,7 +462,7 @@ namespace BetterSecondBot.HttpService
             GetParcelBanlistObject reply = new GetParcelBanlistObject();
             int delays = 0;
             bool haslookup = true;
-            while ((haslookup == true) || (delays < 3))
+            while ((haslookup == true) && (delays < 3))
             {
                 haslookup = false;
                 foreach (ParcelAccessEntry e in targetparcel.AccessBlackList)
