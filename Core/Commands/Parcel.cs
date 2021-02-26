@@ -467,9 +467,12 @@ namespace BetterSecondBot.HttpService
                 haslookup = false;
                 foreach (ParcelAccessEntry e in targetparcel.AccessBlackList)
                 {
-                    if(bot.FindAvatarKey2Name(e.AgentID) == "lookup")
+                    if (e.AgentID != UUID.Zero)
                     {
-                        haslookup = true;
+                        if (bot.FindAvatarKey2Name(e.AgentID) == "lookup")
+                        {
+                            haslookup = true;
+                        }
                     }
                 }
                 if(haslookup == true)
@@ -642,7 +645,7 @@ namespace BetterSecondBot.HttpService
 
     public class GetParcelBanlistObject
     {
-        public Dictionary<UUID, String> entrys;
+        public Dictionary<UUID, String> entrys = new Dictionary<UUID, string>();
         public string parcelName = "";
         public string regionName = "";
         public int delay = 0;
