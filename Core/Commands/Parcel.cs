@@ -460,6 +460,24 @@ namespace BetterSecondBot.HttpService
                 return Failure(tests.Value);
             }
             Dictionary<string, string> reply = new Dictionary<string, string>();
+            int delays = 0;
+            bool haslookup = true;
+            while ((haslookup == true) || (delays < 3))
+            {
+                haslookup = false;
+                foreach (ParcelAccessEntry e in targetparcel.AccessBlackList)
+                {
+                    if(bot.FindAvatarKey2Name(e.AgentID) == "lookup")
+                    {
+                        haslookup = true;
+                    }
+                }
+                if(haslookup == true)
+                {
+                    Thread.Sleep(1000);
+                    delays++;
+                }
+            }
             foreach (ParcelAccessEntry e in targetparcel.AccessBlackList)
             {
                 string name = bot.FindAvatarKey2Name(e.AgentID);
