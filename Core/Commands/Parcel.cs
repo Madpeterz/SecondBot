@@ -448,7 +448,7 @@ namespace BetterSecondBot.HttpService
 
 
         [About("Fetchs the parcel ban list of the parcel the bot is currently on<br/>If the name returned is lookup the bot is currently requesting the avatar name")]
-        [ReturnHints("array of UUID=Name")]
+        [ReturnHints("json object: GetParcelBanlistObject")]
         [ReturnHints("Error not in a sim")]
         [ReturnHints("Parcel data not ready")]
         [Route(HttpVerbs.Get, "/GetParcelBanlist/{token}")]
@@ -459,7 +459,7 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure(tests.Value);
             }
-            Dictionary<string, string> reply = new Dictionary<string, string>();
+            GetParcelBanlistObject reply = new GetParcelBanlistObject();
             int delays = 0;
             bool haslookup = true;
             while ((haslookup == true) || (delays < 3))
@@ -481,8 +481,12 @@ namespace BetterSecondBot.HttpService
             foreach (ParcelAccessEntry e in targetparcel.AccessBlackList)
             {
                 string name = bot.FindAvatarKey2Name(e.AgentID);
-                reply.Add(e.AgentID.ToString(), name);
+                reply.entrys.Add(e.AgentID, name);
             }
+            reply.reportedEntrys = targetparcel.AccessBlackList.Count;
+            reply.delay = delays * 1000;
+            reply.parcelName = targetparcel.Name;
+            reply.regionName = bot.GetClient.Network.CurrentSim.Name;
             return BasicReply(JsonConvert.SerializeObject(reply));
         }
 
@@ -634,5 +638,14 @@ namespace BetterSecondBot.HttpService
             }
             return true;
         }
+    }
+
+    public class GetParcelBanlistObject
+    {
+        public Dictionary<UUID, String> entrys;
+        public string parcelName = "";
+        public string regionName = "";
+        public int delay = 0;
+        public int reportedEntrys = 0;
     }
 }
