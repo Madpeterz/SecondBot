@@ -113,7 +113,11 @@ namespace BetterSecondbot.Tracking
                         Thread newThread = new Thread(this.TrackerEventAdd);
                         newThread.Start(A);
                     }
-                    List<UUID> TrackedUUID = AvatarSeen.Keys.ToList();
+                    List<UUID> TrackedUUID = new List<UUID>();
+                    lock (AvatarSeen)
+                    {
+                        TrackedUUID = AvatarSeen.Keys.ToList();
+                    }
                     foreach (UUID A in TrackedUUID)
                     {
                         if(seenavs.Contains(A) == false)
