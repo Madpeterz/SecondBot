@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
@@ -503,7 +504,12 @@ namespace BetterSecondBot.bottypes
 
         protected override void GroupInvite(InstantMessageEventArgs e)
         {
+            LogFormater.Info("Group invite event from: " + e.IM.FromAgentName);
             string[] stage1 = e.IM.FromAgentName.ToLowerInvariant().Split('.');
+            if(stage1.Length == 1)
+            {
+                stage1 = e.IM.FromAgentName.ToLowerInvariant().Split(" ");
+            }
             string name = "" + stage1[0].FirstCharToUpper() + "";
             if (stage1.Length == 1)
             {
@@ -514,23 +520,31 @@ namespace BetterSecondBot.bottypes
                 name = "" + name + " " + stage1[1].FirstCharToUpper() + "";
             }
             bool accept_invite;
+            string whyAccept = "";
             if (Is_avatar_master(name) == true)
             {
                 accept_invite = true;
+                whyAccept = "Master";
             }
             else
             {
                 accept_invite = Accept_action_from("group", e.IM.FromAgentID);
                 if(accept_invite == true)
                 {
+                    whyAccept = "Action auth";
                     Remove_action_from("group", e.IM.FromAgentID);
                 }
             }
             if (accept_invite == true)
             {
+                LogFormater.Info("Group invite event from: " + e.IM.FromAgentName+" Accepted - "+ whyAccept);
                 GroupInvitationEventArgs G = new GroupInvitationEventArgs(e.Simulator, e.IM.FromAgentID, e.IM.FromAgentName, e.IM.Message);
                 Client.Self.GroupInviteRespond(G.AgentID, e.IM.IMSessionID, true);
                 Client.Groups.RequestCurrentGroups();
+            }
+            else
+            {
+                LogFormater.Info("Group invite event from: " + e.IM.FromAgentName + " Rejected");
             }
         }
     }
