@@ -164,11 +164,6 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("avatar lookup");
             }
-            bool status = bot.FastCheckInGroup(groupuuid, avataruuid);
-            if(status == false)
-            {
-                return BasicReply("Not in group");
-            }
             bot.GetClient.Groups.EjectUser(groupuuid, avataruuid);
             return BasicReply("Requested");
         }

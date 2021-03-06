@@ -246,8 +246,20 @@ namespace BetterSecondBotShared.Static
                 }
             }
             return false;
-
         }
+
+        public static bool isempty(string V)
+        {
+            if (V != null)
+            {
+                if (V.Length > 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public static bool notempty(string[] V)
         {
             if (V != null)

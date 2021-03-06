@@ -39,19 +39,19 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "chat", "Say", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted");
+                return Failure("Token not accepted");
             }
-            if (helpers.notempty(message) == false)
+            if (helpers.isempty(message) == true)
             {
-                return BasicReply("Message empty");
+                return Failure("Message empty");
             }
             if(int.TryParse(channel,out int channelnum) == false)
             {
-                return BasicReply("Invaild channel");
+                return Failure("Invaild channel");
             }
             if(channelnum < 0)
             {
-                return BasicReply("Invaild channel");
+                return Failure("Invaild channel");
             }
             bot.GetClient.Self.Chat(message, channelnum, ChatType.Normal);
             return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()));
@@ -69,16 +69,16 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "chat", "IM", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted");
+                return Failure("Token not accepted");
             }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return BasicReply("avatar lookup");
+                return Failure("avatar lookup");
             }
-            if (helpers.notempty(message) == false)
+            if (helpers.isempty(message) == true)
             {
-                return BasicReply("Message empty");
+                return Failure("Message empty");
             }
             bot.SendIM(avataruuid, message);
             return BasicReply("ok");
