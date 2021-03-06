@@ -117,15 +117,10 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Invaild ban state");
             }
-            if (bot.NeedReloadGroupData(groupuuid) == true)
-            {
-                bot.GetClient.Groups.RequestGroupMembers(groupuuid);
-            }
             ProcessAvatar(avatar);
-            KeyValuePair<bool, string> reply = waitForReady(true, true, groupuuid);
-            if (reply.Key == false)
+            if(avataruuid == UUID.Zero)
             {
-                return Failure(reply.Value);
+                return Failure("avatar lookup");
             }
             GroupBanAction action = GroupBanAction.Unban;
             string statename = "Unban";
@@ -164,15 +159,10 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Unknown group");
             }
-            if (bot.NeedReloadGroupData(groupuuid) == true)
-            {
-                bot.GetClient.Groups.RequestGroupMembers(groupuuid);
-            }
             ProcessAvatar(avatar);
-            KeyValuePair<bool, string> reply = waitForReady(true, true, groupuuid);
-            if (reply.Key == false)
+            if (avataruuid == UUID.Zero)
             {
-                return Failure(reply.Value);
+                return Failure("avatar lookup");
             }
             bool status = bot.FastCheckInGroup(groupuuid, avataruuid);
             if(status == false)
@@ -263,10 +253,9 @@ namespace BetterSecondBot.HttpService
                 bot.GetClient.Groups.RequestGroupMembers(groupuuid);
             }
             ProcessAvatar(avatar);
-            KeyValuePair<bool,string> reply = waitForReady(true, true, groupuuid);
-            if(reply.Key == false)
+            if (avataruuid == UUID.Zero)
             {
-                return Failure(reply.Value);
+                return Failure("avatar lookup");
             }
             bool status = bot.FastCheckInGroup(groupuuid, avataruuid);
             if (status == true)
