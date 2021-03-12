@@ -51,6 +51,41 @@ namespace BetterSecondBot.HttpService
             return Failure("ok");
         }
 
+        [About("Changes the parcel landing mode to point and sets the landing point")]
+        [ReturnHints("ok")]
+        [ReturnHints("Error not in a sim")]
+        [ReturnHints("Parcel data not ready")]
+        [ReturnHints("Invaild amount")]
+        [ArgHints("x", "URLARG", "X point for landing")]
+        [ArgHints("y", "URLARG", "Y point for landing")]
+        [ArgHints("z", "URLARG", "Z point for landing")]
+        [Route(HttpVerbs.Get, "/SetParcelLandingZone/{x}/{y}/{z}/{token}")]
+        public object SetParcelLandingZone(string x, string y, string z, string token)
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "SetParcelLandingZone");
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
+            if(int.TryParse(x,out int X) == false)
+            {
+                return Failure("Unable to process landing point x value");
+            }
+            if (int.TryParse(y, out int Y) == false)
+            {
+                return Failure("Unable to process landing point y value");
+            }
+            if (int.TryParse(z, out int Z) == false)
+            {
+                return Failure("Unable to process landing point z value");
+            }
+            targetparcel.Landing = LandingType.LandingPoint;
+            targetparcel.UserLocation = new Vector3(X, Y, Z);
+            targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+            return BasicReply("ok");
+        }
+
+
         [About("Updates the current parcels name")]
         [ReturnHints("ok")]
         [ReturnHints("Error not in a sim")]
@@ -71,7 +106,7 @@ namespace BetterSecondBot.HttpService
             }
             targetparcel.Name = name;
             targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
-            return Failure("ok");
+            return BasicReply("ok");
         }
 
         [About("Updates the current parcels description")]
@@ -89,7 +124,7 @@ namespace BetterSecondBot.HttpService
             }
             targetparcel.Desc = desc;
             targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
-            return Failure("ok");
+            return BasicReply("ok");
         }
 
         [About("Fetchs the current parcels desc")]
@@ -104,7 +139,7 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure(tests.Value);
             }
-            return Failure(targetparcel.Desc);
+            return BasicReply(targetparcel.Desc);
         }
 
         [About("gets the flags for the parcel")]
@@ -137,7 +172,7 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "parcel", "ParcelEject", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted");
+                return Failure("Token not accepted");
             }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
@@ -260,7 +295,7 @@ namespace BetterSecondBot.HttpService
                 return Failure(tests.Value);
             }
             bool status = parcel_static.set_parcel_music(bot, targetparcel, musicurl);
-            return Failure(status.ToString());
+            return BasicReply(status.ToString());
         }
 
         [About("Updates the current parcels name")]
