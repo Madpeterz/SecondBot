@@ -371,9 +371,9 @@ namespace BetterSecondBot.HttpService
         [ReturnHints("Title empty")]
         [ReturnHints("Message empty")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
-        [ArgHints("attachment", "URLARG", "the UUID of inventory you wish to attach")]
         [ArgHints("title", "Text", "The title of the group notice")]
         [ArgHints("message", "Text", "The body of the group notice")]
+        [ArgHints("attachment", "URLARG", "the UUID of inventory you wish to attach")]
         [Route(HttpVerbs.Post, "/Groupnotice/{group}/{attachment}/{token}")]
         public object GroupnoticeWithAttachment(string group, [FormField] string title, [FormField] string message, string attachment, string token)
         {
