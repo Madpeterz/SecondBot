@@ -19,7 +19,7 @@ namespace BetterSecondBot.HttpService
 
 
         [About("Checks if the given UUID is in the given group<br/>Note: if group membership data is more than 60 secs old this will return Updating<br/>Please wait and retry later")]
-        [ReturnHints("True|False")]
+        [ReturnHints("Membership reply with [membershipStatus,AvatarUUID,AvatarnameIfKnown,GroupUUID]")]
         [ReturnHints("Updating")]
         [ReturnHints("Unknown group")]
         [ReturnHints("Invaild group UUID")]
@@ -51,8 +51,12 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure(reply.Value);
             }
-            bool status = bot.FastCheckInGroup(groupuuid, avataruuid);
-            return BasicReply(status.ToString());
+            IsGroupMemberReply replyobject = new IsGroupMemberReply();
+            replyobject.membershipStatus = bot.FastCheckInGroup(groupuuid, avataruuid);
+            replyobject.AvatarUUID = avataruuid.ToString();
+            replyobject.AvatarnameIfKnown = bot.FindAvatarKey2Name(avataruuid);
+            replyobject.GroupUUID = groupuuid.ToString();
+            return BasicReply(JsonConvert.SerializeObject(replyobject));
         }
 
         [About("Gets membership of a group")]
@@ -646,5 +650,13 @@ namespace BetterSecondBot.HttpService
         public bool UpdateUnderway { get; set; }
         public Dictionary<string,string> Roles { get; set; }
         public long RoleDataAge = 0;
+    }
+
+    public class IsGroupMemberReply
+    {
+        public bool membershipStatus { get; set; }
+        public string AvatarUUID { get; set; }
+        public string GroupUUID { get; set; }
+        public string AvatarnameIfKnown { get; set; }
     }
 }
