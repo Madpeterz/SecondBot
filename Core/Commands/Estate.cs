@@ -16,10 +16,7 @@ namespace BetterSecondBot.HttpService
 
     public class HTTP_Estate : WebApiControllerWithTokens
     {
-        public HTTP_Estate(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens)
-        {
-
-        }
+        public HTTP_Estate(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("Sends the message to the current sim")]
         [ReturnHints("Not an estate manager here")]
@@ -31,19 +28,19 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/SimRestart/{delay}/{mode}/{token}")]
         public object SimRestart(string delay, string mode, string token)
         {
-            if (tokens.Allow(token, "estate", "SimMessage", handleGetClientIP()) == false)
+            if (tokens.Allow(token, "estate", "SimRestart", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "SimRestart", new string[] { delay, mode });
             }
             if (bot.GetClient.Network.CurrentSim.IsEstateManager == false)
             {
-                return Failure("Not an estate manager here");
+                return Failure("Not an estate manager here", "SimRestart", new string[] { delay, mode });
             }
             bool.TryParse(mode, out bool modeflag);
             if (modeflag == false)
             {
                 bot.GetClient.Estate.CancelRestart();
-                return BasicReply("canceled");
+                return BasicReply("canceled", "SimRestart", new string[] { delay, mode });
             }
             int delay_restart = 60;
             int.TryParse(delay, out delay_restart);
@@ -52,7 +49,7 @@ namespace BetterSecondBot.HttpService
                 delay_restart = 240;
             }
             bot.GetClient.Estate.RestartRegion(delay_restart);
-            return BasicReply("restarting");
+            return BasicReply("restarting", "SimRestart", new string[] { delay, mode });
         }
 
         [About("Sends the message to the current sim")]
@@ -65,18 +62,18 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "estate", "SimMessage", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "SimMessage", new string[] { message });
             }
             if (helpers.notempty(message) == false)
             {
-                return Failure("Message empty");
+                return Failure("Message empty", "SimMessage", new string[] { message });
             }
             if (bot.GetClient.Network.CurrentSim.IsEstateManager == false)
             {
-                return Failure("Not an estate manager here");
+                return Failure("Not an estate manager here", "SimMessage", new string[] { message });
             }
             bot.GetClient.Estate.SimulatorMessage(message);
-            return BasicReply("ok");
+            return BasicReply("ok", "SimMessage", new string[] { message });
         }
 
         [About("Fetchs the regions map tile")]
@@ -88,13 +85,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "estate", "GetSimTexture", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GetSimTexture", new string[] { regionname });
             }
             if (bot.GetClient.Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region) == false)
             {
-                return Failure("Unable to find region");
+                return Failure("Unable to find region", "GetSimTexture", new string[] { regionname });
             }
-            return BasicReply(region.MapImageID.ToString());
+            return BasicReply(region.MapImageID.ToString(), "GetSimTexture", new string[] { regionname });
         }
 
         [About("Reclaims ownership of the current parcel")]
@@ -105,15 +102,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "estate", "EstateParcelReclaim", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "EstateParcelReclaim", new string[] { });
             }
             if (bot.GetClient.Network.CurrentSim.IsEstateManager == false)
             {
-                return Failure("Not an estate manager here");
+                return Failure("Not an estate manager here", "EstateParcelReclaim", new string[] { });
             }
             int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
             bot.GetClient.Parcels.Reclaim(bot.GetClient.Network.CurrentSim, localid);
-            return BasicReply("ok");
+            return BasicReply("ok", "EstateParcelReclaim", new string[] { });
         }
 
         [About("Reclaims ownership of the current parcel")]
@@ -124,16 +121,17 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "estate", "GetSimGlobalPos", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GetSimGlobalPos", new string[] { regionname });
             }
             if (bot.GetClient.Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region) == false)
             {
-                return Failure("Unable to find region");
+                return Failure("Unable to find region", "GetSimGlobalPos", new string[] { regionname });
             }
             Dictionary<string, string> reply = new Dictionary<string, string>();
             reply.Add("region", regionname);
             reply.Add("X", region.X.ToString());
             reply.Add("Y", region.Y.ToString());
+            SuccessNoReturn("GetSimGlobalPos", new string[] { regionname });
             return reply;
         }
 
@@ -144,9 +142,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "estate", "banlist", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "banlist", new string[] { });
             }
-            return BasicReply(JsonConvert.SerializeObject(bot._lastUpdatedSimBlacklist));
+            return BasicReply(JsonConvert.SerializeObject(bot._lastUpdatedSimBlacklist), "banlist", new string[] { });
         }
 
         [About("Attempts to add/remove the avatar to/from the Estate banlist")]
@@ -162,31 +160,31 @@ namespace BetterSecondBot.HttpService
 
         public Object UpdateEstateBanlist(string avatar, string mode, string global, string token)
         {
-            if (tokens.Allow(token, "estate", "banlist-add", handleGetClientIP()) == false)
+            if (tokens.Allow(token, "estate", "UpdateEstateBanlist", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "UpdateEstateBanlist", new string[] { avatar, mode, global });
             }
             if (bot.GetClient.Network.CurrentSim.IsEstateManager == false)
             {
-                return Failure("Not an estate manager on region " + bot.GetClient.Network.CurrentSim.Name);
+                return Failure("Not an estate manager on region " + bot.GetClient.Network.CurrentSim.Name, "UpdateEstateBanlist", new string[] { avatar, mode, global });
             }
             UUID avataruuid = UUID.Zero;
             if (UUID.TryParse(avatar, out avataruuid) == false)
             {
-                return Failure("Unable to find avatar UUID");
+                return Failure("Unable to find avatar UUID", "UpdateEstateBanlist", new string[] { avatar, mode, global });
             }
             bool globalban = false;
             if (bool.TryParse(global, out globalban) == false)
             {
-                return Failure("Unable to process global value please use true or false");
+                return Failure("Unable to process global value please use true or false", "UpdateEstateBanlist", new string[] { avatar, mode, global });
             }
             if (mode != "add")
             {
                 bot.GetClient.Estate.UnbanUser(avataruuid, globalban);
-                return BasicReply("Unban request accepted");
+                return BasicReply("Unban request accepted", "UpdateEstateBanlist", new string[] { avatar, mode, global });
             }
             bot.GetClient.Estate.BanUser(avataruuid, globalban);
-            return BasicReply("Ban request accepted");
+            return BasicReply("Ban request accepted", "UpdateEstateBanlist", new string[] { avatar, mode, global });
         }
     }
 }

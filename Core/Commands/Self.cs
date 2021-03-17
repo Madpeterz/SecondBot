@@ -25,12 +25,12 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "PointAt", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "PointAt", new string[] { avatar });
             }
             ProcessAvatar(avatar);
             if (bot.GetClient.Network.CurrentSim.AvatarPositions.ContainsKey(avataruuid) == false)
             {
-                return Failure("Cant find UUID in sim");
+                return Failure("Cant find UUID in sim", "PointAt", new string[] { avatar });
             }
             bot.ResetAnimations();
             bot.GetClient.Self.Stand();
@@ -39,7 +39,7 @@ namespace BetterSecondBot.HttpService
             bot.GetClient.Self.AnimationStart(Animations.POINT_YOU, true);
             bot.GetClient.Self.PointAtEffect(bot.GetClient.Self.AgentID, avataruuid, new Vector3d(0, 0, 0), PointAtType.Select, UUID.Random());
             bot.GetClient.Self.BeamEffect(bot.GetClient.Self.AgentID, avataruuid, new Vector3d(0, 0, 2), new Color4(255, 255, 255, 1), (float)3.0, UUID.Random());
-            return BasicReply("ok");
+            return BasicReply("ok", "PointAt", new string[] { avatar });
         }
 
         [About("Makes the bot sit on the ground or on a object if it can see it")]
@@ -51,33 +51,33 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "Sit", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Sit", new string[] { target });
             }
             if(target == "ground")
             {
                 bot.GetClient.Self.SitOnGround();
-                return BasicReply("ok");
+                return BasicReply("ok", "Sit", new string[] { target });
             }
             if(UUID.TryParse(target,out UUID objectuuid) == false)
             {
-                return Failure("Invaild object UUID");
+                return Failure("Invaild object UUID", "Sit", new string[] { target });
             }
             bot.GetClient.Self.RequestSit(objectuuid, Vector3.Zero);
-            return BasicReply("ok");
+            return BasicReply("ok", "Sit", new string[] { target });
         }
 
         [About("Makes the bot stand up if sitting (also resets animations)")]
         [ReturnHints("ok")]
         [Route(HttpVerbs.Get, "/Stand/{token}")]
-        public object Stand(string target, string token)
+        public object Stand(string token)
         {
             if (tokens.Allow(token, "self", "Stand", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Stand", new string[] { });
             }
             bot.GetClient.Self.Stand();
             bot.ResetAnimations();
-            return BasicReply("ok");
+            return BasicReply("ok", "Stand", new string[] { });
         }
 
         [About("Makes the bot sit on the ground or on a object if it can see it")]
@@ -90,11 +90,11 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "ClickObject", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "ClickObject", new string[] { target });
             }
             if (UUID.TryParse(target, out UUID objectuuid) == false)
             {
-                return Failure("Invaild object UUID");
+                return Failure("Invaild object UUID", "ClickObject", new string[] { target });
             }
             Dictionary<uint, Primitive> objectsentrys = bot.GetClient.Network.CurrentSim.ObjectsPrimitives.Copy();
             bool found_object = false;
@@ -107,7 +107,7 @@ namespace BetterSecondBot.HttpService
                     break;
                 }
             }
-            return BasicReply(found_object.ToString());
+            return BasicReply(found_object.ToString(), "ClickObject", new string[] { target });
         }
 
         [About("Makes the bot kill itself you monster")]
@@ -117,14 +117,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "Logoff", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Logoff", new string[] { });
             }
             if (bot.KillMe == false)
             {
                 bot.GetClient.Self.Chat("Laters im out", 0, ChatType.Normal);
                 bot.KillMePlease();
             }
-            return BasicReply("ok");
+            return BasicReply("ok", "Logoff", new string[] { });
         }
 
         [About("Makes the bot kill itself you monster")]
@@ -134,14 +134,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "Logout", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Logout", new string[] { });
             }
             if (bot.KillMe == false)
             {
                 bot.GetClient.Self.Chat("Laters im out", 0, ChatType.Normal);
                 bot.KillMePlease();
             }
-            return BasicReply("ok");
+            return BasicReply("ok", "Logout", new string[] { });
         }
 
         [About("Makes the bot kill itself you monster - without making a sound")]
@@ -151,13 +151,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "Bye", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Bye", new string[] { });
             }
             if (bot.KillMe == false)
             {
                 bot.KillMePlease();
             }
-            return BasicReply("ok");
+            return BasicReply("ok", "Bye", new string[] { });
         }
 
         [About("Gets the last 5 commands issued to the bot")]
@@ -167,8 +167,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "GetLastCommands", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GetLastCommands", new string[] { });
             }
+            SuccessNoReturn("GetLastCommands", new string[] { });
             return bot.GetLastCommands(5);
         }
 
@@ -186,35 +187,35 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "SetPermFlag", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "SetPermFlag", new string[] { avatar, flag, state, sticky });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup");
+                return Failure("avatar lookup", "SetPermFlag", new string[] { avatar, flag, state, sticky });
             }
             bool stateflag = false;
             bool stickyflag = false;
             if(bool.TryParse(state,out stateflag) == false)
             {
-                return Failure("Invaild state");
+                return Failure("Invaild state", "SetPermFlag", new string[] { avatar, flag, state, sticky });
             }
             if (bool.TryParse(sticky, out stickyflag) == false)
             {
-                return Failure("Invaild sticky");
+                return Failure("Invaild sticky", "SetPermFlag", new string[] { avatar, flag, state, sticky });
             }
             string[] AcceptedFlags = new string[] { "friend", "group", "animation", "teleport", "command" };
             if (AcceptedFlags.Contains(flag) == true)
             {
-                return Failure("Invaild flag");
+                return Failure("Invaild flag", "SetPermFlag", new string[] { avatar, flag, state, sticky });
             }
             if (stateflag == true)
             {
                 bot.Add_action_from(flag, avataruuid, stickyflag);
-                return BasicReply("Added perm: " + flag + " Sticky: " + stickyflag.ToString());
+                return BasicReply("Added perm: " + flag + " Sticky: " + stickyflag.ToString(), "SetPermFlag", new string[] { avatar, flag, state, sticky });
             }
             bot.Remove_action_from(flag, avataruuid, stickyflag);
-            return BasicReply("Removed perm: " + flag + " Sticky: " + stickyflag.ToString());
+            return BasicReply("Removed perm: " + flag + " Sticky: " + stickyflag.ToString(), "SetPermFlag", new string[] { avatar, flag, state, sticky });
         }
 
 

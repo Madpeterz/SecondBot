@@ -19,14 +19,14 @@ namespace BetterSecondBot.HttpService
         [About("Makes the bot teleport to its home region")]
         [ReturnHints("ok")]
         [Route(HttpVerbs.Get, "/GoHome/{token}")]
-        public object GoHome(string group, string token)
+        public object GoHome(string token)
         {
-            if (tokens.Allow(token, "groups", "GetGroupMembers", handleGetClientIP()) == false)
+            if (tokens.Allow(token, "home", "GoHome", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GoHome", new string[] { });
             }
             bot.GotoNextHomeRegion();
-            return BasicReply("ok");
+            return BasicReply("ok", "GoHome", new string[] { });
         }
 
     }

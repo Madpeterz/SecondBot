@@ -24,14 +24,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "funds", "Balance", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Balance", new string[] { });
             }
             if (bot.GetAllowFunds == false)
             {
-                return Failure("Funds commands are disabled");
+                return Failure("Funds commands are disabled", "Balance", new string[] { });
             }
             bot.GetClient.Self.RequestBalance();
-            return BasicReply(bot.GetClient.Self.Balance.ToString());
+            return BasicReply(bot.GetClient.Self.Balance.ToString(), "Balance", new string[] { });
         }
 
         [About("Makes the bot pay a avatar")]
@@ -47,27 +47,27 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "funds", "PayAvatar", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted");
+                return Failure("Token not accepted", "PayAvatar", new string[] { avatar, amount });
             }
             if (bot.GetAllowFunds == false)
             {
-                return BasicReply("Transfer funds to avatars disabled");
+                return Failure("Transfer funds to avatars disabled", "PayAvatar", new string[] { avatar, amount });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return BasicReply("avatar lookup");
+                return BasicReply("avatar lookup", "PayAvatar", new string[] { avatar, amount });
             }
             if (int.TryParse(amount, out int amountvalue) == false)
             {
-                return BasicReply("Invaild amount");
+                return Failure("Invaild amount", "PayAvatar", new string[] { avatar, amount });
             }
             if ((amountvalue < 0) || (amountvalue > bot.GetClient.Self.Balance))
             {
-                return Failure("Amount out of range");
+                return Failure("Amount out of range", "PayAvatar", new string[] { avatar, amount });
             }
             bot.GetClient.Self.GiveAvatarMoney(avataruuid, amountvalue);
-            return BasicReply("Accepted");
+            return BasicReply("Accepted", "PayAvatar", new string[] { avatar, amount });
         }
 
         [About("Makes the bot pay a object")]
@@ -86,30 +86,30 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "funds", "PayObject", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "PayObject", new string[] { objectuuid, primname, amount });
             }
             if (bot.GetAllowFunds == false)
             {
-                return Failure("Funds commands are disabled");
+                return Failure("Funds commands are disabled", "PayObject", new string[] { objectuuid, primname, amount });
             }
             if (UUID.TryParse(objectuuid, out UUID objectUUID) == false)
             {
-                return Failure("Invaild object UUID");
+                return Failure("Invaild object UUID", "PayObject", new string[] { objectuuid, primname, amount });
             }
             if (int.TryParse(amount, out int amountvalue) == false)
             {
-                return Failure("Invaild amount");
+                return Failure("Invaild amount", "PayObject", new string[] { objectuuid, primname, amount });
             }
             if((amountvalue < 0) || (amountvalue > bot.GetClient.Self.Balance))
             {
-                return Failure("Amount out of range");
+                return Failure("Amount out of range", "PayObject", new string[] { objectuuid, primname, amount });
             }
             if(helpers.notempty(primname) == false)
             {
-                return Failure("Primname is empty");
+                return Failure("Primname is empty", "PayObject", new string[] { objectuuid, primname, amount });
             }
             bot.GetClient.Self.GiveObjectMoney(objectUUID, amountvalue, primname);
-            return BasicReply("ok");
+            return BasicReply("ok", "PayObject", new string[] { objectuuid, primname, amount });
         }
     }
 }

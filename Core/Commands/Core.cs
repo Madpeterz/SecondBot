@@ -39,10 +39,10 @@ namespace BetterSecondBot.HttpService
                 if (hash == authcode)
                 {
                     string newtoken = tokens.CreateToken(handleGetClientIP());
-                    if(newtoken != null) return BasicReply(newtoken);
+                    if(newtoken != null) return BasicReply(newtoken, "GetToken", new string[] { authcode, unixtimegiven });
                 }
             }
-            return Failure("Authcode not accepted");
+            return Failure("Authcode not accepted", "GetToken", new string[] { authcode, unixtimegiven });
         }
 
         [About("Used to check HTTP connections")]
@@ -51,7 +51,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Hello")]
         public object Hello()
         {
-            return BasicReply("world");
+            return BasicReply("world", "Hello", new string[] { });
         }
 
         [About("Delays a thead by X ms<br/>Mostly pointless but good if your doing custom commands")]
@@ -62,14 +62,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "core", "Delay", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Delay", new string[] { amount });
             }
             if(int.TryParse(amount,out int amountvalue) == false)
             {
-                return Failure("Invaild amount");
+                return Failure("Invaild amount", "Delay", new string[] { amount });
             }
             Thread.Sleep(amountvalue);
-            return BasicReply("Ok");
+            return BasicReply("Ok", "Delay", new string[] { amount });
         }
 
         [About("Removes the given token from the accepted token pool")]
@@ -80,8 +80,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "core", "LogoutUI", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "LogoutUI", new string[] { });
             }
+            SuccessNoReturn("LogoutUI", new string[] { });
             return tokens.Expire(token);
         }
     }

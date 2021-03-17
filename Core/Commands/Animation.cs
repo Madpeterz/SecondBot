@@ -26,20 +26,20 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "animation", "addtoallowanimations", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted");
+                return BasicReply("Token not accepted", "addtoallowanimations", new string[] { avatar });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return BasicReply("avatar lookup");
+                return BasicReply("avatar lookup", "addtoallowanimations", new string[] { avatar });
             }
             if (bot.Accept_action_from("animation", avataruuid) == false)
             {
                 bot.Add_action_from("animation", avataruuid);
-                return BasicReply("Granted perm animation");
+                return BasicReply("Granted perm animation", "addtoallowanimations", new string[] { avatar });
             }
             bot.Remove_action_from("animation", avataruuid, true);
-            return BasicReply("Removed perm animation");
+            return BasicReply("Removed perm animation", "addtoallowanimations", new string[] { avatar });
         }
 
         [About("Attempts to play a gesture")]
@@ -51,15 +51,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "animation", "gesture", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted");
+                return BasicReply("Token not accepted", "gesture", new string[] { gesture });
             }
             if (UUID.TryParse(gesture, out UUID gestureUUID) == false)
             {
-                return BasicReply("Error with gesture");
+                return BasicReply("Error with gesture", "gesture", new string[] { gesture });
             }
             InventoryItem itm = bot.GetClient.Inventory.FetchItem(gestureUUID, bot.GetClient.Self.AgentID, (3 * 1000));
             bot.GetClient.Self.PlayGesture(itm.AssetUUID);
-            return BasicReply("Accepted");
+            return BasicReply("Accepted", "gesture", new string[] { gesture });
         }
 
         [About("Resets the animation stack for the bot")]
@@ -69,10 +69,10 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "animation", "resetanimations", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted");
+                return BasicReply("Token not accepted", "resetanimations", new string[] { });
             }
             bot.ResetAnimations();
-            return BasicReply("Accepted");
+            return BasicReply("Accepted", "resetanimations", new string[] { });
         }
 
     }

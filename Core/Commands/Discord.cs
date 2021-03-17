@@ -32,13 +32,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_AddRole", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_AddRole", new string[] { serverid, roleid, memberid });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_AddRole", new string[] { serverid, roleid, memberid });
             }
-            return BasicReply(addRoleToMember(serverid, roleid, memberid).Result.ToString());
+            return BasicReply(addRoleToMember(serverid, roleid, memberid).Result.ToString(), "Discord_AddRole", new string[] { serverid, roleid, memberid });
         }
 
         [About("Adds the selected user to the ban list - Disallows rejoining untill they are removed from the list")]
@@ -53,17 +53,17 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_BanMember", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_BanMember", new string[] { serverid, memberid, why });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_BanMember", new string[] { serverid, memberid, why });
             }
             if (helpers.notempty(why) == false)
             {
-                return Failure("Why empty");
+                return Failure("Why empty", "Discord_BanMember", new string[] { serverid, memberid, why });
             }
-            return BasicReply(BanMember(serverid, memberid, why).Result.ToString());
+            return BasicReply(BanMember(serverid, memberid, why).Result.ToString(), "Discord_BanMember", new string[] { serverid, memberid, why });
         }
 
         [About("Clears messages on the server sent by the member in the last 13 days, 22hours 59mins")]
@@ -76,12 +76,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_BulkClear_Messages", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_BulkClear_Messages", new string[] { serverid, memberid });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_BulkClear_Messages", new string[] { serverid, memberid });
             }
+            SuccessNoReturn("Discord_BulkClear_Messages", new string[] { serverid, memberid });
             return ClearMessages(serverid, memberid).Result;
         }
 
@@ -96,13 +97,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_Dm_Member", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_Dm_Member", new string[] { serverid, memberid, message });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_Dm_Member", new string[] { serverid, memberid, message });
             }
-            return BasicReply(MessageMember(serverid, memberid, message).Result.ToString());
+            return BasicReply(MessageMember(serverid, memberid, message).Result.ToString(), "Discord_Dm_Member", new string[] { serverid, memberid, message });
         }
 
         [About("Returns a list of members in a server \n collection is userid: username \n if the user has set a nickname: userid: nickname|username \n" +
@@ -116,12 +117,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_MembersList", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_MembersList", new string[] { serverid });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_MembersList", new string[] { serverid });
             }
+            SuccessNoReturn("Discord_MembersList", new string[] { serverid });
             return ListMembers(serverid).Result;
         }
 
@@ -137,17 +139,17 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_MessageChannel", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_MessageChannel", new string[] { serverid, channelid, tts, message });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_MessageChannel", new string[] { serverid, channelid, tts, message });
             }
             if (helpers.notempty(message) == false)
             {
-                return Failure("message empty");
+                return Failure("message empty", "Discord_MessageChannel", new string[] { serverid, channelid, tts, message });
             }
-            return BasicReply(MessageChannel(serverid, channelid, message, tts).Result.ToString());
+            return BasicReply(MessageChannel(serverid, channelid, message, tts).Result.ToString(), "Discord_MessageChannel", new string[] { serverid, channelid, tts, message });
         }
 
         [About("Sends a message to the selected channel - Optional TTS usage")]
@@ -161,13 +163,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_MuteMember", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_MuteMember", new string[] { serverid, memberid, mode });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_MuteMember", new string[] { serverid, memberid, mode });
             }
-            return BasicReply(MuteMember(serverid, memberid, mode).Result.ToString());
+            return BasicReply(MuteMember(serverid, memberid, mode).Result.ToString(), "Discord_MuteMember", new string[] { serverid, memberid, mode });
         }
 
         [About("returns a collection of settings for the given role \n This command requires Discord full client mode enabled and connected")]
@@ -181,12 +183,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_Role_GetSettings", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_Role_GetSettings", new string[] { serverid, roleid });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_Role_GetSettings", new string[] { serverid, roleid });
             }
+            SuccessNoReturn("Discord_Role_GetSettings", new string[] { serverid, roleid });
             return RoleSettings(serverid,roleid);
         }
 
@@ -202,13 +205,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_Role_UpdatePerms", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_Role_UpdatePerms", new string[] { serverid, roleid, flagscsv });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_Role_UpdatePerms", new string[] { serverid, roleid, flagscsv });
             }
-            return BasicReply(UpdateRolePerms(serverid, roleid, flagscsv).Result.ToString());
+            return BasicReply(UpdateRolePerms(serverid, roleid, flagscsv).Result.ToString(), "Discord_Role_UpdatePerms", new string[] { serverid, roleid, flagscsv });
         }
 
         [About("Updates perm flags for the selected role \n example CSV format: Speak=True,SendMessages=False \n for a full list of perms see output of Discord_Role_GetSettings \n" +
@@ -222,12 +225,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_RoleCreate", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_RoleCreate", new string[] { serverid, role });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_RoleCreate", new string[] { serverid, role });
             }
+            SuccessNoReturn("Discord_RoleCreate", new string[] { serverid, role });
             return CreateRole(serverid,role).Result;
         }
 
@@ -240,13 +244,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_RoleList", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_RoleList", new string[] { serverid });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_RoleList", new string[] { serverid });
             }
-            return BasicReply(ListRoles(serverid).ToString());
+            return BasicReply(ListRoles(serverid).ToString(), "Discord_RoleList", new string[] { serverid });
         }
 
         [About("Remove a role from a server \n This command requires Discord full client mode enabled and connected")]
@@ -258,13 +262,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_RoleRemove", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_RoleRemove", new string[] { serverid, roleid });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_RoleRemove", new string[] { serverid, roleid });
             }
-            return BasicReply(RemoveRole(serverid, roleid).Result.ToString());
+            return BasicReply(RemoveRole(serverid, roleid).Result.ToString(), "Discord_RoleRemove", new string[] { serverid, roleid });
         }
 
         [About("Returns a list of text channels in a server")]
@@ -276,11 +280,11 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "discord", "Discord_TextChannels_List", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Discord_TextChannels_List", new string[] { serverid });
             }
             if (bot.discordReady() == false)
             {
-                return Failure("Discord client not ready");
+                return Failure("Discord client not ready", "Discord_TextChannels_List", new string[] { serverid });
             }
             return ListTextChannels(serverid);
         }

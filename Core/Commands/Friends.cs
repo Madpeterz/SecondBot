@@ -23,9 +23,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "friends", "Friendslist", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Friendslist", new string[] { });
             }
-            return BasicReply(bot.getJsonFriendlist());
+            return BasicReply(bot.getJsonFriendlist(), "Friendslist", new string[] { });
         }
 
         [About("Updates the friend perms for avatar avatar to State \n if true grants (Online/Map/Modify) perms")]
@@ -41,29 +41,29 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "friends", "FriendFullPerms", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "FriendFullPerms", new string[] { avatar , state });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup");
+                return Failure("avatar lookup", "FriendFullPerms", new string[] { avatar, state });
             }
             bool status = false;
             if (bool.TryParse(state, out status) == false)
             {
-                return Failure("state invaild");
+                return Failure("state invaild", "FriendFullPerms", new string[] { avatar, state });
             }
             if (bot.GetClient.Friends.FriendList.ContainsKey(avataruuid) == false)
             {
-                return Failure("Not A friend");
+                return Failure("Not A friend", "FriendFullPerms", new string[] { avatar, state });
             }
             if (status == true)
             {
                 bot.GetClient.Friends.GrantRights(avataruuid, FriendRights.CanSeeOnline | FriendRights.CanSeeOnMap | FriendRights.CanModifyObjects);
-                return BasicReply("granted");
+                return BasicReply("granted", "FriendFullPerms", new string[] { avatar, state });
             }
             bot.GetClient.Friends.GrantRights(avataruuid, FriendRights.None);
-            return BasicReply("removed");
+            return BasicReply("removed", "FriendFullPerms", new string[] { avatar, state });
         }
 
         [About("Updates the friend perms for avatar avatar to State \n if true grants (Online/Map/Modify) perms")]
@@ -80,32 +80,32 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "friends", "FriendRequest", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "FriendRequest", new string[] { avatar, state });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup");
+                return Failure("avatar lookup", "FriendRequest", new string[] { avatar, state });
             }
             bool status = false;
             if (bool.TryParse(state, out status) == false)
             {
-                return Failure("state invaild");
+                return Failure("state invaild", "FriendRequest", new string[] { avatar, state });
             }
             if (bot.GetClient.Friends.FriendList.ContainsKey(avataruuid) == true)
             {
                 if (status == false)
                 {
                     bot.GetClient.Friends.TerminateFriendship(avataruuid);
-                    return BasicReply("Removed");
+                    return BasicReply("Removed", "FriendRequest", new string[] { avatar, state });
                 }
             }
             if (status == false)
             {
-                return Failure("Not in friendslist");
+                return Failure("Not in friendslist", "FriendRequest", new string[] { avatar, state });
             }
             bot.GetClient.Friends.OfferFriendship(avataruuid);
-            return BasicReply("Request sent");
+            return BasicReply("Request sent", "FriendRequest", new string[] { avatar, state });
             
         }
     }

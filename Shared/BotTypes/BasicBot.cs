@@ -67,6 +67,11 @@ namespace BetterSecondBotShared.bottypes
             teleported = true;
         }
 
+        public bool TeleportStatus()
+        {
+            return teleported;
+        }
+
 
         protected Dictionary<string, string[]> custom_commands = new Dictionary<string, string[]>();
         public Dictionary<string, string[]> getCustomCommands { get { return custom_commands; } }

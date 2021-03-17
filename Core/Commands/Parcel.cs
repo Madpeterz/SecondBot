@@ -32,15 +32,15 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "SetParcelSale");
             if(tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "SetParcelSale", new string[] { amount, avatar });
             }
             if (int.TryParse(amount,out int amountvalue) == false)
             {
-                return Failure("Invaild amount");
+                return Failure("Invaild amount", "SetParcelSale", new string[] { amount, avatar });
             }
             if((amountvalue < 1) || (amountvalue > 9999999))
             {
-                return Failure("Invaild amount");
+                return Failure("Invaild amount", "SetParcelSale", new string[] { amount, avatar });
             }
             ProcessAvatar(avatar);
             targetparcel.SalePrice = amountvalue;
@@ -48,7 +48,7 @@ namespace BetterSecondBot.HttpService
             parcel_static.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
             parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
             targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
-            return Failure("ok");
+            return Failure("ok", "SetParcelSale", new string[] { amount, avatar });
         }
 
         [About("Changes the parcel landing mode to point and sets the landing point")]
@@ -65,24 +65,24 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "SetParcelLandingZone");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "SetParcelLandingZone", new string[] { x, y, z });
             }
             if(int.TryParse(x,out int X) == false)
             {
-                return Failure("Unable to process landing point x value");
+                return Failure("Unable to process landing point x value", "SetParcelLandingZone", new string[] { x, y, z });
             }
             if (int.TryParse(y, out int Y) == false)
             {
-                return Failure("Unable to process landing point y value");
+                return Failure("Unable to process landing point y value", "SetParcelLandingZone", new string[] { x, y, z });
             }
             if (int.TryParse(z, out int Z) == false)
             {
-                return Failure("Unable to process landing point z value");
+                return Failure("Unable to process landing point z value", "SetParcelLandingZone", new string[] { x, y, z });
             }
             targetparcel.Landing = LandingType.LandingPoint;
             targetparcel.UserLocation = new Vector3(X, Y, Z);
             targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
-            return BasicReply("ok");
+            return BasicReply("ok", "SetParcelLandingZone", new string[] { x, y, z });
         }
 
 
@@ -98,15 +98,15 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "SetParcelName");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "SetParcelName", new string[] { name });
             }
             if (helpers.notempty(name) == false)
             {
-                return Failure("Parcel name is empty");
+                return Failure("Parcel name is empty", "SetParcelName", new string[] { name });
             }
             targetparcel.Name = name;
             targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
-            return BasicReply("ok");
+            return BasicReply("ok", "SetParcelName", new string[] { name });
         }
 
         [About("Updates the current parcels description")]
@@ -120,11 +120,11 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "SetParcelDesc");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "SetParcelDesc", new string[] { desc });
             }
             targetparcel.Desc = desc;
             targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
-            return BasicReply("ok");
+            return BasicReply("ok", "SetParcelDesc", new string[] { desc });
         }
 
         [About("Fetchs the current parcels desc")]
@@ -137,9 +137,9 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "GetParcelDesc");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "GetParcelDesc", new string[] { });
             }
-            return BasicReply(targetparcel.Desc);
+            return BasicReply(targetparcel.Desc, "GetParcelDesc", new string[] { });
         }
 
         [About("gets the flags for the parcel")]
@@ -152,7 +152,7 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "GetParcelFlags");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "GetParcelFlags", new string[] { });
             }
             Dictionary<string, ParcelFlags> flags = parcel_static.get_flags_list();
             Dictionary<string, string> collection = new Dictionary<string, string>();
@@ -160,6 +160,7 @@ namespace BetterSecondBot.HttpService
             {
                 collection.Add(cfg.ToString(), targetparcel.Flags.HasFlag(cfg).ToString());
             }
+            SuccessNoReturn("GetParcelFlags", new string[] { });
             return collection;
         }
 
@@ -172,15 +173,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "parcel", "ParcelEject", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "ParcelEject", new string[] { avatar });
             }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar");
+                return Failure("Invaild avatar", "ParcelEject", new string[] { avatar });
             }
             bot.GetClient.Parcels.EjectUser(avataruuid, false);
-            return BasicReply("ok");
+            return BasicReply("ok", "ParcelEject", new string[] { avatar });
         }
 
         [About("Abandons the parcel the bot is currently on, returning it to Linden's or Estate owner")]
@@ -191,10 +192,10 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "AbandonLand");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "AbandonLand", new string[] { });
             }
             bot.GetClient.Parcels.ReleaseParcel(bot.GetClient.Network.CurrentSim, targetparcel.LocalID);
-            return BasicReply("ok");
+            return BasicReply("ok", "AbandonLand", new string[] { });
         }
 
 
@@ -211,12 +212,12 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "ParcelBan");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "ParcelBan", new string[] { avatar });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar");
+                return Failure("Invaild avatar", "ParcelBan", new string[] { avatar });
             }
             bool alreadyBanned = false;
             foreach (ParcelAccessEntry E in targetparcel.AccessBlackList)
@@ -229,7 +230,7 @@ namespace BetterSecondBot.HttpService
             }
             if (alreadyBanned == true)
             {
-                return BasicReply("Avatar is in the blacklist");
+                return BasicReply("Avatar is in the blacklist", "ParcelBan", new string[] { avatar });
             }
             ParcelAccessEntry entry = new ParcelAccessEntry();
             entry.AgentID = avataruuid;
@@ -237,7 +238,7 @@ namespace BetterSecondBot.HttpService
             entry.Time = new System.DateTime(3030, 03, 03);
             targetparcel.AccessBlackList.Add(entry);
             targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
-            return BasicReply("ok");
+            return BasicReply("ok", "ParcelBan", new string[] { avatar });
         }
 
         [About("Unbans an avatar from a parcel")]
@@ -253,12 +254,12 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "ParcelUnBan");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "ParcelUnBan", new string[] { avatar });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar");
+                return Failure("Invaild avatar", "ParcelUnBan", new string[] { avatar });
             }
             bool alreadyBanned = false;
             ParcelAccessEntry removeentry = new ParcelAccessEntry();
@@ -273,11 +274,11 @@ namespace BetterSecondBot.HttpService
             }
             if (alreadyBanned == false)
             {
-                return BasicReply("Avatar is already unbanned");
+                return BasicReply("Avatar is already unbanned", "ParcelUnBan", new string[] { avatar });
             }
             targetparcel.AccessBlackList.Remove(removeentry);
             targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
-            return BasicReply("ok");
+            return BasicReply("ok", "ParcelUnBan", new string[] { avatar });
         }
 
 
@@ -292,10 +293,10 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "SetParcelMusic");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "SetParcelMusic", new string[] { musicurl });
             }
             bool status = parcel_static.set_parcel_music(bot, targetparcel, musicurl);
-            return BasicReply(status.ToString());
+            return BasicReply(status.ToString(), "SetParcelMusic", new string[] { musicurl });
         }
 
         [About("Updates the current parcels name")]
@@ -314,7 +315,7 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "SetParcelFlag");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "SetParcelFlag", new string[] { escapedflagdata });
             }
             List<string> acceptablewords = new List<string>();
             Dictionary<string, ParcelFlags> flags = parcel_static.get_flags_list();
@@ -343,11 +344,11 @@ namespace BetterSecondBot.HttpService
             }
             if (setflags.Count == 0)
             {
-                return Failure("No accepted flags");
+                return Failure("No accepted flags", "SetParcelFlag", new string[] { escapedflagdata });
             }
             if (parcel_static.has_parcel_perm(targetparcel, bot) == false)
             {
-                return Failure("Incorrect perms to control parcel");
+                return Failure("Incorrect perms to control parcel", "SetParcelFlag", new string[] { escapedflagdata });
             }
             foreach (KeyValuePair<string, bool> cfg in setflags)
             {
@@ -357,7 +358,7 @@ namespace BetterSecondBot.HttpService
                 }
             }
             targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
-            return BasicReply("Applying perms");
+            return BasicReply("Applying perms", "SetParcelFlag", new string[] { escapedflagdata });
         }
 
         [About("Returns all objects from the current parcel for the selected avatar")]
@@ -372,15 +373,15 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "ParcelReturnTargeted");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "ParcelReturnTargeted", new string[] { avatar });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar UUID");
+                return Failure("Invaild avatar UUID", "ParcelReturnTargeted", new string[] { avatar });
             }
             bot.GetClient.Parcels.ReturnObjects(bot.GetClient.Network.CurrentSim, targetparcel.LocalID, ObjectReturnType.None, new List<UUID>() { avataruuid });
-            return BasicReply("ok");
+            return BasicReply("ok", "ParcelReturnTargeted", new string[] { avatar });
         }
 
 
@@ -393,24 +394,24 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/ParcelDeedToGroup/{group}/{token}")]
         public object ParcelDeedToGroup(string group, string token)
         {
-            KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "ParcelReturnTargeted");
+            KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "ParcelDeedToGroup");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "ParcelDeedToGroup", new string[] { group });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group uuid");
+                return Failure("Invaild group uuid", "ParcelDeedToGroup", new string[] { group });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Not in group");
+                return Failure("Not in group", "ParcelDeedToGroup", new string[] { group });
             }
             targetparcel.GroupID = groupuuid;
             targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
             Thread.Sleep(500);
             bot.GetClient.Parcels.DeedToGroup(bot.GetClient.Network.CurrentSim, targetparcel.LocalID, groupuuid);
-            return BasicReply("ok");
+            return BasicReply("ok", "ParcelDeedToGroup", new string[] { group });
         }
 
         [About("Attempts to buy the parcel the bot is standing on, the amount must match the sale price for the land!")]
@@ -429,30 +430,30 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "ParcelBuy");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "ParcelBuy", new string[] { amount });
             }
             if (int.TryParse(amount, out int amountvalue) == false)
             {
-                return Failure("Invaild amount");
+                return Failure("Invaild amount", "ParcelBuy", new string[] { amount });
             }
             if (amountvalue < 1)
             {
-                return Failure("Invaild amount");
+                return Failure("Invaild amount", "ParcelBuy", new string[] { amount });
             };
             if (targetparcel.Flags.HasFlag(ParcelFlags.ForSale) == false)
             {
-                return Failure("Parcel not for sale");
+                return Failure("Parcel not for sale", "ParcelBuy", new string[] { amount });
             }
             if ((targetparcel.AuthBuyerID != UUID.Zero) && (targetparcel.AuthBuyerID != bot.GetClient.Self.AgentID))
             {
-                return Failure("Parcel sale locked to other avatars");
+                return Failure("Parcel sale locked to other avatars", "ParcelBuy", new string[] { amount });
             }
             if (targetparcel.SalePrice != amountvalue)
             {
-                return Failure("Parcel sale price and amount do not match");
+                return Failure("Parcel sale price and amount do not match", "ParcelBuy", new string[] { amount });
             }
             bot.GetClient.Parcels.Buy(bot.GetClient.Network.CurrentSim, targetparcel.LocalID, false, UUID.Zero, false, targetparcel.Area, amountvalue);
-            return BasicReply("ok");
+            return BasicReply("ok", "ParcelBuy", new string[] { amount });
         }
 
         [About("Freezes an avatar")]
@@ -466,19 +467,19 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "parcel", "ParcelFreeze", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "ParcelFreeze", new string[] { avatar, state });
             }
             if(bool.TryParse(state, out bool freezestate) == false)
             {
-                return Failure("Invaild state");
+                return Failure("Invaild state", "ParcelFreeze", new string[] { avatar, state });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar UUID");
+                return Failure("Invaild avatar UUID", "ParcelFreeze", new string[] { avatar, state });
             }
             bot.GetClient.Parcels.FreezeUser(avataruuid, freezestate);
-            return BasicReply("ok");
+            return BasicReply("ok", "ParcelFreeze", new string[] { avatar, state });
         }
 
 
@@ -492,7 +493,7 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "GetParcelBanlist");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "GetParcelBanlist", new string[] { });
             }
             GetParcelBanlistObject reply = new GetParcelBanlistObject();
             int delays = 0;
@@ -525,7 +526,7 @@ namespace BetterSecondBot.HttpService
             reply.delay = delays * 1000;
             reply.parcelName = targetparcel.Name;
             reply.regionName = bot.GetClient.Network.CurrentSim.Name;
-            return BasicReply(JsonConvert.SerializeObject(reply));
+            return BasicReply(JsonConvert.SerializeObject(reply), "GetParcelBanlist", new string[] { });
         }
 
         [About("Returns a rezzed object")]
@@ -538,11 +539,11 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "parcel", "UnRezObject", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "UnRezObject", new string[] { objectuuid });
             }
             if (UUID.TryParse(objectuuid, out UUID targetobject) == false)
             {
-                return Failure("Invaild object uuid");
+                return Failure("Invaild object uuid", "UnRezObject", new string[] { objectuuid });
             }
             bool found = false;
             Dictionary<uint, Primitive> objects_copy = bot.GetClient.Network.CurrentSim.ObjectsPrimitives.Copy();
@@ -557,9 +558,9 @@ namespace BetterSecondBot.HttpService
             }
             if(found == false)
             {
-                return Failure("Unable to find object");
+                return Failure("Unable to find object", "UnRezObject", new string[] { objectuuid });
             }
-            return BasicReply("ok");
+            return BasicReply("ok", "UnRezObject", new string[] { objectuuid });
         }
 
         [About("Updates the current parcels media settings \n" +
@@ -582,7 +583,7 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "ParcelSetMedia");
             if (tests.Key == false)
             {
-                return Failure(tests.Value);
+                return Failure(tests.Value, "ParcelSetMedia", new string[] { escapedflagdata });
             }
             string[] args = escapedflagdata.Split(":::");
             foreach (string A in args)
@@ -643,7 +644,7 @@ namespace BetterSecondBot.HttpService
                 }
             }
             targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
-            return BasicReply("ok");
+            return BasicReply("ok", "ParcelSetMedia", new string[] { escapedflagdata });
         }
 
         protected bool UpdateParcel_MediaType(Parcel targetparcel, string value)

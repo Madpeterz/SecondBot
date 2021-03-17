@@ -323,6 +323,11 @@ namespace BetterSecondbot.BetterAtHome
                 SetBetterAtHomeAction("No home regions");
                 return;
             }
+            if(controler.Bot.TeleportStatus() == true)
+            {
+                SetBetterAtHomeAction("Teleported");
+                return;
+            }
             if (IsAtHome() == true)
             {
                 SetBetterAtHomeAction("AtHome");

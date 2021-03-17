@@ -31,15 +31,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "IsGroupMember", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "IsGroupMember", new string[] { group, avatar });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID");
+                return Failure("Invaild group UUID", "IsGroupMember", new string[] { group, avatar });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "IsGroupMember", new string[] { group, avatar });
             }
             if (bot.NeedReloadGroupData(groupuuid) == true)
             {
@@ -49,14 +49,14 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> reply = waitForReady(true, true, groupuuid);
             if (reply.Key == false)
             {
-                return Failure(reply.Value);
+                return Failure(reply.Value, "IsGroupMember", new string[] { group, avatar });
             }
             IsGroupMemberReply replyobject = new IsGroupMemberReply();
             replyobject.membershipStatus = bot.FastCheckInGroup(groupuuid, avataruuid);
             replyobject.AvatarUUID = avataruuid.ToString();
             replyobject.AvatarnameIfKnown = bot.FindAvatarKey2Name(avataruuid);
             replyobject.GroupUUID = groupuuid.ToString();
-            return BasicReply(JsonConvert.SerializeObject(replyobject));
+            return BasicReply(JsonConvert.SerializeObject(replyobject), "IsGroupMember", new string[] { group, avatar });
         }
 
         [About("Gets membership of a group")]
@@ -71,15 +71,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GetGroupMembers", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GetGroupMembers", new string[] { group });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID");
+                return Failure("Invaild group UUID", "GetGroupMembers", new string[] { group });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "GetGroupMembers", new string[] { group });
             }
             if (bot.NeedReloadGroupData(groupuuid) == true)
             {
@@ -88,8 +88,9 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> reply = waitForReady(false, true, groupuuid);
             if (reply.Key == false)
             {
-                return Failure(reply.Value);
+                return Failure(reply.Value, "GetGroupMembers", new string[] { group });
             }
+            SuccessNoReturn("GetGroupMembers", new string[] { group });
             return bot.GetGroupMembers(groupuuid);
         }
 
@@ -105,26 +106,26 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupBan/{group}/{avatar}/{state}/{token}")]
         public object GroupBan(string group, string avatar, string state, string token)
         {
-            if (tokens.Allow(token, "groups", "GetGroupMembers", handleGetClientIP()) == false)
+            if (tokens.Allow(token, "groups", "GroupBan", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GroupBan", new string[] { group,avatar,state });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID");
+                return Failure("Invaild group UUID", "GroupBan", new string[] { group, avatar, state });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "GroupBan", new string[] { group, avatar, state });
             }
             if (bool.TryParse(state, out bool banstate) == false)
             {
-                return Failure("Invaild ban state");
+                return Failure("Invaild ban state", "GroupBan", new string[] { group, avatar, state });
             }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup");
+                return Failure("avatar lookup", "GroupBan", new string[] { group, avatar, state });
             }
             GroupBanAction action = GroupBanAction.Unban;
             string statename = "Unban";
@@ -134,7 +135,7 @@ namespace BetterSecondBot.HttpService
                 statename = "Ban";
             }
             bot.GetClient.Groups.RequestBanAction(groupuuid, action, new UUID[] { avataruuid });
-            return BasicReply(statename+" request accepted");
+            return BasicReply(statename+" request accepted", "GroupBan", new string[] { group, avatar, state });
         }
 
 
@@ -153,23 +154,23 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GroupEject", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GroupEject", new string[] { group, avatar });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID");
+                return Failure("Invaild group UUID", "GroupEject", new string[] { group, avatar });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "GroupEject", new string[] { group, avatar });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup");
+                return Failure("avatar lookup", "GroupEject", new string[] { group, avatar });
             }
             bot.GetClient.Groups.EjectUser(groupuuid, avataruuid);
-            return BasicReply("Requested");
+            return BasicReply("Requested", "GroupEject", new string[] { group, avatar });
         }
 
         [About("Adds the avatar to the Group with the role \n if they are not in the group then it invites them aswell")]
@@ -188,19 +189,19 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GroupAddRole", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GroupAddRole", new string[] { group, avatar });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID");
+                return Failure("Invaild group UUID", "GroupAddRole", new string[] { group, avatar });
             }
             if (UUID.TryParse(role, out UUID roleuuid) == false)
             {
-                return Failure("Invaild role UUID");
+                return Failure("Invaild role UUID", "GroupAddRole", new string[] { group, avatar });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "GroupAddRole", new string[] { group, avatar });
             }
             if (bot.NeedReloadGroupData(groupuuid) == true)
             {
@@ -210,16 +211,16 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> reply = waitForReady(true, true, groupuuid);
             if (reply.Key == false)
             {
-                return Failure(reply.Value);
+                return Failure(reply.Value, "GroupAddRole", new string[] { group, avatar });
             }
             bool status = bot.FastCheckInGroup(groupuuid, avataruuid);
             if (status == false)
             {
                 bot.GetClient.Groups.Invite(groupuuid, new List<UUID>() { roleuuid }, avataruuid);
-                return BasicReply("Invite sent");
+                return BasicReply("Invite sent", "GroupAddRole", new string[] { group, avatar });
             }
             bot.GetClient.Groups.AddToRole(groupuuid, roleuuid, avataruuid);
-            return BasicReply("Roles updated");
+            return BasicReply("Roles updated", "GroupAddRole", new string[] { group, avatar });
         }
 
         [About("Eject selected avatar from group")]
@@ -237,15 +238,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GroupInvite", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GroupInvite", new string[] { group, avatar, role });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID");
+                return Failure("Invaild group UUID", "GroupInvite", new string[] { group, avatar, role });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "GroupInvite", new string[] { group, avatar, role });
             }
             if (bot.NeedReloadGroupData(groupuuid) == true)
             {
@@ -254,12 +255,12 @@ namespace BetterSecondBot.HttpService
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup");
+                return Failure("avatar lookup", "GroupInvite", new string[] { group, avatar, role });
             }
             bool status = bot.FastCheckInGroup(groupuuid, avataruuid);
             if (status == true)
             {
-                return Failure("Already in group");
+                return Failure("Already in group", "GroupInvite", new string[] { group, avatar, role });
             }
             if(role == "everyone")
             {
@@ -267,10 +268,10 @@ namespace BetterSecondBot.HttpService
             }
             if(UUID.TryParse(role,out UUID roleuuid) == false)
             {
-                return Failure("Unable to process role UUID");
+                return Failure("Unable to process role UUID", "GroupInvite", new string[] { group, avatar, role });
             }
             bot.GetClient.Groups.Invite(groupuuid, new List<UUID>() { roleuuid }, avataruuid);
-            return BasicReply("Invite sent");
+            return BasicReply("Invite sent", "GroupInvite", new string[] { group, avatar, role });
         }
 
         [About("Sends a group notice (No attachments please use GroupnoticeWithAttachment to attach items!)")]
@@ -287,30 +288,30 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "Groupnotice", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Groupnotice", new string[] { group, title, message });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID");
+                return Failure("Invaild group UUID", "Groupnotice", new string[] { group, title, message });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "Groupnotice", new string[] { group, title, message });
             }
             if (helpers.notempty(title) == false)
             {
-                return Failure("Title empty");
+                return Failure("Title empty", "Groupnotice", new string[] { group, title, message });
             }
             if (helpers.notempty(message) == false)
             {
-                return Failure("Message empty");
+                return Failure("Message empty", "Groupnotice", new string[] { group, title, message });
             }
             GroupNotice NewNotice = new GroupNotice();
             NewNotice.Subject = title;
             NewNotice.Message = message;
             NewNotice.OwnerID = bot.GetClient.Self.AgentID;
             bot.GetClient.Groups.SendGroupNotice(groupuuid, NewNotice);
-            return BasicReply("Sending notice");
+            return BasicReply("Sending notice", "Groupnotice", new string[] { group, title, message });
         }
 
         [About("Activates the selected title")]
@@ -325,22 +326,22 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GroupActiveTitle", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GroupActiveTitle", new string[] { group, role });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID");
+                return Failure("Invaild group UUID", "GroupActiveTitle", new string[] { group, role });
             }
             if (UUID.TryParse(role, out UUID roleuuid) == false)
             {
-                return Failure("Invaild role UUID");
+                return Failure("Invaild role UUID", "GroupActiveTitle", new string[] { group, role });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "GroupActiveTitle", new string[] { group, role });
             }
             bot.GetClient.Groups.ActivateTitle(groupuuid, roleuuid);
-            return BasicReply("Switching title");
+            return BasicReply("Switching title", "GroupActiveTitle", new string[] { group, role });
         }
 
         [About("Sets the selected group to the active group")]
@@ -351,20 +352,20 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupActiveGroup/{group}/{token}")]
         public object GroupActiveGroup(string group, string role, string token)
         {
-            if (tokens.Allow(token, "groups", "GroupActiveTitle", handleGetClientIP()) == false)
+            if (tokens.Allow(token, "groups", "GroupActiveGroup", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GroupActiveGroup", new string[] { group, role });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID");
+                return Failure("Invaild group UUID", "GroupActiveGroup", new string[] { group, role });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "GroupActiveGroup", new string[] { group, role });
             }
             bot.GetClient.Groups.ActivateGroup(groupuuid);
-            return BasicReply("Switching active group");
+            return BasicReply("Switching active group", "GroupActiveGroup", new string[] { group, role });
         }
 
         [About("Sends a group notice with an attachment")]
@@ -383,27 +384,27 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GroupnoticeWithAttachment", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GroupnoticeWithAttachment", new string[] { group, title, message, attachment });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID");
+                return Failure("Invaild group UUID", "GroupnoticeWithAttachment", new string[] { group, title, message, attachment });
             }
             if (UUID.TryParse(attachment, out UUID inventoryuuid) == false)
             {
-                return Failure("Invaild inventory UUID");
+                return Failure("Invaild inventory UUID", "GroupnoticeWithAttachment", new string[] { group, title, message, attachment });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "GroupnoticeWithAttachment", new string[] { group, title, message, attachment });
             }
             if (helpers.notempty(title) == false)
             {
-                return Failure("Title empty");
+                return Failure("Title empty", "GroupnoticeWithAttachment", new string[] { group, title, message, attachment });
             }
             if (helpers.notempty(message) == false)
             {
-                return Failure("Message empty");
+                return Failure("Message empty", "GroupnoticeWithAttachment", new string[] { group, title, message, attachment });
             }
             GroupNotice NewNotice = new GroupNotice();
             NewNotice.Subject = title;
@@ -411,7 +412,7 @@ namespace BetterSecondBot.HttpService
             NewNotice.OwnerID = bot.GetClient.Self.AgentID;
             NewNotice.AttachmentID = inventoryuuid;
             bot.GetClient.Groups.SendGroupNotice(groupuuid, NewNotice);
-            return BasicReply("Sending notice with attachment");
+            return BasicReply("Sending notice with attachment", "GroupnoticeWithAttachment", new string[] { group, title, message, attachment });
         }
 
 
@@ -422,14 +423,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GetGroupList", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GetGroupList", new string[] {});
             }
             Dictionary<string, string> grouppackage = new Dictionary<string, string>();
             foreach (KeyValuePair<UUID, Group> entry in bot.MyGroups)
             {
                 grouppackage.Add(entry.Value.ID.ToString(), entry.Value.Name);
             }
-            return BasicReply(JsonConvert.SerializeObject(grouppackage));
+            return BasicReply(JsonConvert.SerializeObject(grouppackage), "GetGroupList", new string[] { });
         }
 
         [About("Requests the roles for the selected group<br/>Replys with GroupRoleDetails object formated as follows <ul><li>UpdateUnderway (Bool)</li><li>RoleDataAge (Int) [default -1]</li><li>Roles (KeyPair array of UUID=Name)</li></ul><br/>")]
@@ -443,15 +444,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GetGroupRoles", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GetGroupRoles", new string[] { group });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID");
+                return Failure("Invaild group UUID", "GetGroupRoles", new string[] { group });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "GetGroupRoles", new string[] { group });
             }
             GroupRoleDetails reply = new GroupRoleDetails();
             reply.UpdateUnderway = false;
@@ -479,10 +480,10 @@ namespace BetterSecondBot.HttpService
                 bot.GetClient.Groups.RequestGroupRoles(groupuuid);
                 if (reply.Roles.Count == 0)
                 {
-                    return Failure("Updating");
+                    return Failure("Updating", "GetGroupRoles", new string[] { group });
                 }
             }
-            return BasicReply(JsonConvert.SerializeObject(reply));
+            return BasicReply(JsonConvert.SerializeObject(reply), "GetGroupRoles", new string[] { group });
         }
 
         [About("fetchs a list of all groups with unread messages")]
@@ -492,9 +493,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GroupchatListAllUnreadGroups", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GroupchatListAllUnreadGroups", new string[] { });
             }
-            return BasicReply(JsonConvert.SerializeObject(bot.UnreadGroupchatGroups()));
+            return BasicReply(JsonConvert.SerializeObject(bot.UnreadGroupchatGroups()), "GroupchatListAllUnreadGroups", new string[] { });
         }
 
         [About("fetchs a list of all groups with unread messages")]
@@ -506,20 +507,20 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/GroupchatGroupHasUnread/{group}/{token}")]
         public object GroupchatGroupHasUnread(string group,string token)
         {
-            if (tokens.Allow(token, "groups", "GroupchatListAllUnreadGroups", handleGetClientIP()) == false)
+            if (tokens.Allow(token, "groups", "GroupchatGroupHasUnread", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GroupchatGroupHasUnread", new string[] { group });
             }
             UUID groupUUID = UUID.Zero;
             if(UUID.TryParse(group,out groupUUID) == false)
             {
-                return Failure("group value is invaild");
+                return Failure("group value is invaild", "GroupchatGroupHasUnread", new string[] { group });
             }
             if(bot.MyGroups.ContainsKey(groupUUID) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "GroupchatGroupHasUnread", new string[] { group });
             }
-            return BasicReply(bot.GroupHasUnread(groupUUID).ToString());
+            return BasicReply(bot.GroupHasUnread(groupUUID).ToString(), "GroupchatGroupHasUnread", new string[] { group });
         }
 
 
@@ -530,9 +531,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GroupchatAnyUnread", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GroupchatAnyUnread", new string[] { });
             }
-            return BasicReply(bot.HasUnreadGroupchats().ToString());
+            return BasicReply(bot.HasUnreadGroupchats().ToString(), "GroupchatAnyUnread", new string[] { });
         }
 
         [About("Clears all group chat buffers at once")]
@@ -542,10 +543,10 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GroupchatClearAll", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GroupchatClearAll", new string[] { });
             }
             bot.ClearAllGroupchat();
-            return BasicReply("ok");
+            return BasicReply("ok", "GroupchatClearAll", new string[] { });
         }
 
         [About("fetchs the groupchat history")]
@@ -557,13 +558,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GroupchatHistory", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "GroupchatHistory", new string[] { group });
             }
             if (UUID.TryParse(group, out UUID groupUUID) == false)
             {
-                return Failure("Group UUID invaild");
+                return Failure("Group UUID invaild", "GroupchatHistory", new string[] { group });
             }
-            return BasicReply(JsonConvert.SerializeObject(bot.GetGroupchat(groupUUID)));
+            return BasicReply(JsonConvert.SerializeObject(bot.GetGroupchat(groupUUID)), "GroupchatHistory", new string[] { group });
         }
 
         [About("sends a message to the groupchat")]
@@ -578,24 +579,24 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "Groupchat", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Groupchat", new string[] { group, message });
             }
             UUID groupUUID = UUID.Zero;
             if (UUID.TryParse(group, out groupUUID) == false)
             {
-                return Failure("group value is invaild");
+                return Failure("group value is invaild", "Groupchat", new string[] { group, message });
             }
             if (bot.MyGroups.ContainsKey(groupUUID) == false)
             {
-                return Failure("Unknown group");
+                return Failure("Unknown group", "Groupchat", new string[] { group, message });
             }
             if (bot.GetActiveGroupchatSessions.Contains(groupUUID) == false)
             {
                 bot.GetClient.Self.RequestJoinGroupChat(groupUUID);
-                return Failure("Opening groupchat");
+                return Failure("Opening groupchat", "Groupchat", new string[] { group, message });
             }
             bot.GetClient.Self.InstantMessageGroup(groupUUID, message);
-            return BasicReply("Sending");
+            return BasicReply("Sending", "Groupchat", new string[] { group, message });
         }
 
         protected KeyValuePair<bool, string> waitForReady(bool avatar, bool group, UUID groupuuid)

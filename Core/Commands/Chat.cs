@@ -23,9 +23,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "chat", "LocalChatHistory", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "LocalChatHistory", new string[] { });
             }
-            return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()));
+            return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()), "LocalChatHistory", new string[] { });
         }
 
         [About("sends a message to localchat")]
@@ -39,22 +39,22 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "chat", "Say", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "Say", new string[] { channel, message });
             }
             if (helpers.isempty(message) == true)
             {
-                return Failure("Message empty");
+                return Failure("Message empty", "Say", new string[] { channel, message });
             }
             if(int.TryParse(channel,out int channelnum) == false)
             {
-                return Failure("Invaild channel");
+                return Failure("Invaild channel", "Say", new string[] { channel, message });
             }
             if(channelnum < 0)
             {
-                return Failure("Invaild channel");
+                return Failure("Invaild channel", "Say", new string[] { channel, message });
             }
             bot.GetClient.Self.Chat(message, channelnum, ChatType.Normal);
-            return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()));
+            return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()), "Say", new string[] { channel, message });
             
         }
 
@@ -69,19 +69,19 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "chat", "IM", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted");
+                return Failure("Token not accepted", "IM", new string[] { avatar, message });
             }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup");
+                return Failure("avatar lookup", "IM", new string[] { avatar, message });
             }
             if (helpers.isempty(message) == true)
             {
-                return Failure("Message empty");
+                return Failure("Message empty", "IM", new string[] { avatar, message });
             }
             bot.SendIM(avataruuid, message);
-            return BasicReply("ok");
+            return BasicReply("ok", "IM", new string[] { avatar, message });
         }
 
     }
