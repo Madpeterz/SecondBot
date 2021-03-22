@@ -270,6 +270,15 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Unable to process role UUID", "GroupInvite", new string[] { group, avatar, role });
             }
+            if(bot.MyGroups.ContainsKey(groupuuid) == false)
+            {
+                return Failure("Group missing from MyGroups", "GroupInvite", new string[] { group, avatar, role });
+            }
+            Group G = bot.MyGroups[groupuuid];
+            if(G.Powers.HasFlag(GroupPowers.Invite) == false)
+            {
+                return Failure("Missing group invite power", "GroupInvite", new string[] { group, avatar, role });
+            }
             bot.GetClient.Groups.Invite(groupuuid, new List<UUID>() { roleuuid }, avataruuid);
             return BasicReply("Invite sent", "GroupInvite", new string[] { group, avatar, role });
         }
