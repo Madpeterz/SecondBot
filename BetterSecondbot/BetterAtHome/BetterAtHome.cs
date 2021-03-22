@@ -316,6 +316,8 @@ namespace BetterSecondbot.BetterAtHome
                 FiredAfterLogin = true;
                 controler.Bot.AfterBotLoginHandler();
                 controler.Bot.reconnect = true;
+                SetBetterAtHomeAction("Starting after login events");
+                return;
             }
             void_counter = 0;
             if (homeRegions.Count == 0)
@@ -364,7 +366,7 @@ namespace BetterSecondbot.BetterAtHome
 
         protected bool IsAtHome()
         {
-            if(simname == "")
+            if((simname == "") || (FiredAfterLogin == false))
             {
                 if (controler.Bot.GetClient.Network.CurrentSim == null)
                 {
