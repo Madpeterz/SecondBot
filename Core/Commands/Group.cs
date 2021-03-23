@@ -118,6 +118,11 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Unknown group", "GroupBan", new string[] { group, avatar, state });
             }
+            Group G = bot.MyGroups[groupuuid];
+            if (G.Powers.HasFlag(GroupPowers.GroupBanAccess) == false)
+            {
+                return Failure("Missing group GroupBanAccess power", "GroupBan", new string[] { group, avatar, state });
+            }
             if (bool.TryParse(state, out bool banstate) == false)
             {
                 return Failure("Invaild ban state", "GroupBan", new string[] { group, avatar, state });
@@ -163,6 +168,11 @@ namespace BetterSecondBot.HttpService
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
                 return Failure("Unknown group", "GroupEject", new string[] { group, avatar });
+            }
+            Group G = bot.MyGroups[groupuuid];
+            if (G.Powers.HasFlag(GroupPowers.Eject) == false)
+            {
+                return Failure("Missing group Eject power", "GroupEject", new string[] { group, avatar });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
@@ -270,10 +280,6 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Unable to process role UUID", "GroupInvite", new string[] { group, avatar, role });
             }
-            if(bot.MyGroups.ContainsKey(groupuuid) == false)
-            {
-                return Failure("Group missing from MyGroups", "GroupInvite", new string[] { group, avatar, role });
-            }
             Group G = bot.MyGroups[groupuuid];
             if(G.Powers.HasFlag(GroupPowers.Invite) == false)
             {
@@ -314,6 +320,11 @@ namespace BetterSecondBot.HttpService
             if (helpers.notempty(message) == false)
             {
                 return Failure("Message empty", "Groupnotice", new string[] { group, title, message });
+            }
+            Group G = bot.MyGroups[groupuuid];
+            if (G.Powers.HasFlag(GroupPowers.SendNotices) == false)
+            {
+                return Failure("Missing group notice power", "Groupnotice", new string[] { group, title, message });
             }
             GroupNotice NewNotice = new GroupNotice();
             NewNotice.Subject = title;
@@ -414,6 +425,11 @@ namespace BetterSecondBot.HttpService
             if (helpers.notempty(message) == false)
             {
                 return Failure("Message empty", "GroupnoticeWithAttachment", new string[] { group, title, message, attachment });
+            }
+            Group G = bot.MyGroups[groupuuid];
+            if (G.Powers.HasFlag(GroupPowers.SendNotices) == false)
+            {
+                return Failure("Missing group notice power", "GroupnoticeWithAttachment", new string[] { group, title, message, attachment });
             }
             GroupNotice NewNotice = new GroupNotice();
             NewNotice.Subject = title;
@@ -598,6 +614,11 @@ namespace BetterSecondBot.HttpService
             if (bot.MyGroups.ContainsKey(groupUUID) == false)
             {
                 return Failure("Unknown group", "Groupchat", new string[] { group, message });
+            }
+            Group G = bot.MyGroups[groupUUID];
+            if (G.Powers.HasFlag(GroupPowers.JoinChat) == false)
+            {
+                return Failure("Missing group JoinChat power", "Groupchat", new string[] { group, message });
             }
             if (bot.GetActiveGroupchatSessions.Contains(groupUUID) == false)
             {
