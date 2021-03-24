@@ -374,22 +374,22 @@ namespace BetterSecondBot.HttpService
         [ReturnHints("Invaild group UUID")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [Route(HttpVerbs.Get, "/GroupActiveGroup/{group}/{token}")]
-        public object GroupActiveGroup(string group, string role, string token)
+        public object GroupActiveGroup(string group, string token)
         {
             if (tokens.Allow(token, "groups", "GroupActiveGroup", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "GroupActiveGroup", new string[] { group, role });
+                return Failure("Token not accepted", "GroupActiveGroup", new string[] { group });
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID", "GroupActiveGroup", new string[] { group, role });
+                return Failure("Invaild group UUID", "GroupActiveGroup", new string[] { group });
             }
             if (bot.MyGroups.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group", "GroupActiveGroup", new string[] { group, role });
+                return Failure("Unknown group", "GroupActiveGroup", new string[] { group });
             }
             bot.GetClient.Groups.ActivateGroup(groupuuid);
-            return BasicReply("Switching active group", "GroupActiveGroup", new string[] { group, role });
+            return BasicReply("Switching active group", "GroupActiveGroup", new string[] { group });
         }
 
         [About("Sends a group notice with an attachment")]
