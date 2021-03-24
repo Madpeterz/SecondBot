@@ -149,6 +149,20 @@ namespace BetterSecondBot.bottypes
             return output.ToArray();
         }
 
+        public string[] GetFullListOfCommandsWithCustoms()
+        {
+            List<string> output = new List<string>();
+            foreach (string A in endpointcommandmap.Keys)
+            {
+                output.Add(A.ToLowerInvariant());
+            }
+            foreach(string A in custom_commands.Keys)
+            {
+                output.Add(A.ToLowerInvariant());
+            }
+            return output.ToArray();
+        }
+
         public void NotecardAddContent(string target_notecard_storage_id, string content)
         {
             NotecardAddContent(target_notecard_storage_id, content, true, "\n\r");

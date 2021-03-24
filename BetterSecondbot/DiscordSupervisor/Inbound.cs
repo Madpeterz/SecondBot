@@ -106,24 +106,25 @@ namespace BetterSecondBot.DiscordSupervisor
                     else
                     {
                         string[] bits = message.Content.Split("|||");
-                        if(bits.Length >= 2)
+                        string target = "None";
+                        if (bits.Length == 3)
                         {
-                            string target = "None";
-                            if (bits.Length == 3)
-                            {
-                                target = bits[2];
-                            }
-                            if (controler.Bot.getFullListOfCommands().Contains(bits[0].ToLowerInvariant()) == true)
-                            {
-                                controler.Bot.CallAPI(bits[0], bits[1].Split("~#~"), target);
-                                await MarkMessage(message, "✅").ConfigureAwait(false);
-                            }
-                            else
-                            {
-                                await MarkMessage(message, "❌").ConfigureAwait(false);
-                            }
+                            target = bits[2];
                         }
-                        await MarkMessage(message, "❌").ConfigureAwait(false);
+                        string args = "";
+                        if (bits.Length == 3)
+                        {
+                            args = bits[1];
+                        }
+                        if (controler.Bot.GetFullListOfCommandsWithCustoms().Contains(bits[0].ToLowerInvariant()) == true)
+                        {
+                            controler.Bot.CallAPI(bits[0], args.Split("~#~"), target);
+                            await MarkMessage(message, "✅").ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            await MarkMessage(message, "❌").ConfigureAwait(false);
+                        }
                     }
                 }
             }
