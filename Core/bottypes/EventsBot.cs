@@ -62,10 +62,10 @@ namespace BetterSecondBot.bottypes
     }
     public class StatusMessageEvent : EventArgs
     {
-        public bool connected  { get; }
+        public bool connected { get; }
         public string sim { get; }
 
-        public StatusMessageEvent(bool connected,string sim)
+        public StatusMessageEvent(bool connected, string sim)
         {
             this.connected = connected;
             this.sim = sim;
@@ -84,7 +84,7 @@ namespace BetterSecondBot.bottypes
     public class ImSendArgs : EventArgs
     {
         public UUID avataruuid { get; }
-        public string message { get;  }
+        public string message { get; }
 
         public ImSendArgs(UUID avataruuid, string message)
         {
@@ -143,6 +143,7 @@ namespace BetterSecondBot.bottypes
             add { lock (_ChangeSimLock) { _ChangeSim += value; } }
             remove { lock (_ChangeSimLock) { _ChangeSim -= value; } }
         }
+
         public event EventHandler<AlertMessageEventArgs> AlertMessage
         {
             add { lock (_AlertMessageLock) { _AlertMessage += value; } }
@@ -259,9 +260,9 @@ namespace BetterSecondBot.bottypes
             return group_members_storage[group].Value;
         }
 
-        public bool FastCheckInGroup(UUID group,UUID avatar)
+        public bool FastCheckInGroup(UUID group, UUID avatar)
         {
-            if(NeedReloadGroupData(group) == false)
+            if (NeedReloadGroupData(group) == false)
             {
                 return group_members_storage[group].Value.Contains(avatar);
             }
@@ -277,7 +278,7 @@ namespace BetterSecondBot.bottypes
                     long dif = last_cleanup - group_members_storage[group].Key;
                     if (dif < 240)
                     {
-                        result= false;
+                        result = false;
                     }
                     else
                     {
@@ -360,7 +361,7 @@ namespace BetterSecondBot.bottypes
         public virtual void GroupsHandler(object sender, CurrentGroupsEventArgs e)
         {
             mygroups = e.Groups;
-            foreach(KeyValuePair<UUID,Group> entry in mygroups)
+            foreach (KeyValuePair<UUID, Group> entry in mygroups)
             {
                 Client.Self.RequestJoinGroupChat(entry.Value.ID);
             }
@@ -378,6 +379,8 @@ namespace BetterSecondBot.bottypes
                 Client.Self.ScriptQuestion += PermissionsHandler;
                 Client.Friends.FriendshipResponse += FriendshipResponse;
                 Client.Friends.FriendNames += AvatarFriendNames;
+                Client.Self.AlertMessage += AlertEvent;
+                Client.Network.SimChanged += ChangeSim;
                 delay_group_fetch = helpers.UnixTimeNow() + 10;
             }
             base.AfterBotLoginHandler();
@@ -440,7 +443,7 @@ namespace BetterSecondBot.bottypes
             {
                 accept_invite = true;
             }
-            else if(IsSittingOnUUID(e.ItemID) == true)
+            else if (IsSittingOnUUID(e.ItemID) == true)
             {
                 accept_invite = true;
             }
@@ -506,7 +509,7 @@ namespace BetterSecondBot.bottypes
         {
             LogFormater.Info("Group invite event from: " + e.IM.FromAgentName);
             string[] stage1 = e.IM.FromAgentName.ToLowerInvariant().Split('.');
-            if(stage1.Length == 1)
+            if (stage1.Length == 1)
             {
                 stage1 = e.IM.FromAgentName.ToLowerInvariant().Split(" ");
             }
@@ -529,7 +532,7 @@ namespace BetterSecondBot.bottypes
             else
             {
                 accept_invite = Accept_action_from("group", e.IM.FromAgentID);
-                if(accept_invite == true)
+                if (accept_invite == true)
                 {
                     whyAccept = "Action auth";
                     Remove_action_from("group", e.IM.FromAgentID);
@@ -537,7 +540,7 @@ namespace BetterSecondBot.bottypes
             }
             if (accept_invite == true)
             {
-                LogFormater.Info("Group invite event from: " + e.IM.FromAgentName+" Accepted - "+ whyAccept);
+                LogFormater.Info("Group invite event from: " + e.IM.FromAgentName + " Accepted - " + whyAccept);
                 GroupInvitationEventArgs G = new GroupInvitationEventArgs(e.Simulator, e.IM.FromAgentID, e.IM.FromAgentName, e.IM.Message);
                 Client.Self.GroupInviteRespond(G.AgentID, e.IM.IMSessionID, true);
                 Client.Groups.RequestCurrentGroups();
