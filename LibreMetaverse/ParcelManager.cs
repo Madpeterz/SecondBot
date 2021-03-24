@@ -570,6 +570,11 @@ namespace OpenMetaverse
         public bool ObscureMusic;
         /// <summary>A struct containing media details</summary>
         public ParcelMedia Media;
+        public bool SeeAVs;
+        /// <summary> true if avatars outside can hear any sounds avatars inside play</summary>
+        public bool AnyAVSounds;
+        /// <summary> true if group members outside can hear any sounds avatars inside play</summary>
+        public bool GroupAVSounds;
 
         /// <summary>
         /// Displays a parcel object in string format
@@ -631,11 +636,14 @@ namespace OpenMetaverse
                     ObscureMusic = ObscureMusic,
                     ParcelFlags = Flags,
                     PassHours = PassHours,
-                    PassPrice = (uint) PassPrice,
-                    SalePrice = (uint) SalePrice,
+                    PassPrice = (uint)PassPrice,
+                    SalePrice = (uint)SalePrice,
                     SnapshotID = SnapshotID,
                     UserLocation = UserLocation,
-                    UserLookAt = UserLookAt
+                    UserLookAt = UserLookAt,
+                    SeeAVs = SeeAVs,
+                    AnyAVSounds = AnyAVSounds,
+                    GroupAVSounds = GroupAVSounds
                 };
 
                 OSDMap body = req.Serialize();
@@ -1842,7 +1850,10 @@ namespace OpenMetaverse
                 RegionDenyAgeUnverified = msg.RegionDenyAgeUnverified,
                 RegionDenyAnonymous = msg.RegionDenyAnonymous,
                 RegionPushOverride = msg.RegionPushOverride,
-                RentPrice = msg.RentPrice
+                RentPrice = msg.RentPrice,
+                SeeAVs = msg.SeeAVs,
+                AnyAVSounds = msg.AnyAVSounds,
+                GroupAVSounds = msg.GroupAVSounds
             };
 
             ParcelResult result = msg.RequestResult;
