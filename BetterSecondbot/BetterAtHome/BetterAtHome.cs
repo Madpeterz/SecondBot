@@ -191,6 +191,7 @@ namespace BetterSecondbot.BetterAtHome
 
         protected void StatusPing(object o, StatusMessageEvent e)
         {
+            CleanAvoidSimList();
             if (hasBasicBot() == false)
             {
                 return; // no bot (cant do anything)
@@ -221,10 +222,48 @@ namespace BetterSecondbot.BetterAtHome
 
         protected void AlertMessage(object o, AlertMessageEventArgs e)
         {
-            if(e.Message.Contains("Restart") == true)
+            if(e.Message.Contains("restart") == true)
             {
-                gotoNextHomeRegion(true);
+                AvoidSim();
             }
+        }
+
+        protected void CleanAvoidSimList()
+        {
+            List<string> clear = new List<string>();
+            foreach(string A in AvoidSimList.Keys)
+            {
+                long dif = helpers.UnixTimeNow() - AvoidSimList[A];
+                if(dif > 240)
+                {
+                    clear.Add(A);
+                }
+            }
+            foreach(string A in clear)
+            {
+                AvoidSimList.Remove(A);
+            }
+        }
+
+        protected bool SimInAvoid()
+        {
+            return AvoidSimList.ContainsKey(simname);
+        }
+
+        protected bool IsInAvoidList(string slurl)
+        {
+            string[] bits = helpers.ParseSLurl(slurl);
+            return AvoidSimList.ContainsKey(bits[0]);
+        }
+
+        Dictionary<string, long> AvoidSimList = new Dictionary<string, long>();
+        protected void AvoidSim()
+        {
+            if(AvoidSimList.ContainsKey(simname) == false)
+            {
+                AvoidSimList.Add(simname, 1);
+            }
+            AvoidSimList[simname] = helpers.UnixTimeNow();
         }
 
         protected void LoggedOutActions()
@@ -320,14 +359,20 @@ namespace BetterSecondbot.BetterAtHome
                 return;
             }
             void_counter = 0;
+            if (SimInAvoid() == true)
+            {
+                SetBetterAtHomeAction("Attempting to avoid this sim");
+                gotoNextHomeRegion(true);
+                return;
+            }
+            if (controler.Bot.TeleportStatus() == true)
+            {
+                SetBetterAtHomeAction("Teleported");
+                return;
+            }
             if (homeRegions.Count == 0)
             {
                 SetBetterAtHomeAction("No home regions");
-                return;
-            }
-            if(controler.Bot.TeleportStatus() == true)
-            {
-                SetBetterAtHomeAction("Teleported");
                 return;
             }
             if (IsAtHome() == true)
@@ -353,12 +398,21 @@ namespace BetterSecondbot.BetterAtHome
                 SetBetterAtHomeAction("Attempted all home regions restarting list");
                 homeregionIndexer = -1;
                 LastTeleportEvent = helpers.UnixTimeNow();
-                if(force == true)
+                if (force == true)
                 {
                     gotoNextHomeRegion(false);
                 }
                 return;
             }
+            if(IsInAvoidList(configfile.Basic_HomeRegions[homeregionIndexer]) == true)
+            {
+                if (force == true)
+                {
+                    gotoNextHomeRegion(false);
+                }
+                return;
+            }
+
             SetBetterAtHomeAction("Teleporting to home region: " + homeRegions[homeregionIndexer] + "");
             LastTeleportEvent = helpers.UnixTimeNow();
             controler.Bot.TeleportWithSLurl(configfile.Basic_HomeRegions[homeregionIndexer]);
@@ -366,7 +420,7 @@ namespace BetterSecondbot.BetterAtHome
 
         protected bool IsAtHome()
         {
-            if((simname == "") || (FiredAfterLogin == false))
+            if ((simname == "") || (FiredAfterLogin == false))
             {
                 if (controler.Bot.GetClient.Network.CurrentSim == null)
                 {
