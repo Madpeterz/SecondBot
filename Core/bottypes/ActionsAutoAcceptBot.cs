@@ -10,6 +10,17 @@ namespace BetterSecondBot.bottypes
 		Dictionary<UUID, List<string>> accept_actions_storage = new Dictionary<UUID, List<string>>();
 		Dictionary<UUID, List<string>> sticky_accept_actions_storage = new Dictionary<UUID, List<string>>();
 
+		Dictionary<string, UUID> accept_lookup_name2key = new Dictionary<string, UUID>();
+
+		public bool Accept_action_from_name(string action, string name)
+        {
+			if(accept_lookup_name2key.ContainsKey(name) == true)
+            {
+				return Accept_action_from(action, accept_lookup_name2key[name]);
+            }
+			return false;
+        }
+
 		public bool Accept_action_from(string action, UUID avatar)
 		{
 			if(accept_actions_storage.ContainsKey(avatar) == true)
@@ -24,6 +35,14 @@ namespace BetterSecondBot.bottypes
 				return sticky_accept_actions_storage[avatar].Contains(action);
 			}
 			return false;
+		}
+
+		public void Remove_action_from_name(string action, string name)
+        {
+			if (accept_lookup_name2key.ContainsKey(name) == true)
+			{
+				Remove_action_from(action, accept_lookup_name2key[name]);
+			}
 		}
 		public void Remove_action_from(string action, UUID avatar)
         {
@@ -58,12 +77,17 @@ namespace BetterSecondBot.bottypes
 				}
 			}
 		}
-		public void Add_action_from(string action, UUID avatar)
+		public void Add_action_from(string action, UUID avatar, string name)
         {
-			Add_action_from(action, avatar, false);
+			Add_action_from(action, avatar, name, false);
 		}
-		public void Add_action_from(string action, UUID avatar, bool sticky)
+		public void Add_action_from(string action, UUID avatar, string name, bool sticky)
 		{
+			name = name.ToLowerInvariant();
+			if(accept_lookup_name2key.ContainsKey(name) == false)
+            {
+				accept_lookup_name2key.Add(name, avatar);
+			}
 			if(sticky == true)
             {
 				if (sticky_accept_actions_storage.ContainsKey(avatar) == false)

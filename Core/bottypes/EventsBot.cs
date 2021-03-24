@@ -507,7 +507,6 @@ namespace BetterSecondBot.bottypes
 
         protected override void GroupInvite(InstantMessageEventArgs e)
         {
-            LogFormater.Info("Group invite event from: " + e.IM.FromAgentName);
             string[] stage1 = e.IM.FromAgentName.ToLowerInvariant().Split('.');
             if (stage1.Length == 1)
             {
@@ -531,11 +530,12 @@ namespace BetterSecondBot.bottypes
             }
             else
             {
-                accept_invite = Accept_action_from("group", e.IM.FromAgentID);
+                name = name.ToLowerInvariant();
+                accept_invite = Accept_action_from_name("group", name);
                 if (accept_invite == true)
                 {
                     whyAccept = "Action auth";
-                    Remove_action_from("group", e.IM.FromAgentID);
+                    Remove_action_from_name("group", name);
                 }
             }
             if (accept_invite == true)

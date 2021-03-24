@@ -35,7 +35,7 @@ namespace BetterSecondBot.HttpService
             }
             if (bot.Accept_action_from("animation", avataruuid) == false)
             {
-                bot.Add_action_from("animation", avataruuid);
+                bot.Add_action_from("animation", avataruuid, bot.FindAvatarKey2Name(avataruuid));
                 return BasicReply("Granted perm animation", "addtoallowanimations", new string[] { avatar });
             }
             bot.Remove_action_from("animation", avataruuid, true);

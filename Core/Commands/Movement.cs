@@ -107,7 +107,7 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Invaild avatar UUID", "RequestTeleport", new string[] { avatar });
             }
-            bot.Add_action_from("teleport", avataruuid);
+            bot.Add_action_from("teleport", avataruuid, bot.FindAvatarKey2Name(avataruuid));
             bot.GetClient.Self.SendTeleportLureRequest(avataruuid, "I would like to teleport to you");
             return BasicReply("ok", "RequestTeleport", new string[] { avatar });
         }

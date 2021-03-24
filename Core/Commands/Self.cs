@@ -205,13 +205,13 @@ namespace BetterSecondBot.HttpService
                 return Failure("Invaild sticky", "SetPermFlag", new string[] { avatar, flag, state, sticky });
             }
             string[] AcceptedFlags = new string[] { "friend", "group", "animation", "teleport", "command" };
-            if (AcceptedFlags.Contains(flag) == true)
+            if (AcceptedFlags.Contains(flag) == false)
             {
                 return Failure("Invaild flag", "SetPermFlag", new string[] { avatar, flag, state, sticky });
             }
             if (stateflag == true)
             {
-                bot.Add_action_from(flag, avataruuid, stickyflag);
+                bot.Add_action_from(flag, avataruuid, bot.FindAvatarKey2Name(avataruuid), stickyflag);
                 return BasicReply("Added perm: " + flag + " Sticky: " + stickyflag.ToString(), "SetPermFlag", new string[] { avatar, flag, state, sticky });
             }
             bot.Remove_action_from(flag, avataruuid, stickyflag);
