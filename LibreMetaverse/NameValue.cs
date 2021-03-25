@@ -108,7 +108,7 @@ namespace OpenMetaverse
         public object Value;
 
 
-        private static readonly string[] TypeStrings = new string[]
+        private static readonly string[] TypeStrings = new []
         {
             "STRING",
             "F32",
@@ -118,13 +118,13 @@ namespace OpenMetaverse
             "ASSET",
             "U64"
         };
-        private static readonly string[] ClassStrings = new string[]
+        private static readonly string[] ClassStrings = new []
         {
             "R",    // Read-only
             "RW",   // Read-write
             "CB"    // Callback
         };
-        private static readonly string[] SendtoStrings = new string[]
+        private static readonly string[] SendtoStrings = new []
         {
             "S",    // Sim
             "DS",   // Data Sim

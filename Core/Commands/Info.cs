@@ -23,9 +23,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "info", "Version", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Version", new string[] { });
+                return Failure("Token not accepted", "Version", new [] { });
             }
-            return BasicReply(bot.MyVersion, "Version", new string[] { });
+            return BasicReply(bot.MyVersion, "Version", new [] { });
 
         }
 
@@ -36,9 +36,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "info", "Name", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Name", new string[] { });
+                return Failure("Token not accepted", "Name", new [] { });
             }
-            return BasicReply(bot.GetClient.Self.FirstName + " " + bot.GetClient.Self.LastName, "Name", new string[] { });
+            return BasicReply(bot.GetClient.Self.FirstName + " " + bot.GetClient.Self.LastName, "Name", new [] { });
         }
 
         [About("Fetchs the current parcels name")]
@@ -50,18 +50,18 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "info", "ParcelName", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "ParcelName", new string[] { });
+                return Failure("Token not accepted", "ParcelName", new [] { });
             }
             if (bot.GetClient.Network.CurrentSim == null)
             {
-                return Failure("Error not in a sim", "ParcelName", new string[] { });
+                return Failure("Error not in a sim", "ParcelName", new [] { });
             }
             int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
             if (bot.GetClient.Network.CurrentSim.Parcels.ContainsKey(localid) == false)
             {
-                return Failure("Error parcel not found", "ParcelName", new string[] { });
+                return Failure("Error parcel not found", "ParcelName", new [] { });
             }
-            return BasicReply(bot.GetClient.Network.CurrentSim.Parcels[localid].Name, "ParcelName", new string[] { });
+            return BasicReply(bot.GetClient.Network.CurrentSim.Parcels[localid].Name, "ParcelName", new [] { });
         }
 
         [About("Requests the current unixtime at the bot")]
@@ -71,9 +71,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "info", "UnixTimeNow", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "UnixTimeNow", new string[] { });
+                return Failure("Token not accepted", "UnixTimeNow", new [] { });
             }
-            return BasicReply(helpers.UnixTimeNow().ToString(), "UnixTimeNow", new string[] { });
+            return BasicReply(helpers.UnixTimeNow().ToString(), "UnixTimeNow", new [] { });
         }
 
         [About("Fetchs the current region name")]
@@ -84,13 +84,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "info", "SimName", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "SimName", new string[] { });
+                return Failure("Token not accepted", "SimName", new [] { });
             }
             if (bot.GetClient.Network.CurrentSim == null)
             {
-                return Failure("Error not in a sim", "SimName", new string[] { });
+                return Failure("Error not in a sim", "SimName", new [] { });
             }
-            return BasicReply(bot.GetClient.Network.CurrentSim.Name, "SimName", new string[] { });
+            return BasicReply(bot.GetClient.Network.CurrentSim.Name, "SimName", new [] { });
         }
 
         [About("Fetchs the current location of the bot")]
@@ -101,17 +101,17 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "info", "GetPosition", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "GetPosition", new string[] { });
+                return Failure("Token not accepted", "GetPosition", new [] { });
             }
             if (bot.GetClient.Network.CurrentSim == null)
             {
-                return Failure("Error not in a sim", "GetPosition", new string[] { });
+                return Failure("Error not in a sim", "GetPosition", new [] { });
             }
             Dictionary<string, int> pos = new Dictionary<string, int>();
             pos.Add("x", (int)Math.Round(bot.GetClient.Self.SimPosition.X));
             pos.Add("y", (int)Math.Round(bot.GetClient.Self.SimPosition.Y));
             pos.Add("z", (int)Math.Round(bot.GetClient.Self.SimPosition.Z));
-            return BasicReply(JsonConvert.SerializeObject(pos), "GetPosition", new string[] { });
+            return BasicReply(JsonConvert.SerializeObject(pos), "GetPosition", new [] { });
         }
     }
 }

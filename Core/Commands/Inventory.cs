@@ -26,19 +26,19 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "RezObject", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "RezObject", new string[] { item });
+                return Failure("Token not accepted", "RezObject", new [] { item });
             }
             if (UUID.TryParse(item, out UUID targetitem) == true)
             {
-                return Failure("Invaild item UUID", "RezObject", new string[] { item });
+                return Failure("Invaild item UUID", "RezObject", new [] { item });
             }
             InventoryItem itm = bot.GetClient.Inventory.FetchItem(targetitem, bot.GetClient.Self.AgentID, (5 * 1000));
             if (itm == null)
             {
-                return Failure("Unable to find item", "RezObject", new string[] { item });
+                return Failure("Unable to find item", "RezObject", new [] { item });
             }
             UUID rezedobject = bot.GetClient.Inventory.RequestRezFromInventory(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimRotation, bot.GetClient.Self.RelativePosition, itm);
-            return BasicReply(rezedobject.ToString(), "RezObject", new string[] { item });
+            return BasicReply(rezedobject.ToString(), "RezObject", new [] { item });
         }
 
 
@@ -54,24 +54,24 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "RenameInventory", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "RenameInventory", new string[] { item, newname });
+                return Failure("Token not accepted", "RenameInventory", new [] { item, newname });
             }
             if (UUID.TryParse(item, out UUID target) == false)
             {
-                return Failure("invaild item uuid", "RenameInventory", new string[] { item, newname });
+                return Failure("invaild item uuid", "RenameInventory", new [] { item, newname });
             }
             if (newname.Length < 3)
             {
-                return Failure("Item name is to short", "RenameInventory", new string[] { item, newname });
+                return Failure("Item name is to short", "RenameInventory", new [] { item, newname });
             }
             InventoryItem realitem = HelperInventory.getItemByInventoryUUID(bot, target);
             if (realitem == null)
             {
-                return Failure("Unable to find inventory item", "RenameInventory", new string[] { item, newname });
+                return Failure("Unable to find inventory item", "RenameInventory", new [] { item, newname });
             }
             realitem.Name = newname;
             bot.GetClient.Inventory.RequestUpdateItem(realitem);
-            return BasicReply("Ok", "RenameInventory", new string[] { item, newname });
+            return BasicReply("Ok", "RenameInventory", new [] { item, newname });
         }
 
         [About("Attempts to Remove the given inventory item")]
@@ -83,14 +83,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "DeleteInventoryItem", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "DeleteInventoryItem", new string[] { item });
+                return Failure("Token not accepted", "DeleteInventoryItem", new [] { item });
             }
             if (UUID.TryParse(item, out UUID target) == false)
             {
-                return Failure("invaild item uuid", "DeleteInventoryItem", new string[] { item });
+                return Failure("invaild item uuid", "DeleteInventoryItem", new [] { item });
             }
             bot.GetClient.Inventory.Remove(new List<UUID>() { target }, new List<UUID>());
-            return BasicReply("Ok", "DeleteInventoryItem", new string[] { item });
+            return BasicReply("Ok", "DeleteInventoryItem", new [] { item });
         }
 
         [About("Attempts to Remove the given inventory folder")]
@@ -102,14 +102,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "DeleteInventoryFolder", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "DeleteInventoryFolder", new string[] { folder });
+                return Failure("Token not accepted", "DeleteInventoryFolder", new [] { folder });
             }
             if (UUID.TryParse(folder, out UUID target) == false)
             {
-                return Failure("invaild folder uuid", "DeleteInventoryFolder", new string[] { folder });
+                return Failure("invaild folder uuid", "DeleteInventoryFolder", new [] { folder });
             }
             bot.GetClient.Inventory.Remove(new List<UUID>(), new List<UUID>() { target });
-            return BasicReply("Ok", "DeleteInventoryFolder", new string[] { folder });
+            return BasicReply("Ok", "DeleteInventoryFolder", new [] { folder });
         }
 
         [About("Attempts to attach the given inventory item")]
@@ -121,15 +121,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "Attach", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Attach", new string[] { item });
+                return Failure("Token not accepted", "Attach", new [] { item });
             }
             if(UUID.TryParse(item,out UUID itemuuid) == false)
             {
-                return Failure("invaild item uuid", "Attach", new string[] { item });
+                return Failure("invaild item uuid", "Attach", new [] { item });
             }
             InventoryItem realitem = HelperInventory.getItemByInventoryUUID(bot, itemuuid);
             bot.GetClient.Appearance.AddAttachments(new List<InventoryItem>() { realitem }, false, false);
-            return BasicReply("Ok", "Attach", new string[] { item });
+            return BasicReply("Ok", "Attach", new [] { item });
         }
 
         [About("Attempts to Remove the given inventory folder")]
@@ -141,15 +141,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "Detach", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Detach", new string[] { item });
+                return Failure("Token not accepted", "Detach", new [] { item });
             }
             if (UUID.TryParse(item, out UUID itemuuid) == false)
             {
-                return Failure("invaild item uuid", "Detach", new string[] { item });
+                return Failure("invaild item uuid", "Detach", new [] { item });
             }
             InventoryItem realitem = HelperInventory.getItemByInventoryUUID(bot, itemuuid);
             bot.GetClient.Appearance.RemoveFromOutfit(realitem);
-            return BasicReply("Ok", "Detach", new string[] { item });
+            return BasicReply("Ok", "Detach", new [] { item });
         }
 
         [About("Replaces the current avatar outfit with the Clothing/[NAME] folder<br/>Please note: This does not use the outfits folder!<br/>Please do not use links in the folder!")]
@@ -164,11 +164,11 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "Outfit", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Outfit", new string[] { name });
+                return Failure("Token not accepted", "Outfit", new [] { name });
             }
             if (helpers.notempty(name) == false)
             {
-                return Failure("Named folder value is empty", "Outfit", new string[] { name });
+                return Failure("Named folder value is empty", "Outfit", new [] { name });
             }
             // uses the Clothing folder
             // must be a full outfit (shapes/eyes ect)
@@ -185,7 +185,7 @@ namespace BetterSecondBot.HttpService
             }
             if (AA == null)
             {
-                return Failure("Cant find Clothing folder", "Outfit", new string[] { name });
+                return Failure("Cant find Clothing folder", "Outfit", new [] { name });
             }
             T = bot.GetClient.Inventory.Store.GetContents(AA);
             AA = null;
@@ -199,13 +199,13 @@ namespace BetterSecondBot.HttpService
             }
             if (AA == null)
             {
-                return Failure("Cant find target folder", "Outfit", new string[] { name });
+                return Failure("Cant find target folder", "Outfit", new [] { name });
             }
             List<InventoryBase> contents = bot.GetClient.Inventory.FolderContents(AA.UUID, bot.GetClient.Self.AgentID, true, true, InventorySortOrder.ByName, 5 * 1000);
             List<InventoryItem> wareables = new List<InventoryItem>();
             if (contents == null)
             {
-                return Failure("target folder is empty or so full I cant get it in 5 secs...", "Outfit", new string[] { name });
+                return Failure("target folder is empty or so full I cant get it in 5 secs...", "Outfit", new [] { name });
             }
             foreach (InventoryBase item in contents)
             {
@@ -215,7 +215,7 @@ namespace BetterSecondBot.HttpService
                 }
             }
             bot.GetClient.Appearance.ReplaceOutfit(wareables, false);
-            return BasicReply("ok", "Outfit", new string[] { name });
+            return BasicReply("ok", "Outfit", new [] { name });
         }
 
 
@@ -228,7 +228,7 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "InventoryPurgeNotecards", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "InventoryPurgeNotecards", new string[] { });
+                return Failure("Token not accepted", "InventoryPurgeNotecards", new [] { });
             }
             List<InventoryBase> T = bot.GetClient.Inventory.Store.GetContents(bot.GetClient.Inventory.Store.RootFolder);
             InventoryBase NotecardFolder = null;
@@ -242,7 +242,7 @@ namespace BetterSecondBot.HttpService
             }
             if (NotecardFolder != null)
             {
-                return Failure("Unable to find notecard folder", "InventoryPurgeNotecards", new string[] { });
+                return Failure("Unable to find notecard folder", "InventoryPurgeNotecards", new [] { });
             }
             List<UUID> purge_notecards = new List<UUID>();
             List<InventoryBase> contents = bot.GetClient.Inventory.FolderContents(NotecardFolder.UUID, bot.GetClient.Self.AgentID, true, true, InventorySortOrder.ByDate, 40 * 1000);
@@ -262,7 +262,7 @@ namespace BetterSecondBot.HttpService
             {
                 bot.GetClient.Inventory.Remove(purge_notecards, new List<UUID>());
             }
-            return BasicReply("Ok", "InventoryPurgeNotecards", new string[] { });
+            return BasicReply("Ok", "InventoryPurgeNotecards", new [] { });
         }
 
         [About("converts a inventory uuid to a realworld uuid<br/>Needed for texture preview")]
@@ -274,14 +274,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "getRealUUID", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "getRealUUID", new string[] { item });
+                return Failure("Token not accepted", "getRealUUID", new [] { item });
             }
             if (UUID.TryParse(item, out UUID itemUUID) == false)
             {
-                return Failure("Invaild item uuid", "getRealUUID", new string[] { item });
+                return Failure("Invaild item uuid", "getRealUUID", new [] { item });
             }
             UUID reply = HelperInventory.GetAssetUUID(bot, itemUUID);
-            return BasicReply(reply.ToString(), "getRealUUID", new string[] { item });
+            return BasicReply(reply.ToString(), "getRealUUID", new [] { item });
         }
 
         [About("sends a item to an avatar")]
@@ -297,24 +297,24 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "SendItem", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "SendItem", new string[] { item, avatar });
+                return Failure("Token not accepted", "SendItem", new [] { item, avatar });
             }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar uuid", "SendItem", new string[] { item, avatar });
+                return Failure("Invaild avatar uuid", "SendItem", new [] { item, avatar });
             }
             if (UUID.TryParse(item, out UUID targetitem) == true)
             {
-                return Failure("Invaild item uuid", "SendItem", new string[] { item, avatar });
+                return Failure("Invaild item uuid", "SendItem", new [] { item, avatar });
             }
             InventoryItem itm = bot.GetClient.Inventory.FetchItem(targetitem, bot.GetClient.Self.AgentID, (3 * 1000));
             if (itm == null)
             {
-                return Failure("Unable to find item", "SendItem", new string[] { item, avatar });
+                return Failure("Unable to find item", "SendItem", new [] { item, avatar });
             }
             bot.GetClient.Inventory.GiveItem(itm.UUID, itm.Name, itm.AssetType, avataruuid, false);
-            return BasicReply("ok", "SendItem", new string[] { item, avatar });
+            return BasicReply("ok", "SendItem", new [] { item, avatar });
         }
 
         [About("Sends a folder to an avatar")]
@@ -330,24 +330,24 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "SendFolder", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "SendFolder", new string[] { folder, avatar });
+                return Failure("Token not accepted", "SendFolder", new [] { folder, avatar });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar uuid", "SendFolder", new string[] { folder, avatar });
+                return Failure("Invaild avatar uuid", "SendFolder", new [] { folder, avatar });
             }
             if (UUID.TryParse(folder, out UUID targetfolder) == true)
             {
-                return Failure("Invaild folder uuid", "SendFolder", new string[] { folder, avatar });
+                return Failure("Invaild folder uuid", "SendFolder", new [] { folder, avatar });
             }
             InventoryBase FindFolderHelper = HelperInventory.FindFolder(bot, bot.GetClient.Inventory.Store.RootFolder, targetfolder);
             if (FindFolderHelper == null)
             {
-                return Failure("Unable to find folder", "SendFolder", new string[] { folder, avatar });
+                return Failure("Unable to find folder", "SendFolder", new [] { folder, avatar });
             }
             bot.GetClient.Inventory.GiveFolder(FindFolderHelper.UUID, FindFolderHelper.Name, avataruuid, false);
-            return BasicReply("ok", "SendFolder", new string[] { folder, avatar });
+            return BasicReply("ok", "SendFolder", new [] { folder, avatar });
         }
 
 
@@ -369,25 +369,25 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "TransferInventoryToObject", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "TransferInventoryToObject", new string[] { item, objectuuid, running });
+                return Failure("Token not accepted", "TransferInventoryToObject", new [] { item, objectuuid, running });
             }
             if (UUID.TryParse(item, out UUID itemuuid) == false)
             {
-                return Failure("Invaild item uuid", "TransferInventoryToObject", new string[] { item, objectuuid, running });
+                return Failure("Invaild item uuid", "TransferInventoryToObject", new [] { item, objectuuid, running });
             }
             if (UUID.TryParse(objectuuid, out UUID objectUUID) == false)
             {
-                return Failure("Invaild object uuid", "TransferInventoryToObject", new string[] { item, objectuuid, running });
+                return Failure("Invaild object uuid", "TransferInventoryToObject", new [] { item, objectuuid, running });
             }
             if (bool.TryParse(running, out bool runscript) == false)
             {
-                return Failure("Invaild running", "TransferInventoryToObject", new string[] { item, objectuuid, running });
+                return Failure("Invaild running", "TransferInventoryToObject", new [] { item, objectuuid, running });
             }
 
             InventoryItem itm = bot.GetClient.Inventory.FetchItem(itemuuid, bot.GetClient.Self.AgentID, (3 * 1000));
             if (itm == null)
             {
-                return Failure("Unable to find inventory", "TransferInventoryToObject", new string[] { item, objectuuid, running });
+                return Failure("Unable to find inventory", "TransferInventoryToObject", new [] { item, objectuuid, running });
             }
             Dictionary<uint, Primitive> objects_copy = bot.GetClient.Network.CurrentSim.ObjectsPrimitives.Copy();
             KeyValuePair<uint, Primitive> RealObject = new KeyValuePair<uint, Primitive>(0,null);
@@ -401,7 +401,7 @@ namespace BetterSecondBot.HttpService
             }
             if (RealObject.Value == null)
             {
-                return Failure("Unable to find object", "TransferInventoryToObject", new string[] { item, objectuuid, running });
+                return Failure("Unable to find object", "TransferInventoryToObject", new [] { item, objectuuid, running });
             }
             bool scriptState = runscript;
             if (itm.AssetType != AssetType.LSLText)
@@ -411,10 +411,10 @@ namespace BetterSecondBot.HttpService
             if (itm.AssetType == AssetType.LSLText)
             {
                 bot.GetClient.Inventory.CopyScriptToTask(RealObject.Key, itm, scriptState);
-                return BasicReply("Transfering script [state: "+scriptState.ToString()+"]", "TransferInventoryToObject", new string[] { item, objectuuid, running });
+                return BasicReply("Transfering script [state: "+scriptState.ToString()+"]", "TransferInventoryToObject", new [] { item, objectuuid, running });
             }
             bot.GetClient.Inventory.UpdateTaskInventory(RealObject.Key, itm);
-            return BasicReply("Transfering inventory", "TransferInventoryToObject", new string[] { item, objectuuid, running });
+            return BasicReply("Transfering inventory", "TransferInventoryToObject", new [] { item, objectuuid, running });
         }
 
         [About("Requests the inventory folder layout as a json object InventoryMapFolder<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>subfolders: InventoryMapFolder[]</li></ul>")]
@@ -425,11 +425,11 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "InventoryFolders", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "InventoryFolders", new string[] { });
+                return Failure("Token not accepted", "InventoryFolders", new [] { });
             }
             string reply = HelperInventory.MapFolderJson(bot);
-            if (reply != null) return BasicReply(reply, "InventoryFolders", new string[] { });
-            return Failure("Error", "InventoryFolders", new string[] { });
+            if (reply != null) return BasicReply(reply, "InventoryFolders", new [] { });
+            return Failure("Error", "InventoryFolders", new [] { });
         }
 
         [About("Requests the contents of a folder as an array of InventoryMapItem<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>typename: String</li></ul>")]
@@ -441,13 +441,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "InventoryContents", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "InventoryContents", new string[] { folderUUID });
+                return Failure("Token not accepted", "InventoryContents", new [] { folderUUID });
             }
             if (UUID.TryParse(folderUUID, out UUID folder) == false)
             {
-                return Failure("Invaild folder UUID", "InventoryContents", new string[] { folderUUID });
+                return Failure("Invaild folder UUID", "InventoryContents", new [] { folderUUID });
             }
-            return BasicReply(HelperInventory.MapFolderInventoryJson(bot, folder), "InventoryContents", new string[] { folderUUID });
+            return BasicReply(HelperInventory.MapFolderInventoryJson(bot, folder), "InventoryContents", new [] { folderUUID });
         }
     }
 }

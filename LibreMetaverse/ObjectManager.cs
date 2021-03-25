@@ -1301,7 +1301,7 @@ namespace OpenMetaverse
         /// <param name="name">A string containing the new name of the object</param>
         public void SetName(Simulator simulator, uint localID, string name)
         {
-            SetNames(simulator, new uint[] { localID }, new string[] { name });
+            SetNames(simulator, new uint[] { localID }, new [] { name });
         }
 
         /// <summary>
@@ -1336,7 +1336,7 @@ namespace OpenMetaverse
         /// <param name="description">A string containing the new description of the object</param>
         public void SetDescription(Simulator simulator, uint localID, string description)
         {
-            SetDescriptions(simulator, new uint[] { localID }, new string[] { description });
+            SetDescriptions(simulator, new uint[] { localID }, new [] { description });
         }
 
         /// <summary>

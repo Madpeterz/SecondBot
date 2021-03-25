@@ -50,21 +50,21 @@ namespace BetterSecondBot.DiscordSupervisor
             }
             if(HasBasicBot() == true)
             {
-                string newreply = controler.Bot.GetStatus();
-                if(newreply != controler.Bot.LastStatusMessage)
+                string newreply = controler.getBot().GetStatus();
+                if(newreply != controler.getBot().LastStatusMessage)
                 {
-                    controler.Bot.LastStatusMessage = newreply;
+                    controler.getBot().LastStatusMessage = newreply;
                 }
                 else
                 {
                     newreply = "";
                 }
                 reply = newreply + reply;
-                if (controler.Bot.KillMe == true)
+                if (controler.getBot().KillMe == true)
                 {
-                    if (controler.Bot.GetClient.Network.Connected == true)
+                    if (controler.getBot().GetClient.Network.Connected == true)
                     {
-                        controler.Bot.GetClient.Network.Logout();
+                        controler.getBot().GetClient.Network.Logout();
                     }
                     controler = null;
                     reply = "[Discord-V: connected] (Logging out)";

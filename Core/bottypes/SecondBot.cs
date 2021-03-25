@@ -29,10 +29,10 @@ namespace BetterSecondBot.bottypes
                 started_friendship_hug = true;
                 if (Client.Friends.FriendList.ContainsKey(master_uuid) == false)
                 {
-                    CallAPI("IM", new string[] { myconfig.Security_MasterUsername, "Hello master, I am sending you a friend request now!" });
-                    CallAPI("FriendRequest", new string[] { master_uuid.ToString(), "true" });
+                    CallAPI("IM", new [] { myconfig.Security_MasterUsername, "Hello master, I am sending you a friend request now!" });
+                    CallAPI("FriendRequest", new [] { master_uuid.ToString(), "true" });
                 }
-                CallAPI("FriendFullPerms", new string[] { master_uuid.ToString(), "true" });
+                CallAPI("FriendFullPerms", new [] { master_uuid.ToString(), "true" });
             }
         }
 
@@ -61,7 +61,7 @@ namespace BetterSecondBot.bottypes
             {
                 if(E.AgentName == myconfig.Security_MasterUsername)
                 {
-                    CallAPI("FriendFullPerms", new string[] { myconfig.Security_MasterUsername, "true" });
+                    CallAPI("FriendFullPerms", new [] { myconfig.Security_MasterUsername, "true" });
                 }
             }
         }

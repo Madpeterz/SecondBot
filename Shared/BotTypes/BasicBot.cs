@@ -86,7 +86,7 @@ namespace BetterSecondBotShared.bottypes
                     string name = env.Key.ToString();
                     if (name.StartsWith("cmd_") == true)
                     {
-                        string[] steps = env.Value.ToString().Split(new string[] { "{-}" }, StringSplitOptions.None);
+                        string[] steps = env.Value.ToString().Split(new [] { "{-}" }, StringSplitOptions.None);
                         name = name.Replace("cmd_", "");
                         name = name.ToLowerInvariant();
                         custom_commands.Add(name, steps);
@@ -98,7 +98,7 @@ namespace BetterSecondBotShared.bottypes
                 // search for file called "commands.cmd"
                 JsonCommandsfile LoadedCommands = new JsonCommandsfile
                 {
-                    CustomCommands = new string[] { "sayexample!!!say|||Hello{-}delay|||2500{-}say|||Bye" }
+                    CustomCommands = new [] { "sayexample!!!say|||Hello{-}delay|||2500{-}say|||Bye" }
                 };
                 string CommandsFile = "custom_commands.json";
                 SimpleIO io = new SimpleIO();
@@ -114,10 +114,10 @@ namespace BetterSecondBotShared.bottypes
                                 LoadedCommands = JsonConvert.DeserializeObject<JsonCommandsfile>(json);
                                 foreach (string loaded in LoadedCommands.CustomCommands)
                                 {
-                                    string[] bits = loaded.Split(new string[] { "!!!" }, StringSplitOptions.None);
+                                    string[] bits = loaded.Split(new [] { "!!!" }, StringSplitOptions.None);
                                     if (bits.Length == 2)
                                     {
-                                        string[] steps = bits[1].Split(new string[] { "{-}" }, StringSplitOptions.None);
+                                        string[] steps = bits[1].Split(new [] { "{-}" }, StringSplitOptions.None);
                                         custom_commands.Add(bits[0].ToLowerInvariant(), steps);
                                     }
                                 }
@@ -202,7 +202,7 @@ namespace BetterSecondBotShared.bottypes
         }
         protected virtual string[] getNextHomeArgs()
         {
-            return new string[] { };
+            return new [] { };
         }
         public virtual void Start()
         {

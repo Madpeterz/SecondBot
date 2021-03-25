@@ -51,7 +51,7 @@ namespace BetterSecondBot.HttpService
         {
             JsonScopedTokens LoadedTokens = new JsonScopedTokens
             {
-                ScopedTokens = new string[] { "t:[XXX],ws:core" }
+                ScopedTokens = new [] { "t:[XXX],ws:core" }
             };
             string targetfile = "scoped_tokens.json";
             SimpleIO io = new SimpleIO();

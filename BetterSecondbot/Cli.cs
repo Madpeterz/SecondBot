@@ -15,10 +15,15 @@ namespace BetterSecondBot
     {
         public bool Exited { get { return exitBot; } }
         protected bool exitBot = false;
-        public SecondBot Bot;
+        protected SecondBot Bot;
         protected BetterAtHome betterAtHomeService;
         protected BetterTracking betterTracking;
         protected Datastorage datastorage;
+
+        public SecondBot getBot()
+        {
+            return Bot;
+        }
 
         protected void keep_alive()
         {

@@ -31,7 +31,7 @@ namespace BetterSecondBot.bottypes
             base.AfterBotLoginHandler();
         }
 
-        readonly string[] hard_blocked_agents = new string[] { "secondlife", "second life"};
+        readonly string[] hard_blocked_agents = new [] { "secondlife", "second life"};
         protected override void ChatInputHandler(object sender, ChatEventArgs e)
         {
             bool fromme = false;

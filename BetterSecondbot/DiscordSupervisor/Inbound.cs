@@ -197,13 +197,13 @@ namespace BetterSecondBot.DiscordSupervisor
                                     }
                                     Noticetitle = Noticetitle.Replace("!notice ", "");
                                     Noticetitle = Noticetitle.Trim();
-                                    controler.Bot.CallAPI("Groupnotice", new string[] { Noticetitle, Noticemessage });
+                                    controler.Bot.CallAPI("Groupnotice", new [] { Noticetitle, Noticemessage });
                                     await MarkMessage(message, "✅");
                                 }
                                 else
                                 {
                                     IGuildUser user = (IGuildUser)message.Author;
-                                    controler.Bot.CallAPI("Groupchat", new string[] { group.ToString(), message.Content });
+                                    controler.Bot.CallAPI("Groupchat", new [] { group.ToString(), message.Content });
                                     await MarkMessage(message, "✅");
                                 }
                             }

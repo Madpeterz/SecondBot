@@ -22,9 +22,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "im", "chatwindows", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted", "chatwindows", new string[] { });
+                return BasicReply("Token not accepted", "chatwindows", new [] { });
             }
-            return BasicReply(JsonConvert.SerializeObject(bot.GetIMChatWindowKeyNames()), "chatwindows", new string[] { });
+            return BasicReply(JsonConvert.SerializeObject(bot.GetIMChatWindowKeyNames()), "chatwindows", new [] { });
         }
 
         [About("gets a list of chat windows with unread messages")]
@@ -34,7 +34,7 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "im", "listwithunread", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted", "listwithunread", new string[] { });
+                return BasicReply("Token not accepted", "listwithunread", new [] { });
             }
             List<UUID> unreadimwindows = new List<UUID>();
             foreach (UUID window in bot.IMChatWindows())
@@ -44,7 +44,7 @@ namespace BetterSecondBot.HttpService
                     unreadimwindows.Add(window);
                 }
             }
-            return BasicReply(JsonConvert.SerializeObject(unreadimwindows), "listwithunread", new string[] { });
+            return BasicReply(JsonConvert.SerializeObject(unreadimwindows), "listwithunread", new [] { });
         }
 
         [About("gets if there are any unread im messages at all")]
@@ -54,7 +54,7 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "im", "haveunreadims", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted", "haveunreadims", new string[] { });
+                return BasicReply("Token not accepted", "haveunreadims", new [] { });
             }
             bool reply = false;
             foreach (UUID window in bot.IMChatWindows())
@@ -65,7 +65,7 @@ namespace BetterSecondBot.HttpService
                     break;
                 }
             }
-            return BasicReply(reply.ToString(), "haveunreadims", new string[] { });
+            return BasicReply(reply.ToString(), "haveunreadims", new [] { });
         }
 
         [About("gets the chat from the selected window")]
@@ -77,13 +77,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "im", "getimchat", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "getimchat", new string[] { window });
+                return Failure("Token not accepted", "getimchat", new [] { window });
             }
             if (UUID.TryParse(window, out UUID windowUUID) == false)
             {
-                return Failure("Window UUID invaild", "getimchat", new string[] { window });
+                return Failure("Window UUID invaild", "getimchat", new [] { window });
             }
-            return BasicReply(JsonConvert.SerializeObject(bot.GetIMChatWindow(windowUUID)), "getimchat", new string[] { window });
+            return BasicReply(JsonConvert.SerializeObject(bot.GetIMChatWindow(windowUUID)), "getimchat", new [] { window });
         }
     }
 }

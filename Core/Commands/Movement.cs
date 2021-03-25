@@ -31,23 +31,23 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "movement", "AutoPilot", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "AutoPilot", new string[] { x, y, z });
+                return Failure("Token not accepted", "AutoPilot", new [] { x, y, z });
             }
             if (Vector3.TryParse("<" + x + "," + y + "," + z + ">", out Vector3 pos) == false)
             {
-                return Failure("Convert to vector has failed", "AutoPilot", new string[] { x, y, z });
+                return Failure("Convert to vector has failed", "AutoPilot", new [] { x, y, z });
             }
             if (helpers.inrange(pos.X, 0, 255) == false)
             {
-                return Failure("x value out of range 0-255", "AutoPilot", new string[] { x, y, z });
+                return Failure("x value out of range 0-255", "AutoPilot", new [] { x, y, z });
             }
             if (helpers.inrange(pos.Y, 0, 255) == false)
             {
-                return Failure("y value out of range 0-255", "AutoPilot", new string[] { x, y, z });
+                return Failure("y value out of range 0-255", "AutoPilot", new [] { x, y, z });
             }
             if (helpers.inrange(pos.Z, 0, 5000) == false)
             {
-                return Failure("z value out of range 0-5000", "AutoPilot", new string[] { x, y, z });
+                return Failure("z value out of range 0-5000", "AutoPilot", new [] { x, y, z });
             }
             bot.GetClient.Self.AutoPilotCancel();
             bot.GetClient.Self.Movement.TurnToward(pos, true);
@@ -55,7 +55,7 @@ namespace BetterSecondBot.HttpService
             uint Globalx, Globaly;
             Utils.LongToUInts(bot.GetClient.Network.CurrentSim.Handle, out Globalx, out Globaly);
             bot.GetClient.Self.AutoPilot((ulong)(Globalx + pos.X), (ulong)(Globaly + pos.Y), pos.Z);
-            return BasicReply("ok", "AutoPilot", new string[] { x, y, z });
+            return BasicReply("ok", "AutoPilot", new [] { x, y, z });
         }
 
         [About("Attempt to teleport to a new region")]
@@ -65,10 +65,10 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "movement", "AutoPilotStop", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "AutoPilotStop", new string[] { });
+                return Failure("Token not accepted", "AutoPilotStop", new [] { });
             }
             bot.GetClient.Self.AutoPilotCancel();
-            return BasicReply("ok", "AutoPilotStop", new string[] { });
+            return BasicReply("ok", "AutoPilotStop", new [] { });
         }
 
         [About("Make the bot request the target avatar teleport to the bot")]
@@ -80,15 +80,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "movement", "SendTeleportLure", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "SendTeleportLure", new string[] { avatar });
+                return Failure("Token not accepted", "SendTeleportLure", new [] { avatar });
             }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar UUID", "SendTeleportLure", new string[] { avatar });
+                return Failure("Invaild avatar UUID", "SendTeleportLure", new [] { avatar });
             }
             bot.GetClient.Self.SendTeleportLure(avataruuid);
-            return BasicReply("ok", "SendTeleportLure", new string[] { avatar });
+            return BasicReply("ok", "SendTeleportLure", new [] { avatar });
         }
 
         [About("Sends a teleport request (Move the bot to the avatar)")]
@@ -100,16 +100,16 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "movement", "RequestTeleport", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "RequestTeleport", new string[] { avatar });
+                return Failure("Token not accepted", "RequestTeleport", new [] { avatar });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar UUID", "RequestTeleport", new string[] { avatar });
+                return Failure("Invaild avatar UUID", "RequestTeleport", new [] { avatar });
             }
             bot.Add_action_from("teleport", avataruuid, bot.FindAvatarKey2Name(avataruuid));
             bot.GetClient.Self.SendTeleportLureRequest(avataruuid, "I would like to teleport to you");
-            return BasicReply("ok", "RequestTeleport", new string[] { avatar });
+            return BasicReply("ok", "RequestTeleport", new [] { avatar });
         }
 
         [About("Makes the bot fly (or not)")]
@@ -121,15 +121,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "movement", "Fly", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Fly", new string[] { mode });
+                return Failure("Token not accepted", "Fly", new [] { mode });
             }
             if (bool.TryParse(mode, out bool flymode) == false)
             {
-                return Failure("Invaild mode", "Fly", new string[] { mode });
+                return Failure("Invaild mode", "Fly", new [] { mode });
             }
             bot.GetClient.Self.Movement.Fly = flymode;
             bot.GetClient.Self.Movement.SendUpdate();
-            return BasicReply("ok", "Fly", new string[] { mode });
+            return BasicReply("ok", "Fly", new [] { mode });
         }
 
 
@@ -144,25 +144,25 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "movement", "RotateToFaceVector", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "RotateToFaceVector", new string[] { vector });
+                return Failure("Token not accepted", "RotateToFaceVector", new [] { vector });
             }
             if (Vector3.TryParse(vector, out Vector3 pos) == false)
             {
-                return Failure("Invaild vector", "RotateToFaceVector", new string[] { vector });
+                return Failure("Invaild vector", "RotateToFaceVector", new [] { vector });
             }
             if (helpers.inrange(pos.X, 0, 255) == false)
             {
-                return Failure("Vector x value is out of range 0-255", "RotateToFaceVector", new string[] { vector });
+                return Failure("Vector x value is out of range 0-255", "RotateToFaceVector", new [] { vector });
             }
             if (helpers.inrange(pos.Y, 0, 255) == false)
             {
-                return Failure("Vector y value is out of range 0-255", "RotateToFaceVector", new string[] { vector });
+                return Failure("Vector y value is out of range 0-255", "RotateToFaceVector", new [] { vector });
             }
             if (helpers.inrange(pos.Z, 0, 5000) == false)
             {
-                return Failure("Vector z value is out of range 0-5000", "RotateToFaceVector", new string[] { vector });
+                return Failure("Vector z value is out of range 0-5000", "RotateToFaceVector", new [] { vector });
             }
-            return BasicReply(bot.GetClient.Self.Movement.TurnToward(pos, true).ToString(), "RotateToFaceVector", new string[] { vector });
+            return BasicReply(bot.GetClient.Self.Movement.TurnToward(pos, true).ToString(), "RotateToFaceVector", new [] { vector });
         }
 
         [About("Rotates the bot to face a avatar")]
@@ -175,18 +175,18 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "movement", "RotateToFace", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "RotateToFace", new string[] { avatar });
+                return Failure("Token not accepted", "RotateToFace", new [] { avatar });
             }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar UUID", "RotateToFace", new string[] { avatar });
+                return Failure("Invaild avatar UUID", "RotateToFace", new [] { avatar });
             }
             if (bot.GetClient.Network.CurrentSim.AvatarPositions.ContainsKey(avataruuid) == false)
             {
-                return Failure("Unable to see avatar", "RotateToFace", new string[] { avatar });
+                return Failure("Unable to see avatar", "RotateToFace", new [] { avatar });
             }
-            return BasicReply(bot.GetClient.Self.Movement.TurnToward(bot.GetClient.Network.CurrentSim.AvatarPositions[avataruuid], true).ToString(), "RotateToFace", new string[] { avatar });
+            return BasicReply(bot.GetClient.Self.Movement.TurnToward(bot.GetClient.Network.CurrentSim.AvatarPositions[avataruuid], true).ToString(), "RotateToFace", new [] { avatar });
         }
 
 
@@ -199,11 +199,11 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "movement", "RotateTo", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "RotateTo", new string[] { deg });
+                return Failure("Token not accepted", "RotateTo", new [] { deg });
             }
             if (float.TryParse(deg, out float target_yaw) == true)
             {
-                return Failure("Unable to process rotation", "RotateTo", new string[] { deg });
+                return Failure("Unable to process rotation", "RotateTo", new [] { deg });
             }
             float yaw = target_yaw;
             bot.GetClient.Self.Movement.BodyRotation.GetEulerAngles(out float roll, out float pitch, out _);
@@ -226,7 +226,7 @@ namespace BetterSecondBot.HttpService
             result.Z = cosYawOver2 * cosPitchOver2 * sinRollOver2 - sinYawOver2 * sinPitchOver2 * cosRollOver2;
             bot.GetClient.Self.Movement.BodyRotation = result;
             bot.GetClient.Self.Movement.SendUpdate();
-            return BasicReply("ok", "RotateTo", new string[] { deg });
+            return BasicReply("ok", "RotateTo", new [] { deg });
         }
 
 
@@ -243,15 +243,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "movement", "Teleport", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Teleport", new string[] { region,x,y,z });
+                return Failure("Token not accepted", "Teleport", new [] { region,x,y,z });
             }
-            bool status = TeleportRequest(new string[] { region, x, y, z });
+            bool status = TeleportRequest(new [] { region, x, y, z });
             if (status == false)
             {
-                return Failure("Error Unable to Teleport to location", "Teleport", new string[] { region, x, y, z });
+                return Failure("Error Unable to Teleport to location", "Teleport", new [] { region, x, y, z });
             }
             bot.SetTeleported();
-            return BasicReply("Accepted", "Teleport", new string[] { region, x, y, z });
+            return BasicReply("Accepted", "Teleport", new [] { region, x, y, z });
         }
 
 
@@ -264,14 +264,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "movement", "TeleportSLURL", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "TeleportSLURL", new string[] { slurl });
+                return Failure("Token not accepted", "TeleportSLURL", new [] { slurl });
             }
             if(helpers.notempty(slurl) == false)
             {
-                return Failure("slurl is empty", "TeleportSLURL", new string[] { slurl });
+                return Failure("slurl is empty", "TeleportSLURL", new [] { slurl });
             }
             bot.SetTeleported();
-            return BasicReply(TeleportRequest(new string[] { slurl }).ToString(), "TeleportSLURL", new string[] { slurl });
+            return BasicReply(TeleportRequest(new [] { slurl }).ToString(), "TeleportSLURL", new [] { slurl });
         }
 
         protected bool TeleportRequest(string[] args)

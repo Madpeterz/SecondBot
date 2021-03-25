@@ -28,32 +28,32 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "dialogs", "DialogRelay", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "DialogRelay", new string[] { target });
+                return Failure("Token not accepted", "DialogRelay", new [] { target });
             }
             if (target == "clear")
             {
                 bot.SetRelayDialogsAvatar(UUID.Zero);
                 bot.SetRelayDialogsChannel(0);
                 bot.SetRelayDialogsHTTP("");
-                return BasicReply("cleared", "DialogRelay", new string[] { target });
+                return BasicReply("cleared", "DialogRelay", new [] { target });
             }
             ProcessAvatar(target);
             if (avataruuid != UUID.Zero)
             {
                 bot.SetRelayDialogsAvatar(avataruuid);
-                return BasicReply("set/avatar", "DialogRelay", new string[] { target });
+                return BasicReply("set/avatar", "DialogRelay", new [] { target });
             }
             if (target.StartsWith("http") == true)
             {
                 bot.SetRelayDialogsHTTP(target);
-                return BasicReply("set/http", "DialogRelay", new string[] { target });
+                return BasicReply("set/http", "DialogRelay", new [] { target });
             }
             if (int.TryParse(target, out int channel) == true)
             {
                 bot.SetRelayDialogsChannel(channel);
-                return BasicReply("set/channel", "DialogRelay", new string[] { target });
+                return BasicReply("set/channel", "DialogRelay", new [] { target });
             }
-            return Failure("Not a vaild option", "DialogRelay", new string[] { target });
+            return Failure("Not a vaild option", "DialogRelay", new [] { target });
             
         }
 
@@ -67,13 +67,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "dialogs", "DialogResponce", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "DialogResponce", new string[] { dialogid, buttontext });
+                return Failure("Token not accepted", "DialogResponce", new [] { dialogid, buttontext });
             }
             if (int.TryParse(dialogid, out int dialogidnum) == false)
             {
-                return Failure("bad dialog id", "DialogResponce", new string[] { dialogid, buttontext });
+                return Failure("bad dialog id", "DialogResponce", new [] { dialogid, buttontext });
             }
-            return BasicReply(bot.DialogReply(dialogidnum, buttontext).ToString(), "DialogResponce", new string[] { dialogid, buttontext });
+            return BasicReply(bot.DialogReply(dialogidnum, buttontext).ToString(), "DialogResponce", new [] { dialogid, buttontext });
         }
 
         [About("Should the bot track dialogs and send them to the relays setup?")]
@@ -85,14 +85,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "dialogs", "DialogTrack", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "DialogTrack", new string[] { status });
+                return Failure("Token not accepted", "DialogTrack", new [] { status });
             }
             if (bool.TryParse(status, out bool statuscode) == false)
             {
-                return Failure("bad status", "DialogTrack", new string[] { status });
+                return Failure("bad status", "DialogTrack", new [] { status });
             }
             bot.SetTrackDialogs(statuscode);
-            return BasicReply("updated", "DialogTrack", new string[] { status });
+            return BasicReply("updated", "DialogTrack", new [] { status });
         }
 
     }

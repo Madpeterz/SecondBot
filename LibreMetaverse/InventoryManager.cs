@@ -377,7 +377,7 @@ namespace OpenMetaverse
         #region String Arrays
 
         /// <summary>Partial mapping of FolderTypes to folder names</summary>
-        private static readonly string[] _NewFolderNames = new string[]
+        private static readonly string[] _NewFolderNames = new []
         {
             "Textures",         //  0
             "Sounds",           //  1
@@ -486,7 +486,7 @@ namespace OpenMetaverse
             // Register extra parameters with login and parse the inventory data that comes back
             Client.Network.RegisterLoginResponseCallback(
                 Network_OnLoginResponse,
-                new string[] {
+                new [] {
                     "inventory-root", "inventory-skeleton", "inventory-lib-root",
                     "inventory-lib-owner", "inventory-skel-lib"});
         }

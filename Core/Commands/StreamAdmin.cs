@@ -33,15 +33,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "streamadmin", "FetchNextNotecard", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "FetchNextNotecard", new string[] { endpoint, endpointcode });
+                return Failure("Token not accepted", "FetchNextNotecard", new [] { endpoint, endpointcode });
             }
             if(helpers.notempty(endpoint) == false)
             {
-                return Failure("Endpoint is empty", "FetchNextNotecard", new string[] { endpoint, endpointcode });
+                return Failure("Endpoint is empty", "FetchNextNotecard", new [] { endpoint, endpointcode });
             }
             if (helpers.notempty(endpointcode) == false)
             {
-                return Failure("Endpointcode is empty", "FetchNextNotecard", new string[] { endpoint, endpointcode });
+                return Failure("Endpointcode is empty", "FetchNextNotecard", new [] { endpoint, endpointcode });
             }
 
             string attempt_endpoint = endpoint + "endpoint.php";
@@ -53,24 +53,24 @@ namespace BetterSecondBot.HttpService
             IRestResponse endpoint_checks = client.Post(request);
             if (endpoint_checks.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                return Failure("HTTP status code: " + endpoint_checks.StatusCode.ToString(), "FetchNextNotecard", new string[] { endpoint, endpointcode });
+                return Failure("HTTP status code: " + endpoint_checks.StatusCode.ToString(), "FetchNextNotecard", new [] { endpoint, endpointcode });
             }
             try
             {
                 notecardendpoint server_reply = JsonConvert.DeserializeObject<notecardendpoint>(endpoint_checks.Content);
                 if (server_reply.status == false)
                 {
-                    return Failure("Bad reply: " + server_reply.message, "FetchNextNotecard", new string[] { endpoint, endpointcode });
+                    return Failure("Bad reply: " + server_reply.message, "FetchNextNotecard", new [] { endpoint, endpointcode });
                 }
                 if (server_reply.NotecardTitle.Length < 3)
                 {
-                    return Failure("Notecard title is to short", "FetchNextNotecard", new string[] { endpoint, endpointcode });
+                    return Failure("Notecard title is to short", "FetchNextNotecard", new [] { endpoint, endpointcode });
                 }
-                return BasicReply(bot.SendNotecard(server_reply.NotecardTitle, server_reply.NotecardContent, (UUID)server_reply.AvatarUUID).ToString(), "FetchNextNotecard", new string[] { endpoint, endpointcode });
+                return BasicReply(bot.SendNotecard(server_reply.NotecardTitle, server_reply.NotecardContent, (UUID)server_reply.AvatarUUID).ToString(), "FetchNextNotecard", new [] { endpoint, endpointcode });
             }
             catch (Exception e)
             {
-                return Failure("Error: " + e.Message + "", "FetchNextNotecard", new string[] { endpoint, endpointcode });
+                return Failure("Error: " + e.Message + "", "FetchNextNotecard", new [] { endpoint, endpointcode });
             }
         }
 

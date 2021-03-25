@@ -481,7 +481,7 @@ namespace OpenMetaverse
             Client.Network.RegisterCallback(PacketType.FindAgent, OnFindAgentReplyHandler);
 
             Client.Network.RegisterLoginResponseCallback(new NetworkManager.LoginResponseCallback(Network_OnLoginResponse),
-                new string[] { "buddy-list" });
+                new [] { "buddy-list" });
         }
 
         #region Public Methods

@@ -181,7 +181,7 @@ namespace BetterSecondBotShared.Json
 
         public override string[] GetCommandArgHints(string cmd)
         {
-            return new string[] { JsonGetCommandArgHints(cmd) };
+            return new [] { JsonGetCommandArgHints(cmd) };
         }
 
 

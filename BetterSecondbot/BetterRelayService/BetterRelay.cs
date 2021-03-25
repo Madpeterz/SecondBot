@@ -119,7 +119,7 @@ namespace BetterSecondBot.BetterRelayService
         {
             JsonCustomRelays LoadedRelays = new JsonCustomRelays
             {
-                CustomRelays = new string[] { "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:0" }
+                CustomRelays = new [] { "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:0" }
             };
             string targetfile = "customrelays.json";
             SimpleIO io = new SimpleIO();
@@ -155,13 +155,13 @@ namespace BetterSecondBot.BetterRelayService
 
         public void unattach_events()
         {
-            controler.Bot.MessageEvent -= SLMessageHandler;
+            controler.getBot().MessageEvent -= SLMessageHandler;
             superV.MessageEvent -= DiscordMessageHandler;
         }
 
         protected void attach_events()
         {
-            controler.Bot.MessageEvent += SLMessageHandler;
+            controler.getBot().MessageEvent += SLMessageHandler;
             superV.MessageEvent += DiscordMessageHandler;
         }
 
@@ -170,11 +170,26 @@ namespace BetterSecondBot.BetterRelayService
         protected async void TriggerRelay(string sourcetype, string name,string message, string filtervalue, string discordServerid, string discordChannelid)
         {
             List<relay_config> Dataset = new List<relay_config>();
-            if (sourcetype == "localchat") Dataset = LocalchatRelay;
-            else if (sourcetype == "groupchat") Dataset = GroupChatRelay;
-            else if (sourcetype == "avatarim") Dataset = AvatarIMRelay;
-            else if (sourcetype == "objectim") Dataset = ObjectIMRelay;
-            else if (sourcetype == "discord") Dataset = DiscordRelay;
+            if (sourcetype == "localchat")
+            {
+                Dataset = LocalchatRelay;
+            }
+            else if (sourcetype == "groupchat")
+            {
+                Dataset = GroupChatRelay;
+            }
+            else if (sourcetype == "avatarim")
+            {
+                Dataset = AvatarIMRelay;
+            }
+            else if (sourcetype == "objectim")
+            {
+                Dataset = ObjectIMRelay;
+            }
+            else if (sourcetype == "discord")
+            {
+                Dataset = DiscordRelay;
+            }
             if(message.Contains("[relay]") == true)
             {
                 return;
@@ -207,7 +222,7 @@ namespace BetterSecondBot.BetterRelayService
                         {
                             if ((cfga[0] + "@" + cfga[1]) != filtervalue)
                             {
-                                await controler.Bot.SendMessageToDiscord(cfga[0], cfga[1], sendmessage, false);
+                                await controler.getBot().SendMessageToDiscord(cfga[0], cfga[1], sendmessage, false);
                             }
                         }
                     }
@@ -232,7 +247,7 @@ namespace BetterSecondBot.BetterRelayService
                     {
                         int chan = 0;
                         int.TryParse(cfg.targetvalue, out chan);
-                        controler.Bot.GetClient.Self.Chat(sendmessage, chan, ChatType.Normal);
+                        controler.getBot().GetClient.Self.Chat(sendmessage, chan, ChatType.Normal);
                     }
                     else if (cfg.targetname == "avatarchat")
                     {
@@ -240,7 +255,7 @@ namespace BetterSecondBot.BetterRelayService
                         {
                             if (UUID.TryParse(cfg.targetvalue, out UUID target) == true)
                             {
-                                controler.Bot.SendIM(target, sendmessage);
+                                controler.getBot().SendIM(target, sendmessage);
                             }
                         }
                     }
@@ -248,16 +263,7 @@ namespace BetterSecondBot.BetterRelayService
                     {
                         if (cfg.targetvalue != filtervalue)
                         {
-                            bool status = false;
-                            //bool status = controler.Bot.GetCommandsInterface.Call("groupchat", cfg.targetvalue + "~#~" + sendmessage, UUID.Zero, "~#~");
-                            if(status == false)
-                            {
-                                LogFormater.Info("sending via groupchat to group: " + cfg.targetvalue + " [Failed]");
-                            }
-                            else
-                            {
-                                LogFormater.Info("sending via groupchat to group: " + cfg.targetvalue+" [OK]");
-                            }
+                            controler.getBot().CallAPI("Groupchat", new[] { cfg.targetvalue, sendmessage });
                         }
                     }
                 }

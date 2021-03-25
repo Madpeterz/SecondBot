@@ -39,10 +39,10 @@ namespace BetterSecondBot.HttpService
                 if (hash == authcode)
                 {
                     string newtoken = tokens.CreateToken(handleGetClientIP());
-                    if(newtoken != null) return BasicReply(newtoken, "GetToken", new string[] { authcode, unixtimegiven });
+                    if(newtoken != null) return BasicReply(newtoken, "GetToken", new [] { authcode, unixtimegiven });
                 }
             }
-            return Failure("Authcode not accepted", "GetToken", new string[] { authcode, unixtimegiven });
+            return Failure("Authcode not accepted", "GetToken", new [] { authcode, unixtimegiven });
         }
 
         [About("Used to check HTTP connections")]
@@ -51,7 +51,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Hello")]
         public object Hello()
         {
-            return BasicReply("world", "Hello", new string[] { });
+            return BasicReply("world", "Hello", new [] { });
         }
 
         [About("Delays a thead by X ms<br/>Mostly pointless but good if your doing custom commands")]
@@ -62,14 +62,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "core", "Delay", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Delay", new string[] { amount });
+                return Failure("Token not accepted", "Delay", new [] { amount });
             }
             if(int.TryParse(amount,out int amountvalue) == false)
             {
-                return Failure("Invaild amount", "Delay", new string[] { amount });
+                return Failure("Invaild amount", "Delay", new [] { amount });
             }
             Thread.Sleep(amountvalue);
-            return BasicReply("Ok", "Delay", new string[] { amount });
+            return BasicReply("Ok", "Delay", new [] { amount });
         }
 
         [About("Removes the given token from the accepted token pool")]
@@ -80,9 +80,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "core", "LogoutUI", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "LogoutUI", new string[] { });
+                return Failure("Token not accepted", "LogoutUI", new [] { });
             }
-            SuccessNoReturn("LogoutUI", new string[] { });
+            SuccessNoReturn("LogoutUI", new [] { });
             return tokens.Expire(token);
         }
     }

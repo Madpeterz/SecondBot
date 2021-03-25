@@ -24,14 +24,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "funds", "Balance", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Balance", new string[] { });
+                return Failure("Token not accepted", "Balance", new [] { });
             }
             if (bot.GetAllowFunds == false)
             {
-                return Failure("Funds commands are disabled", "Balance", new string[] { });
+                return Failure("Funds commands are disabled", "Balance", new [] { });
             }
             bot.GetClient.Self.RequestBalance();
-            return BasicReply(bot.GetClient.Self.Balance.ToString(), "Balance", new string[] { });
+            return BasicReply(bot.GetClient.Self.Balance.ToString(), "Balance", new [] { });
         }
 
         [About("Makes the bot pay a avatar")]
@@ -47,27 +47,27 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "funds", "PayAvatar", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "PayAvatar", new string[] { avatar, amount });
+                return Failure("Token not accepted", "PayAvatar", new [] { avatar, amount });
             }
             if (bot.GetAllowFunds == false)
             {
-                return Failure("Transfer funds to avatars disabled", "PayAvatar", new string[] { avatar, amount });
+                return Failure("Transfer funds to avatars disabled", "PayAvatar", new [] { avatar, amount });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return BasicReply("avatar lookup", "PayAvatar", new string[] { avatar, amount });
+                return BasicReply("avatar lookup", "PayAvatar", new [] { avatar, amount });
             }
             if (int.TryParse(amount, out int amountvalue) == false)
             {
-                return Failure("Invaild amount", "PayAvatar", new string[] { avatar, amount });
+                return Failure("Invaild amount", "PayAvatar", new [] { avatar, amount });
             }
             if ((amountvalue < 0) || (amountvalue > bot.GetClient.Self.Balance))
             {
-                return Failure("Amount out of range", "PayAvatar", new string[] { avatar, amount });
+                return Failure("Amount out of range", "PayAvatar", new [] { avatar, amount });
             }
             bot.GetClient.Self.GiveAvatarMoney(avataruuid, amountvalue);
-            return BasicReply("Accepted", "PayAvatar", new string[] { avatar, amount });
+            return BasicReply("Accepted", "PayAvatar", new [] { avatar, amount });
         }
 
         [About("Makes the bot pay a object")]
@@ -86,30 +86,30 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "funds", "PayObject", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "PayObject", new string[] { objectuuid, primname, amount });
+                return Failure("Token not accepted", "PayObject", new [] { objectuuid, primname, amount });
             }
             if (bot.GetAllowFunds == false)
             {
-                return Failure("Funds commands are disabled", "PayObject", new string[] { objectuuid, primname, amount });
+                return Failure("Funds commands are disabled", "PayObject", new [] { objectuuid, primname, amount });
             }
             if (UUID.TryParse(objectuuid, out UUID objectUUID) == false)
             {
-                return Failure("Invaild object UUID", "PayObject", new string[] { objectuuid, primname, amount });
+                return Failure("Invaild object UUID", "PayObject", new [] { objectuuid, primname, amount });
             }
             if (int.TryParse(amount, out int amountvalue) == false)
             {
-                return Failure("Invaild amount", "PayObject", new string[] { objectuuid, primname, amount });
+                return Failure("Invaild amount", "PayObject", new [] { objectuuid, primname, amount });
             }
             if((amountvalue < 0) || (amountvalue > bot.GetClient.Self.Balance))
             {
-                return Failure("Amount out of range", "PayObject", new string[] { objectuuid, primname, amount });
+                return Failure("Amount out of range", "PayObject", new [] { objectuuid, primname, amount });
             }
             if(helpers.notempty(primname) == false)
             {
-                return Failure("Primname is empty", "PayObject", new string[] { objectuuid, primname, amount });
+                return Failure("Primname is empty", "PayObject", new [] { objectuuid, primname, amount });
             }
             bot.GetClient.Self.GiveObjectMoney(objectUUID, amountvalue, primname);
-            return BasicReply("ok", "PayObject", new string[] { objectuuid, primname, amount });
+            return BasicReply("ok", "PayObject", new [] { objectuuid, primname, amount });
         }
     }
 }
