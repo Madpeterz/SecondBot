@@ -14,13 +14,19 @@ namespace BetterSecondBot.DiscordSupervisor
         {
             if (AllowNewOutbound() == true)
             {
-
-                channelname = channelname.ToLowerInvariant();
-                channelname = String.Concat(channelname.Where(char.IsLetterOrDigit));
-                ITextChannel Channel = await FindTextChannel(channelname, catmap[catmapid], sender_id, TopicType, false).ConfigureAwait(true);
-                if (Channel != null)
+                try
                 {
-                    return await Channel.SendMessageAsync(message).ConfigureAwait(false);
+                    channelname = channelname.ToLowerInvariant();
+                    channelname = String.Concat(channelname.Where(char.IsLetterOrDigit));
+                    ITextChannel Channel = await FindTextChannel(channelname, catmap[catmapid], sender_id, TopicType, false).ConfigureAwait(true);
+                    if (Channel != null)
+                    {
+                        return await Channel.SendMessageAsync(message).ConfigureAwait(false);
+                    }
+                }
+                catch
+                {
+                    return null;
                 }
             }
             return null;
