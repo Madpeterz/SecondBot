@@ -47,7 +47,7 @@ namespace BetterSecondBot.DiscordSupervisor
             if (HasBot() == true)
             {
                 IGuildUser user = (IGuildUser)message.Author;
-                controler.Bot.GetClient.Self.Chat(message.Content, 0, ChatType.Normal);
+                controler.getBot().GetClient.Self.Chat(message.Content, 0, ChatType.Normal);
                 return await MarkMessage(message, "✅");
             }
             return await MarkMessage(message, "❌");
@@ -69,7 +69,7 @@ namespace BetterSecondBot.DiscordSupervisor
                 {
                     return await MarkMessage(message, "❌");
                 }
-                controler.Bot.KillMePlease();
+                controler.getBot().KillMePlease();
                 controler = null;
                 return await MarkMessage(message, "✅").ConfigureAwait(false);
             }
@@ -77,8 +77,8 @@ namespace BetterSecondBot.DiscordSupervisor
             {
                 if (HasBot() == true)
                 {
-                    controler.Bot.KillMePlease();
-                    controler.Bot.GetClient.Network.Logout();
+                    controler.getBot().KillMePlease();
+                    controler.getBot().GetClient.Network.Logout();
                 }
                 exit_super = true;
                 return await MarkMessage(message, "✅").ConfigureAwait(false);
@@ -92,7 +92,7 @@ namespace BetterSecondBot.DiscordSupervisor
                     {
                         if (message.Content == "!commands")
                         {
-                            string[] commands = controler.Bot.getFullListOfCommands();
+                            string[] commands = controler.getBot().getFullListOfCommands();
                             await SendMessageToChannelAsync("interface", string.Join("\n",commands)+ " \n For more details please see the wiki \n https://wiki.magicmadpeter.xyz/", "bot", UUID.Zero, "bot");
                         }
                         else
@@ -116,9 +116,9 @@ namespace BetterSecondBot.DiscordSupervisor
                         {
                             args = bits[1];
                         }
-                        if (controler.Bot.GetFullListOfCommandsWithCustoms().Contains(bits[0].ToLowerInvariant()) == true)
+                        if (controler.getBot().GetFullListOfCommandsWithCustoms().Contains(bits[0].ToLowerInvariant()) == true)
                         {
-                            controler.Bot.CallAPI(bits[0], args.Split("~#~"), target);
+                            controler.getBot().CallAPI(bits[0], args.Split("~#~"), target);
                             await MarkMessage(message, "✅").ConfigureAwait(false);
                         }
                         else
@@ -175,7 +175,7 @@ namespace BetterSecondBot.DiscordSupervisor
                     {
                         if (UUID.TryParse(bits[1], out UUID group) == true)
                         {
-                            if (controler.Bot.MyGroups.ContainsKey(group) == true)
+                            if (controler.getBot().MyGroups.ContainsKey(group) == true)
                             {
                                 if (message.Content == "!clear")
                                 {
@@ -197,13 +197,13 @@ namespace BetterSecondBot.DiscordSupervisor
                                     }
                                     Noticetitle = Noticetitle.Replace("!notice ", "");
                                     Noticetitle = Noticetitle.Trim();
-                                    controler.Bot.CallAPI("Groupnotice", new [] { Noticetitle, Noticemessage });
+                                    controler.getBot().CallAPI("Groupnotice", new [] { Noticetitle, Noticemessage });
                                     await MarkMessage(message, "✅");
                                 }
                                 else
                                 {
                                     IGuildUser user = (IGuildUser)message.Author;
-                                    controler.Bot.CallAPI("Groupchat", new [] { group.ToString(), message.Content });
+                                    controler.getBot().CallAPI("Groupchat", new [] { group.ToString(), message.Content });
                                     await MarkMessage(message, "✅");
                                 }
                             }

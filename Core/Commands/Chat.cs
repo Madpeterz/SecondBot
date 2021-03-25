@@ -23,9 +23,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "chat", "LocalChatHistory", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "LocalChatHistory", new [] { });
+                return Failure("Token not accepted", "LocalChatHistory");
             }
-            return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()), "LocalChatHistory", new [] { });
+            return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()), "LocalChatHistory");
         }
 
         [About("sends a message to localchat")]

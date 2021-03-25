@@ -23,9 +23,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "friends", "Friendslist", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Friendslist", new [] { });
+                return Failure("Token not accepted", "Friendslist");
             }
-            return BasicReply(bot.getJsonFriendlist(), "Friendslist", new [] { });
+            return BasicReply(bot.getJsonFriendlist(), "Friendslist");
         }
 
         [About("Updates the friend perms for avatar avatar to State \n if true grants (Online/Map/Modify) perms")]

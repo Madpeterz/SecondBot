@@ -460,9 +460,18 @@ namespace BetterSecondBot.HttpService
             UUID.TryParse(avatar, out avataruuid);
         }
 
+        protected void SuccessNoReturn(string command)
+        {
+            SuccessNoReturn(command);
+        }
         protected void SuccessNoReturn(string command, string[] args)
         {
             bot.CommandHistoryAdd(command, String.Join("~#~", args), true, "");
+        }
+
+        protected Object BasicReply(string input, string command)
+        {
+            return BasicReply(input, command);
         }
 
         protected Object BasicReply(string input,string command, string[] args)
@@ -475,6 +484,11 @@ namespace BetterSecondBot.HttpService
         {
             bot.CommandHistoryAdd(command, String.Join("~#~",args), false, "");
             return new { reply = input, status = false };
+        }
+
+        protected Object Failure(string input, string command)
+        {
+            return Failure(input, command);
         }
 
 

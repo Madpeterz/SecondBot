@@ -51,7 +51,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/Hello")]
         public object Hello()
         {
-            return BasicReply("world", "Hello", new [] { });
+            return BasicReply("world", "Hello");
         }
 
         [About("Delays a thead by X ms<br/>Mostly pointless but good if your doing custom commands")]
@@ -80,9 +80,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "core", "LogoutUI", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "LogoutUI", new [] { });
+                return Failure("Token not accepted", "LogoutUI");
             }
-            SuccessNoReturn("LogoutUI", new [] { });
+            SuccessNoReturn("LogoutUI");
             return tokens.Expire(token);
         }
     }

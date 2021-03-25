@@ -73,11 +73,11 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "Stand", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Stand", new [] { });
+                return Failure("Token not accepted", "Stand");
             }
             bot.GetClient.Self.Stand();
             bot.ResetAnimations();
-            return BasicReply("ok", "Stand", new [] { });
+            return BasicReply("ok", "Stand");
         }
 
         [About("Makes the bot sit on the ground or on a object if it can see it")]
@@ -117,14 +117,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "Logoff", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Logoff", new [] { });
+                return Failure("Token not accepted", "Logoff");
             }
             if (bot.KillMe == false)
             {
                 bot.GetClient.Self.Chat("Laters im out", 0, ChatType.Normal);
                 bot.KillMePlease();
             }
-            return BasicReply("ok", "Logoff", new [] { });
+            return BasicReply("ok", "Logoff");
         }
 
         [About("Makes the bot kill itself you monster")]
@@ -134,14 +134,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "Logout", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Logout", new [] { });
+                return Failure("Token not accepted", "Logout");
             }
             if (bot.KillMe == false)
             {
                 bot.GetClient.Self.Chat("Laters im out", 0, ChatType.Normal);
                 bot.KillMePlease();
             }
-            return BasicReply("ok", "Logout", new [] { });
+            return BasicReply("ok", "Logout");
         }
 
         [About("Makes the bot kill itself you monster - without making a sound")]
@@ -151,13 +151,13 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "Bye", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Bye", new [] { });
+                return Failure("Token not accepted", "Bye");
             }
             if (bot.KillMe == false)
             {
                 bot.KillMePlease();
             }
-            return BasicReply("ok", "Bye", new [] { });
+            return BasicReply("ok", "Bye");
         }
 
         [About("Gets the last 5 commands issued to the bot")]
@@ -167,9 +167,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "GetLastCommands", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "GetLastCommands", new [] { });
+                return Failure("Token not accepted", "GetLastCommands");
             }
-            SuccessNoReturn("GetLastCommands", new [] { });
+            SuccessNoReturn("GetLastCommands");
             return bot.GetLastCommands(5);
         }
 

@@ -38,7 +38,7 @@ namespace BetterSecondBot.DiscordSupervisor
         {
             if (HasBasicBot() == true)
             {
-                return controler.Bot.GetClient.Network.Connected;
+                return controler.getBot().GetClient.Network.Connected;
             }
             return false;
         }
@@ -47,11 +47,11 @@ namespace BetterSecondBot.DiscordSupervisor
         {
             if (controler != null)
             {
-                if (controler.Bot != null)
+                if (controler.getBot() != null)
                 {
-                    if (controler.Bot.GetClient != null)
+                    if (controler.getBot().GetClient != null)
                     {
-                        if (controler.Bot.GetClient.Network != null)
+                        if (controler.getBot().GetClient.Network != null)
                         {
                             return true;
                         }

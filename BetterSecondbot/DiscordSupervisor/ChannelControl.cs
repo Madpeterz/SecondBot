@@ -195,9 +195,9 @@ namespace BetterSecondBot.DiscordSupervisor
             }
             else if (sender_id == UUID.Zero.ToString())
             {
-                if (controler.Bot != null)
+                if (controler.getBot() != null)
                 {
-                    display_topic = "" + myconfig.Basic_BotUserName + " #" + controler.Bot.MyVersion + "";
+                    display_topic = "" + myconfig.Basic_BotUserName + " #" + controler.getBot().MyVersion + "";
                 }
             }
             else if (channeltopictype == "Group")
@@ -286,7 +286,7 @@ namespace BetterSecondBot.DiscordSupervisor
 
                 if (HasBot() == true)
                 {
-                    foreach (Group G in controler.Bot.MyGroups.Values)
+                    foreach (Group G in controler.getBot().MyGroups.Values)
                     {
                         string groupname = G.Name.ToLowerInvariant();
                         groupname = String.Concat(groupname.Where(char.IsLetterOrDigit));

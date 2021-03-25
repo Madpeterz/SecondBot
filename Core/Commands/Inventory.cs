@@ -228,7 +228,7 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "InventoryPurgeNotecards", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "InventoryPurgeNotecards", new [] { });
+                return Failure("Token not accepted", "InventoryPurgeNotecards");
             }
             List<InventoryBase> T = bot.GetClient.Inventory.Store.GetContents(bot.GetClient.Inventory.Store.RootFolder);
             InventoryBase NotecardFolder = null;
@@ -242,7 +242,7 @@ namespace BetterSecondBot.HttpService
             }
             if (NotecardFolder != null)
             {
-                return Failure("Unable to find notecard folder", "InventoryPurgeNotecards", new [] { });
+                return Failure("Unable to find notecard folder", "InventoryPurgeNotecards");
             }
             List<UUID> purge_notecards = new List<UUID>();
             List<InventoryBase> contents = bot.GetClient.Inventory.FolderContents(NotecardFolder.UUID, bot.GetClient.Self.AgentID, true, true, InventorySortOrder.ByDate, 40 * 1000);
@@ -262,7 +262,7 @@ namespace BetterSecondBot.HttpService
             {
                 bot.GetClient.Inventory.Remove(purge_notecards, new List<UUID>());
             }
-            return BasicReply("Ok", "InventoryPurgeNotecards", new [] { });
+            return BasicReply("Ok", "InventoryPurgeNotecards");
         }
 
         [About("converts a inventory uuid to a realworld uuid<br/>Needed for texture preview")]
@@ -425,11 +425,11 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "inventory", "InventoryFolders", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "InventoryFolders", new [] { });
+                return Failure("Token not accepted", "InventoryFolders");
             }
             string reply = HelperInventory.MapFolderJson(bot);
-            if (reply != null) return BasicReply(reply, "InventoryFolders", new [] { });
-            return Failure("Error", "InventoryFolders", new [] { });
+            if (reply != null) return BasicReply(reply, "InventoryFolders");
+            return Failure("Error", "InventoryFolders");
         }
 
         [About("Requests the contents of a folder as an array of InventoryMapItem<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>typename: String</li></ul>")]

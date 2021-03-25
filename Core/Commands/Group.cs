@@ -453,14 +453,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GetGroupList", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "GetGroupList", new [] {});
+                return Failure("Token not accepted", "GetGroupList");
             }
             Dictionary<string, string> grouppackage = new Dictionary<string, string>();
             foreach (KeyValuePair<UUID, Group> entry in bot.MyGroups)
             {
                 grouppackage.Add(entry.Value.ID.ToString(), entry.Value.Name);
             }
-            return BasicReply(JsonConvert.SerializeObject(grouppackage), "GetGroupList", new [] { });
+            return BasicReply(JsonConvert.SerializeObject(grouppackage), "GetGroupList");
         }
 
         [About("Requests the roles for the selected group<br/>Replys with GroupRoleDetails object formated as follows <ul><li>UpdateUnderway (Bool)</li><li>RoleDataAge (Int) [default -1]</li><li>Roles (KeyPair array of UUID=Name)</li></ul><br/>")]
@@ -523,9 +523,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GroupchatListAllUnreadGroups", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "GroupchatListAllUnreadGroups", new [] { });
+                return Failure("Token not accepted", "GroupchatListAllUnreadGroups");
             }
-            return BasicReply(JsonConvert.SerializeObject(bot.UnreadGroupchatGroups()), "GroupchatListAllUnreadGroups", new [] { });
+            return BasicReply(JsonConvert.SerializeObject(bot.UnreadGroupchatGroups()), "GroupchatListAllUnreadGroups");
         }
 
         [About("fetchs a list of all groups with unread messages")]
@@ -561,9 +561,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GroupchatAnyUnread", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "GroupchatAnyUnread", new [] { });
+                return Failure("Token not accepted", "GroupchatAnyUnread");
             }
-            return BasicReply(bot.HasUnreadGroupchats().ToString(), "GroupchatAnyUnread", new [] { });
+            return BasicReply(bot.HasUnreadGroupchats().ToString(), "GroupchatAnyUnread");
         }
 
         [About("Clears all group chat buffers at once")]
@@ -573,10 +573,10 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "groups", "GroupchatClearAll", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "GroupchatClearAll", new [] { });
+                return Failure("Token not accepted", "GroupchatClearAll");
             }
             bot.ClearAllGroupchat();
-            return BasicReply("ok", "GroupchatClearAll", new [] { });
+            return BasicReply("ok", "GroupchatClearAll");
         }
 
         [About("fetchs the groupchat history")]

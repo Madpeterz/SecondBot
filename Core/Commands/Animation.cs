@@ -69,10 +69,10 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "animation", "resetanimations", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted", "resetanimations", new [] { });
+                return BasicReply("Token not accepted", "resetanimations");
             }
             bot.ResetAnimations();
-            return BasicReply("Accepted", "resetanimations", new [] { });
+            return BasicReply("Accepted", "resetanimations");
         }
 
     }

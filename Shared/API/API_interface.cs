@@ -13,8 +13,8 @@ namespace BetterSecondBotShared.API
         public string CommandName { get { return GetType().Name.ToLowerInvariant(); ; } }
         public virtual int Min_Required_args { get { return 0; } }
         public virtual string Helpfile { get { return "No help given"; } }
-        public virtual string[] ArgTypes { get { return new [] { }; } }
-        public virtual string[] ArgHints { get { return new [] { }; } }
+        public virtual string[] ArgTypes { get { return new string[] { }; } }
+        public virtual string[] ArgHints { get { return new string[] { }; } }
 
         protected string InfoBlob = "";
         public string GetInfoBlob { get { return InfoBlob; } }
@@ -162,7 +162,7 @@ namespace BetterSecondBotShared.API
             {
                 return CmdGet.ArgTypes;
             }
-            return new [] { };
+            return new string[] { };
         }
         public virtual string[] GetCommandArgHints(string cmd)
         {
@@ -171,7 +171,7 @@ namespace BetterSecondBotShared.API
             {
                 return CmdGet.ArgHints;
             }
-            return new [] { };
+            return new string[] { };
         }
 
         public virtual List<string> GetAllWorkspaces()

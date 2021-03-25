@@ -28,17 +28,17 @@ namespace BetterSecondbot.Tracking
         public BetterTracking(Cli setcontroler)
         {
             controler = setcontroler;
-            if(controler.Bot.getMyConfig.Setting_Tracker.ToLowerInvariant() == "false")
+            if(controler.getBot().getMyConfig.Setting_Tracker.ToLowerInvariant() == "false")
             {
                 LogFormater.Info("Tracker - Disabled because set to false");
                 return;
             }
-            if(int.TryParse(controler.Bot.getMyConfig.Setting_Tracker,out output_channel) == true)
+            if(int.TryParse(controler.getBot().getMyConfig.Setting_Tracker,out output_channel) == true)
             {
                 output_to_channel = true;
                 attachEvents();
             }
-            else if (controler.Bot.getMyConfig.Setting_Tracker.StartsWith("http") == true)
+            else if (controler.getBot().getMyConfig.Setting_Tracker.StartsWith("http") == true)
             {
                 output_to_url = true;
                 attachEvents();
@@ -51,7 +51,7 @@ namespace BetterSecondbot.Tracking
         protected void attachEvents()
         {
             LogFormater.Info("Tracker - Connected to login process event");
-            controler.Bot.LoginProgess += LoginProcess;
+            controler.getBot().LoginProgess += LoginProcess;
         }
 
         protected void LoginProcess(object o, LoginProgressEventArgs e)
@@ -59,7 +59,7 @@ namespace BetterSecondbot.Tracking
             if(e.Status == LoginStatus.ConnectingToSim)
             {
                 LogFormater.Info("Tracker - disconnected from login process event");
-                controler.Bot.LoginProgess -= LoginProcess;
+                controler.getBot().LoginProgess -= LoginProcess;
                 if (AfterLogin == false)
                 {
                     AfterLogin = true;
@@ -69,10 +69,10 @@ namespace BetterSecondbot.Tracking
                     }
                     if (output_to_url == true)
                     {
-                        LogFormater.Info("Tracker - Enabled HTTP: " + controler.Bot.getMyConfig.Setting_Tracker);
+                        LogFormater.Info("Tracker - Enabled HTTP: " + controler.getBot().getMyConfig.Setting_Tracker);
                     }
-                    controler.Bot.StatusMessageEvent += StatusPing;
-                    //controler.Bot.GetClient.Grid.CoarseLocationUpdate += LocationUpdate;
+                    controler.getBot().StatusMessageEvent += StatusPing;
+                    //controler.getBot().GetClient.Grid.CoarseLocationUpdate += LocationUpdate;
                 }
             }
         }
@@ -83,28 +83,28 @@ namespace BetterSecondbot.Tracking
             {
                 return false;
             }
-            if (controler.Bot == null)
+            if (controler.getBot() == null)
             {
                 return false;
             }
-            if (controler.Bot.GetClient == null)
+            if (controler.getBot().GetClient == null)
             {
                 return false;
             }
-            if (controler.Bot.GetClient.Network == null)
+            if (controler.getBot().GetClient.Network == null)
             {
                 return false;
             }
-            return controler.Bot.GetClient.Network.Connected;
+            return controler.getBot().GetClient.Network.Connected;
         }
 
         protected void StatusPing(object o, StatusMessageEvent e)
         {
             if(hasBot() == true)
             {
-                if(controler.Bot.GetClient.Network.CurrentSim != null)
+                if(controler.getBot().GetClient.Network.CurrentSim != null)
                 {
-                    Dictionary<UUID, Vector3> entrys = controler.Bot.GetClient.Network.CurrentSim.AvatarPositions.Copy();
+                    Dictionary<UUID, Vector3> entrys = controler.getBot().GetClient.Network.CurrentSim.AvatarPositions.Copy();
                     List<UUID> avs = entrys.Keys.ToList();
                     List<UUID> seenavs = new List<UUID>();
                     foreach (UUID A in avs)
@@ -139,7 +139,7 @@ namespace BetterSecondbot.Tracking
             string output = av.ToString() + "|||" + mode;
             if (output_to_channel == true)
             {
-                controler.Bot.GetClient.Self.Chat(output, output_channel, ChatType.Normal);
+                controler.getBot().GetClient.Self.Chat(output, output_channel, ChatType.Normal);
             }
             if(output_to_url == true)
             {
@@ -159,7 +159,7 @@ namespace BetterSecondbot.Tracking
             var content = new FormUrlEncodedContent(values);
             try
             {
-                HTTPclient.PostAsync(controler.Bot.getMyConfig.Setting_Tracker, content);
+                HTTPclient.PostAsync(controler.getBot().getMyConfig.Setting_Tracker, content);
             }
             catch (Exception e)
             {
@@ -174,12 +174,12 @@ namespace BetterSecondbot.Tracking
                 if (AvatarSeen.ContainsKey(avuuid) == false)
                 {
                     addToSeen(avuuid);
-                    string name = controler.Bot.FindAvatarKey2Name(avuuid);
+                    string name = controler.getBot().FindAvatarKey2Name(avuuid);
                     int loop = 0;
                     while ((loop < 32) && (name == "lookup"))
                     {
                         Thread.Sleep(500);
-                        name = controler.Bot.FindAvatarKey2Name(avuuid);
+                        name = controler.getBot().FindAvatarKey2Name(avuuid);
                         loop++;
                     }
                     output(avuuid, "entry###" + name);
@@ -217,12 +217,12 @@ namespace BetterSecondbot.Tracking
             {
                 if (AvatarSeen.ContainsKey(avuuid) == true)
                 {
-                    string name = controler.Bot.FindAvatarKey2Name(avuuid);
+                    string name = controler.getBot().FindAvatarKey2Name(avuuid);
                     int loop = 0;
                     while ((loop < 32) && (name == "lookup"))
                     {
                         Thread.Sleep(500);
-                        name = controler.Bot.FindAvatarKey2Name(avuuid);
+                        name = controler.getBot().FindAvatarKey2Name(avuuid);
                         loop++;
                     }
                     if (AvatarSeen.ContainsKey(avuuid) == true)

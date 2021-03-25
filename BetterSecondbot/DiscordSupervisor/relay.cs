@@ -11,7 +11,7 @@ namespace BetterSecondBot.DiscordSupervisor
         {
             if (HasBot() == true)
             {
-                controler.Bot.SendIM(avatar, message);
+                controler.getBot().SendIM(avatar, message);
             }
         }
         protected async Task DiscordGroupMessage(UUID group_uuid, string sender_name, string message)
@@ -20,9 +20,9 @@ namespace BetterSecondBot.DiscordSupervisor
             {
                 if ((helpers.notempty(sender_name) == true) && (helpers.notempty(message) == true))
                 {
-                    if (controler.Bot.MyGroups.ContainsKey(group_uuid) == true)
+                    if (controler.getBot().MyGroups.ContainsKey(group_uuid) == true)
                     {
-                        await SendMessageToChannelAsync(controler.Bot.MyGroups[group_uuid].Name, "" + sender_name + ": " + message + "", "group", group_uuid, "Group").ConfigureAwait(false);
+                        await SendMessageToChannelAsync(controler.getBot().MyGroups[group_uuid].Name, "" + sender_name + ": " + message + "", "group", group_uuid, "Group").ConfigureAwait(false);
                     }
                 }
             }
@@ -44,7 +44,7 @@ namespace BetterSecondBot.DiscordSupervisor
         {
             if (HasBot() == true)
             {
-                string output = controler.Bot.CommandHistoryAdd(command, arg, status, WhyFailed);
+                string output = controler.getBot().CommandHistoryAdd(command, arg, status, WhyFailed);
                 if (output != "")
                 {
                     _ = SendMessageToChannelAsync("interface", output, "bot", UUID.Zero, "bot");
@@ -68,24 +68,24 @@ namespace BetterSecondBot.DiscordSupervisor
                             {
                                 if (group == true)
                                 {
-                                    controler.Bot.Debug("DiscordBotChatControler - GroupChat:(" + group_uuid.ToString() + " -> " + sender_name + ":" + message);
+                                    controler.getBot().Debug("DiscordBotChatControler - GroupChat:(" + group_uuid.ToString() + " -> " + sender_name + ":" + message);
                                     await DiscordGroupMessage(group_uuid, sender_name, message).ConfigureAwait(false);
                                 }
                                 else
                                 {
-                                    controler.Bot.Debug("DiscordBotChatControler - IM:" + sender_name + ":" + message);
+                                    controler.getBot().Debug("DiscordBotChatControler - IM:" + sender_name + ":" + message);
                                     await DiscordIMMessage(sender_uuid, sender_name, message).ConfigureAwait(false);
                                 }
                             }
                             else
                             {
-                                controler.Bot.Debug("DiscordBotChatControler - Localchat:" + sender_name + ":" + message);
+                                controler.getBot().Debug("DiscordBotChatControler - Localchat:" + sender_name + ":" + message);
                                 await SendMessageToChannelAsync("localchat", "" + sender_name + ": " + message, "bot", UUID.Zero, "bot").ConfigureAwait(false);
                             }
                         }
                         else
                         {
-                            controler.Bot.Debug("DiscordBotChatControler - Not from an avatar");
+                            controler.getBot().Debug("DiscordBotChatControler - Not from an avatar");
                         }
                     }
                 }

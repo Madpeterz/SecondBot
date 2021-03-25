@@ -10,27 +10,27 @@ namespace BetterSecondBot.DiscordSupervisor
         protected StatusMessageEvent LastNetworkEventArgs = null;
         protected void attach_events()
         {
-            controler.Bot.MessageEvent += BotChatControlerHandler;
-            controler.Bot.StatusMessageEvent += StatusMessageHandler;
-            controler.Bot.GroupsReadyEvent += GroupsReadyHandler;
-            controler.Bot.SendImEvent += SendImHandler;
+            controler.getBot().MessageEvent += BotChatControlerHandler;
+            controler.getBot().StatusMessageEvent += StatusMessageHandler;
+            controler.getBot().GroupsReadyEvent += GroupsReadyHandler;
+            controler.getBot().SendImEvent += SendImHandler;
         }
 
         protected void unattach_events()
         {
-            controler.Bot.MessageEvent -= BotChatControlerHandler;
-            controler.Bot.StatusMessageEvent -= StatusMessageHandler;
-            controler.Bot.GroupsReadyEvent -= GroupsReadyHandler;
-            controler.Bot.SendImEvent -= SendImHandler;
+            controler.getBot().MessageEvent -= BotChatControlerHandler;
+            controler.getBot().StatusMessageEvent -= StatusMessageHandler;
+            controler.getBot().GroupsReadyEvent -= GroupsReadyHandler;
+            controler.getBot().SendImEvent -= SendImHandler;
         }
 
         protected void SendImHandler(object sender, ImSendArgs e)
         {
-            if (controler.Bot.AvatarKey2Name.ContainsKey(e.avataruuid) == true)
+            if (controler.getBot().AvatarKey2Name.ContainsKey(e.avataruuid) == true)
             {
                 if (DiscordClientConnected == true)
                 {
-                    _ = SendMessageToChannelAsync(controler.Bot.AvatarKey2Name[e.avataruuid], "Bot/Script: " + e.message + "", "im", e.avataruuid, "IM").ConfigureAwait(false);
+                    _ = SendMessageToChannelAsync(controler.getBot().AvatarKey2Name[e.avataruuid], "Bot/Script: " + e.message + "", "im", e.avataruuid, "IM").ConfigureAwait(false);
                 }
             }
         }

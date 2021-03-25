@@ -202,7 +202,7 @@ namespace BetterSecondBotShared.bottypes
         }
         protected virtual string[] getNextHomeArgs()
         {
-            return new [] { };
+            return new string[] { };
         }
         public virtual void Start()
         {

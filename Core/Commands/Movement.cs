@@ -65,10 +65,10 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "movement", "AutoPilotStop", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "AutoPilotStop", new [] { });
+                return Failure("Token not accepted", "AutoPilotStop");
             }
             bot.GetClient.Self.AutoPilotCancel();
-            return BasicReply("ok", "AutoPilotStop", new [] { });
+            return BasicReply("ok", "AutoPilotStop");
         }
 
         [About("Make the bot request the target avatar teleport to the bot")]

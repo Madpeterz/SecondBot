@@ -22,9 +22,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "im", "chatwindows", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted", "chatwindows", new [] { });
+                return BasicReply("Token not accepted", "chatwindows");
             }
-            return BasicReply(JsonConvert.SerializeObject(bot.GetIMChatWindowKeyNames()), "chatwindows", new [] { });
+            return BasicReply(JsonConvert.SerializeObject(bot.GetIMChatWindowKeyNames()), "chatwindows");
         }
 
         [About("gets a list of chat windows with unread messages")]
@@ -34,7 +34,7 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "im", "listwithunread", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted", "listwithunread", new [] { });
+                return BasicReply("Token not accepted", "listwithunread");
             }
             List<UUID> unreadimwindows = new List<UUID>();
             foreach (UUID window in bot.IMChatWindows())
@@ -44,7 +44,7 @@ namespace BetterSecondBot.HttpService
                     unreadimwindows.Add(window);
                 }
             }
-            return BasicReply(JsonConvert.SerializeObject(unreadimwindows), "listwithunread", new [] { });
+            return BasicReply(JsonConvert.SerializeObject(unreadimwindows), "listwithunread");
         }
 
         [About("gets if there are any unread im messages at all")]
@@ -54,7 +54,7 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "im", "haveunreadims", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted", "haveunreadims", new [] { });
+                return BasicReply("Token not accepted", "haveunreadims");
             }
             bool reply = false;
             foreach (UUID window in bot.IMChatWindows())
@@ -65,7 +65,7 @@ namespace BetterSecondBot.HttpService
                     break;
                 }
             }
-            return BasicReply(reply.ToString(), "haveunreadims", new [] { });
+            return BasicReply(reply.ToString(), "haveunreadims");
         }
 
         [About("gets the chat from the selected window")]

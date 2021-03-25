@@ -23,10 +23,10 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "home", "GoHome", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "GoHome", new [] { });
+                return Failure("Token not accepted", "GoHome");
             }
             bot.GotoNextHomeRegion();
-            return BasicReply("ok", "GoHome", new [] { });
+            return BasicReply("ok", "GoHome");
         }
 
     }

@@ -14,14 +14,14 @@ namespace BetterSecondbot.BetterAtHome
         protected JsonConfig configfile;
 
 
-        protected bool LoginFailed = false;
+        protected bool LoginFailed ;
         protected string whyfailed = "";
         protected string whyloggedout = "";
         protected bool LoggingIn = true;
-        protected bool LoggedIn = false;
-        protected bool StartingLogin = false;
+        protected bool LoggedIn;
+        protected bool StartingLogin;
         protected long LastLoginEvent = 0;
-        protected bool FiredAfterLogin = false;
+        protected bool FiredAfterLogin;
         protected int homeregionIndexer = 0;
         protected long LastTeleportEvent = 0;
         protected List<string> homeRegions = new List<string>();
@@ -43,11 +43,11 @@ namespace BetterSecondbot.BetterAtHome
 
         protected void attach_events()
         {
-            controler.Bot.ChangeSimEvent += ChangedSim;
-            controler.Bot.AlertMessage += AlertMessage;
-            controler.Bot.StatusMessageEvent += StatusPing;
-            controler.Bot.LoginProgess += LoginProcess;
-            controler.Bot.NextHomeRegion += NextHomeRegionRequest;
+            controler.getBot().ChangeSimEvent += ChangedSim;
+            controler.getBot().AlertMessage += AlertMessage;
+            controler.getBot().StatusMessageEvent += StatusPing;
+            controler.getBot().LoginProgess += LoginProcess;
+            controler.getBot().NextHomeRegion += NextHomeRegionRequest;
         }
 
         protected void resetSwitchs()
@@ -108,7 +108,7 @@ namespace BetterSecondbot.BetterAtHome
                 whyloggedout = "No control";
                 return false;
             }
-            if (controler.Bot == null)
+            if (controler.getBot() == null)
             {
                 whyloggedout = "No Bot";
                 return false;
@@ -122,12 +122,12 @@ namespace BetterSecondbot.BetterAtHome
             {
                 return false;
             }
-            if (controler.Bot.GetClient == null)
+            if (controler.getBot().GetClient == null)
             {
                 whyloggedout = "No client";
                 return false;
             }
-            if (controler.Bot.GetClient.Network == null)
+            if (controler.getBot().GetClient.Network == null)
             {
                 whyloggedout = "No network";
                 return false;
@@ -161,7 +161,7 @@ namespace BetterSecondbot.BetterAtHome
                 return false;
             }
             whyloggedout = "";
-            return controler.Bot.GetClient.Network.Connected;
+            return controler.getBot().GetClient.Network.Connected;
         }
 
         protected string lastwarn = "";
@@ -170,8 +170,8 @@ namespace BetterSecondbot.BetterAtHome
         {
             if(hasBasicBot() == true)
             {
-                //controler.Bot.SetBetterAtHomeAction(whyloggedout+" "+message);
-                controler.Bot.SetBetterAtHomeAction(message);
+                //controler.getBot().SetBetterAtHomeAction(whyloggedout+" "+message);
+                controler.getBot().SetBetterAtHomeAction(message);
             }
             /*
              * extra debug stuff
@@ -214,9 +214,9 @@ namespace BetterSecondbot.BetterAtHome
         protected void ChangedSim(object o, SimChangedEventArgs e)
         {
             simname = "";
-            if (controler.Bot.GetClient.Network.CurrentSim != null)
+            if (controler.getBot().GetClient.Network.CurrentSim != null)
             {
-                simname = controler.Bot.GetClient.Network.CurrentSim.Name;
+                simname = controler.getBot().GetClient.Network.CurrentSim.Name;
             }
         }
 
@@ -269,7 +269,7 @@ namespace BetterSecondbot.BetterAtHome
         protected void LoggedOutActions()
         {
             SetBetterAtHomeAction("Logged Out Actions");
-            if (controler.Bot.KillMe == true)
+            if (controler.getBot().KillMe == true)
             {
                 SetBetterAtHomeAction("Marked for death");
                 return;
@@ -311,13 +311,13 @@ namespace BetterSecondbot.BetterAtHome
             SetBetterAtHomeAction("[DC] Attempting login");
             resetSwitchs();
             StartingLogin = true;
-            controler.Bot.Start();
+            controler.getBot().Start();
         }
 
         protected void LoggedInAction()
         {
             SetBetterAtHomeAction("Logged In Actions");
-            if (controler.Bot.KillMe == true)
+            if (controler.getBot().KillMe == true)
             {
                 SetBetterAtHomeAction("Marked for death");
                 return;
@@ -334,11 +334,11 @@ namespace BetterSecondbot.BetterAtHome
                 SetBetterAtHomeAction("Waiting for Teleport lockout");
                 return;
             }
-            if ((simname == "") || (controler.Bot.GetClient.Self.SimPosition.Z == 0))
+            if ((simname == "") || (controler.getBot().GetClient.Self.SimPosition.Z == 0))
             {
                 ChangedSim(null, null);
             }
-            if ((simname == "") || (controler.Bot.GetClient.Self.SimPosition.Z == 0))
+            if ((simname == "") || (controler.getBot().GetClient.Self.SimPosition.Z == 0))
             {
                 void_counter++;
                 SetBetterAtHomeAction("Void counter: " + void_counter.ToString());
@@ -353,8 +353,8 @@ namespace BetterSecondbot.BetterAtHome
             if (FiredAfterLogin == false)
             {
                 FiredAfterLogin = true;
-                controler.Bot.AfterBotLoginHandler();
-                controler.Bot.reconnect = true;
+                controler.getBot().AfterBotLoginHandler();
+                controler.getBot().reconnect = true;
                 SetBetterAtHomeAction("Starting after login events");
                 return;
             }
@@ -365,7 +365,7 @@ namespace BetterSecondbot.BetterAtHome
                 gotoNextHomeRegion(true);
                 return;
             }
-            if (controler.Bot.TeleportStatus() == true)
+            if (controler.getBot().TeleportStatus() == true)
             {
                 SetBetterAtHomeAction("Teleported");
                 return;
@@ -415,18 +415,18 @@ namespace BetterSecondbot.BetterAtHome
 
             SetBetterAtHomeAction("Teleporting to home region: " + homeRegions[homeregionIndexer] + "");
             LastTeleportEvent = helpers.UnixTimeNow();
-            controler.Bot.TeleportWithSLurl(configfile.Basic_HomeRegions[homeregionIndexer]);
+            controler.getBot().TeleportWithSLurl(configfile.Basic_HomeRegions[homeregionIndexer]);
         }
 
         protected bool IsAtHome()
         {
             if ((simname == "") || (FiredAfterLogin == false))
             {
-                if (controler.Bot.GetClient.Network.CurrentSim == null)
+                if (controler.getBot().GetClient.Network.CurrentSim == null)
                 {
                     return true;
                 }
-                simname = controler.Bot.GetClient.Network.CurrentSim.Name;
+                simname = controler.getBot().GetClient.Network.CurrentSim.Name;
             }
             return homeRegions.Contains(simname);
         }

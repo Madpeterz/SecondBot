@@ -24,14 +24,14 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "funds", "Balance", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "Balance", new [] { });
+                return Failure("Token not accepted", "Balance");
             }
             if (bot.GetAllowFunds == false)
             {
-                return Failure("Funds commands are disabled", "Balance", new [] { });
+                return Failure("Funds commands are disabled", "Balance");
             }
             bot.GetClient.Self.RequestBalance();
-            return BasicReply(bot.GetClient.Self.Balance.ToString(), "Balance", new [] { });
+            return BasicReply(bot.GetClient.Self.Balance.ToString(), "Balance");
         }
 
         [About("Makes the bot pay a avatar")]

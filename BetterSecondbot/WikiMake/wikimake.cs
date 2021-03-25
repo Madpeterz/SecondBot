@@ -628,7 +628,7 @@ namespace BetterSecondBot.WikiMake
                     }
                 }
             }
-            return new [] { };
+            return new string[] { };
         }
 
 

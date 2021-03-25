@@ -37,7 +37,7 @@ namespace BetterSecondBot.DiscordSupervisor
                             LastStatusMessage = NewStatusMessage;
                             if (HasBasicBot() == true)
                             {
-                                controler.Bot.Log2File(LogFormater.Status(LastStatusMessage, false), ConsoleLogLogLevel.Status);
+                                controler.getBot().Log2File(LogFormater.Status(LastStatusMessage, false), ConsoleLogLogLevel.Status);
                             }
                             else
                             {
@@ -79,11 +79,11 @@ namespace BetterSecondBot.DiscordSupervisor
             if (controler != null)
             {
                 unattach_events();
-                controler.Bot.KillMePlease();
+                controler.getBot().KillMePlease();
                 controler = null;
             }
             controler = new Cli(myconfig, running_as_docker, self_keep_alive);
-            controler.Bot.setDiscordClient(DiscordClient);
+            controler.getBot().setDiscordClient(DiscordClient);
             relayService = new BetterRelay(controler, this, running_as_docker);
             attach_events();
         }

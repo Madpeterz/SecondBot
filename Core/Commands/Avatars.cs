@@ -24,11 +24,11 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "avatars", "nearmewithdetails", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted", "nearmewithdetails", new [] { });
+                return BasicReply("Token not accepted", "nearmewithdetails");
             }
             if (bot.GetClient.Network.CurrentSim == null)
             {
-                return BasicReply("Error not in a sim", "nearmewithdetails", new [] { });
+                return BasicReply("Error not in a sim", "nearmewithdetails");
             }
             List<NearMeDetails> BetterNearMe = new List<NearMeDetails>();
             Dictionary<uint, Avatar> avcopy = bot.GetClient.Network.CurrentSim.ObjectsAvatars.Copy();
@@ -46,7 +46,7 @@ namespace BetterSecondBot.HttpService
                     BetterNearMe.Add(details);
                 }
             }
-            return BasicReply(JsonConvert.SerializeObject(BetterNearMe), "nearmewithdetails", new [] { });
+            return BasicReply(JsonConvert.SerializeObject(BetterNearMe), "nearmewithdetails");
         }
 
         [About("returns a list of all known avatars nearby")]
@@ -57,11 +57,11 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "avatars", "nearme", handleGetClientIP()) == false)
             {
-                return BasicReply("Token not accepted", "nearme", new [] { });
+                return BasicReply("Token not accepted", "nearme");
             }
             if (bot.GetClient.Network.CurrentSim == null)
             {
-                return BasicReply("Error not in a sim", "nearme", new [] { });
+                return BasicReply("Error not in a sim", "nearme");
             }
             Dictionary<UUID, string> NearMe = new Dictionary<UUID, string>();
             Dictionary<uint, Avatar> avcopy = bot.GetClient.Network.CurrentSim.ObjectsAvatars.Copy();
@@ -72,7 +72,7 @@ namespace BetterSecondBot.HttpService
                     NearMe.Add(av.ID, av.Name);
                 }
             }
-            return BasicReply(JsonConvert.SerializeObject(NearMe), "nearme", new [] { });
+            return BasicReply(JsonConvert.SerializeObject(NearMe), "nearme");
         }
     }
 }

@@ -137,9 +137,9 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "GetParcelDesc");
             if (tests.Key == false)
             {
-                return Failure(tests.Value, "GetParcelDesc", new [] { });
+                return Failure(tests.Value, "GetParcelDesc");
             }
-            return BasicReply(targetparcel.Desc, "GetParcelDesc", new [] { });
+            return BasicReply(targetparcel.Desc, "GetParcelDesc");
         }
 
         [About("gets the flags for the parcel")]
@@ -152,7 +152,7 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "GetParcelFlags");
             if (tests.Key == false)
             {
-                return Failure(tests.Value, "GetParcelFlags", new [] { });
+                return Failure(tests.Value, "GetParcelFlags");
             }
             Dictionary<string, ParcelFlags> flags = parcel_static.get_flags_list();
             Dictionary<string, string> collection = new Dictionary<string, string>();
@@ -160,7 +160,7 @@ namespace BetterSecondBot.HttpService
             {
                 collection.Add(cfg.ToString(), targetparcel.Flags.HasFlag(cfg).ToString());
             }
-            SuccessNoReturn("GetParcelFlags", new [] { });
+            SuccessNoReturn("GetParcelFlags");
             return collection;
         }
 
@@ -192,10 +192,10 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "AbandonLand");
             if (tests.Key == false)
             {
-                return Failure(tests.Value, "AbandonLand", new [] { });
+                return Failure(tests.Value, "AbandonLand");
             }
             bot.GetClient.Parcels.ReleaseParcel(bot.GetClient.Network.CurrentSim, targetparcel.LocalID);
-            return BasicReply("ok", "AbandonLand", new [] { });
+            return BasicReply("ok", "AbandonLand");
         }
 
 
@@ -493,7 +493,7 @@ namespace BetterSecondBot.HttpService
             KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "GetParcelBanlist");
             if (tests.Key == false)
             {
-                return Failure(tests.Value, "GetParcelBanlist", new [] { });
+                return Failure(tests.Value, "GetParcelBanlist");
             }
             GetParcelBanlistObject reply = new GetParcelBanlistObject();
             int delays = 0;
@@ -526,7 +526,7 @@ namespace BetterSecondBot.HttpService
             reply.delay = delays * 1000;
             reply.parcelName = targetparcel.Name;
             reply.regionName = bot.GetClient.Network.CurrentSim.Name;
-            return BasicReply(JsonConvert.SerializeObject(reply), "GetParcelBanlist", new [] { });
+            return BasicReply(JsonConvert.SerializeObject(reply), "GetParcelBanlist");
         }
 
         [About("Returns a rezzed object")]

@@ -102,15 +102,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "estate", "EstateParcelReclaim", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "EstateParcelReclaim", new [] { });
+                return Failure("Token not accepted", "EstateParcelReclaim");
             }
             if (bot.GetClient.Network.CurrentSim.IsEstateManager == false)
             {
-                return Failure("Not an estate manager here", "EstateParcelReclaim", new [] { });
+                return Failure("Not an estate manager here", "EstateParcelReclaim");
             }
             int localid = bot.GetClient.Parcels.GetParcelLocalID(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimPosition);
             bot.GetClient.Parcels.Reclaim(bot.GetClient.Network.CurrentSim, localid);
-            return BasicReply("ok", "EstateParcelReclaim", new [] { });
+            return BasicReply("ok", "EstateParcelReclaim");
         }
 
         [About("Reclaims ownership of the current parcel")]
@@ -142,9 +142,9 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "estate", "banlist", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "banlist", new [] { });
+                return Failure("Token not accepted", "banlist");
             }
-            return BasicReply(JsonConvert.SerializeObject(bot._lastUpdatedSimBlacklist), "banlist", new [] { });
+            return BasicReply(JsonConvert.SerializeObject(bot._lastUpdatedSimBlacklist), "banlist");
         }
 
         [About("Attempts to add/remove the avatar to/from the Estate banlist")]
