@@ -17,6 +17,7 @@ namespace BetterSecondBot.DiscordSupervisor
             }
         }
 
+        public string lastStatus = "";
         public string GetStatus()
         {
             string reply = "";
@@ -39,10 +40,26 @@ namespace BetterSecondBot.DiscordSupervisor
             {
                 reply = " " + reply;
             }
+            if(reply != lastStatus)
+            {
+                lastStatus = reply;
+            }
+            else
+            {
+                reply = "";
+            }
             if(HasBasicBot() == true)
             {
-                controler.Bot.LastStatusMessage = controler.Bot.GetStatus();
-                reply = controler.Bot.LastStatusMessage + reply;
+                string newreply = controler.Bot.GetStatus();
+                if(newreply != controler.Bot.LastStatusMessage)
+                {
+                    controler.Bot.LastStatusMessage = newreply;
+                }
+                else
+                {
+                    newreply = "";
+                }
+                reply = newreply + reply;
                 if (controler.Bot.KillMe == true)
                 {
                     if (controler.Bot.GetClient.Network.Connected == true)
