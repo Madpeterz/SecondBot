@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace BetterSecondBot.BetterRelayService
 {
@@ -182,7 +183,7 @@ namespace BetterSecondBot.BetterRelayService
 
         protected HttpClient HTTPclient = new HttpClient();
 
-        protected async void TriggerRelay(string sourcetype, string name,string message, string filtervalue, string discordServerid, string discordChannelid)
+        protected async Task<Task> TriggerRelay(string sourcetype, string name,string message, string filtervalue, string discordServerid, string discordChannelid)
         {
             List<relay_config> Dataset = new List<relay_config>();
             if (sourcetype == "localchat")
@@ -207,7 +208,7 @@ namespace BetterSecondBot.BetterRelayService
             }
             if(message.Contains("[relay]") == true)
             {
-                return;
+                return Task.CompletedTask;
             }
             string message_no_name = "[relay]" + message;
             message = "[relay] " + sourcetype + " # " + name + ": " + message;
@@ -283,11 +284,12 @@ namespace BetterSecondBot.BetterRelayService
                     }
                 }
             }
+            return Task.CompletedTask;
         }
 
         protected void DiscordMessageHandler(object sender, DiscordMessageEvent e)
         {
-            TriggerRelay("discord", e.name, e.message, "" + e.server.ToString() + "@" + e.channel.ToString(),e.server.ToString(),e.channel.ToString());
+            _ = TriggerRelay("discord", e.name, e.message, "" + e.server.ToString() + "@" + e.channel.ToString(),e.server.ToString(),e.channel.ToString());
         }
 
         protected void SLMessageHandler(object sender, MessageEventArgs e)
@@ -296,19 +298,19 @@ namespace BetterSecondBot.BetterRelayService
             {
                 if (e.localchat == true)
                 {
-                    TriggerRelay("localchat", e.sender_name, e.message, e.sender_uuid.ToString(), "", "");
+                    _ = TriggerRelay("localchat", e.sender_name, e.message, e.sender_uuid.ToString(), "", "");
                 }
                 else if (e.avatar == false)
                 {
-                    TriggerRelay("objectim", e.sender_name, e.message, e.sender_uuid.ToString(), "", "");
+                    _ = TriggerRelay("objectim", e.sender_name, e.message, e.sender_uuid.ToString(), "", "");
                 }
                 else if (e.group == true)
                 {
-                    TriggerRelay("groupchat", e.sender_name, e.message, e.group_uuid.ToString(), "", "");
+                    _ = TriggerRelay("groupchat", e.sender_name, e.message, e.group_uuid.ToString(), "", "");
                 }
                 else if (e.avatar == true)
                 {
-                    TriggerRelay("avatarim", e.sender_name, e.message, e.sender_uuid.ToString(), "", "");
+                    _ = TriggerRelay("avatarim", e.sender_name, e.message, e.sender_uuid.ToString(), "", "");
                 }
             }
 
