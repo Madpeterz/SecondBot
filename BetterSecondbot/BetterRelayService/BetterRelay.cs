@@ -86,11 +86,26 @@ namespace BetterSecondBot.BetterRelayService
                 List<bool> tests = new List<bool>() { have_source_type, have_source_filter, have_target_type, have_target_filter };
                 if(tests.Contains(false) == false)
                 {
-                    if (relay.sourcename == "localchat") LocalchatRelay.Add(relay);
-                    else if (relay.sourcename == "groupchat") GroupChatRelay.Add(relay);
-                    else if (relay.sourcename == "avatarim") AvatarIMRelay.Add(relay);
-                    else if (relay.sourcename == "objectim") ObjectIMRelay.Add(relay);
-                    else if (relay.sourcename == "discord") DiscordRelay.Add(relay);
+                    if (relay.sourcename == "localchat")
+                    {
+                        LocalchatRelay.Add(relay);
+                    }
+                    else if (relay.sourcename == "groupchat")
+                    {
+                        GroupChatRelay.Add(relay);
+                    }
+                    else if (relay.sourcename == "avatarim")
+                    {
+                        AvatarIMRelay.Add(relay);
+                    }
+                    else if (relay.sourcename == "objectim")
+                    {
+                        ObjectIMRelay.Add(relay);
+                    }
+                    else if (relay.sourcename == "discord")
+                    {
+                        DiscordRelay.Add(relay);
+                    }
                 }
             }
         }
