@@ -462,7 +462,7 @@ namespace BetterSecondBot.HttpService
 
         protected void SuccessNoReturn(string command)
         {
-            SuccessNoReturn(command);
+            SuccessNoReturn(command, new string[] { });
         }
         protected void SuccessNoReturn(string command, string[] args)
         {
