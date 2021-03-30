@@ -216,7 +216,6 @@ namespace BetterSecondbot.Adverts
             DateTime moment = DateTime.Now;
             int dayofweek = (int)(moment.DayOfWeek + 6) % 7;
             int loop = 0;
-            LogFormater.Info(moment.Minute.ToString());
             while (loop < titles.Count)
             {
                 if (enabled[loop] == false)
