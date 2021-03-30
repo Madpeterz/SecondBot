@@ -8,6 +8,7 @@ using static BetterSecondBot.Program;
 using BetterSecondbot.BetterAtHome;
 using BetterSecondbot.DataStorage;
 using BetterSecondbot.Tracking;
+using BetterSecondbot.Adverts;
 
 namespace BetterSecondBot
 {
@@ -18,6 +19,7 @@ namespace BetterSecondBot
         protected SecondBot Bot;
         protected BetterAtHome betterAtHomeService;
         protected BetterTracking betterTracking;
+        protected advertsService Adverts;
         protected Datastorage datastorage;
 
         public SecondBot getBot()
@@ -58,6 +60,7 @@ namespace BetterSecondBot
                     new HttpAsService(Bot, Config, as_docker);
                 }).Start();
             }
+            Adverts = new advertsService(this, as_docker);
             betterAtHomeService = new BetterAtHome(this, Config);
             betterTracking = new BetterTracking(this);
             datastorage = new Datastorage(this);

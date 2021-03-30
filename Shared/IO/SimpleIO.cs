@@ -79,6 +79,16 @@ namespace BetterSecondBotShared.IO
             }
         }
 
+        public void WriteJsonAdverts(advertsBlob adverts, string targetfile)
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            using (StreamWriter sw = new StreamWriter(@"" + root_folder + "" + targetfile))
+            using (JsonWriter writer = new JsonTextWriter(sw) { Formatting = Formatting.Indented })
+            {
+                serializer.Serialize(writer, adverts);
+            }
+        }
+
 
 
         public void makeOld(string targetfile)

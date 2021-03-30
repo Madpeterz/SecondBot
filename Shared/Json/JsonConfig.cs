@@ -20,6 +20,24 @@ namespace BetterSecondBotShared.Json
         public string[] CustomRelays { get; set; }
     }
 
+    public class advertConfig
+    {
+        public string title;
+        public string attachment;
+        public string content;
+        public string notice;
+        public string enabled;
+        public string[] groups;
+        public string days;
+        public string hour;
+        public string min;
+    }
+
+    public class advertsBlob
+    {
+        public advertConfig[] adverts = new advertConfig[] { };
+    }
+
 
     public class JsonConfig
     {
