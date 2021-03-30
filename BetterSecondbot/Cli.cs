@@ -27,15 +27,10 @@ namespace BetterSecondBot
             return Bot;
         }
 
-        public void TickAdverts()
-        {
-            Adverts.Tick();
-        }
         protected void keep_alive()
         {
             while (Bot.KillMe == false)
             {
-                TickAdverts();
                 string NewStatusMessage = Bot.GetStatus();
                 NewStatusMessage = NewStatusMessage.Trim();
                 if (NewStatusMessage != Bot.LastStatusMessage)

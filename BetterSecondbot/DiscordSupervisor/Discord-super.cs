@@ -38,7 +38,6 @@ namespace BetterSecondBot.DiscordSupervisor
                             LastStatusMessage = NewStatusMessage;
                             if (HasBasicBot() == true)
                             {
-                                controler.TickAdverts();
                                 controler.getBot().Log2File(LogFormater.Status(LastStatusMessage, false), ConsoleLogLogLevel.Status);
                             }
                             else

@@ -1,4 +1,5 @@
 ﻿using BetterSecondBot;
+using BetterSecondBot.bottypes;
 using BetterSecondBotShared.IO;
 using BetterSecondBotShared.Json;
 using BetterSecondBotShared.logs;
@@ -27,6 +28,7 @@ namespace BetterSecondbot.Adverts
             {
                 loadFromDisk();
             }
+            controler.getBot().StatusMessageEvent += StatusPing;
         }
 
         protected void loadFromDisk()
@@ -183,16 +185,28 @@ namespace BetterSecondbot.Adverts
         protected Cli controler = null;
 
         protected int lastTickMin = -1;
-        public void Tick()
+        protected void StatusPing(object o, StatusMessageEvent e)
         {
             DateTime moment = DateTime.Now;
-            if(lastTickMin == -1)
-            {
-                LogFormater.Info("Current time: "+moment.Hour.ToString()+":"+moment.Minute.ToString(), true);
-            }
             if (lastTickMin != moment.Minute)
             {
                 lastTickMin = moment.Minute;
+                if (controler.getBot() == null)
+                {
+                    return;
+                }
+                if(controler.getBot().GetClient == null)
+                {
+                    return;
+                }
+                if (controler.getBot().GetClient.Network == null)
+                {
+                    return;
+                }
+                if (controler.getBot().GetClient.Network.CurrentSim == null)
+                {
+                    return;
+                }
                 checkForWork();
             }
         }
@@ -202,43 +216,46 @@ namespace BetterSecondbot.Adverts
             DateTime moment = DateTime.Now;
             int dayofweek = (int)(moment.DayOfWeek + 6) % 7;
             int loop = 0;
+            LogFormater.Info(moment.Minute.ToString());
             while (loop < titles.Count)
             {
-                bool noGo = false;
                 if (enabled[loop] == false)
                 {
-                    noGo = true;
+                    loop++;
+                    continue;
                 }
-                if (activeDays[loop].Contains(dayofweek) == false)
+                if ((activeMins[loop] != moment.Minute) && (activeMins[loop] != -1))
                 {
-                    noGo = true;
+                    loop++;
+                    continue;
                 }
-                if ((activeHours[loop] != moment.Hour) && (activeHours[loop] != -1))
-                {
-                    noGo = true;
-                }
-                if ((activeHours[loop] != moment.Minute) && (activeHours[loop] != -1))
-                {
-                    noGo = true;
-                }
-                if (activeHours[loop] == -1)
+                if (activeMins[loop] == -1)
                 {
                     if ((moment.Minute != 0) && (moment.Minute != 30))
                     {
-                        noGo = true;
+                        loop++;
+                        continue;
                     }
                 }
-                if (noGo == false)
+
+                if (activeDays[loop].Contains(dayofweek) == false)
                 {
-                    TriggerAdvert(loop);
+                    loop++;
+                    continue;
                 }
+                if ((activeHours[loop] != moment.Hour) && (activeHours[loop] != -1))
+                {
+                    loop++;
+                    continue;
+                }
+                TriggerAdvert(loop);
                 loop++;
             }
         }
 
         protected void TriggerAdvert(int advertID)
         {
-            LogFormater.Info("Processing advert: "+advertID.ToString(), true);
+            LogFormater.Info("Processing advert: "+(advertID+1).ToString(), true);
             foreach (UUID group in groups[advertID])
             {
                 if (asNotice[advertID] == true)
