@@ -32227,6 +32227,12 @@
         <member name="F:OpenMetaverse.Parcel.Media">
             <summary>A struct containing media details</summary>
         </member>
+        <member name="F:OpenMetaverse.Parcel.AnyAVSounds">
+            <summary> true if avatars outside can hear any sounds avatars inside play</summary>
+        </member>
+        <member name="F:OpenMetaverse.Parcel.GroupAVSounds">
+            <summary> true if group members outside can hear any sounds avatars inside play</summary>
+        </member>
         <member name="M:OpenMetaverse.Parcel.ToString">
             <summary>
             Displays a parcel object in string format

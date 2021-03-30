@@ -1,6 +1,7 @@
 ﻿using BetterSecondBot;
 using BetterSecondBotShared.IO;
 using BetterSecondBotShared.Json;
+using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
 using Newtonsoft.Json;
 using OpenMetaverse;
@@ -17,7 +18,8 @@ namespace BetterSecondbot.Adverts
         public advertsService(Cli Master, bool LoadFromDocker)
         {
             controler = Master;
-            if(LoadFromDocker == true)
+            LogFormater.Info("Starting adverts service", true);
+            if (LoadFromDocker == true)
             {
                 loadFromDockerEnv();
             }
@@ -29,6 +31,7 @@ namespace BetterSecondbot.Adverts
 
         protected void loadFromDisk()
         {
+            LogFormater.Info("Loading adverts from Disk", true);
             advertsBlob loadedAdverts = new advertsBlob();
             advertConfig demoAdvert = new advertConfig();
             demoAdvert.attachment = UUID.Zero.ToString();
@@ -47,11 +50,13 @@ namespace BetterSecondbot.Adverts
             SimpleIO io = new SimpleIO();
             if (SimpleIO.FileType(targetfile, "json") == false)
             {
+                LogFormater.Status("Creating new adverts file", true);
                 io.WriteJsonAdverts(loadedAdverts, targetfile);
                 return;
             }
             if (io.Exists(targetfile) == false)
             {
+                LogFormater.Status("Creating new adverts file", true);
                 io.WriteJsonAdverts(loadedAdverts, targetfile);
                 return;
             }
@@ -115,10 +120,12 @@ namespace BetterSecondbot.Adverts
                 }
             }
             groups.Add(selectedGroups);
+            LogFormater.Info("Loaded advert: ("+config.enabled+") "+ config.title+" "+config.days+" | "+config.hour+"h "+config.min+"m", true);
         }
 
         protected void loadFromDockerEnv()
         {
+            LogFormater.Info("Loading adverts from ENV", true);
             int loop = 1;
             bool found = true;
             while (found == true)
@@ -140,7 +147,7 @@ namespace BetterSecondbot.Adverts
                     while(exitNow == false)
                     {
                         exitNow = true;
-                        string value = getEnv("advert_" + loop.ToString() + "_group_" + loop2.ToString());
+                        string value = getEnv("advert_" + loop2.ToString() + "_group_" + loop2.ToString());
                         if (helpers.notempty(value) == true)
                         {
                             groupentrys.Add(value);
@@ -179,6 +186,10 @@ namespace BetterSecondbot.Adverts
         public void Tick()
         {
             DateTime moment = DateTime.Now;
+            if(lastTickMin == -1)
+            {
+                LogFormater.Info("Current time: "+moment.Hour.ToString()+":"+moment.Minute.ToString(), true);
+            }
             if (lastTickMin != moment.Minute)
             {
                 lastTickMin = moment.Minute;
@@ -193,37 +204,41 @@ namespace BetterSecondbot.Adverts
             int loop = 0;
             while (loop < titles.Count)
             {
+                bool noGo = false;
                 if (enabled[loop] == false)
                 {
-                    continue;
+                    noGo = true;
                 }
                 if (activeDays[loop].Contains(dayofweek) == false)
                 {
-                    continue;
+                    noGo = true;
                 }
                 if ((activeHours[loop] != moment.Hour) && (activeHours[loop] != -1))
                 {
-                    continue;
+                    noGo = true;
                 }
                 if ((activeHours[loop] != moment.Minute) && (activeHours[loop] != -1))
                 {
-                    continue;
+                    noGo = true;
                 }
                 if (activeHours[loop] == -1)
                 {
                     if ((moment.Minute != 0) && (moment.Minute != 30))
                     {
-                        continue;
+                        noGo = true;
                     }
                 }
-                TriggerAdvert(loop);
+                if (noGo == false)
+                {
+                    TriggerAdvert(loop);
+                }
                 loop++;
             }
         }
 
         protected void TriggerAdvert(int advertID)
         {
-
+            LogFormater.Info("Processing advert: "+advertID.ToString(), true);
             foreach (UUID group in groups[advertID])
             {
                 if (asNotice[advertID] == true)

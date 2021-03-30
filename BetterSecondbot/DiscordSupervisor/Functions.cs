@@ -26,7 +26,7 @@ namespace BetterSecondBot.DiscordSupervisor
             }
             return false;
         }
-        protected Task DiscordClientLoggedOut()
+        protected virtual Task DiscordClientLoggedOut()
         {
             DiscordClientConnected = false;
             return Task.CompletedTask;

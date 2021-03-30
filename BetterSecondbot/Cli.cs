@@ -27,10 +27,15 @@ namespace BetterSecondBot
             return Bot;
         }
 
+        public void TickAdverts()
+        {
+            Adverts.Tick();
+        }
         protected void keep_alive()
         {
             while (Bot.KillMe == false)
             {
+                TickAdverts();
                 string NewStatusMessage = Bot.GetStatus();
                 NewStatusMessage = NewStatusMessage.Trim();
                 if (NewStatusMessage != Bot.LastStatusMessage)
@@ -43,6 +48,7 @@ namespace BetterSecondBot
                 }
                 Thread.Sleep(1500);
             }
+            Adverts = null;
             betterAtHomeService = null;
             betterTracking = null;
             datastorage = null;
@@ -68,6 +74,7 @@ namespace BetterSecondBot
         public Cli(JsonConfig Config, bool as_docker, bool use_self_keep_alive)
         {
             exitBot = false;
+            LogFormater.Info("Starting cli");
             if (helpers.botRequired(Config) == true)
             {
                 Bot = new SecondBot();
