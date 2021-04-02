@@ -454,8 +454,8 @@ namespace BetterSecondBot.HttpService
                 if(avatar == "lookup")
                 {
                     int loops = 0;
-                    int secstowait = 4;
-                    int delaysize = 3;
+                    int secstowait = 7;
+                    int delaysize = 2;
                     while(loops < (secstowait * delaysize))
                     {
                         Thread.Sleep(1000/ delaysize);
