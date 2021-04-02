@@ -448,10 +448,11 @@ namespace BetterSecondBot.HttpService
         {
             string[] bits = avatar.Split(' ');
             avataruuid = UUID.Zero;
-            if (bits.Length == 2)
+            string findavatar = avatar;
+            if ((bits.Length == 2) || (avatar.Length != UUID.Zero.ToString().Length))
             {
-                avatar = bot.FindAvatarName2Key(avatar);
-                if(avatar == "lookup")
+                findavatar = bot.FindAvatarName2Key(avatar);
+                if(findavatar == "lookup")
                 {
                     int loops = 0;
                     int secstowait = 7;
@@ -459,8 +460,8 @@ namespace BetterSecondBot.HttpService
                     while(loops < (secstowait * delaysize))
                     {
                         Thread.Sleep(1000/ delaysize);
-                        avatar = bot.FindAvatarName2Key(avatar);
-                        if(avatar != "lookup")
+                        findavatar = bot.FindAvatarName2Key(avatar);
+                        if(findavatar != "lookup")
                         {
                             loops = 55;
                         }
@@ -470,7 +471,8 @@ namespace BetterSecondBot.HttpService
                     
                 }
             }
-            UUID.TryParse(avatar, out avataruuid);
+            UUID.TryParse(findavatar, out avataruuid);
+
         }
 
         protected void SuccessNoReturn(string command)

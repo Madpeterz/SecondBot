@@ -323,7 +323,7 @@ namespace BetterSecondBot.bottypes
             {
                 bits.Add("Resident");
             }
-            avatar_name = bits[0].FirstCharToUpper() + " " + bits[1].FirstCharToUpper();
+            avatar_name = bits[0] + " " + bits[1];
             string uuid = FindAvatarUUIDInStorage(avatar_name);
             if (uuid != "")
             {
