@@ -79,9 +79,9 @@ namespace BetterSecondBot.bottypes
         }
         public override void SendIM(UUID avatar,string message)
         {
-            base.SendIM(avatar, message);
             AddToIMchat(avatar, GetClient.Self.Name, message);
             Client.Self.InstantMessage(avatar, message);
+            base.SendIM(avatar, message);
         }
 
         protected Dictionary<string, string> notecards_content = new Dictionary<string, string>();
@@ -307,7 +307,7 @@ namespace BetterSecondBot.bottypes
                 MethodInfo theMethod = Endpoint.GetType().GetMethod(command);
                 List<string> argsList = args.ToList();
                 argsList.Add(ott);
-                string reply = "Inconnect number of args";
+                string reply = "Inconnect number of args expected: "+ theMethod.GetParameters().Count().ToString()+" but got: "+ argsList.Count.ToString();
                 bool status = false;
                 if (argsList.Count == theMethod.GetParameters().Count())
                 {
@@ -341,27 +341,27 @@ namespace BetterSecondBot.bottypes
             }
         }
 
-        public void CallAPI(string command, string[] args)
+        public string CallAPI(string command, string[] args)
         {
-            CallAPI(command, args, "None");
+            return CallAPI(command, args, "None");
         }
-        public void CallAPI(string command, string[] args, string replyvia)
+        public string CallAPI(string command, string[] args, string replyvia)
         {
-            CallAPI(command, args, replyvia, false);
+            return CallAPI(command, args, replyvia, false);
         }
-        public void CallAPI(string command, string[] args, string replyvia, bool customcommand)
+        public string CallAPI(string command, string[] args, string replyvia, bool customcommand)
         {
             if(commandnameLowerToReal.ContainsKey(command.ToLowerInvariant()) == false)
             {
                 if (custom_commands.ContainsKey(command) == false)
                 {
                     SmartCommandReply(false, replyvia, "Unknown command", command);
-                    return;
+                    return "{ status: \"false\", message: \"Unknown\" }";
                 }
                 if(customcommand == true)
                 {
                     SmartCommandReply(false, replyvia, "Custom command lockout", command);
-                    return;
+                    return "{ status: \"false\", message: \"Custom command lockout\" }";
                 }
                 foreach (string A in custom_commands[command])
                 {
@@ -379,10 +379,11 @@ namespace BetterSecondBot.bottypes
                     }
                     CallAPI(command_args_split[0], args_passed.Split("~#~"),"None",true);
                 }
-                return;
+                return "{ status: \"true\", message: \"mixed reply cuistom command\" }";
             }
             KeyValuePair<bool, string> statusreply = callAPIcommand(command, args);
             SmartCommandReply(statusreply.Key, replyvia, statusreply.Value, command);
+            return "{ status: \"" + statusreply.Key.ToString() + "\", message: \""+ statusreply.Value+"\" command: \""+command+"\", args: \""+string.Join("~#~",args)+"\" }";
         }
 
         protected HttpClient HTTPclient = new HttpClient();
