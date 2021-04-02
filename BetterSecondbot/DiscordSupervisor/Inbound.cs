@@ -111,15 +111,15 @@ namespace BetterSecondBot.DiscordSupervisor
                         {
                             target = bits[2];
                         }
-                        string args = "";
-                        if (bits.Length == 3)
+                        string args = null;
+                        if (bits.Length >= 2)
                         {
                             args = bits[1];
                         }
                         if (controler.getBot().GetFullListOfCommandsWithCustoms().Contains(bits[0].ToLowerInvariant()) == true)
                         {
-                            controler.getBot().CallAPI(bits[0], args.Split("~#~"), target);
-                            await MarkMessage(message, "✅").ConfigureAwait(false);
+                            string reply = controler.getBot().CallAPI(bits[0], args.Split("~#~"), target);
+                            await message.Channel.SendMessageAsync(reply, false, null,null,null, new MessageReference(message.Id)).ConfigureAwait(false);
                         }
                         else
                         {
