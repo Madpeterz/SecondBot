@@ -453,8 +453,21 @@ namespace BetterSecondBot.HttpService
                 avatar = bot.FindAvatarName2Key(avatar);
                 if(avatar == "lookup")
                 {
-                    Thread.Sleep(2000);
-                    avatar = bot.FindAvatarName2Key(avatar);
+                    int loops = 0;
+                    int secstowait = 4;
+                    int delaysize = 3;
+                    while(loops < (secstowait * delaysize))
+                    {
+                        Thread.Sleep(1000/ delaysize);
+                        avatar = bot.FindAvatarName2Key(avatar);
+                        if(avatar != "lookup")
+                        {
+                            loops = 55;
+                        }
+                        loops++;
+                    }
+                    
+                    
                 }
             }
             UUID.TryParse(avatar, out avataruuid);
