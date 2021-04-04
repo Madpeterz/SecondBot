@@ -1910,14 +1910,23 @@ namespace OpenMetaverse
             for (int bakedIndex = 0; bakedIndex < BAKED_TEXTURE_COUNT; bakedIndex++)
             {
                 AvatarTextureIndex textureIndex = BakeTypeToAgentTextureIndex((BakeType)bakedIndex);
+                
 
                 if (Textures[(int)textureIndex].TextureID == UUID.Zero)
                 {
+
                     // If this is the skirt layer and we're not wearing a skirt then skip it
                     if (bakedIndex == (int)BakeType.Skirt && !Wearables.ContainsKey(WearableType.Skirt))
+                    {
+                        Logger.DebugLog("texture: " + (AvatarTextureIndex)textureIndex + " skipping not attached");
                         continue;
-
+                    }
+                    Logger.DebugLog("texture: " + (AvatarTextureIndex)textureIndex + " is needed adding to pending Bakes");
                     pendingBakes.Add((BakeType)bakedIndex);
+                }
+                else
+                {
+                    Logger.DebugLog("texture: " + (AvatarTextureIndex)textureIndex+ " is ready");
                 }
             }
 
@@ -1975,7 +1984,10 @@ namespace OpenMetaverse
                 --retries;
             }
 
-            Textures[(int)BakeTypeToAgentTextureIndex(bakeType)].TextureID = newAssetID;
+            int bakeIndex = (int)BakeTypeToAgentTextureIndex(bakeType);
+            Logger.DebugLog("Saving back to "+ (AvatarTextureIndex)bakeIndex);
+            
+            Textures[bakeIndex].TextureID = newAssetID;
 
             if (newAssetID == UUID.Zero)
             {
@@ -2269,9 +2281,9 @@ namespace OpenMetaverse
 
                 for (uint i = 0; i < Textures.Length; i++)
                 {
+                    Primitive.TextureEntryFace face = te.CreateFace(i);
                     if (Textures[i].TextureID != UUID.Zero)
                     {
-                        Primitive.TextureEntryFace face = te.CreateFace(i);
                         face.TextureID = Textures[i].TextureID;
                         Logger.DebugLog("Sending texture entry for " + (AvatarTextureIndex)i + " to " + Textures[i].TextureID, Client);
                     }
