@@ -279,8 +279,16 @@ namespace BetterSecondBot.bottypes
                 }
                 string outputto = "none";
                 List<string> bigbits = message.Split(new[] { "#|#" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                if(bigbits.Count == 0)
+                {
+                    bigbits.Add("");
+                }
                 List<string> bits = bigbits[0].Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                if (bits.Count == 1)
+                if(bits.Count < 1)
+                {
+                    bits.Add("");
+                }
+                if (bits.Count < 2)
                 {
                     bits.Add("");
                 }
@@ -293,7 +301,17 @@ namespace BetterSecondBot.bottypes
                 {
                     frommaster = true;
                 }
-                CoreCommandLib(sender_uuid, frommaster, bits[0], bits[1].Split("~#~", StringSplitOptions.RemoveEmptyEntries), signing_code, outputto);
+                try
+                {
+                    string command = bits[0];
+                    string[] args = bits[1].Split("~#~", StringSplitOptions.RemoveEmptyEntries);
+                    CoreCommandLib(sender_uuid, frommaster, command, args, signing_code, outputto);
+
+                }
+                catch (Exception e)
+                {
+                    LogFormater.Crit("[CoreCommandLib] exploded: " + e.Message + "");
+                }
             }
         }
 
@@ -305,17 +323,45 @@ namespace BetterSecondBot.bottypes
                 string ott = Tokens.OneTimeToken();
                 WebApiControllerWithTokens Endpoint = commandEndpoints[endpointcommandmap[command]];
                 MethodInfo theMethod = Endpoint.GetType().GetMethod(command);
-                List<string> argsList = args.ToList();
-                argsList.Add(ott);
-                string reply = "Inconnect number of args expected: "+ theMethod.GetParameters().Count().ToString()+" but got: "+ argsList.Count.ToString();
-                bool status = false;
-                if (argsList.Count == theMethod.GetParameters().Count())
+                if (theMethod != null)
                 {
-                    status = true;
-                    object processed = theMethod.Invoke(Endpoint, argsList.ToArray<object>());
-                    reply = JsonConvert.SerializeObject(processed);
+                    List<string> argsList = args.ToList();
+                    argsList.Add(ott);
+                    string reply = "Inconnect number of args expected: " + theMethod.GetParameters().Count().ToString() + " but got: " + argsList.Count.ToString();
+                    bool status = false;
+                    if (argsList.Count == theMethod.GetParameters().Count())
+                    {
+                        status = true;
+                        try
+                        {
+                            if (Endpoint == null)
+                            {
+                                return new KeyValuePair<bool, string>(false, "Endpoint is null");
+                            }
+                            if (argsList.Count == 0)
+                            {
+                                return new KeyValuePair<bool, string>(false, "Zero args at final check require at min 1");
+                            }
+                            object[] argsWorker = argsList.ToArray<object>();
+                            object processed = theMethod.Invoke(Endpoint, argsWorker);
+                            reply = "Error";
+                            if(processed != null)
+                            {
+                                reply = JsonConvert.SerializeObject(processed);
+                            }
+                            return new KeyValuePair<bool, string>(status, reply);
+                        }
+                        catch (Exception e)
+                        {
+                            return new KeyValuePair<bool, string>(false, e.Message);
+                        }
+                    }
+                    return new KeyValuePair<bool, string>(status, reply);
                 }
-                return new KeyValuePair<bool, string>(status, reply);
+                else
+                {
+                    return new KeyValuePair<bool, string>(false, "theMethod is null");
+                }
             }
             catch (Exception e)
             {
@@ -349,37 +395,50 @@ namespace BetterSecondBot.bottypes
         {
             return CallAPI(command, args, replyvia, false);
         }
+
+        protected string customCommand(string command, string[] args, string replyvia, bool customcommand)
+        {
+            if (customcommand == true)
+            {
+                SmartCommandReply(false, replyvia, "Custom command lockout", command);
+                return "{ status: \"false\", message: \"Custom command lockout\" }";
+            }
+            foreach (string A in custom_commands[command])
+            {
+                List<string> command_args_split = A.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                int loop = 1;
+                string args_passed = "";
+                if (command_args_split.Count() == 2)
+                {
+                    args_passed = command_args_split[1];
+                    while ((loop <= 5) && (loop <= args.Length))
+                    {
+                        args_passed = args_passed.Replace("[C_ARG_" + loop.ToString() + "]", args[loop - 1]);
+                        loop++;
+                    }
+                }
+                CallAPI(command_args_split[0], args_passed.Split("~#~"), "None", true);
+            }
+            return "{ status: \"true\", message: \"mixed reply custom command\" }";
+        }
         public string CallAPI(string command, string[] args, string replyvia, bool customcommand)
         {
-            if(commandnameLowerToReal.ContainsKey(command.ToLowerInvariant()) == false)
+            if(command == null)
+            {
+                return "No command";
+            }
+            if (replyvia == null)
+            {
+                replyvia = "none";
+            }
+            if (commandnameLowerToReal.ContainsKey(command.ToLowerInvariant()) == false)
             {
                 if (custom_commands.ContainsKey(command) == false)
                 {
                     SmartCommandReply(false, replyvia, "Unknown command", command);
                     return "{ status: \"false\", message: \"Unknown\" }";
                 }
-                if(customcommand == true)
-                {
-                    SmartCommandReply(false, replyvia, "Custom command lockout", command);
-                    return "{ status: \"false\", message: \"Custom command lockout\" }";
-                }
-                foreach (string A in custom_commands[command])
-                {
-                    List<string> command_args_split = A.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                    int loop = 1;
-                    string args_passed = "";
-                    if (command_args_split.Count() == 2)
-                    {
-                        args_passed = command_args_split[1];
-                        while ((loop <= 5) && (loop <= args.Length))
-                        {
-                            args_passed = args_passed.Replace("[C_ARG_" + loop.ToString() + "]", args[loop - 1]);
-                            loop++;
-                        }
-                    }
-                    CallAPI(command_args_split[0], args_passed.Split("~#~"),"None",true);
-                }
-                return "{ status: \"true\", message: \"mixed reply custom command\" }";
+                customCommand(command, args, replyvia, customcommand);
             }
             KeyValuePair<bool, string> statusreply = callAPIcommand(command, args);
             SmartCommandReply(statusreply.Key, replyvia, statusreply.Value, command);

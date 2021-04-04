@@ -12,6 +12,8 @@ namespace BetterSecondBot
     {
         static void Main(string[] args)
         {
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.UnhandledException += new UnhandledExceptionEventHandler(PanicMode);
             if (helpers.notempty(Environment.GetEnvironmentVariable("Basic_BotUserName")) == true)
             {
                 new CliDocker();
@@ -22,6 +24,13 @@ namespace BetterSecondBot
             }
             LogFormater.Status("- Exiting in 5 secs -");
             Thread.Sleep(5000);
+        }
+
+        static void PanicMode(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception e = (Exception)args.ExceptionObject;
+            Console.WriteLine("PanicMode caught : " + e.Message);
+            Console.WriteLine("Runtime terminating: {0}", args.IsTerminating);
         }
 
         public static class AssemblyInfo

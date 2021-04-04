@@ -407,13 +407,21 @@ namespace BetterSecondBot.HttpService
 
         public IPAddress handleGetClientIP()
         {
-            if(disableIPchecks == true)
+            try
             {
-                return IPAddress.Parse("127.0.0.1");
+                if (disableIPchecks == true)
+                {
+                    return IPAddress.Parse("127.0.0.1");
+                }
+                else
+                {
+                    return HttpContext.Request.RemoteEndPoint.Address;
+                }
             }
-            else
+            catch (Exception e)
             {
-                return HttpContext.Request.RemoteEndPoint.Address;
+                Console.WriteLine("Error getting client ip");
+                return IPAddress.Parse("0.0.0.0");
             }
         }
 
@@ -486,7 +494,7 @@ namespace BetterSecondBot.HttpService
 
         protected Object BasicReply(string input, string command)
         {
-            return BasicReply(input, command);
+            return BasicReply(input, command, new string[] { });
         }
 
         protected Object BasicReply(string input,string command, string[] args)
@@ -503,7 +511,7 @@ namespace BetterSecondBot.HttpService
 
         protected Object Failure(string input, string command)
         {
-            return Failure(input, command);
+            return Failure(input, command, new string[] { });
         }
 
 
