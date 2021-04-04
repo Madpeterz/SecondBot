@@ -111,7 +111,7 @@ namespace BetterSecondBot.DiscordSupervisor
                         {
                             target = bits[2];
                         }
-                        string args = null;
+                        string args = "";
                         if (bits.Length >= 2)
                         {
                             args = bits[1];

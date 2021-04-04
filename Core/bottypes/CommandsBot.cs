@@ -379,7 +379,7 @@ namespace BetterSecondBot.bottypes
                     }
                     CallAPI(command_args_split[0], args_passed.Split("~#~"),"None",true);
                 }
-                return "{ status: \"true\", message: \"mixed reply cuistom command\" }";
+                return "{ status: \"true\", message: \"mixed reply custom command\" }";
             }
             KeyValuePair<bool, string> statusreply = callAPIcommand(command, args);
             SmartCommandReply(statusreply.Key, replyvia, statusreply.Value, command);
