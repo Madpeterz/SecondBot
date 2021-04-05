@@ -40,74 +40,33 @@ namespace BetterSecondBot.BetterRelayService
             attach_events();
         }
 
-        protected void ApplyRelayConfig(string raw)
+        protected void ApplyRelayConfig(string sourcename,string sourcevalue,string targetname,string targetvalue,bool jsonEncoded)
         {
-            string[] bits = raw.Split(",");
-            bool have_source_type = false;
-            bool have_source_filter = false;
-            bool have_target_type = false;
-            bool have_target_filter = false;
-            if(bits.Length >= 4)
+            relay_config relay = new relay_config();
+            relay.encode_as_json = jsonEncoded;
+            relay.sourcename = sourcename;
+            relay.sourcevalue = sourcevalue;
+            relay.targetname = targetname;
+            relay.targetvalue = targetvalue;
+            if (relay.sourcename == "localchat")
             {
-                relay_config relay = new relay_config();
-                foreach (string a in bits)
-                {
-                    string[] subbits = a.Split("::");
-                    if(subbits.Length == 2)
-                    {
-                        if(subbits[0] == "source-type")
-                        {
-                            have_source_type = true;
-                            relay.sourcename = subbits[1];
-                        }
-                        else if (subbits[0] == "source-filter")
-                        {
-                            have_source_filter = true;
-                            relay.sourcevalue = subbits[1];
-                        }
-                        else if (subbits[0] == "target-type")
-                        {
-                            have_target_type = true;
-                            relay.targetname = subbits[1];
-                        }
-                        else if (subbits[0] == "target-config")
-                        {
-                            have_target_filter = true;
-                            relay.targetvalue = subbits[1];
-                        }
-                        else if(subbits[0] == "encode-as-json")
-                        {
-                            if(bool.TryParse(subbits[1],out bool use_json_encode) == true)
-                            {
-                                relay.encode_as_json = use_json_encode;
-                            }
-                        }
-                    }
-                }
-                List<bool> tests = new List<bool>() { have_source_type, have_source_filter, have_target_type, have_target_filter };
-                if(tests.Contains(false) == false)
-                {
-                    if (relay.sourcename == "localchat")
-                    {
-                        LocalchatRelay.Add(relay);
-                    }
-                    else if (relay.sourcename == "groupchat")
-                    {
-                        GroupChatRelay.Add(relay);
-                    }
-                    else if (relay.sourcename == "avatarim")
-                    {
-                        AvatarIMRelay.Add(relay);
-                    }
-                    else if (relay.sourcename == "objectim")
-                    {
-                        ObjectIMRelay.Add(relay);
-                    }
-                    else if (relay.sourcename == "discord")
-                    {
-                        DiscordRelay.Add(relay);
-                    }
-                }
+                LocalchatRelay.Add(relay);
+            }
+            else if (relay.sourcename == "groupchat")
+            {
+                GroupChatRelay.Add(relay);
+            }
+            else if (relay.sourcename == "avatarim")
+            {
+                AvatarIMRelay.Add(relay);
+            }
+            else if (relay.sourcename == "objectim")
+            {
+                ObjectIMRelay.Add(relay);
+            }
+            else if (relay.sourcename == "discord")
+            {
+                DiscordRelay.Add(relay);
             }
         }
 
@@ -115,16 +74,30 @@ namespace BetterSecondBot.BetterRelayService
         {
             int loop = 1;
             bool found = true;
+            string[] needBits = new string[]{ "asJson", "sourceType", "sourceFilter", "targetType", "targetConfig" };
             while (found == true)
             {
-                if (helpers.notempty(Environment.GetEnvironmentVariable("CustomRelay_" + loop.ToString())) == true)
+                bool configfound = true;
+                Dictionary<string, string> config = new Dictionary<string, string>();
+                foreach(string a in needBits)
                 {
-                    ApplyRelayConfig(Environment.GetEnvironmentVariable("CustomRelay_" + loop.ToString()));
+                    if (helpers.notempty(Environment.GetEnvironmentVariable("CustomRelay_" + loop.ToString()+"_"+a)) == false)
+                    {
+                        configfound = false;
+                        break;
+                    }
+                    else
+                    {
+                        config.Add(a, "CustomRelay_" + loop.ToString() + "_" + a);
+                    }
                 }
-                else
+                if(configfound == false)
                 {
-                    found = false;
+                    continue;
                 }
+                bool asJson = false;
+                bool.TryParse(config["asJson"], out asJson);
+                ApplyRelayConfig(config["sourceType"], config["sourceFilter"], config["targetType"], config["targetConfig"], asJson);
                 loop++;
             }
         }
@@ -133,9 +106,10 @@ namespace BetterSecondBot.BetterRelayService
 
         protected void loadRelayConfigFromFile()
         {
-            JsonCustomRelays LoadedRelays = new JsonCustomRelays
+            JsonCustomRelays Demo = new JsonCustomRelays() { sourceFilter = "all", sourceType = "localchat", targetType = "groupchat", targetConfig = UUID.Zero.ToString() };
+            JsonCustomRelaysSet LoadedRelays = new JsonCustomRelaysSet
             {
-                CustomRelays = new [] { "source-type:discord,source-filter:123451231235@12351312321,target-type:localchat,target-config:0" }
+                Entrys = new JsonCustomRelays[] { Demo }
             };
             string targetfile = "customrelays.json";
             SimpleIO io = new SimpleIO();
@@ -154,10 +128,10 @@ namespace BetterSecondBot.BetterRelayService
             {
                 try
                 {
-                    LoadedRelays = JsonConvert.DeserializeObject<JsonCustomRelays>(json);
-                    foreach (string loaded in LoadedRelays.CustomRelays)
+                    LoadedRelays = JsonConvert.DeserializeObject<JsonCustomRelaysSet>(json);
+                    foreach (JsonCustomRelays loaded in LoadedRelays.Entrys)
                     {
-                        ApplyRelayConfig(loaded);
+                        ApplyRelayConfig(loaded.sourceType, loaded.sourceFilter, loaded.targetType, loaded.targetConfig, loaded.encodeJson);
                     }
                 }
                 catch
@@ -210,7 +184,9 @@ namespace BetterSecondBot.BetterRelayService
             {
                 return Task.CompletedTask;
             }
+
             string message_no_name = "[relay]" + message;
+            string message_no_addon = message;
             message = "[relay] " + sourcetype + " # " + name + ": " + message;
 
 
@@ -231,14 +207,25 @@ namespace BetterSecondBot.BetterRelayService
 
                 if (((cfg.sourcevalue == "all") && (sourcetype != "discordchat")) || (cfg.sourcevalue == filtervalue))
                 {
-                    if (cfg.targetname == "discord")
+                    if(cfg.targetname == "discordTTS")
                     {
                         string[] cfga = cfg.targetvalue.Split("@");
                         if (cfga.Length == 2)
                         {
                             if ((cfga[0] + "@" + cfga[1]) != filtervalue)
                             {
-                                await controler.getBot().SendMessageToDiscord(cfga[0], cfga[1], sendmessage, false);
+                                await controler.getBot().SendMessageToDiscord(cfga[0], cfga[1], message_no_addon, true);
+                            }
+                        }
+                    }
+                    else if (cfg.targetname == "discord")
+                    {
+                        string[] cfga = cfg.targetvalue.Split("@");
+                        if (cfga.Length == 2)
+                        {
+                            if ((cfga[0] + "@" + cfga[1]) != filtervalue)
+                            {
+                                await controler.getBot().SendMessageToDiscord(cfga[0], cfga[1], message_no_addon, false);
                             }
                         }
                     }

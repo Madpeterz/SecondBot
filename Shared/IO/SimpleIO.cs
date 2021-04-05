@@ -69,7 +69,7 @@ namespace BetterSecondBotShared.IO
             }
         }
 
-        public void WriteJsonRelays(JsonCustomRelays relays, string targetfile)
+        public void WriteJsonRelays(JsonCustomRelaysSet relays, string targetfile)
         {
             JsonSerializer serializer = new JsonSerializer();
             using (StreamWriter sw = new StreamWriter(@"" + root_folder + "" + targetfile))

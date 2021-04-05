@@ -15,9 +15,18 @@ namespace BetterSecondBotShared.Json
         public string[] CustomCommands { get; set; }
     }
 
+    public class JsonCustomRelaysSet
+    {
+        public JsonCustomRelays[] Entrys {get; set;}
+    }
+
     public class JsonCustomRelays
     {
-        public string[] CustomRelays { get; set; }
+        public bool encodeJson = false;
+        public string sourceType = "";
+        public string sourceFilter = "";
+        public string targetType = "";
+        public string targetConfig = "";
     }
 
     public class advertConfig
