@@ -261,7 +261,22 @@ namespace BetterSecondBotShared.Json
 
         public static string GetProp(JsonConfig reply, string arg)
         {
-            return reply.GetType().GetProperty(arg, BindingFlags.Public | BindingFlags.Instance).GetValue(reply).ToString();
+            Type T = reply.GetType();
+            if(T == null)
+            {
+                return "- ERROR no type -";
+            }
+            PropertyInfo Pi = T.GetProperty(arg, BindingFlags.Public | BindingFlags.Instance);
+            if(Pi == null)
+            {
+                return "- ERROR no prop -";
+            }
+            object val = Pi.GetValue(reply);
+            if(val == null)
+            {
+                return "";
+            }
+            return val.ToString();
         }
 
         protected void SetPropTypeAndValue(JsonConfig reply,PropertyInfo prop,string arg,string arg_type,string arg_value_default)

@@ -77,6 +77,7 @@ namespace BetterSecondBot.BetterRelayService
             string[] needBits = new string[]{ "asJson", "sourceType", "sourceFilter", "targetType", "targetConfig" };
             while (found == true)
             {
+                found = false;
                 bool configfound = true;
                 Dictionary<string, string> config = new Dictionary<string, string>();
                 foreach(string a in needBits)
@@ -93,8 +94,9 @@ namespace BetterSecondBot.BetterRelayService
                 }
                 if(configfound == false)
                 {
-                    continue;
+                    break;
                 }
+                found = true;
                 bool asJson = false;
                 bool.TryParse(config["asJson"], out asJson);
                 ApplyRelayConfig(config["sourceType"], config["sourceFilter"], config["targetType"], config["targetConfig"], asJson);

@@ -16,7 +16,7 @@ namespace BetterSecondBot
     {
         public bool Exited { get { return exitBot; } }
         protected bool exitBot = false;
-        protected SecondBot Bot;
+        protected SecondBot Bot = null;
         protected BetterAtHome betterAtHomeService;
         protected BetterTracking betterTracking;
         protected advertsService Adverts;

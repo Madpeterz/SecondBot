@@ -28,7 +28,13 @@ namespace BetterSecondbot.Tracking
         public BetterTracking(Cli setcontroler)
         {
             controler = setcontroler;
-            if(controler.getBot().getMyConfig.Setting_Tracker.ToLowerInvariant() == "false")
+            if (controler.getBot() == null)
+            {
+                LogFormater.Info("Tracker - error no bot");
+                return;
+            }
+            SecondBot bot = controler.getBot();
+            if (bot.getMyConfig.Setting_Tracker.ToLowerInvariant() == "false")
             {
                 LogFormater.Info("Tracker - Disabled because set to false");
                 return;
