@@ -118,7 +118,15 @@ namespace BetterSecondBot.DiscordSupervisor
                         }
                         if (controler.getBot().GetFullListOfCommandsWithCustoms().Contains(bits[0].ToLowerInvariant()) == true)
                         {
-                            string reply = controler.getBot().CallAPI(bits[0], args.Split("~#~"), target);
+                            string reply = "";
+                            if (args == "")
+                            {
+                                reply = controler.getBot().CallAPI(bits[0], new string[] { }, target);
+                            }
+                            else
+                            {
+                                reply = controler.getBot().CallAPI(bits[0], args.Split("~#~"), target);
+                            }
                             await message.Channel.SendMessageAsync(reply, false, null,null,null, new MessageReference(message.Id)).ConfigureAwait(false);
                         }
                         else
