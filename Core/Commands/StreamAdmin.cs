@@ -44,11 +44,13 @@ namespace BetterSecondBot.HttpService
                 return Failure("Endpointcode is empty", "FetchNextNotecard", new [] { endpoint, endpointcode });
             }
 
-            string attempt_endpoint = endpoint + "endpoint.php";
+            string attempt_endpoint = endpoint + "sys.php";
             token = helpers.GetSHA1(helpers.UnixTimeNow().ToString() + "notecardnext" + endpointcode);
             var client = new RestClient(attempt_endpoint);
             var request = new RestRequest("notecard/next", Method.POST);
+            string unixtime = helpers.UnixTimeNow().ToString();
             request.AddParameter("token", token);
+            request.AddParameter("unixtime", unixtime);
             request.AddHeader("content-type", "application/x-www-form-urlencoded");
             IRestResponse endpoint_checks = client.Post(request);
             if (endpoint_checks.StatusCode != System.Net.HttpStatusCode.OK)
