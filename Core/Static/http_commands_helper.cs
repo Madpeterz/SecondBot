@@ -15,6 +15,7 @@ namespace Core.Static
             reply.Add("chat", typeof(HTTP_Chat));
             reply.Add("core", typeof(HTTP_Core));
             reply.Add("dialogs", typeof(HTTP_Dialogs));
+            reply.Add("discord", typeof(HTTP_Discord));
             reply.Add("estate", typeof(HTTP_Estate));
             reply.Add("friends", typeof(HTTP_Friends));
             reply.Add("funds", typeof(Http_Funds));
