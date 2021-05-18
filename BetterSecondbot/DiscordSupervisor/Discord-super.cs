@@ -50,10 +50,11 @@ namespace BetterSecondBot.DiscordSupervisor
                 Thread.Sleep(1500);
             }
         }
-        public Discord_super(JsonConfig configfile, bool as_docker)
+        public Discord_super(JsonConfig configfile, bool as_docker, string readfromfolder)
         {
             myconfig = configfile;
             running_as_docker = as_docker;
+            use_folder = readfromfolder;
             startService();
         }
 
@@ -83,7 +84,7 @@ namespace BetterSecondBot.DiscordSupervisor
                 controler.getBot().KillMePlease();
                 controler = null;
             }
-            controler = new Cli(myconfig, running_as_docker, self_keep_alive);
+            controler = new Cli(myconfig, running_as_docker, self_keep_alive, use_folder);
             controler.getBot().setDiscordClient(DiscordClient);
             relayService = new BetterRelay(controler, this, running_as_docker);
             attach_events();

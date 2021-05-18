@@ -15,24 +15,26 @@ namespace BetterSecondBot
         {
             SimpleIO io = new SimpleIO();
             JsonConfig Config = new JsonConfig();
-            string json_file = "";
+            string loadFolder = "debug";
+            string json_file = "bot.json";
 #if DEBUG
-            LogFormater.Status("Hardware/Debug version");
-            json_file = "debug.json";
+            LogFormater.Debug("!! RUNNING IN DEBUG !!");
+
 #else
-            LogFormater.Status("Hardware/Live version");
+            LogFormater.Status("Hardware config");
             if(args.Length == 1)
             {
-                json_file = ""+args[0]+".json";
+                loadFolder = args[0];
             }
             else
             {
-                json_file = "mybot.json";
-                LogFormater.Warn("Using: mybot.json as the config");
+                loadFolder = "default";
+                io.ChangeRoot("default");
+                LogFormater.Warn("Using: using default folder");
             }
-
 #endif
-            if (SimpleIO.dir_exists("wiki") == false)
+            io.ChangeRoot(loadFolder);
+            if (SimpleIO.DirExists("wiki") == false)
             {
                 LogFormater.Info("Basic Wiki [Creating]");
                 new DebugModeCreateWiki(AssemblyInfo.GetGitHash(), io);
@@ -55,7 +57,7 @@ namespace BetterSecondBot
                         catch (Exception e)
                         {
                             LogFormater.Warn("Unable to read config file\n moving config to " + json_file + ".old and creating a empty config\nError was: " + e.Message + "");
-                            io.makeOld(json_file);
+                            io.MarkOld(json_file);
                             Config = new JsonConfig();
                             io.WriteJsonConfig(MakeJsonConfig.GetDefault(), json_file);
                         }
@@ -79,7 +81,7 @@ namespace BetterSecondBot
             if(ok_to_try_start == true)
             {
                 Config = MakeJsonConfig.Http_config_check(Config);
-                new Discord_super(Config, false);
+                new Discord_super(Config, false, loadFolder);
             }
         }
     }

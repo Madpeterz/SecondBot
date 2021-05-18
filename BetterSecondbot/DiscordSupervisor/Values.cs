@@ -11,6 +11,7 @@ namespace BetterSecondBot.DiscordSupervisor
         protected bool exit_super = false;
         protected Cli controler;
         protected bool running_as_docker = false;
+        protected string use_folder = "";
 
         protected bool discord_group_relay;
         protected DiscordSocketClient DiscordClient;

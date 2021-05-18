@@ -44,12 +44,13 @@ namespace BetterSecondbot.Adverts
             demoAdvert.hour = "12";
             demoAdvert.min = "30";
             demoAdvert.notice = "false";
-            demoAdvert.enabled = "true";
+            demoAdvert.enabled = "false";
             loadedAdverts.adverts = new advertConfig[] { demoAdvert };
             
 
             string targetfile = "adverts.json";
             SimpleIO io = new SimpleIO();
+            io.ChangeRoot(controler.getFolderUsed());
             if (SimpleIO.FileType(targetfile, "json") == false)
             {
                 LogFormater.Status("Creating new adverts file", true);
@@ -75,7 +76,7 @@ namespace BetterSecondbot.Adverts
                 }
                 catch
                 {
-                    io.makeOld(targetfile);
+                    io.MarkOld(targetfile);
                     io.WriteJsonAdverts(loadedAdverts, targetfile);
                 }
                 return;

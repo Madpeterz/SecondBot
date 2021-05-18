@@ -16,6 +16,7 @@ namespace BetterSecondBot
     {
         public bool Exited { get { return exitBot; } }
         protected bool exitBot = false;
+        protected string use_folder = "";
         protected SecondBot Bot = null;
         protected BetterAtHome betterAtHomeService;
         protected BetterTracking betterTracking;
@@ -25,6 +26,11 @@ namespace BetterSecondBot
         public SecondBot getBot()
         {
             return Bot;
+        }
+
+        public string getFolderUsed()
+        {
+            return use_folder;
         }
 
         protected void keep_alive()
@@ -66,9 +72,10 @@ namespace BetterSecondBot
             betterTracking = new BetterTracking(this);
             datastorage = new Datastorage(this);
         }
-        public Cli(JsonConfig Config, bool as_docker, bool use_self_keep_alive)
+        public Cli(JsonConfig Config, bool as_docker, bool use_self_keep_alive, string loadingFromFolder)
         {
             exitBot = false;
+            use_folder = loadingFromFolder;
             LogFormater.Info("Starting cli");
             if (helpers.botRequired(Config) == true)
             {

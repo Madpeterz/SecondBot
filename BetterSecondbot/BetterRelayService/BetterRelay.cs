@@ -115,6 +115,7 @@ namespace BetterSecondBot.BetterRelayService
             };
             string targetfile = "customrelays.json";
             SimpleIO io = new SimpleIO();
+            io.ChangeRoot(controler.getFolderUsed());
             if (SimpleIO.FileType(targetfile, "json") == false)
             {
                 io.WriteJsonRelays(LoadedRelays, targetfile);
@@ -138,7 +139,7 @@ namespace BetterSecondBot.BetterRelayService
                 }
                 catch
                 {
-                    io.makeOld(targetfile);
+                    io.MarkOld(targetfile);
                     io.WriteJsonRelays(LoadedRelays, targetfile);
                 }
                 return;
