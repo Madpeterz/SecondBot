@@ -62,24 +62,40 @@ namespace BetterSecondBot.DiscordSupervisor
 
         protected virtual async Task<Task> DiscordClientReady()
         {
-            LogFormater.Info("Discord is active", true);
             ReconnectTimer.Enabled = false;
-            await DiscordClient.SetStatusAsync(Discord.UserStatus.Idle);
-            await DiscordClient.SetGameAsync("Not connected", null, ActivityType.CustomStatus);
-            DiscordServer = DiscordClient.GetGuild(myconfig.DiscordFull_ServerID);
-            if (DiscordServer != null)
+            bool hasAdmin = false;
+            foreach(SocketRole Role in DiscordClient.GetGuild(myconfig.DiscordFull_ServerID).CurrentUser.Roles)
             {
-                if (myconfig.DiscordFull_Enable == true)
+                if(Role.Permissions.Administrator == true)
                 {
-                    login_bot(false);
+                    hasAdmin = true;
+                    break;
                 }
-                DiscordUnixTimeOnine = helpers.UnixTimeNow();
-                DiscordClientConnected = true;
-                await DiscordRebuildChannels();
+            }
+            if (hasAdmin == true)
+            {
+                LogFormater.Info("Discord is active", true);
+                await DiscordClient.SetStatusAsync(Discord.UserStatus.Idle);
+                await DiscordClient.SetGameAsync("Not connected", null, ActivityType.CustomStatus);
+                DiscordServer = DiscordClient.GetGuild(myconfig.DiscordFull_ServerID);
+                if (DiscordServer != null)
+                {
+                    if (myconfig.DiscordFull_Enable == true)
+                    {
+                        login_bot(false);
+                    }
+                    DiscordUnixTimeOnine = helpers.UnixTimeNow();
+                    DiscordClientConnected = true;
+                    await DiscordRebuildChannels();
+                }
+                else
+                {
+                    DiscordClientConnected = false;
+                }
             }
             else
             {
-                DiscordClientConnected = false;
+                LogFormater.Info("Discord has failed - missing admin perm", true);
             }
             return Task.CompletedTask;
         }
