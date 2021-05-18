@@ -78,7 +78,7 @@ namespace BetterSecondBot.HttpService
                 }
                 catch
                 {
-                    io.makeOld(targetfile);
+                    io.MarkOld(targetfile);
                     io.WriteJsonTokens(LoadedTokens, targetfile);
                 }
                 return;
@@ -152,15 +152,13 @@ namespace BetterSecondBot.HttpService
                     killedLogger = true;
                     Swan.Logging.Logger.UnregisterLogger<ConsoleLogger>();
                 }
-                using (var server = CreateWebServer(Config.Http_Host))
+                WebServer server = CreateWebServer(Config.Http_Host);
+                // Once we've registered our modules and configured them, we call the RunAsync() method.
+                LogFormater.Info("Starting HTTP service: " + Config.Http_Host);
+                server.RunAsync();
+                while (Bot.KillMe == false)
                 {
-                    // Once we've registered our modules and configured them, we call the RunAsync() method.
-                    LogFormater.Info("Starting HTTP service: " + Config.Http_Host);
-                    server.RunAsync();
-                    while (Bot.KillMe == false)
-                    {
-                        Thread.Sleep(3000);
-                    }
+                    Thread.Sleep(3000);
                 }
             }
             catch (Exception e)
@@ -419,7 +417,7 @@ namespace BetterSecondBot.HttpService
                     return HttpContext.Request.RemoteEndPoint.Address;
                 }
             }
-            catch (Exception e)
+            catch
             {
                 Console.WriteLine("Error getting client ip");
                 return IPAddress.Parse("0.0.0.0");
