@@ -45,9 +45,9 @@ namespace BetterSecondBot.HttpService
             }
 
             string attempt_endpoint = endpoint + "sys.php";
-            token = helpers.GetSHA1(helpers.UnixTimeNow().ToString() + "notecardnext" + endpointcode);
+            token = helpers.GetSHA1(helpers.UnixTimeNow().ToString() + "NotecardNext" + endpointcode);
             var client = new RestClient(attempt_endpoint);
-            var request = new RestRequest("notecard/next", Method.POST);
+            var request = new RestRequest("Notecard/Next", Method.POST);
             string unixtime = helpers.UnixTimeNow().ToString();
             request.AddParameter("token", token);
             request.AddParameter("unixtime", unixtime);
@@ -59,7 +59,7 @@ namespace BetterSecondBot.HttpService
             }
             try
             {
-                notecardendpoint server_reply = JsonConvert.DeserializeObject<notecardendpoint>(endpoint_checks.Content);
+                NotecardEndpoint server_reply = JsonConvert.DeserializeObject<NotecardEndpoint>(endpoint_checks.Content);
                 if (server_reply.status == false)
                 {
                     return Failure("Bad reply: " + server_reply.message, "FetchNextNotecard", new [] { endpoint, endpointcode });
@@ -76,14 +76,14 @@ namespace BetterSecondBot.HttpService
             }
         }
 
-        public class notecardendpoint : endpoint
+        public class NotecardEndpoint : BasicEndpoint
         {
             public string AvatarUUID { get; set; }
             public string NotecardTitle { get; set; }
             public string NotecardContent { get; set; }
         }
 
-        public class endpoint
+        public class BasicEndpoint
         {
             public bool status { get; set; }
             public string message { get; set; }
