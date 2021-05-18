@@ -176,7 +176,7 @@ namespace BetterSecondBot.WikiMake
                 sb.Replace("[[RETURNROOT]]", "../");
                 sb = DebugModeCreateWiki.MenuActive(sb, area);
                 string target_file = "" + area + "" + workspace + "" + c + ".html";
-                io.writefile(target_file, sb.ToString());
+                io.WriteFile(target_file, sb.ToString());
             }
         }
         protected void InterfaceWorkspaces(string area, API_supported_interface shared_interface)
@@ -219,7 +219,7 @@ namespace BetterSecondBot.WikiMake
                 sb.Append(html_footer);
                 sb = DebugModeCreateWiki.MenuActive(sb, area);
                 string target_file = "" + area + "" + workspace + ".html";
-                io.writefile(target_file, sb.ToString());
+                io.WriteFile(target_file, sb.ToString());
             }
         }
 
@@ -259,7 +259,7 @@ namespace BetterSecondBot.WikiMake
             sb.Replace("[[AREA]]", area);
             sb.Append(html_footer);
             sb = DebugModeCreateWiki.MenuActive(sb, area);
-            io.writefile("" + area + ".html", sb.ToString());
+            io.WriteFile("" + area + ".html", sb.ToString());
         }
         protected void InterfaceWiki(string area, API_supported_interface shared_interface, bool track_commands = false)
         {
@@ -293,7 +293,7 @@ namespace BetterSecondBot.WikiMake
             HTTPWiki();
 
             io.ChangeRoot("wiki");
-            io.writefile("index.html", CreateRoot());
+            io.WriteFile("index.html", CreateRoot());
         }
 
         protected void HTTPWiki()
@@ -414,7 +414,7 @@ namespace BetterSecondBot.WikiMake
                     sb.Replace("[[SUBFOLDER]]", "");
                     sb.Replace("[[RETURNROOT]]", "../");
                     string target_file = "" + area + "" + workspace + "" + c + ".html";
-                    io.writefile(target_file, sb.ToString());
+                    io.WriteFile(target_file, sb.ToString());
                 }
             }
         }
@@ -448,7 +448,7 @@ namespace BetterSecondBot.WikiMake
             sb.Replace("[[AREA]]", area);
             sb.Append(html_footer);
             sb = DebugModeCreateWiki.MenuActive(sb, area);
-            io.writefile("" + area + ".html", sb.ToString());
+            io.WriteFile("" + area + ".html", sb.ToString());
         }
 
         protected void HTTPWorkspaces(string area, HTTPendpoint HTTP)
@@ -492,7 +492,7 @@ namespace BetterSecondBot.WikiMake
                 sb.Append(html_footer);
                 sb = DebugModeCreateWiki.MenuActive(sb, area);
                 string target_file = "" + area + "" + workspace + ".html";
-                io.writefile(target_file, sb.ToString());
+                io.WriteFile(target_file, sb.ToString());
             }
         }
     }
