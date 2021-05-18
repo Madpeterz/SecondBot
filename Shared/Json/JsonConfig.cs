@@ -83,15 +83,16 @@ namespace BetterSecondBotShared.Json
         public bool Http_Enable { get; set; }
         public string Http_Host { get; set; }
 
-        // Name2Key DB
-        public bool Name2Key_Enable { get; set; }
-        public string Name2Key_Url { get; set; }
-        public string Name2Key_Key { get; set; }
-
         // Logs
         public bool Log2File_Enable { get; set; }
         public int Log2File_Level { get; set; }
         public bool Setting_LogCommands { get; set; }
+
+        // agent
+        public string Agent_Channel { get; set; }
+        public string Agent_Version { get; set; }
+        
+
     }
 
 }

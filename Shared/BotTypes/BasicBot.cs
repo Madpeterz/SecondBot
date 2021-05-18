@@ -124,7 +124,7 @@ namespace BetterSecondBotShared.bottypes
                             }
                             catch
                             {
-                                io.makeOld(CommandsFile);
+                                io.MarkOld(CommandsFile);
                                 io.WriteJsonCommands(LoadedCommands, CommandsFile);
                             }
                         }
@@ -220,6 +220,17 @@ namespace BetterSecondBotShared.bottypes
             Client.Settings.AVATAR_TRACKING = true;
             List<string> bits = myconfig.Basic_BotUserName.Split(' ').ToList();
             LoginParams Lp;
+            string AgentChannel = myconfig.Agent_Channel;
+            string AgentVersion = myconfig.Agent_Version;
+            if((AgentChannel == "auto") || (AgentChannel == ""))
+            {
+                AgentChannel = "BetterSecondBot";
+            }
+            if ((AgentVersion == "auto") || (AgentVersion == ""))
+            {
+                AgentVersion = version;
+            }
+            Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, AgentChannel, AgentVersion);
             if (myconfig.Setting_loginURI != "secondlife")
             {
                 if (myconfig.Setting_loginURI != null)
@@ -227,23 +238,9 @@ namespace BetterSecondBotShared.bottypes
                     if (myconfig.Setting_loginURI.Length > 5)
                     {
                         Info("Using custom login server");
-                        Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version, myconfig.Setting_loginURI);
-                    }
-                    else
-                    {
-                        Warn("loginURI invaild: using secondlife");
-                        Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
+                        Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, AgentChannel, AgentVersion, myconfig.Setting_loginURI);
                     }
                 }
-                else
-                {
-                    Warn("loginURI invaild: using secondlife");
-                    Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
-                }
-            }
-            else
-            {
-                Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, "BetterSecondBot", version);
             }
             if (helpers.notempty(myconfig.Basic_LoginLocation) == false)
             {

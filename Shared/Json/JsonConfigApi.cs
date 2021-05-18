@@ -143,9 +143,8 @@ namespace BetterSecondBotShared.Json
                                                     + "3: +Warnings\n"
                                                     + "4: +Debug\n";
             }
-            // Name2Key
-            else if (cmd == "Name2Key_Url") { return "url to the name to key provider"; }
-            else if (cmd == "Name2Key_Key") { return "access code for the provider"; }
+            else if (cmd == "Agent_Channel") { return "What channel to use for the client - should only be used if badly coded grids that are unable to accept custom clients: leave auto otherwise"; }
+            else if (cmd == "Agent_Version") { return "What version to use for the client - should only be used if badly coded grids that are unable to accept custom clients: leave auto otherwise"; }
             return "Unknown value:" + cmd;
         }
         #endregion
@@ -238,9 +237,8 @@ namespace BetterSecondBotShared.Json
             // Logs
             if (cmd == "Log2File_Enable") { return "False"; }
             else if (cmd == "Log2File_Level") { return "1"; }
-            // Name2Key
-            else if(cmd == "Name2Key_Url") { return ""; }
-            else if(cmd == "Name2Key_Key") { return ""; }
+            else if (cmd == "Agent_Channel") { return "auto"; }
+            else if (cmd == "Agent_Version") { return "auto"; }
             return "Unknown value:" + cmd;
         }
         #endregion
