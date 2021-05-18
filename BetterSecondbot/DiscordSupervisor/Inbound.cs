@@ -202,17 +202,25 @@ namespace BetterSecondBot.DiscordSupervisor
                                     else
                                     {
                                         Noticemessage = bits[0];
+                                        Noticemessage = Noticemessage.Replace("!notice ", "");
                                     }
-                                    Noticetitle = Noticetitle.Replace("!notice ", "");
-                                    Noticetitle = Noticetitle.Trim();
-                                    controler.getBot().CallAPI("Groupnotice", new [] { Noticetitle, Noticemessage });
-                                    await MarkMessage(message, "✅");
+                                    if (Noticemessage.Length > 5)
+                                    {
+                                        Noticetitle = Noticetitle.Replace("!notice ", "");
+                                        Noticetitle = Noticetitle.Trim();
+                                        controler.getBot().CallAPI("Groupnotice", new[] { group.ToString(), Noticetitle, Noticemessage });
+                                        await MarkMessage(message, "✅").ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await MarkMessage(message, "❌").ConfigureAwait(false);
+                                    }
                                 }
                                 else
                                 {
                                     IGuildUser user = (IGuildUser)message.Author;
                                     controler.getBot().CallAPI("Groupchat", new [] { group.ToString(), message.Content });
-                                    await MarkMessage(message, "✅");
+                                    await MarkMessage(message, "✅").ConfigureAwait(false);
                                 }
                             }
                         }
