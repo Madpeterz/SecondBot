@@ -32,6 +32,7 @@ namespace BetterSecondBot.bottypes
                     group_members_storage.Remove(e.GroupID);
                 }
                 group_members_storage.Add(e.GroupID, new KeyValuePair<long, List<UUID>>(helpers.UnixTimeNow(), e.Members.Keys.ToList()));
+
             }
         }
 

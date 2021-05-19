@@ -42,16 +42,23 @@ namespace BetterSecondbot.Tracking
             if(int.TryParse(controler.getBot().getMyConfig.Setting_Tracker,out output_channel) == true)
             {
                 output_to_channel = true;
+                LogFormater.Info("Tracker - Running as EventDriver + Channel output");
                 attachEvents();
             }
             else if (controler.getBot().getMyConfig.Setting_Tracker.StartsWith("http") == true)
             {
                 output_to_url = true;
+                LogFormater.Info("Tracker - Running as EventDriver + HTTP output");
                 attachEvents();
+            }
+            else if(controler.getBot().getMyConfig.Setting_Tracker != "Event")
+            {
+                LogFormater.Info("Tracker - Disabled not a vaild channel,http address or EventDriver");
             }
             else
             {
-                LogFormater.Info("Tracker - Disabled not a vaild channel or http");
+                LogFormater.Info("Tracker - Running as EventDriver");
+                attachEvents();
             }
         }
         protected void attachEvents()
@@ -64,7 +71,7 @@ namespace BetterSecondbot.Tracking
         {
             if(e.Status == LoginStatus.ConnectingToSim)
             {
-                LogFormater.Info("Tracker - disconnected from login process event");
+                LogFormater.Info("Tracker - warming up");
                 controler.getBot().LoginProgess -= LoginProcess;
                 if (AfterLogin == false)
                 {
@@ -78,7 +85,6 @@ namespace BetterSecondbot.Tracking
                         LogFormater.Info("Tracker - Enabled HTTP: " + controler.getBot().getMyConfig.Setting_Tracker);
                     }
                     controler.getBot().StatusMessageEvent += StatusPing;
-                    //controler.getBot().GetClient.Grid.CoarseLocationUpdate += LocationUpdate;
                 }
             }
         }
@@ -189,6 +195,21 @@ namespace BetterSecondbot.Tracking
                         loop++;
                     }
                     output(avuuid, "entry###" + name);
+                    string parcelname = "";
+                    string simname = "";
+                    if (controler.getBot().GetClient.Network.CurrentSim.AvatarPositions.ContainsKey(avuuid))
+                    {
+                        Vector3 pos = controler.getBot().GetClient.Network.CurrentSim.AvatarPositions[avuuid];
+                        simname = controler.getBot().GetClient.Network.CurrentSim.Name;
+                        int localp = controler.getBot().GetClient.Parcels.GetParcelLocalID(controler.getBot().GetClient.Network.CurrentSim, pos);
+                        parcelname = "?";
+                        if (controler.getBot().GetClient.Network.CurrentSim.Parcels.ContainsKey(localp) == true)
+                        {
+                            Parcel P = controler.getBot().GetClient.Network.CurrentSim.Parcels[localp];
+                            parcelname = P.Name;
+                        }
+                    }
+                    controler.getBot().TriggerTrackingEvent(avuuid, name,parcelname, simname, false);
                 }
                 addToSeen(avuuid);
             }
@@ -235,31 +256,10 @@ namespace BetterSecondbot.Tracking
                     {
                         output(avuuid, "exit###" + name + "~#~" + AvatarSeen[avuuid].ToString());
                         removeFromSeen(avuuid);
+                        controler.getBot().TriggerTrackingEvent(avuuid, name,"","",true);
                     }
                 }
             }
-        }
-
-
-
-        protected void LocationUpdate(object o, CoarseLocationUpdateEventArgs e)
-        {
-            if (e.NewEntries.Count() > 0)
-            {
-                foreach (UUID av in e.NewEntries)
-                {
-                    Thread newThread = new Thread(this.TrackerEventAdd);
-                    newThread.Start(av);
-                }
-            }
-            if (e.RemovedEntries.Count() > 0)
-            {
-                foreach (UUID av in e.RemovedEntries)
-                {
-                    TrackerEventRemove(av);
-                }
-            }
-
         }
     }
 }

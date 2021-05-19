@@ -81,6 +81,23 @@ namespace BetterSecondBot.bottypes
         }
     }
 
+    public class TrackerEventArgs: EventArgs
+    {
+        public UUID avatarUUID { get; }
+        public string avatarName { get; }
+        public string parcelName { get; }
+        public string simName { get; }
+        public bool Leaving { get;  }
+        public TrackerEventArgs(UUID avataruuid, string name, string parcelname, string simname, bool leaving)
+        {
+            this.avatarUUID = avataruuid;
+            this.avatarName = name;
+            this.parcelName = parcelname;
+            this.simName = simname;
+            this.Leaving = leaving;
+        }
+    }
+
     public class ImSendArgs : EventArgs
     {
         public UUID avataruuid { get; }
@@ -127,6 +144,7 @@ namespace BetterSecondBot.bottypes
         private EventHandler<StatusMessageEvent> _StatusMessageEvent;
         private EventHandler<GroupEventArgs> _GroupsEvent;
         private EventHandler<ImSendArgs> _SendImEvent;
+        private EventHandler<TrackerEventArgs> _TrackerEvent;
 
         private readonly object _ChangeSimLock = new object();
         private readonly object _AlertMessageLock = new object();
@@ -136,7 +154,12 @@ namespace BetterSecondBot.bottypes
         private readonly object _StatusMessageEventlock = new object();
         private readonly object _GroupsEventLock = new object();
         private readonly object _SendImEventLock = new object();
+        private readonly object _TrackerUpdateEventLock = new object();
 
+        public void TriggerTrackingEvent(UUID avatar,string name,string parcelname,string simname, bool exit)
+        {
+            On_TrackerUpdateEvent(new TrackerEventArgs(avatar, name,parcelname,simname,exit));
+        }
 
         public event EventHandler<SimChangedEventArgs> ChangeSimEvent
         {
@@ -165,6 +188,7 @@ namespace BetterSecondBot.bottypes
             add { lock (_MessageEventLock) { _MessageEvent += value; } }
             remove { lock (_MessageEventLock) { _MessageEvent -= value; } }
         }
+
         public event EventHandler<StatusMessageEvent> StatusMessageEvent
         {
             add { lock (_StatusMessageEventlock) { _StatusMessageEvent += value; } }
@@ -179,6 +203,17 @@ namespace BetterSecondBot.bottypes
         {
             add { lock (_SendImEventLock) { _SendImEvent += value; } }
             remove { lock (_SendImEventLock) { _SendImEvent -= value; } }
+        }
+        public event EventHandler<TrackerEventArgs> TrackerEvent
+        {
+            add { lock (_TrackerUpdateEventLock) { _TrackerEvent += value; } }
+            remove { lock (_TrackerUpdateEventLock) { _TrackerEvent -= value; } }
+        }
+
+        protected void On_TrackerUpdateEvent(TrackerEventArgs e)
+        {
+            EventHandler<TrackerEventArgs> handler = _TrackerEvent;
+            handler?.Invoke(this, e);
         }
 
         protected void On_SendImEvent(ImSendArgs e)

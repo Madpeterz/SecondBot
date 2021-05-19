@@ -86,7 +86,7 @@ namespace BetterSecondBotShared.Json
             }
             else if(cmd == "Setting_Tracker")
             {
-                return "should the avatar tracker be enabled (anything but \"false\") and if so where should it go: (Channel number or a url)";
+                return "Enable avatar tracking (and supported events) by setting this value to a channel number<br/>or a URL<b/r/>or \"Event\" for events only";
             }
             return "";
         }

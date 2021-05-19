@@ -47,6 +47,21 @@ namespace BetterSecondBotShared.Json
         public advertConfig[] adverts = new advertConfig[] { };
     }
 
+    public class OnEvent
+    {
+        public string title;
+        public bool Enabled;
+        public string On;
+        public string Monitor;
+        public string[] Where;
+        public string[] Actions;
+    }
+
+    public class OnEventBlob
+    {
+        public OnEvent[] listEvents = new OnEvent[] { };
+    }
+
 
     public class JsonConfig
     {
