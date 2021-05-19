@@ -9,6 +9,7 @@ using BetterSecondbot.BetterAtHome;
 using BetterSecondbot.DataStorage;
 using BetterSecondbot.Tracking;
 using BetterSecondbot.Adverts;
+using BetterSecondbot.OnEvents;
 
 namespace BetterSecondBot
 {
@@ -21,11 +22,37 @@ namespace BetterSecondBot
         protected BetterAtHome betterAtHomeService;
         protected BetterTracking betterTracking;
         protected advertsService Adverts;
+        protected onevent Events;
         protected Datastorage datastorage;
 
         public SecondBot getBot()
         {
             return Bot;
+        }
+
+        public bool BotReady()
+        {
+            if (getBot() == null)
+            {
+                return false;
+            }
+            else if (getBot().GetClient == null)
+            {
+                return false;
+            }
+            else if (getBot().GetClient.Network == null)
+            {
+                return false;
+            }
+            else if (getBot().GetClient.Network.Connected == false)
+            {
+                return false;
+            }
+            else if (getBot().GetClient.Network.CurrentSim == null)
+            {
+                return false;
+            }
+            return true;
         }
 
         public string getFolderUsed()
@@ -50,6 +77,7 @@ namespace BetterSecondBot
                 Thread.Sleep(1500);
             }
             Adverts = null;
+            Events = null;
             betterAtHomeService = null;
             betterTracking = null;
             datastorage = null;
@@ -68,6 +96,7 @@ namespace BetterSecondBot
                 }).Start();
             }
             Adverts = new advertsService(this, as_docker);
+            Events = new onevent(this, as_docker);
             betterAtHomeService = new BetterAtHome(this, Config);
             betterTracking = new BetterTracking(this);
             datastorage = new Datastorage(this);

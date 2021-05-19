@@ -188,27 +188,15 @@ namespace BetterSecondbot.Adverts
         protected int lastTickMin = -1;
         protected void StatusPing(object o, StatusMessageEvent e)
         {
-            DateTime moment = DateTime.Now;
-            if (lastTickMin != moment.Minute)
+            if (controler.BotReady() == true)
             {
-                lastTickMin = moment.Minute;
-                if (controler.getBot() == null)
+                DateTime moment = DateTime.Now;
+                if (lastTickMin != moment.Minute)
                 {
-                    return;
+                    lastTickMin = moment.Minute;
+
+                    checkForWork();
                 }
-                if(controler.getBot().GetClient == null)
-                {
-                    return;
-                }
-                if (controler.getBot().GetClient.Network == null)
-                {
-                    return;
-                }
-                if (controler.getBot().GetClient.Network.CurrentSim == null)
-                {
-                    return;
-                }
-                checkForWork();
             }
         }
 
