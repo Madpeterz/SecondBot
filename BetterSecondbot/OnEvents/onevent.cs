@@ -570,7 +570,7 @@ namespace BetterSecondbot.OnEvents
             }
             foreach (UUID entry in repop)
             {
-                LogFormater.Info("OnEvent - requesting group membership: " + entry.ToString(), true);
+                //LogFormater.Info("OnEvent - requesting group membership: " + entry.ToString(), true);
                 group_membership_update_q[entry] = new KeyValuePair<long, int>(now + 120, 45);
                 controler.getBot().GetClient.Groups.RequestGroupMembers(entry);
             }
@@ -604,7 +604,7 @@ namespace BetterSecondbot.OnEvents
         {
             if (group_membership_update_q.ContainsKey(e.GroupID) == true)
             {
-                LogFormater.Info("OnEvent - updating group membership: " + e.GroupID.ToString(), true);
+                //LogFormater.Info("OnEvent - updating group membership: " + e.GroupID.ToString(), true);
                 updateGroupPolling(e.GroupID);
                 bool enableChanges = GroupMembership.ContainsKey(e.GroupID);
                 List<UUID> members = new List<UUID>();
@@ -649,7 +649,7 @@ namespace BetterSecondbot.OnEvents
                         {
                             lookups++;
                         }
-                        LogFormater.Info("OnEvent - new group member: " + name, true);
+                        //LogFormater.Info("OnEvent - new group member: " + name, true);
                     }
                     foreach (UUID missingMember in missingEntrys)
                     {
@@ -658,7 +658,7 @@ namespace BetterSecondbot.OnEvents
                         {
                             lookups++;
                         }
-                        LogFormater.Info("OnEvent - leaving group member: " + name, true);
+                        //LogFormater.Info("OnEvent - leaving group member: " + name, true);
                     }
                     if (lookups > 0)
                     {
