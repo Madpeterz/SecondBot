@@ -20,7 +20,6 @@ namespace BetterSecondbot.OnEvents
         protected StatusMessageEvent LastStatus = null;
         protected int lastMinTick = 0;
         protected int lastSecTick = 0;
-        protected bool DisableGroupEvents = true;
 
         protected Dictionary<UUID, KeyValuePair<long, int>> group_membership_update_q = new Dictionary<UUID, KeyValuePair<long, int>>();
         protected List<OnEvent> Events = new List<OnEvent>();
@@ -432,7 +431,8 @@ namespace BetterSecondbot.OnEvents
                 {
                     continue;
                 }
-                group_membership_update_q.Add(checking, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 60));
+                LogFormater.Info("OnEvent - attaching to group membership: "+checking.ToString(), true);
+                group_membership_update_q.Add(checking, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 45));
             }
         }
 
@@ -554,6 +554,8 @@ namespace BetterSecondbot.OnEvents
             controler.getBot().GetClient.Groups.GroupMemberEjected += groupMembershipUpdateEject;
         }
 
+        protected bool requestedGroupdetails = false;
+
         protected void groupMembershipChecks()
         {
             long now = helpers.UnixTimeNow();
@@ -568,7 +570,8 @@ namespace BetterSecondbot.OnEvents
             }
             foreach (UUID entry in repop)
             {
-                group_membership_update_q[entry] = new KeyValuePair<long, int>(now + 120, 60);
+                LogFormater.Info("OnEvent - requesting group membership: " + entry.ToString(), true);
+                group_membership_update_q[entry] = new KeyValuePair<long, int>(now + 120, 45);
                 controler.getBot().GetClient.Groups.RequestGroupMembers(entry);
             }
         }
@@ -578,7 +581,7 @@ namespace BetterSecondbot.OnEvents
             {
                 return;
             }
-            group_membership_update_q[group] = new KeyValuePair<long, int>(helpers.UnixTimeNow(), 25);
+            group_membership_update_q[group] = new KeyValuePair<long, int>(helpers.UnixTimeNow(), 45);
         }
         protected void updateGroupPolling(UUID group)
         {
@@ -586,7 +589,7 @@ namespace BetterSecondbot.OnEvents
             {
                 return;
             }
-            group_membership_update_q[group] = new KeyValuePair<long, int>(helpers.UnixTimeNow(), 60);
+            group_membership_update_q[group] = new KeyValuePair<long, int>(helpers.UnixTimeNow(), 45);
         }
 
         protected void groupMembershipUpdateEject(object o, GroupOperationEventArgs e)
@@ -599,71 +602,89 @@ namespace BetterSecondbot.OnEvents
 
         protected void groupMembershipUpdate(object o, GroupMembersReplyEventArgs e)
         {
-            DisableGroupEvents = false;
-            updateGroupPolling(e.GroupID);
-            bool enableChanges = GroupMembership.ContainsKey(e.GroupID);
-            List<UUID> members = new List<UUID>();
-            foreach(KeyValuePair<UUID,GroupMember> entry in e.Members)
+            if (group_membership_update_q.ContainsKey(e.GroupID) == true)
             {
-                members.Add(entry.Key);
-            }
-            if(enableChanges == true)
-            {
-                List<UUID> newEntrys = new List<UUID>();
-                List<UUID> missingEntrys = GroupMembership[e.GroupID];
-                foreach (UUID updated in members)
+                LogFormater.Info("OnEvent - updating group membership: " + e.GroupID.ToString(), true);
+                updateGroupPolling(e.GroupID);
+                bool enableChanges = GroupMembership.ContainsKey(e.GroupID);
+                List<UUID> members = new List<UUID>();
+                foreach (KeyValuePair<UUID, GroupMember> entry in e.Members)
                 {
-                    if(missingEntrys.Contains(updated) == false)
-                    {
-                        newEntrys.Add(updated);
-                    }
-                    else
-                    {
-                        missingEntrys.Remove(updated);
-                    }
+                    members.Add(entry.Key);
                 }
-                int lookups = 0;
-                foreach (UUID newMember in newEntrys)
+                if (enableChanges == false)
                 {
-                    string name = controler.getBot().FindAvatarKey2Name(newMember);
-                    if(name == "lookup")
+                    bool skip = false;
+                    if(members.Count == 1)
                     {
-                        lookups++;
+                        skip = members.Contains(UUID.Zero);
+                    }
+                    if (skip == false)
+                    {
+                        GroupMembership.Add(e.GroupID, members);
                     }
                 }
-                foreach (UUID missingMember in missingEntrys)
+                else
                 {
-                    string name = controler.getBot().FindAvatarKey2Name(missingMember);
-                    if (name == "lookup")
+                    List<UUID> newEntrys = new List<UUID>();
+                    List<UUID> missingEntrys = GroupMembership[e.GroupID];
+                    foreach (UUID updated in members)
                     {
-                        lookups++;
+                        if (missingEntrys.Contains(updated) == false)
+                        {
+                            newEntrys.Add(updated);
+                            
+                        }
+                        else
+                        {
+                            missingEntrys.Remove(updated);
+                        }
                     }
-                }
-                if (lookups > 0)
-                {
-                    Thread.Sleep(500);
-                }
-                Dictionary<string, string> args = new Dictionary<string, string>();
-                args.Add("avataruuid", "notset");
-                args.Add("avatarname", "notset");
-                args.Add("groupuuid", e.GroupID.ToString());
+                    GroupMembership[e.GroupID] = members;
+                    int lookups = 0;
+                    foreach (UUID newMember in newEntrys)
+                    {
+                        string name = controler.getBot().FindAvatarKey2Name(newMember);
+                        if (name == "lookup")
+                        {
+                            lookups++;
+                        }
+                        LogFormater.Info("OnEvent - new group member: " + name, true);
+                    }
+                    foreach (UUID missingMember in missingEntrys)
+                    {
+                        string name = controler.getBot().FindAvatarKey2Name(missingMember);
+                        if (name == "lookup")
+                        {
+                            lookups++;
+                        }
+                        LogFormater.Info("OnEvent - leaving group member: " + name, true);
+                    }
+                    if (lookups > 0)
+                    {
+                        Thread.Sleep(500);
+                    }
+                    Dictionary<string, string> args = new Dictionary<string, string>();
+                    args.Add("avataruuid", "notset");
+                    args.Add("avatarname", "notset");
+                    args.Add("groupuuid", e.GroupID.ToString());
 
-                foreach (UUID newMember in newEntrys)
-                {
-                    string name = controler.getBot().FindAvatarKey2Name(newMember);
-                    args["avataruuid"] = newMember.ToString();
-                    args["avatarname"] = name;
-                    TriggerEvent("GroupMemberJoins", args, false);
-                }
+                    foreach (UUID newMember in newEntrys)
+                    {
+                        string name = controler.getBot().FindAvatarKey2Name(newMember);
+                        args["avataruuid"] = newMember.ToString();
+                        args["avatarname"] = name;
+                        TriggerEvent("GroupMemberJoins", args, false);
+                    }
 
-                foreach (UUID missingMember in missingEntrys)
-                {
-                    string name = controler.getBot().FindAvatarKey2Name(missingMember);
-                    args["avataruuid"] = missingMember.ToString();
-                    args["avatarname"] = name;
-                    TriggerEvent("GroupMemberLeaves", args, false);
+                    foreach (UUID missingMember in missingEntrys)
+                    {
+                        string name = controler.getBot().FindAvatarKey2Name(missingMember);
+                        args["avataruuid"] = missingMember.ToString();
+                        args["avatarname"] = name;
+                        TriggerEvent("GroupMemberLeaves", args, false);
+                    }
                 }
-
             }
         }
 
@@ -682,14 +703,19 @@ namespace BetterSecondbot.OnEvents
                 {
                     lastMinTick = Dt.Minute;
                     ClockEvent();
+                    if(requestedGroupdetails == false)
+                    {
+                        requestedGroupdetails = true;
+                        foreach(UUID groupuuid in group_membership_update_q.Keys)
+                        {
+                            controler.getBot().GetClient.Groups.RequestGroupMembers(groupuuid);
+                        }
+                    }
                 }
                 if (Dt.Second != lastSecTick)
                 {
                     lastSecTick = Dt.Second;
-                    if (DisableGroupEvents == false)
-                    {
-                        groupMembershipChecks();
-                    }
+                     groupMembershipChecks();
                 }
                 if (LastStatus == null)
                 {
