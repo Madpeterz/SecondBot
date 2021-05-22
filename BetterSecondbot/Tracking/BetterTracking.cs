@@ -65,6 +65,12 @@ namespace BetterSecondbot.Tracking
         {
             LogFormater.Info("Tracker - Connected to login process event");
             controler.getBot().LoginProgess += LoginProcess;
+            controler.getBot().ChangeSimEvent += ChangedSim;
+        }
+
+        protected void ChangedSim(object o,SimChangedEventArgs e)
+        {
+            AvatarSeen = new Dictionary<UUID, long>();
         }
 
         protected void LoginProcess(object o, LoginProgressEventArgs e)
