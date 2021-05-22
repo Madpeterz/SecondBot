@@ -49,6 +49,14 @@ namespace BetterSecondbot.OnEvents
         {
             if (controler.BotReady() == true)
             {
+                if(controler.getBot().GetClient.Self.SittingOn == 0)
+                {
+                    args.Add("BotSitting", "false");
+                }
+                else
+                {
+                    args.Add("BotSitting", "true");
+                }
                 args.Add("BotSim", controler.getBot().GetClient.Network.CurrentSim.Name);
                 int localp = controler.getBot().GetClient.Parcels.GetParcelLocalID(controler.getBot().GetClient.Network.CurrentSim, controler.getBot().GetClient.Self.SimPosition);
                 if (controler.getBot().GetClient.Network.CurrentSim.Parcels.ContainsKey(localp) == true)
@@ -241,6 +249,7 @@ namespace BetterSecondbot.OnEvents
         protected bool whereChecks(OnEvent E, Dictionary<string, string> args, bool enableCronArgs = false)
         {
             bool WherePassed = true;
+
             Dictionary<string, string> updateArgs = new Dictionary<string, string>();
             string[] keys = args.Keys.ToArray();
             foreach(string K in keys)
