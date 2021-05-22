@@ -412,26 +412,30 @@ namespace BetterSecondbot.OnEvents
         protected void SetupMonitor()
         {
             string[] skipped = new string[] { "None", "" };
-            foreach(OnEvent E in Events)
+            foreach (OnEvent E in Events)
             {
+                if (E.Enabled == false)
+                {
+                    continue;
+                }
                 if ((E.Monitor == "None") || (E.Monitor == ""))
                 {
                     continue;
                 }
                 UUID checking = UUID.Zero;
-                if(UUID.TryParse(E.Monitor,out checking) == false)
+                if (UUID.TryParse(E.Monitor, out checking) == false)
                 {
                     continue;
                 }
-                if(checking == UUID.Zero)
+                if (checking == UUID.Zero)
                 {
                     continue;
                 }
-                if(group_membership_update_q.ContainsKey(checking) == true)
+                if (group_membership_update_q.ContainsKey(checking) == true)
                 {
                     continue;
                 }
-                LogFormater.Info("OnEvent - attaching to group membership: "+checking.ToString(), true);
+                LogFormater.Info("OnEvent - attaching to group membership: " + checking.ToString(), true);
                 group_membership_update_q.Add(checking, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 45));
             }
         }
