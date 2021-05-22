@@ -24,7 +24,27 @@ namespace BetterSecondbot.OnEvents
         protected Dictionary<UUID, KeyValuePair<long, int>> group_membership_update_q = new Dictionary<UUID, KeyValuePair<long, int>>();
         protected List<OnEvent> Events = new List<OnEvent>();
         protected Dictionary<UUID, List<UUID>> GroupMembership = new Dictionary<UUID, List<UUID>>();
+        protected Dictionary<UUID, long> Lockout = new Dictionary<UUID, long>();
 
+        protected void CleanupLockout()
+        {
+            List<UUID> purgeEntrys = new List<UUID>();
+            lock(Lockout)
+            {
+                long now = helpers.UnixTimeNow();
+                foreach(KeyValuePair<UUID,long> entry in Lockout)
+                {
+                    if(entry.Value < now)
+                    {
+                        purgeEntrys.Add(entry.Key);
+                    }
+                }
+                foreach(UUID a in purgeEntrys)
+                {
+                    Lockout.Remove(a);
+                }
+            }
+        }
         protected void TriggerEvent(string trigger, Dictionary<string, string> args, bool enableCronArgs = false)
         {
             if (controler.BotReady() == true)
@@ -61,13 +81,53 @@ namespace BetterSecondbot.OnEvents
 
         protected void actionEvents(OnEvent E, Dictionary<string, string> args)
         {
-            foreach(string a in E.Actions)
+            foreach (string a in E.Actions)
             {
                 string wip = UpdateBits(a, args);
-                string[] bits = wip.Split("|||",StringSplitOptions.None);
+                if (wip.StartsWith("lockout=") == true)
+                {
+                    processLockout(wip);
+                    continue;
+                }
+                string[] bits = wip.Split("|||", StringSplitOptions.None);
+                if (bits.Length == 2)
+                {
+                    controler.getBot().CallAPI(bits[0], bits[1].Split("~#~"));
+                }
+
+            }
+        }
+
+        protected void processLockout(string lockoutString)
+        {
+            lock(Lockout)
+            {
+                string[]bits = lockoutString.Split("=", StringSplitOptions.None);
                 if(bits.Length == 2)
                 {
-                    controler.getBot().CallAPI(bits[0],bits[1].Split("~#~"));
+                    string[]subbits= bits[1].Split("+", StringSplitOptions.None);
+                    if(subbits.Length == 2)
+                    {
+                        if(int.TryParse(subbits[1],out int addsecs) == true)
+                        {
+                            if(addsecs < 60)
+                            {
+                                addsecs = 60;
+                            }
+                            if (addsecs > 9999)
+                            {
+                                addsecs = 9999;
+                            }
+                            if (UUID.TryParse(subbits[0],out UUID addUUID) == true)
+                            {
+                                if(Lockout.ContainsKey(addUUID) == true)
+                                {
+                                    Lockout.Remove(addUUID);
+                                }
+                                Lockout.Add(addUUID, helpers.UnixTimeNow() + addsecs);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -191,7 +251,7 @@ namespace BetterSecondbot.OnEvents
             {
                 "CRON", "IN_GROUP", "NOT_IN_GROUP",
                 "IS", "NOT", "IS_EMPTY", "HAS", "MISSING",
-                "IS_UUID", "CRON"
+                "IS_UUID", "CRON", "LOCKOUT"
             };
             foreach (string A in E.Where)
             {
@@ -230,6 +290,25 @@ namespace BetterSecondbot.OnEvents
                     if(cronMagic(bits[0], bits[1]) == false)
                     {
                         //LogFormater.Info(WhyCronFailed, true);
+                        WherePassed = false;
+                        break;
+                    }
+                }
+                else if(filter == "LOCKOUT")
+                {
+                    if (bool.TryParse(bits[1], out bool status) == false)
+                    {
+                        WherePassed = false;
+                        break;
+                    }
+                    if(UUID.TryParse(bits[0], out UUID leftUUID) == false)
+                    {
+                        WherePassed = false;
+                        break;
+                    }
+                    bool check = Lockout.ContainsKey(leftUUID);
+                    if (check != status)
+                    {
                         WherePassed = false;
                         break;
                     }
@@ -707,6 +786,7 @@ namespace BetterSecondbot.OnEvents
                 {
                     lastMinTick = Dt.Minute;
                     ClockEvent();
+                    CleanupLockout();
                     if(requestedGroupdetails == false)
                     {
                         requestedGroupdetails = true;
