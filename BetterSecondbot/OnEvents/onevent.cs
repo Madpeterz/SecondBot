@@ -435,7 +435,7 @@ namespace BetterSecondbot.OnEvents
                 {
                     continue;
                 }
-                LogFormater.Info("OnEvent - attaching to group membership: " + checking.ToString(), true);
+                //LogFormater.Info("OnEvent - attaching to group membership: " + checking.ToString(), true);
                 group_membership_update_q.Add(checking, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 45));
             }
         }
