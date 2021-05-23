@@ -481,7 +481,7 @@ namespace BetterSecondbot.OnEvents
                     {
                         if (DebugWhere == true)
                         {
-                            LogFormater.Warn("{" + filter + "} Failed checks, true);
+                            LogFormater.Warn("{" + filter + "} Failed checks", true);
                         }
                         WherePassed = false;
                         break;
