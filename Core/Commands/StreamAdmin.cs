@@ -18,7 +18,7 @@ namespace BetterSecondBot.HttpService
     {
         public HTTP_StreamAdmin(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
-        [About("an improved version of near me with extra details<br/>NearMeDetails is a object formated as follows<br/><ul><li>id</li><li>name</li><li>x</li><li>y</li><li>z</li><li>range</li></ul>")]
+        [About("A streamadin command")]
         [ReturnHints("True|False")]
         [ReturnHints("Bad reply:  ...")]
         [ReturnHints("Endpoint is empty")]
@@ -51,6 +51,8 @@ namespace BetterSecondBot.HttpService
             string unixtime = helpers.UnixTimeNow().ToString();
             request.AddParameter("token", token);
             request.AddParameter("unixtime", unixtime);
+            request.AddParameter("method", "Notecard");
+            request.AddParameter("action", "Next");
             request.AddHeader("content-type", "application/x-www-form-urlencoded");
             IRestResponse endpoint_checks = client.Post(request);
             if (endpoint_checks.StatusCode != System.Net.HttpStatusCode.OK)
