@@ -105,7 +105,7 @@ namespace BetterSecondbot.Tracking
         {
             if(hasBot() == true)
             {
-                if(controler.getBot().GetClient.Network.CurrentSim != null)
+                if(controler.getBot().MyGroups.Count > 0)
                 {
                     if(AvatarSeenForSim != controler.getBot().GetClient.Network.CurrentSim.Name)
                     {
