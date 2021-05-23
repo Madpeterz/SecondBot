@@ -100,7 +100,15 @@ namespace BetterSecondbot.OnEvents
                 string[] bits = wip.Split("|||", StringSplitOptions.None);
                 if (bits.Length == 2)
                 {
-                    controler.getBot().CallAPI(bits[0], bits[1].Split("~#~"));
+                    string[] subbits = bits[1].Split("#|#");
+                    if(subbits.Length == 2)
+                    {
+                        controler.getBot().CallAPI(bits[0], subbits[0].Split("~#~"), subbits[1]);
+                    }
+                    else
+                    {
+                        controler.getBot().CallAPI(bits[0], bits[1].Split("~#~"));
+                    }
                 }
 
             }
