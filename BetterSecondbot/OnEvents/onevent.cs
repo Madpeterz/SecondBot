@@ -23,6 +23,7 @@ namespace BetterSecondbot.OnEvents
 
         protected Dictionary<UUID, KeyValuePair<long, int>> group_membership_update_q = new Dictionary<UUID, KeyValuePair<long, int>>();
         protected List<OnEvent> Events = new List<OnEvent>();
+
         protected Dictionary<UUID, List<UUID>> GroupMembership = new Dictionary<UUID, List<UUID>>();
         protected Dictionary<UUID, long> Lockout = new Dictionary<UUID, long>();
 
@@ -595,7 +596,10 @@ namespace BetterSecondbot.OnEvents
                 {
                     continue;
                 }
-                //LogFormater.Info("OnEvent - attaching to group membership: " + checking.ToString(), true);
+                if (DebugWhere == true)
+                {
+                    LogFormater.Info("OnEvent - attaching to group membership: " + checking.ToString(), true);
+                }
                 group_membership_update_q.Add(checking, new KeyValuePair<long, int>(helpers.UnixTimeNow(), 45));
             }
         }
@@ -734,7 +738,10 @@ namespace BetterSecondbot.OnEvents
             }
             foreach (UUID entry in repop)
             {
-                //LogFormater.Info("OnEvent - requesting group membership: " + entry.ToString(), true);
+                if (DebugWhere == true)
+                {
+                    LogFormater.Info("OnEvent - requesting group membership: " + entry.ToString(), true);
+                }
                 group_membership_update_q[entry] = new KeyValuePair<long, int>(now + 120, 45);
                 controler.getBot().GetClient.Groups.RequestGroupMembers(entry);
             }
@@ -768,7 +775,6 @@ namespace BetterSecondbot.OnEvents
         {
             if (group_membership_update_q.ContainsKey(e.GroupID) == true)
             {
-                //LogFormater.Info("OnEvent - updating group membership: " + e.GroupID.ToString(), true);
                 updateGroupPolling(e.GroupID);
                 bool enableChanges = GroupMembership.ContainsKey(e.GroupID);
                 List<UUID> members = new List<UUID>();
@@ -785,6 +791,10 @@ namespace BetterSecondbot.OnEvents
                     }
                     if (skip == false)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Info("OnEvent - updating group membership: " + e.GroupID.ToString(), true);
+                        }
                         GroupMembership.Add(e.GroupID, members);
                     }
                 }
@@ -803,6 +813,10 @@ namespace BetterSecondbot.OnEvents
                         {
                             missingEntrys.Remove(updated);
                         }
+                    }
+                    if (DebugWhere == true)
+                    {
+                        LogFormater.Info("OnEvent - updating group membership: " + e.GroupID.ToString(), true);
                     }
                     GroupMembership[e.GroupID] = members;
                     int lookups = 0;
