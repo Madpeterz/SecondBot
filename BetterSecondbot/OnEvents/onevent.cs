@@ -760,7 +760,6 @@ namespace BetterSecondbot.OnEvents
                 {
                     LogFormater.Info("OnEvent - requesting group membership: " + entry.ToString(), true);
                 }
-                if(controler.getBot().GetClient.Groups.pa)
                 group_membership_update_q[entry] = new KeyValuePair<long, int>(now + 120, 45);
                 controler.getBot().GetClient.Groups.RequestGroupMembers(entry);
             }
