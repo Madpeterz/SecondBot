@@ -738,10 +738,29 @@ namespace BetterSecondbot.OnEvents
             }
             foreach (UUID entry in repop)
             {
+                if (controler.getBot().MyGroups.ContainsKey(entry) == false)
+                {
+                    if (DebugWhere == true)
+                    {
+                        LogFormater.Info("OnEvent - Unable to get membership " + entry.ToString() + " - group not loaded yet: " + entry.ToString(), true);
+                    }
+                    continue;
+                }
+                Group G = controler.getBot().MyGroups[entry];
+                if (G.Powers.HasFlag(GroupPowers.AssignMember) == false)
+                {
+                    if (DebugWhere == true)
+                    {
+                        LogFormater.Info("OnEvent - Unable to get membership "+ entry.ToString()+" - required power: AssignMember missing", true);
+                    }
+                    continue;
+                }
+
                 if (DebugWhere == true)
                 {
                     LogFormater.Info("OnEvent - requesting group membership: " + entry.ToString(), true);
                 }
+                if(controler.getBot().GetClient.Groups.pa)
                 group_membership_update_q[entry] = new KeyValuePair<long, int>(now + 120, 45);
                 controler.getBot().GetClient.Groups.RequestGroupMembers(entry);
             }
@@ -796,6 +815,13 @@ namespace BetterSecondbot.OnEvents
                             LogFormater.Info("OnEvent - updating group membership: " + e.GroupID.ToString(), true);
                         }
                         GroupMembership.Add(e.GroupID, members);
+                    }
+                    else
+                    {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Info("OnEvent - membership data pack: " + e.GroupID + " - invaild 1 entry and its NULL_KEY", true);
+                        }
                     }
                 }
                 else
