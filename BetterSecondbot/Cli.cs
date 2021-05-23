@@ -52,7 +52,7 @@ namespace BetterSecondBot
             {
                 return false;
             }
-            return true;
+            return getBot()._AllowActions;
         }
 
         public string getFolderUsed()

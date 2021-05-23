@@ -404,6 +404,9 @@ namespace BetterSecondBot.bottypes
 
         }
 
+        public bool _AllowActions { get { return AllowActions; } }
+        protected bool AllowActions = false;
+
         public override void AfterBotLoginHandler()
         {
             if (reconnect == false)
@@ -418,6 +421,7 @@ namespace BetterSecondBot.bottypes
                 Client.Network.SimChanged += ChangeSim;
                 delay_group_fetch = helpers.UnixTimeNow() + 10;
             }
+            AllowActions = true;
             base.AfterBotLoginHandler();
         }
 

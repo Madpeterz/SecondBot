@@ -98,23 +98,7 @@ namespace BetterSecondbot.Tracking
 
         protected bool hasBot()
         {
-            if (controler == null)
-            {
-                return false;
-            }
-            if (controler.getBot() == null)
-            {
-                return false;
-            }
-            if (controler.getBot().GetClient == null)
-            {
-                return false;
-            }
-            if (controler.getBot().GetClient.Network == null)
-            {
-                return false;
-            }
-            return controler.getBot().GetClient.Network.Connected;
+            return controler.BotReady();
         }
 
         protected void StatusPing(object o, StatusMessageEvent e)
@@ -193,37 +177,46 @@ namespace BetterSecondbot.Tracking
 
         protected void TrackerEventAdd(object av)
         {
-            if (UUID.TryParse(av.ToString(), out UUID avuuid) == false)
+            if (controler.BotReady() == true)
             {
-                return;
+                if (UUID.TryParse(av.ToString(), out UUID avuuid) == false)
+                {
+                    return;
+                }
+                if (AvatarSeen.ContainsKey(avuuid) == true)
+                {
+                    return;
+                }
+                string name = controler.getBot().FindAvatarKey2Name(avuuid);
+                if (name == "lookup")
+                {
+                    return;
+                }
+                if (controler.getBot().GetClient.Network.CurrentSim.AvatarPositions.ContainsKey(avuuid) == false)
+                {
+                    return;
+                }
+                string parcelname = "";
+                Vector3 pos = controler.getBot().GetClient.Network.CurrentSim.AvatarPositions[avuuid];
+                int localp = controler.getBot().GetClient.Parcels.GetParcelLocalID(controler.getBot().GetClient.Network.CurrentSim, pos);
+                parcelname = "?";
+                if (controler.getBot().GetClient.Network.CurrentSim.Parcels.ContainsKey(localp) == true)
+                {
+                    Parcel P = controler.getBot().GetClient.Network.CurrentSim.Parcels[localp];
+                    parcelname = P.Name;
+                }
+                if (parcelname == "?")
+                {
+                    return;
+                }
+                addToSeen(avuuid);
+                output(avuuid, "entry###" + name);
+
+                string simname = "";
+
+                simname = controler.getBot().GetClient.Network.CurrentSim.Name;
+                controler.getBot().TriggerTrackingEvent(avuuid, name, parcelname, simname, false);
             }
-            if (AvatarSeen.ContainsKey(avuuid) == true)
-            {
-                return;
-            }
-            string name = controler.getBot().FindAvatarKey2Name(avuuid);
-            if (name == "lookup")
-            {
-                return;
-            }
-            if (controler.getBot().GetClient.Network.CurrentSim.AvatarPositions.ContainsKey(avuuid) == false)
-            {
-                return;
-            }
-            addToSeen(avuuid);
-            output(avuuid, "entry###" + name);
-            string parcelname = "";
-            string simname = "";
-            Vector3 pos = controler.getBot().GetClient.Network.CurrentSim.AvatarPositions[avuuid];
-            simname = controler.getBot().GetClient.Network.CurrentSim.Name;
-            int localp = controler.getBot().GetClient.Parcels.GetParcelLocalID(controler.getBot().GetClient.Network.CurrentSim, pos);
-            parcelname = "?";
-            if (controler.getBot().GetClient.Network.CurrentSim.Parcels.ContainsKey(localp) == true)
-            {
-                Parcel P = controler.getBot().GetClient.Network.CurrentSim.Parcels[localp];
-                parcelname = P.Name;
-            }
-            controler.getBot().TriggerTrackingEvent(avuuid, name, parcelname, simname, false);
         }
 
         protected void addToSeen(UUID av)
