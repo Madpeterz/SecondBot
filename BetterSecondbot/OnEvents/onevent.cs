@@ -254,6 +254,7 @@ namespace BetterSecondbot.OnEvents
             return true;
         }
 
+        protected bool DebugWhere = true;
         protected bool whereChecks(OnEvent E, Dictionary<string, string> args, bool enableCronArgs = false)
         {
             bool WherePassed = true;
@@ -306,7 +307,10 @@ namespace BetterSecondbot.OnEvents
                 {
                     if(cronMagic(bits[0], bits[1]) == false)
                     {
-                        //LogFormater.Info(WhyCronFailed, true);
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn(WhyCronFailed, true);
+                        }
                         WherePassed = false;
                         break;
                     }
@@ -315,17 +319,29 @@ namespace BetterSecondbot.OnEvents
                 {
                     if (bool.TryParse(bits[1], out bool status) == false)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{LOCKOUT} Unable to unpack settings for right flag", true);
+                        }
                         WherePassed = false;
                         break;
                     }
                     if(UUID.TryParse(bits[0], out UUID leftUUID) == false)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{LOCKOUT} Unable to unpack settings for left UUID", true);
+                        }
                         WherePassed = false;
                         break;
                     }
                     bool check = Lockout.ContainsKey(leftUUID);
                     if (check != status)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{LOCKOUT} Expected right flag does not match check", true);
+                        }
                         WherePassed = false;
                         break;
                     }
@@ -334,6 +350,10 @@ namespace BetterSecondbot.OnEvents
                 {
                     if(bits[0] != bits[1])
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{IS} "+ bits[0]+" != "+bits[1]+"", true);
+                        }
                         WherePassed = false;
                         break;
                     }
@@ -342,6 +362,10 @@ namespace BetterSecondbot.OnEvents
                 {
                     if (bits[0] == bits[1])
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{NOT} " + bits[0] + " == " + bits[1] + "", true);
+                        }
                         WherePassed = false;
                         break;
                     }
@@ -350,6 +374,10 @@ namespace BetterSecondbot.OnEvents
                 {
                     if(bool.TryParse(bits[1],out bool status) == false)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{IS_EMPTY} unable to unpack right flag", true);
+                        }
                         WherePassed = false;
                         break;
                     }
@@ -360,6 +388,10 @@ namespace BetterSecondbot.OnEvents
                     }
                     if(check != status)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{IS_EMPTY} "+bits[0]+" "+ bits[1]+"", true);
+                        }
                         WherePassed = false;
                         break;
                     }
@@ -368,6 +400,10 @@ namespace BetterSecondbot.OnEvents
                 {
                     if (bits[0].Contains(bits[1]) == false)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{HAS} "+ bits[0]+" does not contain "+bits[1]+"", true);
+                        }
                         WherePassed = false;
                         break;
                     }
@@ -376,6 +412,10 @@ namespace BetterSecondbot.OnEvents
                 {
                     if (bits[0].Contains(bits[1]) == true)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{MISSING} " + bits[0] + " does contain " + bits[1] + "", true);
+                        }
                         WherePassed = false;
                         break;
                     }
@@ -384,12 +424,20 @@ namespace BetterSecondbot.OnEvents
                 {
                     if (bool.TryParse(bits[1], out bool resultCheck) == false)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{IS_UUID} " + bits[1] + " unable to unpack", true);
+                        }
                         WherePassed = false;
                         break;
                     }
                     bool isUUID = UUID.TryParse(bits[0], out UUID _);
                     if(resultCheck != isUUID)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{IS_UUID} " + bits[0] + " failed UUID check result "+bits[1], true);
+                        }
                         WherePassed = false;
                         break;
                     }
@@ -403,22 +451,38 @@ namespace BetterSecondbot.OnEvents
                     }
                     if (UUID.TryParse(bits[0], out UUID avatar) == false)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{"+ filter+"} " + bits[0] + " unable to unpack avatar UUID", true);
+                        }
                         WherePassed = false;
                         break;
                     }
                     if (UUID.TryParse(bits[1],out UUID group) == false)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{" + filter + "} " + bits[1] + " unable to unpack group UUID", true);
+                        }
                         WherePassed = false;
                         break;
                     }
                     if(GroupMembership.ContainsKey(group) == false)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{" + filter + "} GroupMembership does not have group: "+bits[1], true);
+                        }
                         WherePassed = false;
                         break;
                     }
                     bool status = GroupMembership[group].Contains(avatar);
                     if(status != expectedStatus)
                     {
+                        if (DebugWhere == true)
+                        {
+                            LogFormater.Warn("{" + filter + "} Failed checks, true);
+                        }
                         WherePassed = false;
                         break;
                     }
