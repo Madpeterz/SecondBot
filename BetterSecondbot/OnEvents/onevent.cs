@@ -514,8 +514,7 @@ namespace BetterSecondbot.OnEvents
             {
                 loadFromDisk();
             }
-            SetupMonitor();
-            attachEvents();
+            controler.getBot().StatusMessageEvent += statusMessage;
 #if DEBUG
             testCron();
 #endif
@@ -717,7 +716,7 @@ namespace BetterSecondbot.OnEvents
             controler.getBot().ChangeSimEvent += changeSim;
             controler.getBot().TrackerEvent += trackerEvent;
             controler.getBot().AlertMessage += alertMessage;
-            controler.getBot().StatusMessageEvent += statusMessage;
+            
             controler.getBot().GetClient.Groups.GroupMembersReply += groupMembershipUpdate;
             controler.getBot().GetClient.Groups.GroupMemberEjected += groupMembershipUpdateEject;
         }
@@ -895,11 +894,17 @@ namespace BetterSecondbot.OnEvents
         {
             TriggerEvent("Clock", new Dictionary<string, string>(), true);
         }
-
+        bool attachedEvents = false;
         protected void statusMessage(object o, StatusMessageEvent e)
         {
             if (controler.BotReady() == true)
             {
+                if(attachedEvents == false)
+                {
+                    attachedEvents = true;
+                    SetupMonitor();
+                    attachEvents();
+                }
                 bool send = false;
                 DateTime Dt = DateTime.Now;
                 if (Dt.Minute != lastMinTick)
