@@ -26,10 +26,7 @@ namespace BetterSecondbot.OnEvents
 
         protected Dictionary<UUID, List<UUID>> GroupMembership = new Dictionary<UUID, List<UUID>>();
         protected Dictionary<UUID, long> Lockout = new Dictionary<UUID, long>();
-<<<<<<< Updated upstream
-=======
         protected bool DebugWhere = true;
->>>>>>> Stashed changes
 
         protected void CleanupLockout()
         {
@@ -259,7 +256,6 @@ namespace BetterSecondbot.OnEvents
             return true;
         }
 
-        protected bool DebugWhere = true;
         protected bool whereChecks(OnEvent E, Dictionary<string, string> args, bool enableCronArgs = false)
         {
             bool WherePassed = true;
