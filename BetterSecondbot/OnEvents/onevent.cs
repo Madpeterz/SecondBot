@@ -26,7 +26,7 @@ namespace BetterSecondbot.OnEvents
 
         protected Dictionary<UUID, List<UUID>> GroupMembership = new Dictionary<UUID, List<UUID>>();
         protected Dictionary<UUID, long> Lockout = new Dictionary<UUID, long>();
-        protected bool DebugWhere = true;
+        protected bool DebugWhere = false;
 
         protected void CleanupLockout()
         {
