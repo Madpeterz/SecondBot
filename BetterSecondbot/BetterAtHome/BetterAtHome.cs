@@ -5,6 +5,7 @@ using BetterSecondBot.bottypes;
 using OpenMetaverse;
 using System.Collections.Generic;
 using BetterSecondBotShared.logs;
+using System;
 
 namespace BetterSecondbot.BetterAtHome
 {
@@ -25,20 +26,34 @@ namespace BetterSecondbot.BetterAtHome
         protected int homeregionIndexer = 0;
         protected long LastTeleportEvent = 0;
         protected List<string> homeRegions = new List<string>();
+        protected List<string> avoidRestartRegions = new List<string>();
         protected string LastLoginStatus = "None";
 
+        protected bool returnHomeDisabled = false;
+        protected long returnHomeDisabledUntill = 0;
+
+
+
+        Dictionary<string, long> AvoidSimList = new Dictionary<string, long>();
         public BetterAtHome(Cli setcontroler, JsonConfig configfile)
         {
             controler = setcontroler;
             this.configfile = configfile;
             attach_events();
             SetBetterAtHomeAction("Standby");
-            foreach (string a in this.configfile.Basic_HomeRegions)
+            foreach (string a in configfile.Basic_HomeRegions)
             {
                 string[] bits = helpers.ParseSLurl(a);
                 homeRegions.Add(bits[0]);
                 LogFormater.Info("Added home region: " + bits[0]);
             }
+            foreach (string a in configfile.Basic_AvoidRestartRegions)
+            {
+                string[] bits = helpers.ParseSLurl(a);
+                avoidRestartRegions.Add(bits[0]);
+                LogFormater.Info("Added restart region: " + bits[0]);
+            }
+            
         }
 
         protected void attach_events()
@@ -222,8 +237,10 @@ namespace BetterSecondbot.BetterAtHome
 
         protected void AlertMessage(object o, AlertMessageEventArgs e)
         {
-            if(e.Message.Contains("restart") == true)
+            if(e.Message.ToLower().Contains("restart") == true)
             {
+                returnHomeDisabled = true;
+                returnHomeDisabledUntill = helpers.UnixTimeNow() + (60 * 10);
                 AvoidSim();
             }
         }
@@ -256,7 +273,7 @@ namespace BetterSecondbot.BetterAtHome
             return AvoidSimList.ContainsKey(bits[0]);
         }
 
-        Dictionary<string, long> AvoidSimList = new Dictionary<string, long>();
+        
         protected void AvoidSim()
         {
             if(AvoidSimList.ContainsKey(simname) == false)
@@ -322,6 +339,23 @@ namespace BetterSecondbot.BetterAtHome
                 SetBetterAtHomeAction("Marked for death");
                 return;
             }
+            if (SimInAvoid() == true)
+            {
+                SetBetterAtHomeAction("Attempting to avoid this sim");
+                if (gotoAvoidRestartRegion(true) == false)
+                {
+                    gotoNextHomeRegion(true);
+                }
+                return;
+            }
+            long remaining = returnHomeDisabledUntill - helpers.UnixTimeNow();
+            if ((returnHomeDisabled == true) && (remaining > 0))
+            {
+                remaining = remaining / 60;
+                remaining++;
+                SetBetterAtHomeAction("Avoid restart lockout - about " + remaining.ToString() + " min('s) remaining");
+                return;
+            }
             long dif = helpers.UnixTimeNow() - LastLoginEvent;
             if (dif < 15)
             {
@@ -359,15 +393,9 @@ namespace BetterSecondbot.BetterAtHome
                 return;
             }
             void_counter = 0;
-            if (SimInAvoid() == true)
-            {
-                SetBetterAtHomeAction("Attempting to avoid this sim");
-                gotoNextHomeRegion(true);
-                return;
-            }
             if (controler.getBot().TeleportStatus() == true)
             {
-                SetBetterAtHomeAction("Teleported");
+                SetBetterAtHomeAction("Teleported by script/master");
                 return;
             }
             if (homeRegions.Count == 0)
@@ -383,6 +411,35 @@ namespace BetterSecondbot.BetterAtHome
             gotoNextHomeRegion(false);
             return;
            
+        }
+        protected int avoidregionIndexer = -1;
+        protected bool gotoAvoidRestartRegion(bool force)
+        {
+            if (avoidRestartRegions.Count == 0)
+            {
+                SetBetterAtHomeAction("No avoidRestart regions");
+                return false;
+            }
+            avoidregionIndexer++;
+            if (avoidregionIndexer >= avoidRestartRegions.Count)
+            {
+                SetBetterAtHomeAction("Attempted all avoidRestart regions giving up");
+                avoidregionIndexer = -1;
+                return false;
+            }
+            if (IsInAvoidList(configfile.Basic_AvoidRestartRegions[avoidregionIndexer]) == true)
+            {
+                if (force == true)
+                {
+                    return gotoAvoidRestartRegion(true);
+                }
+                SetBetterAtHomeAction("next avoidRegion is alreay in the avoid list");
+                return false;
+            }
+            SetBetterAtHomeAction("Teleporting to avoid restart region: " + avoidRestartRegions[avoidregionIndexer]);
+            LastTeleportEvent = helpers.UnixTimeNow();
+            controler.getBot().TeleportWithSLurl(configfile.Basic_AvoidRestartRegions[avoidregionIndexer]);
+            return true;
         }
 
         protected void gotoNextHomeRegion(bool force)

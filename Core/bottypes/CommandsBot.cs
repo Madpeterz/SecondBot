@@ -300,6 +300,11 @@ namespace BetterSecondBot.bottypes
                 if ((avatar == true) && ((sender_uuid == master_uuid) || (SubMasters.Contains(sender_name) == true)))
                 {
                     frommaster = true;
+                    if(message == "fakerestart")
+                    {
+                        AlertMessageEventArgs args = new AlertMessageEventArgs("this is a fake restart message");
+                        AlertEvent(this, args);
+                    }
                 }
                 try
                 {

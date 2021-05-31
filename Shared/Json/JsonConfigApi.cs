@@ -31,13 +31,16 @@ namespace BetterSecondBotShared.Json
             }
             else if (cmd == "Basic_HomeRegions")
             {
-                return "a CSV of SLURLs that the bot will attempt to return to after avoiding a sim shutdown (In testing)";
+                return "a CSV of SLURLs that the bot will attempt to return to after avoiding a sim shutdown";
             }
             else if (cmd == "Basic_LoginLocation")
             {
                 return "the location to login to: home or last or a region/X/Y/Z string example: Tentacles/128/64/109";
             }
-            
+            else if (cmd == "Basic_AvoidRestartRegions")
+            {
+                return "a CSV of SLURLs the bot will use to attempt to avoid a restart, if empty it will use HomeRegions and get stuck there";
+            }
             return "";
         }
         protected string GetHelp_Security(string cmd)
@@ -191,8 +194,9 @@ namespace BetterSecondBotShared.Json
             // Basic
             if (cmd == "Basic_BotUserName") { return "Example Resident"; }
             else if (cmd == "Basic_BotPassword") { return "Pass"; }
-            else if (cmd == "Basic_HomeRegions") { return "http://maps.secondlife.com/secondlife/Viserion/50/140/23"; }
+            else if (cmd == "Basic_HomeRegions") { return "Viserion/50/140/23"; }
             else if (cmd == "Basic_LoginLocation") { return "home"; }
+            else if(cmd == "Basic_AvoidRestartRegions") { return "Just the Tip/60/96/1490"; }
             return "";
         }
         protected string GetValueHint_Security(string cmd)
