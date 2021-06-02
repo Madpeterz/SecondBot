@@ -127,6 +127,7 @@ namespace BetterSecondBot.DiscordSupervisor
                             {
                                 reply = controler.getBot().CallAPI(bits[0], args.Split("~#~"), target);
                             }
+                            await MarkMessage(message, "✅").ConfigureAwait(false);
                             await message.Channel.SendMessageAsync(reply, false, null,null,null, new MessageReference(message.Id)).ConfigureAwait(false);
                         }
                         else

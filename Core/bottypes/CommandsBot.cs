@@ -406,8 +406,9 @@ namespace BetterSecondBot.bottypes
             if (customcommand == true)
             {
                 SmartCommandReply(false, replyvia, "Custom command lockout", command);
-                return "{ status: \"false\", message: \"Custom command lockout\" }";
+                return "Custom command lockout";
             }
+            int commands_issued = 0;
             foreach (string A in custom_commands[command])
             {
                 List<string> command_args_split = A.Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -423,12 +424,13 @@ namespace BetterSecondBot.bottypes
                     }
                 }
                 CallAPI(command_args_split[0], args_passed.Split("~#~"), "None", true);
+                commands_issued++;
             }
-            return "{ status: \"true\", message: \"mixed reply custom command\" }";
+            return "Issued "+ commands_issued.ToString()+" commands";
         }
         public string CallAPI(string command, string[] args, string replyvia, bool customcommand)
         {
-            if(command == null)
+            if (command == null)
             {
                 return "No command";
             }
@@ -436,6 +438,7 @@ namespace BetterSecondBot.bottypes
             {
                 replyvia = "none";
             }
+            KeyValuePair<bool, string> statusreply = new KeyValuePair<bool, string>(false, "Not processed");
             if (commandnameLowerToReal.ContainsKey(command.ToLowerInvariant()) == false)
             {
                 if (custom_commands.ContainsKey(command) == false)
@@ -443,9 +446,12 @@ namespace BetterSecondBot.bottypes
                     SmartCommandReply(false, replyvia, "Unknown command", command);
                     return "{ status: \"false\", message: \"Unknown\" }";
                 }
-                customCommand(command, args, replyvia, customcommand);
+                statusreply = new KeyValuePair<bool, string>(true, customCommand(command, args, replyvia, customcommand));
             }
-            KeyValuePair<bool, string> statusreply = callAPIcommand(command, args);
+            else
+            {
+                statusreply = callAPIcommand(command, args);
+            }
             SmartCommandReply(statusreply.Key, replyvia, statusreply.Value, command);
             return "{ status: \"" + statusreply.Key.ToString() + "\", message: \""+ statusreply.Value+"\" command: \""+command+"\", args: \""+string.Join("~#~",args)+"\" }";
         }
