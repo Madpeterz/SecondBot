@@ -504,7 +504,13 @@ namespace BetterSecondBot.HttpService
 
         protected Object Failure(string input, string command, string[] args)
         {
-            bot.CommandHistoryAdd(command, String.Join("~#~",args), false, "");
+            bot.CommandHistoryAdd(command, String.Join("~#~",args), false, input);
+            return new { reply = input, status = false };
+        }
+
+        protected Object Failure(string input, string command, string[] args, string whyfailed)
+        {
+            bot.CommandHistoryAdd(command, String.Join("~#~", args), false, whyfailed);
             return new { reply = input, status = false };
         }
 
