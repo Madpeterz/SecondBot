@@ -67,17 +67,9 @@ namespace BetterSecondBotShared.Json
         protected string GetHelp_Settings(string cmd)
         {
             // Settings
-            if (cmd == "Setting_AllowRLV")
-            {
-                return "Enable the RLV api interface";
-            }
-            else if (cmd == "Setting_AllowFunds")
+            if (cmd == "Setting_AllowFunds")
             {
                 return "Allow the bot to transfer L$ and get a non zero balance";
-            }
-            else if (cmd == "Setting_DefaultSit_UUID")
-            {
-                return "UUID of a object the bot should attempt to sit on after logging in";
             }
             else if (cmd == "Setting_loginURI")
             {

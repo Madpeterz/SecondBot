@@ -82,9 +82,7 @@ namespace BetterSecondBotShared.Json
 
 
         // Settings
-        public bool Setting_AllowRLV { get; set; }
         public bool Setting_AllowFunds { get; set; }
-        public string Setting_DefaultSit_UUID { get; set; }
         public string Setting_loginURI { get; set; }
 
         public string Setting_Tracker { get; set; }

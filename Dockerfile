@@ -27,35 +27,26 @@ COPY --from=publish /app/publish .
 ENV Basic_BotUserName=''
 ENV Basic_BotPassword=''
 ENV Basic_HomeRegions='Viserion/50/140/23'
-ENV Basic_LoginLocation='home'
 ENV Basic_AvoidRestartRegions='Just the Tip/60/96/1490'
-
-ENV Security_MasterUsername='Madpeter Zond'
-ENV Security_SubMasters='X X,Y Y,Z Z'
+ENV Basic_LoginLocation='home'
+ENV Security_MasterUsername=''
+ENV Security_SubMasters=''
 ENV Security_SignedCommandkey=''
 ENV Security_WebUIKey=''
-
-ENV Setting_AllowRLV='false'
 ENV Setting_AllowFunds='false'
-ENV Setting_LogCommands='false'
-ENV Setting_DefaultSit_UUID=''
 ENV Setting_loginURI='secondlife'
-ENV Setting_Tracker='false'
-
+ENV Setting_Tracker='Event'
 ENV DiscordFull_Enable='false'
 ENV DiscordFull_Token=''
 ENV DiscordFull_ServerID=''
 ENV DiscordFull_Keep_GroupChat='false'
-
 ENV Http_Enable='false'
 ENV Http_Host='docker'
-
-ENV Name2Key_Enable='false'
-ENV Name2Key_Url='http://localhost:1234'
-ENV Name2Key_Key='magic'
-
 ENV Log2File_Enable='false'
-ENV Log2File_Level=1
+ENV Log2File_Level='1'
+ENV Setting_LogCommands='false'
+ENV Agent_Channel='auto'
+ENV Agent_Version='auto'
 
 EXPOSE 80
 ENV ASPNETCORE_URLS http://+:80
