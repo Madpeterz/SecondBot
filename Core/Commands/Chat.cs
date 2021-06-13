@@ -54,6 +54,10 @@ namespace BetterSecondBot.HttpService
                 return Failure("Invaild channel", "Say", new [] { channel, message });
             }
             bot.GetClient.Self.Chat(message, channelnum, ChatType.Normal);
+            if (channelnum == 0)
+            {
+                bot.AddToLocalChat(bot.GetClient.Self.Name, message);
+            }
             return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()), "Say", new [] { channel, message });
             
         }
