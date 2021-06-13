@@ -304,7 +304,7 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Invaild avatar uuid", "SendItem", new [] { item, avatar });
             }
-            if (UUID.TryParse(item, out UUID targetitem) == true)
+            if (UUID.TryParse(item, out UUID targetitem) == false)
             {
                 return Failure("Invaild item uuid", "SendItem", new [] { item, avatar });
             }
