@@ -296,7 +296,9 @@ namespace BetterSecondbot.BetterAtHome
             {
                 if (whyfailed.Contains("presence") == false)
                 {
-                    SetBetterAtHomeAction("[DC] Unable to continue: " + whyfailed);
+                    LastLoginEvent = helpers.UnixTimeNow() + (5 * 60);
+                    SetBetterAtHomeAction("[DC] Hard login error: " + whyfailed+ " Waiting 5 mins to retry - If your using a VPN please check it!");
+                    LoginFailed = false;
                     return;
                 }
                 else
