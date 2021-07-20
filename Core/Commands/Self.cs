@@ -42,6 +42,54 @@ namespace BetterSecondBot.HttpService
             return BasicReply("ok", "PointAt", new [] { avatar });
         }
 
+        [About("Reads a value from the KeyValue storage (temp unless SQL is enabled)")]
+        [ReturnHints("value")]
+        [ReturnHints("Unknown Key: KeyName")]
+        [ArgHints("Key", "URLARG", "the key we are trying to read from")]
+        [Route(HttpVerbs.Get, "/ReadKeyValue/{Key}/{token}")]
+        public object ReadKeyValue(string Key, string token)
+        {
+            if (tokens.Allow(token, "self", "ReadKeyValue", handleGetClientIP()) == false)
+            {
+                return Failure("Token not accepted", "ReadKeyValue", new[] { Key });
+            }
+            if(bot.HaveLocalKeyStorage(Key) == true)
+            {
+                return BasicReply(bot.ReadLocalKeyStorage(Key), "ReadKeyValue");
+            }
+            return Failure("Unknown Key: "+Key, "ReadKeyValue");
+        }
+
+        [About("sets a value for KeyValue storage (temp unless SQL is enabled)")]
+        [ReturnHints("ok")]
+        [ArgHints("Key", "URLARG", "the key we are trying to set")]
+        [ArgHints("Value", "string", "the value we are tring to put on the key")]
+        [Route(HttpVerbs.Post, "/SetKeyValue/{Key}/{token}")]
+        public object SetKeyValue(string Key, [FormField] string Value, string token)
+        {
+            if (tokens.Allow(token, "self", "SetKeyValue", handleGetClientIP()) == false)
+            {
+                return Failure("Token not accepted", "SetKeyValue", new[] { Key });
+            }
+            bot.setLocalKeyStorage(Key, Value);
+            return BasicReply("ok", "SetKeyValue");
+        }
+
+        [About("Reads a value from the KeyValue storage (temp unless SQL is enabled)")]
+        [ReturnHints("ok")]
+        [ReturnHints("Unknown Key: KeyName")]
+        [ArgHints("Key", "URLARG", "the key we are trying to clear")]
+        [Route(HttpVerbs.Get, "/ClearKeyValue/{Key}/{token}")]
+        public object ClearKeyValue(string Key, string token)
+        {
+            if (tokens.Allow(token, "self", "ClearKeyValue", handleGetClientIP()) == false)
+            {
+                return Failure("Token not accepted", "ClearKeyValue", new[] { Key });
+            }
+            bot.clearLocalKeyStorage(Key);
+            return BasicReply("ok", "SetKeyValue");
+        }
+
         [About("Makes the bot sit on the ground or on a object if it can see it")]
         [ReturnHints("ok")]
         [ReturnHints("Invaild object UUID")]

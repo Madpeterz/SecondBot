@@ -106,8 +106,16 @@ namespace BetterSecondBotShared.Json
         // agent
         public string Agent_Channel { get; set; }
         public string Agent_Version { get; set; }
-        
 
+        // Database
+
+        public bool SQLDB_Enabled { get; set; }
+        public string SQLDB_Host { get; set; }
+        public int SQLDB_Port { get; set; }
+        public string SQLDB_Username { get; set; }
+        public string SQLDB_Password { get; set; }
+        public int SQLDB_Timeout { get; set; }
+        public string SQLDB_Database { get; set; }
     }
 
 }
