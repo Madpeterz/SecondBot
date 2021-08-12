@@ -61,7 +61,8 @@ namespace BetterSecondBot.HttpService
         [ReturnHints("true")]
         [ReturnHints("false")]
         [ReturnHints("bad dialog id")]
-        [ArgHints("target", "URLARG", "Options: Channel (Any number),Avatar UUID,HTTPurl<br/>Clear")]
+        [ArgHints("dialogid", "URLARG", "The ID for the dialog")]
+        [ArgHints("buttontext", "URLARG", "The button text to push")]
         [Route(HttpVerbs.Get, "/DialogResponce/{dialogid}/{buttontext}/{token}")]
         public object DialogResponce(string dialogid, string buttontext, string token)
         {
