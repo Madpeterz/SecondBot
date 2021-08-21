@@ -155,7 +155,10 @@ namespace BetterSecondBot.BetterRelayService
         protected void attach_events()
         {
             controler.getBot().MessageEvent += SLMessageHandler;
-            superV.MessageEvent += DiscordMessageHandler;
+            if (superV != null)
+            {
+                superV.MessageEvent += DiscordMessageHandler;
+            }
         }
 
         protected HttpClient HTTPclient = new HttpClient();
