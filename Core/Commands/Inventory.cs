@@ -28,14 +28,14 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Token not accepted", "RezObject", new [] { item });
             }
-            if (UUID.TryParse(item, out UUID targetitem) == true)
+            if (UUID.TryParse(item, out UUID targetitem) == false)
             {
-                return Failure("Invaild item UUID", "RezObject", new [] { item });
+                return Failure("Invaild item UUID: "+ item, "RezObject", new [] { item });
             }
             InventoryItem itm = bot.GetClient.Inventory.FetchItem(targetitem, bot.GetClient.Self.AgentID, (5 * 1000));
             if (itm == null)
             {
-                return Failure("Unable to find item", "RezObject", new [] { item });
+                return Failure("Unable to find item: " + item, "RezObject", new [] { item });
             }
             UUID rezedobject = bot.GetClient.Inventory.RequestRezFromInventory(bot.GetClient.Network.CurrentSim, bot.GetClient.Self.SimRotation, bot.GetClient.Self.RelativePosition, itm);
             return BasicReply(rezedobject.ToString(), "RezObject", new [] { item });
@@ -430,6 +430,22 @@ namespace BetterSecondBot.HttpService
             string reply = HelperInventory.MapFolderJson(bot);
             if (reply != null) return BasicReply(reply, "InventoryFolders");
             return Failure("Error", "InventoryFolders");
+        }
+
+        [About("Requests folders limited to selected folder")]
+        [ArgHints("targetfolder", "URLARG", "the UUID of the folder or root")]
+        [ReturnHints("single InventoryMapFolder")]
+        [ReturnHints("Error")]
+        [Route(HttpVerbs.Get, "/InventoryFoldersLimited/{targetfolder}/{token}")]
+        public object InventoryFoldersLimited(string targetfolder,string token)
+        {
+            if (tokens.Allow(token, "inventory", "InventoryFoldersLimited", handleGetClientIP()) == false)
+            {
+                return Failure("Token not accepted", "InventoryFoldersLimited");
+            }
+            string reply = HelperInventory.MapFolderJson(bot, targetfolder,false);
+            if (reply != null) return BasicReply(reply, "InventoryFoldersLimited");
+            return Failure("Error", "InventoryFoldersLimited");
         }
 
         [About("Requests the contents of a folder as an array of InventoryMapItem<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>typename: String</li></ul>")]
