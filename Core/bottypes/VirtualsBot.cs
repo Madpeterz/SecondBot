@@ -57,6 +57,10 @@ namespace BetterSecondBot.bottypes
         }
         public bool discordReady()
         {
+            if (myconfig.DiscordFull_Enable == false)
+            {
+                return false;
+            }
             if (DiscordLink == null)
             {
                 DiscordReadyWhyFailed = "No client";
