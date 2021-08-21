@@ -10,18 +10,24 @@ namespace BetterSecondBot.DiscordSupervisor
         protected StatusMessageEvent LastNetworkEventArgs = null;
         protected void attach_events()
         {
-            controler.getBot().MessageEvent += BotChatControlerHandler;
-            controler.getBot().StatusMessageEvent += StatusMessageHandler;
-            controler.getBot().GroupsReadyEvent += GroupsReadyHandler;
-            controler.getBot().SendImEvent += SendImHandler;
+            if (controler.getBot() != null)
+            {
+                controler.getBot().MessageEvent += BotChatControlerHandler;
+                controler.getBot().StatusMessageEvent += StatusMessageHandler;
+                controler.getBot().GroupsReadyEvent += GroupsReadyHandler;
+                controler.getBot().SendImEvent += SendImHandler;
+            }
         }
 
         protected void unattach_events()
         {
-            controler.getBot().MessageEvent -= BotChatControlerHandler;
-            controler.getBot().StatusMessageEvent -= StatusMessageHandler;
-            controler.getBot().GroupsReadyEvent -= GroupsReadyHandler;
-            controler.getBot().SendImEvent -= SendImHandler;
+            if (controler.getBot() != null)
+            {
+                controler.getBot().MessageEvent -= BotChatControlerHandler;
+                controler.getBot().StatusMessageEvent -= StatusMessageHandler;
+                controler.getBot().GroupsReadyEvent -= GroupsReadyHandler;
+                controler.getBot().SendImEvent -= SendImHandler;
+            }
         }
 
         protected void SendImHandler(object sender, ImSendArgs e)

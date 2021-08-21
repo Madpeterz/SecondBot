@@ -148,16 +148,25 @@ namespace BetterSecondBot.BetterRelayService
 
         public void unattach_events()
         {
-            controler.getBot().MessageEvent -= SLMessageHandler;
-            superV.MessageEvent -= DiscordMessageHandler;
+            if (superV != null)
+            {
+                superV.MessageEvent -= DiscordMessageHandler;
+            }
+            if (controler.getBot() != null)
+            {
+                controler.getBot().MessageEvent -= SLMessageHandler;
+            }
         }
 
         protected void attach_events()
         {
-            controler.getBot().MessageEvent += SLMessageHandler;
             if (superV != null)
             {
                 superV.MessageEvent += DiscordMessageHandler;
+            }
+            if (controler.getBot() != null)
+            {
+                controler.getBot().MessageEvent += SLMessageHandler;
             }
         }
 
