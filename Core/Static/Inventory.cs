@@ -113,19 +113,34 @@ namespace BetterSecondBot.Static
             return new KeyValuePair<string,string>(foldername,output.ToString());
         }
 
-        public static string MapFolderJson(CommandsBot bot)
+        public static string MapFolderJson(CommandsBot bot,string targetFolder="root", bool subfolders = true)
         {
             if (bot.GetClient.Inventory.Store != null)
             {
                 if (bot.GetClient.Inventory.Store.RootFolder != null)
                 {
-                    return JsonConvert.SerializeObject(DoMapFolderJson(bot, bot.GetClient.Inventory.Store.RootFolder));
+                    InventoryFolder topLevel = null;
+                    if (targetFolder == "root")
+                    {
+                        topLevel = bot.GetClient.Inventory.Store.RootFolder;
+                    }
+                    else
+                    {
+                        if(UUID.TryParse(targetFolder, out UUID folderUUID) == true)
+                        {
+                            topLevel = new InventoryFolder(folderUUID);
+                        }
+                    }
+                    if (topLevel != null)
+                    {
+                        return JsonConvert.SerializeObject(DoMapFolderJson(bot, topLevel, subfolders));
+                    }
                 }
             }
             return null;
         }
 
-        public static InventoryMapFolder DoMapFolderJson(CommandsBot bot, InventoryFolder folder)
+        public static InventoryMapFolder DoMapFolderJson(CommandsBot bot, InventoryFolder folder, bool subfolders=true)
         {
             InventoryMapFolder ReplyFolder = new InventoryMapFolder();
             ReplyFolder.id = folder.UUID.ToString();
@@ -136,7 +151,10 @@ namespace BetterSecondBot.Static
             {
                 if (R.GetType() == typeof(InventoryFolder))
                 {
-                    ReplyFolder.subfolders.Add(DoMapFolderJson(bot, (InventoryFolder)R));
+                    if (subfolders == true)
+                    {
+                        ReplyFolder.subfolders.Add(DoMapFolderJson(bot, (InventoryFolder)R, subfolders));
+                    }
                 }
             }
             return ReplyFolder;

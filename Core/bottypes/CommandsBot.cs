@@ -15,7 +15,7 @@ using System.Net.Http;
 
 namespace BetterSecondBot.bottypes
 {
-    public abstract class CommandsBot : AVstorageBot
+    public abstract class CommandsBot : StorageBot
     {
         protected List<string> CommandHistory = new List<string>();
         protected int commandid = 1;

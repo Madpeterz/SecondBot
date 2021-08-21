@@ -47,11 +47,18 @@ namespace BetterSecondbot.BetterAtHome
                 homeRegions.Add(bits[0]);
                 LogFormater.Info("Added home region: " + bits[0]);
             }
-            foreach (string a in configfile.Basic_AvoidRestartRegions)
+            if (configfile.Basic_AvoidRestartRegions != null)
             {
-                string[] bits = helpers.ParseSLurl(a);
-                avoidRestartRegions.Add(bits[0]);
-                LogFormater.Info("Added restart region: " + bits[0]);
+                foreach (string a in configfile.Basic_AvoidRestartRegions)
+                {
+                    string[] bits = helpers.ParseSLurl(a);
+                    avoidRestartRegions.Add(bits[0]);
+                    LogFormater.Info("Added restart region: " + bits[0]);
+                }
+            }
+            else
+            {
+                LogFormater.Warn("Config is old - please update");
             }
             
         }

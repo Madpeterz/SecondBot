@@ -106,6 +106,39 @@ namespace BetterSecondBotShared.Json
             }
             return "";
         }
+
+        protected string GetHelp_SQLDB(string cmd)
+        {
+            if (cmd == "SQLDB_Enabled")
+            {
+                return "Allow the bot to use mysql for keypair storage and guest logging.";
+            }
+            else if (cmd == "SQLDB_Host")
+            {
+                return "The host for the SQL server";
+            }
+            else if (cmd == "SQLDB_Port")
+            {
+                return "The port for the SQL server";
+            }
+            else if (cmd == "SQLDB_Username")
+            {
+                return "The username for the SQL server";
+            }
+            else if (cmd == "SQLDB_Password")
+            {
+                return "The password for the SQL server the SQL server";
+            }
+            else if (cmd == "SQLDB_Timeout")
+            {
+                return "How long to allow a connection to wait for before giving up in secs";
+            }
+            else if(cmd == "SQLDB_Database")
+            {
+                return "The name of the database to use";
+            }
+            return "";
+        }
         protected string GetHelp_HTTP(string cmd)
         {
             // HTTP
@@ -150,6 +183,7 @@ namespace BetterSecondBotShared.Json
             else if (cmd.StartsWith("Setting") == true) { return GetHelp_Settings(cmd); }
             else if (cmd.StartsWith("Discord") == true) { return GetHelp_Discord(cmd); }
             else if (cmd.StartsWith("Http_") == true) { return GetHelp_HTTP(cmd); }
+            else if (cmd.StartsWith("SQLDB_") == true) { return GetHelp_SQLDB(cmd); }
             else { return GetHelp_Logs(cmd); }
         }
 
@@ -220,6 +254,39 @@ namespace BetterSecondBotShared.Json
             else if (cmd == "DiscordFull_Keep_GroupChat") { return "False"; }
             return "";
         }
+
+        protected string GetValueHint_SQL(string cmd)
+        {
+            if (cmd == "SQLDB_Enabled")
+            {
+                return "False";
+            }
+            else if (cmd == "SQLDB_Host")
+            {
+                return "127.0.0.1";
+            }
+            else if (cmd == "SQLDB_Port")
+            {
+                return "3306";
+            }
+            else if (cmd == "SQLDB_Username")
+            {
+                return "UserName";
+            }
+            else if (cmd == "SQLDB_Password")
+            {
+                return "PassWord";
+            }
+            else if (cmd == "SQLDB_Timeout")
+            {
+                return "4";
+            }
+            else if (cmd == "SQLDB_Database")
+            {
+                return "secondbot";
+            }
+            return "";
+        }
         protected string GetValueHint_HTTP(string cmd)
         {
             // HTTP
@@ -246,6 +313,7 @@ namespace BetterSecondBotShared.Json
             else if (cmd.StartsWith("Setting") == true) { return GetValueHint_Settings(cmd); }
             else if (cmd.StartsWith("Discord") == true) { return GetValueHint_Discord(cmd); }
             else if (cmd.StartsWith("Http_") == true) { return GetValueHint_HTTP(cmd); }
+            else if(cmd.StartsWith("SQLDB_") == true) { return GetValueHint_SQL(cmd); }
             else { return GetValueHint_Logs(cmd); }
         }
         public override int GetCommandArgs(string cmd)

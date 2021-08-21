@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace BetterSecondBot.DiscordSupervisor
 {
@@ -128,7 +129,12 @@ namespace BetterSecondBot.DiscordSupervisor
                                 reply = controler.getBot().CallAPI(bits[0], args.Split("~#~"), target);
                             }
                             await MarkMessage(message, "✅").ConfigureAwait(false);
-                            await message.Channel.SendMessageAsync(reply, false, null,null,null, new MessageReference(message.Id)).ConfigureAwait(false);
+
+                            foreach(string A in Split(reply, 1250))
+                            {
+                                await message.Channel.SendMessageAsync(A, false, null, null, null, new MessageReference(message.Id)).ConfigureAwait(false);
+                            }
+                            
                         }
                         else
                         {
@@ -138,6 +144,32 @@ namespace BetterSecondBot.DiscordSupervisor
                 }
             }
             return Task.CompletedTask;
+        }
+
+        public string[] Split(string input,int size)
+        {
+            if (input.Length < size)
+            {
+                return new string[] { input };
+            }
+            else
+            {
+                int index = 0;
+                int length = input.Length;
+                List<string> bits = new List<string>();
+                while((index+size) < length)
+                {
+                    bits.Add(input.Substring(index, size));
+                    index += size;
+                }
+                if(index != length)
+                {
+                    // last bit
+                    int remain = length - index;
+                    bits.Add(input.Substring(index, remain));
+                }
+                return bits.ToArray();
+            }
         }
         protected virtual async Task<Task> InboundImMessage(ITextChannel Chan, IUserMessage message)
         {

@@ -47,6 +47,13 @@ ENV Log2File_Level='1'
 ENV Setting_LogCommands='false'
 ENV Agent_Channel='auto'
 ENV Agent_Version='auto'
+ENV SQLDB_Enabled='false'
+ENV SQLDB_Host='127.0.0.1'
+ENV SQLDB_Port='3306'
+ENV SQLDB_Username=''
+ENV SQLDB_Password=''
+ENV SQLDB_Timeout='3'
+ENV SQLDB_Database='secondbot'
 
 EXPOSE 80
 ENV ASPNETCORE_URLS http://+:80
