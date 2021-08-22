@@ -17,11 +17,14 @@ Secondbot is a CommandLine based bot for SecondLife based on libremetaverse reta
 ### Status
 ---
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1945bad2070d4421adc9c6266dadb237)](https://www.codacy.com/manual/madpeter/SecondBot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Madpeterz/SecondBot&amp;utm_campaign=Badge_Grade)
-
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3765/badge)](https://bestpractices.coreinfrastructure.org/projects/3765)
 
 
 ### Getting started guides
 ---
 Wiki /  [Docker-with-Portainer](https://github.com/Madpeterz/SecondBot/wiki/Setting-up-(Docker-with-Portainer))
+
+### Running on a pi?
+---
+[arm32 v7 docker image provided by shadoskill](https://hub.docker.com/r/shadoskill/secondbot_arm)
+
