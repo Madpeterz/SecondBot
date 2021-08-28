@@ -48,6 +48,7 @@ namespace BetterSecondBot.BetterRelayService
             relay.sourcevalue = sourcevalue;
             relay.targetname = targetname;
             relay.targetvalue = targetvalue;
+            LogFormater.Info("Attaching relay: "+relay.sourcename+" to "+relay.targetname);
             if (relay.sourcename == "localchat")
             {
                 LocalchatRelay.Add(relay);
@@ -82,20 +83,23 @@ namespace BetterSecondBot.BetterRelayService
                 Dictionary<string, string> config = new Dictionary<string, string>();
                 foreach(string a in needBits)
                 {
-                    if (helpers.notempty(Environment.GetEnvironmentVariable("CustomRelay_" + loop.ToString()+"_"+a)) == false)
+                    string value = Environment.GetEnvironmentVariable("CustomRelay_" + loop.ToString() + "_" + a);
+                    if (helpers.notempty(value) == false)
                     {
                         configfound = false;
                         break;
                     }
                     else
                     {
-                        config.Add(a, "CustomRelay_" + loop.ToString() + "_" + a);
+                        config.Add(a, value);
                     }
                 }
                 if(configfound == false)
                 {
-                    break;
+                    LogFormater.Info("Relay "+loop.ToString()+" invaild config skipping");
+                    continue;
                 }
+                LogFormater.Info("Relay " + loop.ToString() + " [OK] sending to attach");
                 found = true;
                 bool asJson = false;
                 bool.TryParse(config["asJson"], out asJson);
@@ -132,9 +136,12 @@ namespace BetterSecondBot.BetterRelayService
                 try
                 {
                     LoadedRelays = JsonConvert.DeserializeObject<JsonCustomRelaysSet>(json);
+                    int loop = 1;
                     foreach (JsonCustomRelays loaded in LoadedRelays.Entrys)
                     {
+                        LogFormater.Info("Relay " + loop.ToString() + " [OK] sending to attach");
                         ApplyRelayConfig(loaded.sourceType, loaded.sourceFilter, loaded.targetType, loaded.targetConfig, loaded.encodeJson);
+                        loop++;
                     }
                 }
                 catch
@@ -148,6 +155,7 @@ namespace BetterSecondBot.BetterRelayService
 
         public void unattach_events()
         {
+            LogFormater.Info("Relay - disconnecting");
             if (superV != null)
             {
                 superV.MessageEvent -= DiscordMessageHandler;
@@ -160,13 +168,23 @@ namespace BetterSecondBot.BetterRelayService
 
         protected void attach_events()
         {
-            if (superV != null)
-            {
-                superV.MessageEvent += DiscordMessageHandler;
-            }
             if (controler.getBot() != null)
             {
                 controler.getBot().MessageEvent += SLMessageHandler;
+                LogFormater.Info("Relay - Grid support enabled");
+            }
+            else
+            {
+                LogFormater.Info("Relay - Grid support: [No] (Maybe the bot is offline)");
+            }
+            if (superV != null)
+            {
+                superV.MessageEvent += DiscordMessageHandler;
+                LogFormater.Info("Relay - Discord support enabled");
+            }
+            else
+            {
+                LogFormater.Info("Relay - Discord support: [No]");
             }
         }
 
