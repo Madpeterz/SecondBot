@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Net.Http.Headers;
+using RestSharp;
 
 namespace BetterSecondBot.BetterRelayService
 {
@@ -188,8 +190,6 @@ namespace BetterSecondBot.BetterRelayService
             }
         }
 
-        protected HttpClient HTTPclient = new HttpClient();
-
         protected async Task<Task> TriggerRelay(string sourcetype, string name,string message, string filtervalue, string discordServerid, string discordChannelid)
         {
             List<relay_config> Dataset = new List<relay_config>();
@@ -264,15 +264,21 @@ namespace BetterSecondBot.BetterRelayService
                     }
                     else if (cfg.targetname == "http")
                     {
-                        Dictionary<string, string> values = new Dictionary<string, string>
-                        {
-                            { "reply", sendmessage },
-                        };
-
-                        var content = new FormUrlEncodedContent(values);
                         try
                         {
-                            await HTTPclient.PostAsync(cfg.targetvalue, content);
+                            string[] bits = cfg.targetvalue.Split("@|@");
+                            if (bits.Length == 2)
+                            {
+                                var client = new RestClient(bits[0]);
+                                var request = new RestRequest(bits[1], Method.POST);
+                                request.AddParameter("reply", sendmessage);
+                                request.AddHeader("content-type", "application/x-www-form-urlencoded");
+                                _ = client.ExecutePostAsync(request).ConfigureAwait(false);
+                            }
+                            else
+                            {
+
+                            }
                         }
                         catch (Exception e)
                         {
