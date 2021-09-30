@@ -58,9 +58,9 @@ namespace BetterSecondBot.DiscordSupervisor
         {
             if (HasBot() == true)
             {
-                if (fromme == false)
+                if (DiscordClientConnected == true)
                 {
-                    if (DiscordClientConnected == true)
+                    if (fromme == false)
                     {
                         if (avatar == true)
                         {
@@ -85,8 +85,19 @@ namespace BetterSecondBot.DiscordSupervisor
                         }
                         else
                         {
-                            controler.getBot().Debug("DiscordBotChatControler - Not from an avatar");
+                            if (sender_uuid != UUID.Zero)
+                            {
+                                await SendEmbedToChannelAsync("localchat", sender_name, message, Discord.Color.DarkMagenta, "bot", UUID.Zero, "bot").ConfigureAwait(false);
+                            }
+                            else
+                            {
+                                await SendEmbedToChannelAsync("localchat", sender_name, message, Discord.Color.DarkRed, "bot", UUID.Zero, "bot").ConfigureAwait(false);
+                            }
                         }
+                    }
+                    else
+                    {
+                        await SendEmbedToChannelAsync("localchat", "{ME}", message, Discord.Color.LightGrey, "bot", UUID.Zero, "bot").ConfigureAwait(false);
                     }
                 }
             }

@@ -32,6 +32,30 @@ namespace BetterSecondBot.DiscordSupervisor
             return null;
         }
 
+        protected async Task<IUserMessage> SendEmbedToChannelAsync(string channelname, string sender, string message, Color color, string catmapid, UUID sender_id, string TopicType)
+        {
+            if (AllowNewOutbound() == true)
+            {
+                try
+                {
+                    channelname = channelname.ToLowerInvariant();
+                    channelname = String.Concat(channelname.Where(char.IsLetterOrDigit));
+                    ITextChannel Channel = await FindTextChannel(channelname, catmap[catmapid], sender_id, TopicType, false).ConfigureAwait(true);
+                    if (Channel != null)
+                    {
+                        var embed = new EmbedBuilder();
+                        embed.AddField(sender, message).WithColor(color);
+                        return await Channel.SendMessageAsync(null, false, embed.Build()).ConfigureAwait(false);
+                    }
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            return null;
+        }
+
         protected async Task<ITextChannel> FindTextChannel(string channelname, ICategoryChannel cat, UUID sender, string TopicType, bool CleanChannel)
         {
             return await FindTextChannel(DiscordServer, channelname, cat, sender, TopicType, true, CleanChannel);
