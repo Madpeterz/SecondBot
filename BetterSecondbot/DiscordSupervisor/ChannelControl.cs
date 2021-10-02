@@ -217,6 +217,10 @@ namespace BetterSecondBot.DiscordSupervisor
             {
                 display_topic = "Actions -> !clear";
             }
+            else if (channelname == "objectchat")
+            {
+                display_topic = "Actions -> !clear";
+            }
             else if (sender_id == UUID.Zero.ToString())
             {
                 if (controler.getBot() != null)
