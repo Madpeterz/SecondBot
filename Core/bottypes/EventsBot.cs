@@ -223,6 +223,10 @@ namespace BetterSecondBot.bottypes
         }
         protected void On_MessageEvent(MessageEventArgs e)
         {
+            if((myconfig.OBJECT_CHAT == false) && (e.avatar == false) && (e.group == false) && (e.localchat == true))
+            {
+                return;
+            }
             EventHandler<MessageEventArgs> handler = _MessageEvent;
             handler?.Invoke(this, e);
         }

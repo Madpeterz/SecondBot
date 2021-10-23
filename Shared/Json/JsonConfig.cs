@@ -107,8 +107,10 @@ namespace BetterSecondBotShared.Json
         public string Agent_Channel { get; set; }
         public string Agent_Version { get; set; }
 
-        // Database
+        // Object Chat
+        public bool OBJECT_CHAT { get; set; }
 
+        // Database
         public bool SQLDB_Enabled { get; set; }
         public string SQLDB_Host { get; set; }
         public int SQLDB_Port { get; set; }

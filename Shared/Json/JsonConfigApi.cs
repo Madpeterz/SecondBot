@@ -171,6 +171,7 @@ namespace BetterSecondBotShared.Json
                                                     + "3: +Warnings\n"
                                                     + "4: +Debug\n";
             }
+            else if (cmd == "OBJECT_CHAT") { return "Enable object chat to be passed over messages event";  }
             else if (cmd == "Agent_Channel") { return "What channel to use for the client - should only be used if badly coded grids that are unable to accept custom clients: leave auto otherwise"; }
             else if (cmd == "Agent_Version") { return "What version to use for the client - should only be used if badly coded grids that are unable to accept custom clients: leave auto otherwise"; }
             return "Unknown value:" + cmd;
@@ -302,6 +303,7 @@ namespace BetterSecondBotShared.Json
             else if (cmd == "Log2File_Level") { return "1"; }
             else if (cmd == "Agent_Channel") { return "auto"; }
             else if (cmd == "Agent_Version") { return "auto"; }
+            else if (cmd == "OBJECT_CHAT") { return "False"; }
             return "Unknown value:" + cmd;
         }
         #endregion
