@@ -73,6 +73,12 @@ namespace BetterSecondBotShared.bottypes
         }
 
 
+        public string use_folder = "";
+        public void setFolder(string folder)
+        {
+            use_folder = folder;
+        }
+
         protected Dictionary<string, string[]> custom_commands = new Dictionary<string, string[]>();
         public Dictionary<string, string[]> getCustomCommands { get { return custom_commands; } }
         protected bool loaded_custom_commands = false;
@@ -102,6 +108,7 @@ namespace BetterSecondBotShared.bottypes
                 };
                 string CommandsFile = "custom_commands.json";
                 SimpleIO io = new SimpleIO();
+                io.ChangeRoot(use_folder);
                 if (SimpleIO.FileType(CommandsFile, "json") == true)
                 {
                     if (io.Exists(CommandsFile) == true)

@@ -109,6 +109,7 @@ namespace BetterSecondBot
             if (helpers.botRequired(Config) == true)
             {
                 Bot = new SecondBot();
+                Bot.setFolder(use_folder);
                 Bot.Setup(Config, AssemblyInfo.GetGitHash());
                 
                 if (as_docker == true)
