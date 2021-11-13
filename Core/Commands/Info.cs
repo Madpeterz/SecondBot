@@ -16,6 +16,23 @@ namespace BetterSecondBot.HttpService
     {
         public HTTP_Info(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
+        [About("Lists objects that are sculpty type in the current sim that the bot can see")]
+        [ReturnHints("A json object of [UUID=Pos]")]
+        [Route(HttpVerbs.Get, "/ListSculptys/{token}")]
+        public object ListSculptys(string token)
+        {
+            Dictionary<string, string> Sculpts = new Dictionary<string, string>();
+            Dictionary<uint, Primitive> objects_copy = bot.GetClient.Network.CurrentSim.ObjectsPrimitives.Copy();
+            foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
+            {
+                if (Obj.Value.Type == PrimType.Sculpt)
+                {
+                    Sculpts.Add(Obj.Value.ID.ToString(), Obj.Value.Position.ToString());
+                }
+            }
+            return BasicReply(JsonConvert.SerializeObject(Sculpts), "ListSculptys");
+        }
+
         [About("Fetchs the current bot")]
         [ReturnHints("The build ID of the bot")]
         [Route(HttpVerbs.Get, "/Version/{token}")]
