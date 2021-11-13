@@ -105,7 +105,7 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Post, "/NotecardDirectSend/{avatar}/{notecardname}/{token}")]
         public object NotecardDirectSend(string avatar, [FormField] string content, string notecardname, string token)
         {
-            if (tokens.Allow(token, "notecard", "NotecardSend", handleGetClientIP()) == false)
+            if (tokens.Allow(token, "notecard", "NotecardDirectSend", handleGetClientIP()) == false)
             {
                 return Failure("Token not accepted", "NotecardDirectSend", new[] { avatar, content, notecardname });
             }
