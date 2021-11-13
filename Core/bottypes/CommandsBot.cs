@@ -12,6 +12,8 @@ using Core.Static;
 using System.Reflection;
 using Newtonsoft.Json;
 using System.Net.Http;
+using Newtonsoft.Json.Linq;
+using BetterSecondBotShared.Json;
 
 namespace BetterSecondBot.bottypes
 {
@@ -259,6 +261,70 @@ namespace BetterSecondBot.bottypes
         }
 
 
+        protected void JsonChatControler(string message, string sender_name, UUID sender_uuid, bool avatar, bool group, UUID group_uuid, bool localchat, bool fromme)
+        {
+            if((group == true) || (localchat == true) || (fromme == true))
+            {
+                return;
+            }
+            try
+            {
+                bool frommaster = true;
+                if (sender_uuid != master_uuid)
+                {
+                    frommaster = false;
+                }
+                if (frommaster == true)
+                {
+                    if (message == "fakerestart")
+                    {
+                        AlertMessageEventArgs Alertargs = new AlertMessageEventArgs("this is a fake restart message");
+                        AlertEvent(this, Alertargs);
+                        return;
+                    }
+
+                }
+
+                JObject json = JObject.Parse(message);
+                string signing_code = "";
+                
+                if (json.ContainsKey("cmd") == false)
+                {
+                    return;
+                }
+                string cmd = json.GetValue("cmd").ToString();
+                if (frommaster == false)
+                {
+                    if (json.ContainsKey("signing") == true)
+                    {
+                        signing_code = json.GetValue("signing").ToString();
+                    }
+                }
+                string[] args = new string[] { };
+                if (json.ContainsKey("args") == true)
+                {
+                    List<string> argsL = new List<string>();
+                    foreach(JToken A in json.GetValue("args").ToList())
+                    {
+                        argsL.Add(A.ToString());
+                    }
+                    args = argsL.ToArray();
+                }
+                string replyto = "";
+                if (json.ContainsKey("reply") == true)
+                {
+                    replyto = json.GetValue("reply").ToString();
+                }
+
+                CoreCommandLib(sender_uuid, frommaster, cmd, args, signing_code, replyto);
+            }
+            catch (Exception e)
+            {
+                LogFormater.Crit("[CoreCommandLib] exploded: " + e.Message + "");
+            }
+        }
+
+
         protected Dictionary<string, WebApiControllerWithTokens> commandEndpoints = new Dictionary<string, WebApiControllerWithTokens>();
         protected Dictionary<string, string> endpointcommandmap = new Dictionary<string, string>(); // command = endpoint
         protected Dictionary<string, string> commandnameLowerToReal = new Dictionary<string, string>();
@@ -268,8 +334,18 @@ namespace BetterSecondBot.bottypes
         protected override void BotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar, bool group, UUID group_uuid, bool localchat, bool fromme)
         {
             base.BotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
-            if ((group == false) && (localchat == false) && (fromme == false))
+            if ((group == true) || (localchat == true) || (fromme == true))
             {
+                return;
+            }
+            try
+            {
+                JObject json = JObject.Parse(message);
+                JsonChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
+            }
+            catch
+            {
+                // Old style [non json] to json converter [to be phased out]
                 string signing_code = "";
                 string[] input = message.Split(new[] { "@@@" }, StringSplitOptions.RemoveEmptyEntries);
                 if (input.Count() == 2)
@@ -279,44 +355,22 @@ namespace BetterSecondBot.bottypes
                 }
                 string outputto = "none";
                 List<string> bigbits = message.Split(new[] { "#|#" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                if(bigbits.Count == 0)
+                if (bigbits.Count == 0)
                 {
                     bigbits.Add("");
                 }
                 List<string> bits = bigbits[0].Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                if(bits.Count < 1)
-                {
-                    bits.Add("");
-                }
-                if (bits.Count < 2)
-                {
-                    bits.Add("");
-                }
-                if(bigbits.Count == 2)
+                if (bigbits.Count == 2)
                 {
                     outputto = bigbits[1];
                 }
-                bool frommaster = false;
-                if ((avatar == true) && ((sender_uuid == master_uuid) || (SubMasters.Contains(sender_name) == true)))
-                {
-                    frommaster = true;
-                    if(message == "fakerestart")
-                    {
-                        AlertMessageEventArgs args = new AlertMessageEventArgs("this is a fake restart message");
-                        AlertEvent(this, args);
-                    }
-                }
-                try
-                {
-                    string command = bits[0];
-                    string[] args = bits[1].Split("~#~", StringSplitOptions.RemoveEmptyEntries);
-                    CoreCommandLib(sender_uuid, frommaster, command, args, signing_code, outputto);
-
-                }
-                catch (Exception e)
-                {
-                    LogFormater.Crit("[CoreCommandLib] exploded: " + e.Message + "");
-                }
+                JsonApiDefine Apihandoff = new JsonApiDefine();
+                Apihandoff.cmd = bits[0];
+                Apihandoff.args = bits[1].Split("~#~", StringSplitOptions.RemoveEmptyEntries);
+                Apihandoff.reply = outputto;
+                Apihandoff.signing = signing_code;
+                message = JsonConvert.SerializeObject(Apihandoff);
+                JsonChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
             }
         }
 
