@@ -94,7 +94,7 @@ namespace BetterSecondBot.DiscordSupervisor
                         if (message.Content == "!commands")
                         {
                             string[] commands = controler.getBot().getFullListOfCommands();
-                            await SendMessageToChannelAsync("interface", string.Join("\n",commands)+ " \n For more details please see the wiki \n https://wiki.magicmadpeter.xyz/", "bot", UUID.Zero, "bot");
+                            await SendMessageToChannelAsync("interface", string.Join("\n",commands)+ " \n For more details please see the wiki \n https://wiki.blackatom.live/", "bot", UUID.Zero, "bot");
                         }
                         else
                         {
