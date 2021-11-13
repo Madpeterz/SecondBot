@@ -20,6 +20,14 @@ namespace BetterSecondBotShared.Json
         public JsonCustomRelays[] Entrys {get; set;}
     }
 
+    public class JsonApiDefine
+    {
+        public string cmd = "";
+        public string[] args = new string[] { };
+        public string reply = "";
+        public string signing = "";
+    }
+
     public class JsonCustomRelays
     {
         public bool encodeJson = false;
