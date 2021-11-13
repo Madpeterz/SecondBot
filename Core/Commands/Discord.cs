@@ -22,7 +22,7 @@ namespace BetterSecondBot.HttpService
         public HTTP_Discord(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("Adds a discord server role to the selected member")]
-        [ReturnHints("Discord client not ready")]
+        [ReturnHintsFailure("Discord client not ready")]
         [ReturnHints("true|false")]
         [ArgHints("serverid","URLARG","the server id to apply this action to")]
         [ArgHints("roleid", "URLARG", "the role id we are giving")]
@@ -42,8 +42,8 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Adds the selected user to the ban list - Disallows rejoining untill they are removed from the list")]
-        [ReturnHints("Discord client not ready")]
-        [ReturnHints("Why empty")]
+        [ReturnHintsFailure("Discord client not ready")]
+        [ReturnHintsFailure("Why empty")]
         [ReturnHints("true|false")]
         [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
         [ArgHints("memberid", "URLARG", "who we are giving it to")]
@@ -67,7 +67,7 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Clears messages on the server sent by the member in the last 13 days, 22hours 59mins")]
-        [ReturnHints("Discord client not ready")]
+        [ReturnHintsFailure("Discord client not ready")]
         [ReturnHints("true|false")]
         [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
         [ArgHints("memberid", "URLARG", "who we are giving it to")]
@@ -87,7 +87,7 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Sends a message directly to the user [They must be in the server]\n This command requires the SERVER MEMBERS INTENT found in discord app dev")]
-        [ReturnHints("Discord client not ready")]
+        [ReturnHintsFailure("Discord client not ready")]
         [ReturnHints("true|false")]
         [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
         [ArgHints("memberid", "URLARG", "who we are giving it to")]
@@ -109,7 +109,7 @@ namespace BetterSecondBot.HttpService
         [About("Returns a list of members in a server \n collection is userid: username \n if the user has set a nickname: userid: nickname|username \n" +
             " This command requires Discord full client mode enabled and connected\n !!!! This command also requires: Privileged Gateway Intents / " +
             "SERVER MEMBERS INTENT set to true on the discord bot api area !!!")]
-        [ReturnHints("Discord client not ready")]
+        [ReturnHintsFailure("Discord client not ready")]
         [ReturnHints("mixed array of userid: nickname|username  or   userid:username")]
         [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
         [Route(HttpVerbs.Get, "/Discord_MembersList/{serverid}/{token}")]
@@ -128,7 +128,8 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Sends a message to the selected channel - Optional TTS usage")]
-        [ReturnHints("Discord client not ready")]
+        [ReturnHintsFailure("Discord client not ready")]
+        [ReturnHintsFailure("message empty")]
         [ReturnHints("true|false")]
         [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
         [ArgHints("channelid", "URLARG", "the channel id to apply this action to")]
@@ -154,7 +155,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Sends a message to the selected channel - Optional TTS usage")]
         [ReturnHints("mixed array of userid: nickname|username  or   userid:username")]
-        [ReturnHints("Discord client not ready")]
+        [ReturnHintsFailure("Discord client not ready")]
         [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
         [ArgHints("memberid", "URLARG", "who we are giving it to")]
         [ArgHints("mode", "URLARG", "should we mute them \"true\" or unmute \"false\"")]
@@ -174,7 +175,7 @@ namespace BetterSecondBot.HttpService
 
         [About("returns a collection of settings for the given role \n This command requires Discord full client mode enabled and connected")]
         [ReturnHints("KeyPair of status: KeyPair[] item = value")]
-        [ReturnHints("Discord client not ready")]
+        [ReturnHintsFailure("Discord client not ready")]
         [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
         [ArgHints("memberid", "URLARG", "who we are giving it to")]
         [ArgHints("mode", "URLARG", "should we mute them \"true\" or unmute \"false\"")]
@@ -196,7 +197,7 @@ namespace BetterSecondBot.HttpService
         [About("Updates perm flags for the selected role \n example CSV format: Speak=True,SendMessages=False \n for a full list of perms see output of Discord_Role_GetSettings \n" +
             " This command requires Discord full client mode enabled and connected")]
         [ReturnHints("true|false")]
-        [ReturnHints("Discord client not ready")]
+        [ReturnHintsFailure("Discord client not ready")]
         [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
         [ArgHints("roleid", "URLARG", "who we are giving it to")]
         [ArgHints("flagscsv", "Text", "what we are setting")]
@@ -217,7 +218,7 @@ namespace BetterSecondBot.HttpService
         [About("Updates perm flags for the selected role \n example CSV format: Speak=True,SendMessages=False \n for a full list of perms see output of Discord_Role_GetSettings \n" +
     " This command requires Discord full client mode enabled and connected")]
         [ReturnHints("KeyPair of statusmessage=roleid or 0")]
-        [ReturnHints("Discord client not ready")]
+        [ReturnHintsFailure("Discord client not ready")]
         [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
         [ArgHints("role", "URLARG", "the name of the role we are creating")]
         [Route(HttpVerbs.Get, "/Discord_RoleCreate/{serverid}/{role}/{token}")]
@@ -237,7 +238,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Returns a list of roles and their ids in collection \n This command requires Discord full client mode enabled and connected")]
         [ReturnHints("KeyPair of status: KeyPair of roleid: rolename")]
-        [ReturnHints("Discord client not ready")]
+        [ReturnHintsFailure("Discord client not ready")]
         [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
         [Route(HttpVerbs.Get, "/Discord_RoleList/{serverid}/{token}")]
         public object Discord_RoleList(string serverid, string token)
@@ -255,7 +256,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Remove a role from a server \n This command requires Discord full client mode enabled and connected")]
         [ReturnHints("true|false")]
-        [ReturnHints("Discord client not ready")]
+        [ReturnHintsFailure("Discord client not ready")]
         [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
         [Route(HttpVerbs.Get, "/Discord_RoleRemove/{serverid}/{roleid}/{token}")]
         public object Discord_RoleRemove(string serverid, string roleid, string token)
@@ -273,7 +274,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Returns a list of text channels in a server")]
         [ReturnHints("array of channelid: name")]
-        [ReturnHints("Discord client not ready")]
+        [ReturnHintsFailure("Discord client not ready")]
         [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
         [Route(HttpVerbs.Get, "/Discord_TextChannels_List/{serverid}/{roleid}/{token}")]
         public object Discord_TextChannels_List(string serverid, string token)

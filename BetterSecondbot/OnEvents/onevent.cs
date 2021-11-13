@@ -519,6 +519,7 @@ namespace BetterSecondbot.OnEvents
         public onevent(Cli master, bool LoadFromDocker)
         {
             controler = master;
+            LogFormater.Info("{onEvents} starting", true);
             if (LoadFromDocker == true)
             {
                 loadFromDockerEnv();
@@ -528,58 +529,8 @@ namespace BetterSecondbot.OnEvents
                 loadFromDisk();
             }
             controler.getBot().StatusMessageEvent += statusMessage;
-#if DEBUG
-            testCron();
-#endif
+            LogFormater.Info("{onEvents} ready", true);
 
-        }
-
-        protected void testCron()
-        {
-            string[] crontests = new string[]
-            {
-                "* * * * *",
-                "* * * * "+dayOfWeek(DateTime.Now.DayOfWeek).ToString(),
-                "* * * "+DateTime.Now.Month.ToString()+" *",
-                "* * "+DateTime.Now.Day.ToString()+" * *",
-                "* "+DateTime.Now.Hour.ToString()+" * * *",
-                ""+DateTime.Now.Minute.ToString()+" * * * *",
-                "* * * * /"+dayOfWeek(DateTime.Now.DayOfWeek).ToString(),
-                "* * * /"+DateTime.Now.Month.ToString()+" *",
-                "* * /"+DateTime.Now.Day.ToString()+" * *",
-                "* /"+DateTime.Now.Hour.ToString()+" * * *",
-                "/"+DateTime.Now.Minute.ToString()+" * * * *",
-                "61 25 77 44 8",
-                "E O E O E",
-            };
-            bool[] expected = new bool[]
-            {
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                true,
-                false,
-                false,
-            };
-            int loop = 1;
-            foreach(string a in crontests)
-            {
-                bool result = cronMagic(a, "true");
-                if (result != expected[loop - 1])
-                {
-                    LogFormater.Info("failed test \"" + a + "\" " + loop.ToString() + " " + result.ToString(), true);
-                }
-                loop++;
-            }
-
-            
         }
 
         protected void SetupMonitor()
@@ -685,42 +636,48 @@ namespace BetterSecondbot.OnEvents
         protected void loadFromDisk()
         {
             LogFormater.Info("Loading onEvents from Disk", true);
-            OnEventBlob DemoloadedEvents = new OnEventBlob();
-            OnEvent demoEvent = new OnEvent();
-            demoEvent.Enabled = false;
-            demoEvent.Actions = new string[] { "Say|||0~#~hi mom im on TV!"};
-            demoEvent.title = "demo";
-            demoEvent.On = "Clock";
-            demoEvent.Where = new string[] { "59 23 * * 7 {CRON} true"};
-            demoEvent.Monitor = "None";
-            DemoloadedEvents.listEvents = new OnEvent[] { demoEvent };
+            try
+            {
+                OnEventBlob DemoloadedEvents = new OnEventBlob();
+                OnEvent demoEvent = new OnEvent();
+                demoEvent.Enabled = false;
+                demoEvent.Actions = new string[] { "Say|||0~#~hi mom im on TV!" };
+                demoEvent.title = "demo";
+                demoEvent.On = "Clock";
+                demoEvent.Where = new string[] { "59 23 * * 7 {CRON} true" };
+                demoEvent.Monitor = "None";
+                DemoloadedEvents.listEvents = new OnEvent[] { demoEvent };
 
-            string targetfile = "events.json";
-            SimpleIO io = new SimpleIO();
-            io.ChangeRoot(controler.getFolderUsed());
-            if (io.Exists(targetfile) == false)
-            {
-                LogFormater.Status("Creating new events file", true);
-                io.WriteJsonEvents(DemoloadedEvents, targetfile);
-                return;
-            }
-            string json = io.ReadFile(targetfile);
-            if (json.Length > 0)
-            {
-                try
+                string targetfile = "events.json";
+                SimpleIO io = new SimpleIO();
+                io.ChangeRoot(controler.getFolderUsed());
+                if (io.Exists(targetfile) == false)
                 {
-                    OnEventBlob loadedEvents = JsonConvert.DeserializeObject<OnEventBlob>(json);
-                    foreach (OnEvent loaded in loadedEvents.listEvents)
-                    {
-                        Events.Add(loaded);
-                    }
-                }
-                catch
-                {
-                    io.MarkOld(targetfile);
+                    LogFormater.Status("Creating new events file", true);
                     io.WriteJsonEvents(DemoloadedEvents, targetfile);
+                    return;
                 }
-                return;
+                string json = io.ReadFile(targetfile);
+                if (json.Length > 0)
+                {
+                    try
+                    {
+                        OnEventBlob loadedEvents = JsonConvert.DeserializeObject<OnEventBlob>(json);
+                        foreach (OnEvent loaded in loadedEvents.listEvents)
+                        {
+                            Events.Add(loaded);
+                        }
+                    }
+                    catch
+                    {
+                        LogFormater.Info("error loading events from "+targetfile+" skipping", true);
+                    }
+                    return;
+                }
+            }
+            catch
+            {
+
             }
         }
 

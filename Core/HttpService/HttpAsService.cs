@@ -184,8 +184,6 @@ namespace BetterSecondBot.HttpService
                 .WithWebApi("/friends", m => m.WithController(() => new HTTP_Friends(Bot, Tokens)))
                 .WithWebApi("/funds", m => m.WithController(() => new Http_Funds(Bot, Tokens)))
                 .WithWebApi("/group", m => m.WithController(() => new HTTP_Group(Bot, Tokens)))
-                .WithWebApi("/home", m => m.WithController(() => new HTTP_Home(Bot, Tokens)))
-                .WithWebApi("/im", m => m.WithController(() => new HTTP_IM(Bot, Tokens)))
                 .WithWebApi("/info", m => m.WithController(() => new HTTP_Info(Bot, Tokens)))
                 .WithWebApi("/inventory", m => m.WithController(() => new HTTP_Inventory(Bot, Tokens)))
                 .WithWebApi("/movement", m => m.WithController(() => new HTTP_Movement(Bot, Tokens)))
@@ -226,9 +224,19 @@ namespace BetterSecondBot.HttpService
     public class ReturnHints : Attribute
     {
         public string hint = "";
+        public bool good = true;
         public ReturnHints(string hint)
         {
             this.hint = hint;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class ReturnHintsFailure : ReturnHints
+    {
+        public ReturnHintsFailure(string hint): base(hint)
+        {
+            this.good = false;
         }
     }
 

@@ -1771,7 +1771,7 @@ namespace OpenMetaverse
         /// (EveryoneMask, GroupMask, and NextOwnerMask of Permissions struct are supported)</param>
         /// <param name="callback">Delegate that will receive feedback on success or failure</param>
         public void RequestCreateItemFromAsset(byte[] data, string name, string description, AssetType assetType,
-            InventoryType invType, UUID folderID, Permissions permissions, ItemCreatedFromAssetCallback callback)
+            InventoryType invType, UUID folderID, Permissions permissions, ItemCreatedFromAssetCallback callback, int uploadCost=10)
         {
             if (Client.Network.CurrentSim == null || Client.Network.CurrentSim.Caps == null)
                 throw new Exception("NewFileAgentInventory capability is not currently available");
@@ -1790,7 +1790,7 @@ namespace OpenMetaverse
                     {"everyone_mask", OSD.FromInteger((int) permissions.EveryoneMask)},
                     {"group_mask", OSD.FromInteger((int) permissions.GroupMask)},
                     {"next_owner_mask", OSD.FromInteger((int) permissions.NextOwnerMask)},
-                    {"expected_upload_cost", OSD.FromInteger(Client.Settings.UPLOAD_COST)}
+                    {"expected_upload_cost", uploadCost}
                 };
 
                 // Make the request

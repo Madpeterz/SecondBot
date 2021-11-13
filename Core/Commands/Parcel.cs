@@ -21,9 +21,9 @@ namespace BetterSecondBot.HttpService
 
         [About("Sets the current parcel for sale Also marks the parcel for sale")]
         [ReturnHints("ok")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
-        [ReturnHints("Invaild amount")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Invaild amount")]
         [ArgHints("amount", "URLARG", "The amount to sell the parcel for from 1 to 9999999")]
         [ArgHints("avatar", "URLARG", "Avatar uuid or Firstname Lastname or \"none\" who we are locking the sale to")]
         [Route(HttpVerbs.Get, "/SetParcelSale/{amount}/{avatar}/{token}")]
@@ -53,9 +53,9 @@ namespace BetterSecondBot.HttpService
 
         [About("Changes the parcel landing mode to point and sets the landing point")]
         [ReturnHints("ok")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
-        [ReturnHints("Invaild amount")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Invaild amount")]
         [ArgHints("x", "URLARG", "X point for landing")]
         [ArgHints("y", "URLARG", "Y point for landing")]
         [ArgHints("z", "URLARG", "Z point for landing")]
@@ -88,9 +88,9 @@ namespace BetterSecondBot.HttpService
 
         [About("Updates the current parcels name")]
         [ReturnHints("ok")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
-        [ReturnHints("Parcel name is empty")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Parcel name is empty")]
         [ArgHints("name", "URLARG", "The new name of the parcel")]
         [Route(HttpVerbs.Get, "/SetParcelName/{name}/{token}")]
         public object SetParcelName(string name, string token)
@@ -111,8 +111,8 @@ namespace BetterSecondBot.HttpService
 
         [About("Updates the current parcels description")]
         [ReturnHints("ok")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
         [ArgHints("desc", "Text", "The new desc of the parcel")]
         [Route(HttpVerbs.Post, "/SetParcelDesc/{token}")]
         public object SetParcelDesc([FormField] string desc, string token)
@@ -129,8 +129,8 @@ namespace BetterSecondBot.HttpService
 
         [About("Fetchs the current parcels desc")]
         [ReturnHints("ok")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
         [Route(HttpVerbs.Get, "/GetParcelDesc/{token}")]
         public object GetParcelDesc(string token)
         {
@@ -144,8 +144,8 @@ namespace BetterSecondBot.HttpService
 
         [About("gets the flags for the parcel")]
         [ReturnHints("ok")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
         [Route(HttpVerbs.Get, "/GetParcelFlags/{token}")]
         public object GetParcelFlags(string token)
         {
@@ -166,7 +166,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Ejects an avatar")]
         [ReturnHints("ok")]
-        [ReturnHints("Invaild avatar")]
+        [ReturnHintsFailure("Invaild avatar")]
         [ArgHints("avatar", "URLARG", "uuid of the avatar or Firstname Lastname")]
         [Route(HttpVerbs.Get, "/ParcelEject/{avatar}/{token}")]
         public object ParcelEject(string avatar,string token)
@@ -201,10 +201,10 @@ namespace BetterSecondBot.HttpService
 
         [About("Bans an avatar from a parcel")]
         [ReturnHints("ok")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
-        [ReturnHints("Invaild avatar")]
-        [ReturnHints("Avatar is in the blacklist")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Invaild avatar")]
+        [ReturnHintsFailure("Avatar is in the blacklist")]
         [ArgHints("avatar", "URLARG", "uuid of the avatar or Firstname Lastname")]
         [Route(HttpVerbs.Get, "/ParcelBan/{avatar}/{token}")]
         public object ParcelBan(string avatar, string token)
@@ -243,10 +243,10 @@ namespace BetterSecondBot.HttpService
 
         [About("Unbans an avatar from a parcel")]
         [ReturnHints("ok")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
-        [ReturnHints("Invaild avatar")]
-        [ReturnHints("Avatar is already unbanned")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Invaild avatar")]
+        [ReturnHintsFailure("Avatar is already unbanned")]
         [ArgHints("avatar", "URLARG", "uuid of the avatar or Firstname Lastname")]
         [Route(HttpVerbs.Get, "/ParcelUnBan/{avatar}/{token}")]
         public object ParcelUnBan(string avatar, string token)
@@ -284,8 +284,8 @@ namespace BetterSecondBot.HttpService
 
         [About("Updates the current parcels name")]
         [ReturnHints("true|false")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
         [ArgHints("musicurl", "URLARG", "The new name of the parcel")]
         [Route(HttpVerbs.Get, "/SetParcelMusic/{musicurl}/{token}")]
         public object SetParcelMusic(string musicurl, string token)
@@ -301,13 +301,13 @@ namespace BetterSecondBot.HttpService
 
         [About("Updates the current parcels name")]
         [ReturnHints("true|false")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
-        [ReturnHints("Incorrect perms to control parcel")]
-        [ReturnHints("No accepted flags")]
-        [ReturnHints("Unable to set flag ...")]
-        [ReturnHints("Flag: ? is unknown")]
-        [ReturnHints("Flag: ? missing \"=\"")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Incorrect perms to control parcel")]
+        [ReturnHintsFailure("No accepted flags")]
+        [ReturnHintsFailure("Unable to set flag ...")]
+        [ReturnHintsFailure("Flag: ? is unknown")]
+        [ReturnHintsFailure("Flag: ? missing \"=\"")]
         [ArgHints("escapedflagdata", "Text", "repeatable flag data split by ::: formated Flag=True|False")]
         [Route(HttpVerbs.Post, "/SetParcelFlag/{escapedflagdata}/{token}")]
         public object SetParcelFlag([FormField] string escapedflagdata, string token)
@@ -363,9 +363,9 @@ namespace BetterSecondBot.HttpService
 
         [About("Returns all objects from the current parcel for the selected avatar")]
         [ReturnHints("ok")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
-        [ReturnHints("Invaild avatar UUID")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Invaild avatar UUID")]
         [ArgHints("avatar", "URLARG", "avatar uuid or Firstname Lastname")]
         [Route(HttpVerbs.Get, "/ParcelReturnTargeted/{avatar}/{token}")]
         public object ParcelReturnTargeted(string avatar, string token)
@@ -387,10 +387,10 @@ namespace BetterSecondBot.HttpService
 
         [About("transfers the current parcel ownership to the assigned group")]
         [ReturnHints("ok")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
-        [ReturnHints("Invaild group uuid")]
-        [ReturnHints("Not in group")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Invaild group uuid")]
+        [ReturnHintsFailure("Not in group")]
         [Route(HttpVerbs.Get, "/ParcelDeedToGroup/{group}/{token}")]
         public object ParcelDeedToGroup(string group, string token)
         {
@@ -416,13 +416,13 @@ namespace BetterSecondBot.HttpService
 
         [About("Attempts to buy the parcel the bot is standing on, the amount must match the sale price for the land!")]
         [ReturnHints("ok")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
-        [ReturnHints("Parcel not for sale")]
-        [ReturnHints("Parcel not for sale")]
-        [ReturnHints("Parcel sale locked to other avatars")]
-        [ReturnHints("Parcel sale price and amount do not match")]
-        [ReturnHints("Invaild amount")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Parcel not for sale")]
+        [ReturnHintsFailure("Parcel not for sale")]
+        [ReturnHintsFailure("Parcel sale locked to other avatars")]
+        [ReturnHintsFailure("Parcel sale price and amount do not match")]
+        [ReturnHintsFailure("Invaild amount")]
         [ArgHints("amount", "URLARG", "amount to pay for the parcel (min 1)")]
         [Route(HttpVerbs.Get, "/ParcelBuy/{amount}/{token}")]
         public object ParcelBuy(string amount, string token)
@@ -458,8 +458,8 @@ namespace BetterSecondBot.HttpService
 
         [About("Freezes an avatar")]
         [ReturnHints("ok")]
-        [ReturnHints("Invaild avatar UUID")]
-        [ReturnHints("Invaild state")]
+        [ReturnHintsFailure("Invaild avatar UUID")]
+        [ReturnHintsFailure("Invaild state")]
         [ArgHints("avatar", "URLARG", "avatar uuid or Firstname Lastname")]
         [ArgHints("state", "URLARG", "setting state to false will unfreeze or true to freeze")]
         [Route(HttpVerbs.Get, "/ParcelFreeze/{avatar}/{state}/{token}")]
@@ -484,9 +484,9 @@ namespace BetterSecondBot.HttpService
 
 
         [About("Fetchs the parcel ban list of the parcel the bot is currently on<br/>If the name returned is lookup the bot is currently requesting the avatar name")]
-        [ReturnHints("json object: GetParcelBanlistObject")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
+        [ReturnHintsFailure("json object: GetParcelBanlistObject")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
         [Route(HttpVerbs.Get, "/GetParcelBanlist/{token}")]
         public object GetParcelBanlist(string token)
         {
@@ -531,8 +531,8 @@ namespace BetterSecondBot.HttpService
 
         [About("Returns a rezzed object")]
         [ReturnHints("ok")]
-        [ReturnHints("Invaild object uuid")]
-        [ReturnHints("Unable to find object")]
+        [ReturnHintsFailure("Invaild object uuid")]
+        [ReturnHintsFailure("Unable to find object")]
         [ArgHints("objectuuid", "URLARG", "object UUID to unrez")]
         [Route(HttpVerbs.Get, "/UnRezObject/{objectuuid}/{token}")]
         public object UnRezObject(string objectuuid,string token)
@@ -574,8 +574,8 @@ namespace BetterSecondBot.HttpService
             "MediaType=String [\"IMG-PNG\",\"IMG-JPG\",\"VID-MP4\",\"VID-AVI\" or \"Custom-MIME_TYPE_CODE\"]"
             )]
         [ReturnHints("ok")]
-        [ReturnHints("Error not in a sim")]
-        [ReturnHints("Parcel data not ready")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
         [ArgHints("escapedflagdata", "Text", "repeatable flag data split by ::: formated Flag=True|False")]
         [Route(HttpVerbs.Get, "/ParcelSetMedia/{token}")]
         public object ParcelSetMedia([FormField] string escapedflagdata, string token)

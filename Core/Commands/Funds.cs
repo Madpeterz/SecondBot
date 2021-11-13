@@ -18,7 +18,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Requests the current balance and requests the balance to update.")]
         [ReturnHints("Current fund level")]
-        [ReturnHints("Funds commands are disabled")]
+        [ReturnHintsFailure("Funds commands are disabled")]
         [Route(HttpVerbs.Get, "/Balance/{token}")]
         public object Balance(string token)
         {
@@ -36,10 +36,10 @@ namespace BetterSecondBot.HttpService
 
         [About("Makes the bot pay a avatar")]
         [ReturnHints("Accepted")]
-        [ReturnHints("avatar lookup")]
-        [ReturnHints("Amount out of range")]
-        [ReturnHints("Invaild amount")]
-        [ReturnHints("Transfer funds to avatars disabled")]
+        [ReturnHintsFailure("avatar lookup")]
+        [ReturnHintsFailure("Amount out of range")]
+        [ReturnHintsFailure("Invaild amount")]
+        [ReturnHintsFailure("Transfer funds to avatars disabled")]
         [ArgHints("avatar", "URLARG", "the avatars UUID or Firstname Lastname")]
         [ArgHints("amount", "URLARG", "the amount to pay (from 1 to current balance)")]
         [Route(HttpVerbs.Get, "/PayAvatar/{avatar}/{amount}/{token}")]
@@ -72,12 +72,11 @@ namespace BetterSecondBot.HttpService
 
         [About("Makes the bot pay a object")]
         [ReturnHints("ok")]
-        [ReturnHints("Primname is empty")]
-        [ReturnHints("Current fund level")]
-        [ReturnHints("Invaild object UUID")]
-        [ReturnHints("Invaild amount")]
-        [ReturnHints("Amount out of range")]
-        [ReturnHints("Funds commands are disabled")]
+        [ReturnHintsFailure("Primname is empty")]
+        [ReturnHintsFailure("Invaild object UUID")]
+        [ReturnHintsFailure("Invaild amount")]
+        [ReturnHintsFailure("Amount out of range")]
+        [ReturnHintsFailure("Funds commands are disabled")]
         [ArgHints("object", "URLARG", "UUID of the object to pay")]
         [ArgHints("primname", "URLARG", "The name of the prim on the object to pay")]
         [ArgHints("amount", "URLARG", "the amount to pay (from 1 to current balance)")]

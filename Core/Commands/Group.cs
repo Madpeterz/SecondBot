@@ -20,10 +20,10 @@ namespace BetterSecondBot.HttpService
 
         [About("Checks if the given UUID is in the given group<br/>Note: if group membership data is more than 60 secs old this will return Updating<br/>Please wait and retry later")]
         [ReturnHints("Membership reply with [membershipStatus,AvatarUUID,AvatarnameIfKnown,GroupUUID]")]
-        [ReturnHints("Updating")]
-        [ReturnHints("Unknown group")]
-        [ReturnHints("Invaild group UUID")]
-        [ReturnHints("avatar lookup")]
+        [ReturnHintsFailure("Updating")]
+        [ReturnHintsFailure("Unknown group")]
+        [ReturnHintsFailure("Invaild group UUID")]
+        [ReturnHintsFailure("avatar lookup")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [ArgHints("avatar", "URLARG", "the UUID of the avatar you wish to check with")]
         [Route(HttpVerbs.Get, "/IsGroupMember/{group}/{avatar}/{token}")]
@@ -61,10 +61,10 @@ namespace BetterSecondBot.HttpService
 
         [About("Gets membership of a group")]
         [ReturnHints("list of UUIDS of group members")]
-        [ReturnHints("Updating")]
-        [ReturnHints("Unknown group")]
-        [ReturnHints("Invaild group UUID")]
-        [ReturnHints("avatar lookup")]
+        [ReturnHintsFailure("Updating")]
+        [ReturnHintsFailure("Unknown group")]
+        [ReturnHintsFailure("Invaild group UUID")]
+        [ReturnHintsFailure("avatar lookup")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [Route(HttpVerbs.Get, "/GetGroupMembers/{group}/{token}")]
         public object GetGroupMembers(string group, string token)
@@ -96,11 +96,11 @@ namespace BetterSecondBot.HttpService
 
         [About("Attempts to ban/unban a given avatar from a group")]
         [ReturnHints("? request accepted")]
-        [ReturnHints("Updating")]
-        [ReturnHints("Unknown group")]
-        [ReturnHints("Invaild group UUID")]
-        [ReturnHints("avatar lookup")]
-        [ReturnHints("Missing group GroupBanAccess power")]
+        [ReturnHintsFailure("Updating")]
+        [ReturnHintsFailure("Unknown group")]
+        [ReturnHintsFailure("Invaild group UUID")]
+        [ReturnHintsFailure("avatar lookup")]
+        [ReturnHintsFailure("Missing group GroupBanAccess power")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [ArgHints("avatar", "URLARG", "the UUID of the avatar or Firstname Lastname")]
         [ArgHints("state", "URLARG", "true to ban false to unban")]
@@ -148,12 +148,12 @@ namespace BetterSecondBot.HttpService
 
         [About("Eject selected avatar from group")]
         [ReturnHints("Requested")]
-        [ReturnHints("Updating")]
-        [ReturnHints("Unknown group")]
-        [ReturnHints("Invaild group UUID")]
-        [ReturnHints("Not in group")]
-        [ReturnHints("avatar lookup")]
-        [ReturnHints("Missing group Eject power")]
+        [ReturnHintsFailure("Updating")]
+        [ReturnHintsFailure("Unknown group")]
+        [ReturnHintsFailure("Invaild group UUID")]
+        [ReturnHintsFailure("Not in group")]
+        [ReturnHintsFailure("avatar lookup")]
+        [ReturnHintsFailure("Missing group Eject power")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [ArgHints("avatar", "URLARG", "the UUID of the avatar you wish to check with")]
         [Route(HttpVerbs.Get, "/GroupEject/{group}/{avatar}/{token}")]
@@ -185,15 +185,15 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Requested", "GroupEject", new [] { group, avatar });
         }
 
-        [About("Adds the avatar to the Group with the role \n if they are not in the group then it invites them aswell")]
+        [About("Adds the avatar to the Group with the role \n if they are not in the group then it invites them at that role")]
         [ReturnHints("Roles updated")]
         [ReturnHints("Invite sent")]
-        [ReturnHints("Updating")]
-        [ReturnHints("Unknown group")]
-        [ReturnHints("Invaild group UUID")]
-        [ReturnHints("Invaild role UUID")]
-        [ReturnHints("Not in group")]
-        [ReturnHints("avatar lookup")]
+        [ReturnHintsFailure("Updating")]
+        [ReturnHintsFailure("Unknown group")]
+        [ReturnHintsFailure("Invaild group UUID")]
+        [ReturnHintsFailure("Invaild role UUID")]
+        [ReturnHintsFailure("Not in group")]
+        [ReturnHintsFailure("avatar lookup")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [ArgHints("avatar", "URLARG", "the UUID of the avatar you wish to check with")]
         [Route(HttpVerbs.Get, "/GroupAddRole/{group}/{avatar}/{role}/{token}")]
@@ -235,14 +235,14 @@ namespace BetterSecondBot.HttpService
             return BasicReply("Roles updated", "GroupAddRole", new [] { group, avatar });
         }
 
-        [About("Eject selected avatar from group")]
+        [About("Invites selected avatar to the group with the selected role")]
         [ReturnHints("Invite sent")]
-        [ReturnHints("Updating")]
-        [ReturnHints("Unknown group")]
-        [ReturnHints("Invaild group UUID")]
         [ReturnHints("Already in group")]
-        [ReturnHints("avatar lookup")]
-        [ReturnHints("Missing group Invite power")]
+        [ReturnHintsFailure("Updating")]
+        [ReturnHintsFailure("Unknown group")]
+        [ReturnHintsFailure("Invaild group UUID")]
+        [ReturnHintsFailure("avatar lookup")]
+        [ReturnHintsFailure("Missing group Invite power")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [ArgHints("avatar", "URLARG", "the UUID of the avatar you wish to check with")]
         [ArgHints("role", "URLARG", "the UUID of the role to invite them at the word \"everyone\"")]
@@ -273,7 +273,7 @@ namespace BetterSecondBot.HttpService
             bool status = bot.FastCheckInGroup(groupuuid, avataruuid);
             if (status == true)
             {
-                return Failure("Already in group", "GroupInvite", new [] { group, avatar, role });
+                return BasicReply("Already in group", "GroupInvite", new[] { group, avatar, role });
             }
             if(role == "everyone")
             {
@@ -294,11 +294,11 @@ namespace BetterSecondBot.HttpService
 
         [About("Sends a group notice (No attachments please use GroupnoticeWithAttachment to attach items!)")]
         [ReturnHints("Sending notice")]
-        [ReturnHints("Unknown group")]
-        [ReturnHints("Invaild group UUID")]
-        [ReturnHints("Title empty")]
-        [ReturnHints("Message empty")]
-        [ReturnHints("Missing group Notice power")]
+        [ReturnHintsFailure("Unknown group")]
+        [ReturnHintsFailure("Invaild group UUID")]
+        [ReturnHintsFailure("Title empty")]
+        [ReturnHintsFailure("Message empty")]
+        [ReturnHintsFailure("Missing group Notice power")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [ArgHints("title", "Text", "The title of the group notice")]
         [ArgHints("message", "Text", "The body of the group notice")]
@@ -340,9 +340,9 @@ namespace BetterSecondBot.HttpService
 
         [About("Activates the selected title")]
         [ReturnHints("Switching title")]
-        [ReturnHints("Unknown group")]
-        [ReturnHints("Invaild group UUID")]
-        [ReturnHints("Invaild role UUID")]
+        [ReturnHintsFailure("Unknown group")]
+        [ReturnHintsFailure("Invaild group UUID")]
+        [ReturnHintsFailure("Invaild role UUID")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [ArgHints("role", "URLARG", "tje UUID of the role")]
         [Route(HttpVerbs.Get, "/GroupActiveTitle/{group}/{token}")]
@@ -370,8 +370,8 @@ namespace BetterSecondBot.HttpService
 
         [About("Sets the selected group to the active group")]
         [ReturnHints("Switching active group")]
-        [ReturnHints("Unknown group")]
-        [ReturnHints("Invaild group UUID")]
+        [ReturnHintsFailure("Unknown group")]
+        [ReturnHintsFailure("Invaild group UUID")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [Route(HttpVerbs.Get, "/GroupActiveGroup/{group}/{token}")]
         public object GroupActiveGroup(string group, string token)
@@ -394,12 +394,12 @@ namespace BetterSecondBot.HttpService
 
         [About("Sends a group notice with an attachment")]
         [ReturnHints("Sending notice with attachment")]
-        [ReturnHints("Unknown group")]
-        [ReturnHints("Invaild group UUID")]
-        [ReturnHints("Invaild inventory UUID")]
-        [ReturnHints("Title empty")]
-        [ReturnHints("Message empty")]
-        [ReturnHints("Missing group Notice power")]
+        [ReturnHintsFailure("Unknown group")]
+        [ReturnHintsFailure("Invaild group UUID")]
+        [ReturnHintsFailure("Invaild inventory UUID")]
+        [ReturnHintsFailure("Title empty")]
+        [ReturnHintsFailure("Message empty")]
+        [ReturnHintsFailure("Missing group Notice power")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [ArgHints("title", "Text", "The title of the group notice")]
         [ArgHints("message", "Text", "The body of the group notice")]
@@ -465,9 +465,9 @@ namespace BetterSecondBot.HttpService
 
         [About("Requests the roles for the selected group<br/>Replys with GroupRoleDetails object formated as follows <ul><li>UpdateUnderway (Bool)</li><li>RoleDataAge (Int) [default -1]</li><li>Roles (KeyPair array of UUID=Name)</li></ul><br/>")]
         [ReturnHints("GroupRoleDetails object")]
-        [ReturnHints("Group is not currently known")]
-        [ReturnHints("Invaild group UUID")]
-        [ReturnHints("Updating")]
+        [ReturnHintsFailure("Group is not currently known")]
+        [ReturnHintsFailure("Invaild group UUID")]
+        [ReturnHintsFailure("Updating")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [Route(HttpVerbs.Get, "/GetGroupRoles/{group}/{token}")]
         public object GetGroupRoles(string group, string token)
@@ -529,10 +529,9 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("fetchs a list of all groups with unread messages")]
-        [ReturnHints("true")]
-        [ReturnHints("false")]
-        [ReturnHints("Unknown group")]
-        [ReturnHints("group value is invaild")]
+        [ReturnHints("true|false")]
+        [ReturnHintsFailure("Unknown group")]
+        [ReturnHintsFailure("group value is invaild")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [Route(HttpVerbs.Get, "/GroupchatGroupHasUnread/{group}/{token}")]
         public object GroupchatGroupHasUnread(string group,string token)
@@ -580,7 +579,7 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("fetchs the groupchat history")]
-        [ReturnHints("Group UUID invaild")]
+        [ReturnHintsFailure("Group UUID invaild")]
         [ReturnHints("Group Chat")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [Route(HttpVerbs.Get, "/GroupchatHistory/{group}/{token}")]
@@ -600,11 +599,10 @@ namespace BetterSecondBot.HttpService
         [About("sends a message to the groupchat")]
         [ArgHints("group", "URLARG", "UUID of the group")]
         [ArgHints("message", "Text", "the message to send")]
-        [ReturnHints("Group UUID invaild")]
-        [ReturnHints("Processing")]
-        [ReturnHints("Opening groupchat")]
         [ReturnHints("Sending")]
-        [ReturnHints("Missing group JoinChat power")]
+        [ReturnHintsFailure("Group UUID invaild")]
+        [ReturnHintsFailure("Opening groupchat - Please retry later")]
+        [ReturnHintsFailure("Missing group JoinChat power")]
         [Route(HttpVerbs.Post, "/Groupchat/{group}/{token}")]
         public object Groupchat(string group, [FormField] string message, string token)
         {
@@ -629,7 +627,7 @@ namespace BetterSecondBot.HttpService
             if (bot.GetActiveGroupchatSessions.Contains(groupUUID) == false)
             {
                 bot.GetClient.Self.RequestJoinGroupChat(groupUUID);
-                return Failure("Opening groupchat", "Groupchat", new [] { group, message });
+                return Failure("Opening groupchat - Please retry later", "Groupchat", new [] { group, message });
             }
             bot.GetClient.Self.InstantMessageGroup(groupUUID, message);
             return BasicReply("Sending", "Groupchat", new [] { group, message });

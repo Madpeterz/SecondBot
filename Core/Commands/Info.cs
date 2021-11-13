@@ -43,8 +43,8 @@ namespace BetterSecondBot.HttpService
 
         [About("Fetchs the current parcels name")]
         [ReturnHints("Parcelname")]
-        [ReturnHints("Error parcel not found")]
-        [ReturnHints("Error not in a sim")]
+        [ReturnHintsFailure("Error parcel not found")]
+        [ReturnHintsFailure("Error not in a sim")]
         [Route(HttpVerbs.Get, "/ParcelName/{token}")]
         public object ParcelName(string token)
         {
@@ -78,7 +78,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Fetchs the current region name")]
         [ReturnHints("Regionname")]
-        [ReturnHints("Error not in a sim")]
+        [ReturnHintsFailure("Error not in a sim")]
         [Route(HttpVerbs.Get, "/SimName/{token}")]
         public object SimName(string token)
         {
@@ -95,7 +95,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Fetchs the current location of the bot")]
         [ReturnHints("array of X,Y,Z values")]
-        [ReturnHints("Error not in a sim")]
+        [ReturnHintsFailure("Error not in a sim")]
         [Route(HttpVerbs.Get, "/GetPosition/{token}")]
         public object GetPosition(string token)
         {

@@ -19,9 +19,9 @@ namespace BetterSecondBot.HttpService
         public HTTP_Estate(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("Sends the message to the current sim")]
-        [ReturnHints("Not an estate manager here")]
         [ReturnHints("restarting")]
-        [ReturnHints("canceled")]
+        [ReturnHintsFailure("Not an estate manager here")]
+        [ReturnHintsFailure("canceled")]
         [ArgHints("delay", "URLARG", "How long to delay the restart for (30 to 240 secs) - defaults to 240 if out of bounds \n" +
             "set to 0 if your canceling!")]
         [ArgHints("mode", "URLARG", "true to start a restart, false to cancel")]
@@ -53,8 +53,8 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Sends the message to the current sim")]
-        [ReturnHints("Not an estate manager here")]
-        [ReturnHints("Message empty")]
+        [ReturnHintsFailure("Not an estate manager here")]
+        [ReturnHintsFailure("Message empty")]
         [ReturnHints("ok")]
         [ArgHints("message", "Text", "What the message is")]
         [Route(HttpVerbs.Post, "/SimMessage/{token}")]
@@ -77,7 +77,7 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Fetchs the regions map tile")]
-        [ReturnHints("Unable to find region")]
+        [ReturnHintsFailure("Unable to find region")]
         [ReturnHints("Texture UUID")]
         [ArgHints("regionname", "URLARG", "the name of the region we are fetching")]
         [Route(HttpVerbs.Get, "/GetSimTexture/{regionname}/{token}")]
@@ -95,7 +95,7 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Reclaims ownership of the current parcel")]
-        [ReturnHints("Not an estate manager here")]
+        [ReturnHintsFailure("Not an estate manager here")]
         [ReturnHints("ok")]
         [Route(HttpVerbs.Get, "/EstateParcelReclaim/{token}")]
         public Object EstateParcelReclaim(string token)
@@ -114,7 +114,7 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Reclaims ownership of the current parcel")]
-        [ReturnHints("Not an estate manager here")]
+        [ReturnHintsFailure("Not an estate manager here")]
         [ReturnHints("ok")]
         [Route(HttpVerbs.Get, "/GetSimGlobalPos/{regionname}/{token}")]
         public Object GetSimGlobalPos(string regionname, string token)
@@ -136,7 +136,7 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Requests the estate banlist")]
-        [ReturnHints("")]
+        [ReturnHints("ban list json")]
         [Route(HttpVerbs.Get, "/GetEstateBanList/{token}")]
         public Object GetEstateBanList(string token)
         {
@@ -150,9 +150,9 @@ namespace BetterSecondBot.HttpService
         [About("Attempts to add/remove the avatar to/from the Estate banlist")]
         [ReturnHints("Unban request accepted")]
         [ReturnHints("Ban request accepted")]
-        [ReturnHints("Unable to find avatar UUID")]
-        [ReturnHints("Unable to process global value please use true or false")]
-        [ReturnHints("Not an estate manager on region {REGIONNAME}")]
+        [ReturnHintsFailure("Unable to find avatar UUID")]
+        [ReturnHintsFailure("Unable to process global value please use true or false")]
+        [ReturnHintsFailure("Not an estate manager on region {REGIONNAME}")]
         [ArgHints("avatar", "URLARG", "the uuid avatar you wish to ban")]
         [ArgHints("mode", "URLARG", "What action would you like to take<br/>Defaults to remove if not given \"add\"")]
         [ArgHints("global", "URLARG", "if true this the ban/unban will be applyed to all estates the bot has access to")]

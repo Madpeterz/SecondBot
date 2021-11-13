@@ -1,14 +1,9 @@
-﻿using BetterSecondBotShared.Json;
-using BetterSecondBotShared.Static;
+﻿using BetterSecondBotShared.Static;
 using BetterSecondBot.bottypes;
-using OpenMetaverse;
-using System.Threading.Tasks;
 using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
 using System.Threading;
 
 namespace BetterSecondBot.HttpService
@@ -20,6 +15,7 @@ namespace BetterSecondBot.HttpService
         [About("Requests a new token (Vaild for 10 mins) <br/>to use with all other requests")]
         [NeedsToken(false)]
         [ReturnHints("A new token with full system scope")]
+        [ReturnHintsFailure("Authcode not accepted")]
         [ArgHints("authcode", "text", "the first 10 chars of SHA1(unixtime+WebUIkey)<br/>unixtime can be +- 30 of the bots time.")]
         [ArgHints("unixtimegiven", "number", "the unixtime you made this request")]
         [Route(HttpVerbs.Post, "/GetToken")]
@@ -55,7 +51,7 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Delays a thead by X ms<br/>Mostly pointless but good if your doing custom commands")]
-        [ReturnHints("Invaild amount")]
+        [ReturnHintsFailure("Invaild amount")]
         [ReturnHints("ok")]
         [Route(HttpVerbs.Get, "/Delay/{amount}/{token}")]
         public object Delay(string amount,string token)
@@ -73,7 +69,6 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Removes the given token from the accepted token pool")]
-        [ReturnHints("Failed to remove token")]
         [ReturnHints("ok")]
         [Route(HttpVerbs.Get, "/LogoutUI/{token}")]
         public object LogoutUI(string token)

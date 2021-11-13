@@ -21,8 +21,8 @@ namespace BetterSecondBot.HttpService
         [About("uses the AutoPilot to move to a location")]
         [ReturnHints("Error Unable to AutoPilot to location")]
         [ReturnHints("ok")]
-        [ReturnHints("Convert to vector has failed")]
-        [ReturnHints("?  value out of range 0-?")]
+        [ReturnHintsFailure("Convert to vector has failed")]
+        [ReturnHintsFailure("?  value out of range 0-?")]
         [ArgHints("x", "URLARG", "X location to AutoPilot to")]
         [ArgHints("y", "URLARG", "y location to AutoPilot to")]
         [ArgHints("z", "URLARG", "z location to AutoPilot to")]
@@ -73,7 +73,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Make the bot request the target avatar teleport to the bot")]
         [ReturnHints("ok")]
-        [ReturnHints("Invaild avatar UUID")]
+        [ReturnHintsFailure("Invaild avatar UUID")]
         [ArgHints("avatar", "URLARG", "Avatar UUID or Firstname Lastname")]
         [Route(HttpVerbs.Get, "/SendTeleportLure/{avatar}/{token}")]
         public object SendTeleportLure(string avatar,string token)
@@ -93,7 +93,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Sends a teleport request (Move the bot to the avatar)")]
         [ReturnHints("ok")]
-        [ReturnHints("Invaild avatar UUID")]
+        [ReturnHintsFailure("Invaild avatar UUID")]
         [ArgHints("avatar", "URLARG", "Avatar UUID or Firstname Lastname")]
         [Route(HttpVerbs.Get, "/RequestTeleport/{avatar}/{token}")]
         public object RequestTeleport(string avatar, string token)
@@ -114,7 +114,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Makes the bot fly (or not)")]
         [ReturnHints("ok")]
-        [ReturnHints("Invaild mode")]
+        [ReturnHintsFailure("Invaild mode")]
         [ArgHints("mode", "URLARG", "true: Start flying, false: stop flying (super fun at height)")]
         [Route(HttpVerbs.Get, "/Fly/{mode}/{token}")]
         public object Fly(string mode, string token)
@@ -136,8 +136,8 @@ namespace BetterSecondBot.HttpService
 
         [About("Rotates the bot to face a vector from its current location")]
         [ReturnHints("true|false")]
-        [ReturnHints("Invaild vector")]
-        [ReturnHints("Vector ? value is out of range 0-?")]
+        [ReturnHintsFailure("Invaild vector")]
+        [ReturnHintsFailure("Vector ? value is out of range 0-?")]
         [ArgHints("vector", "Text", "a vector to face eg <123,45,44>")]
         [Route(HttpVerbs.Post, "/RotateToFaceVector/{token}")]
         public object RotateToFaceVector([FormField] string vector, string token)
@@ -167,8 +167,8 @@ namespace BetterSecondBot.HttpService
 
         [About("Rotates the bot to face a avatar")]
         [ReturnHints("true|false")]
-        [ReturnHints("Invaild avatar UUID")]
-        [ReturnHints("Unable to see avatar")]
+        [ReturnHintsFailure("Invaild avatar UUID")]
+        [ReturnHintsFailure("Unable to see avatar")]
         [ArgHints("avatar", "URLARG", "An avatar UUID or Firstname Lastname")]
         [Route(HttpVerbs.Post, "/RotateToFace/{avatar}/{token}")]
         public object RotateToFace(string avatar, string token)
@@ -192,7 +192,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Rotates the avatar to face a rotation from north in Degrees")]
         [ReturnHints("ok")]
-        [ReturnHints("Unable to process rotation")]
+        [ReturnHintsFailure("Unable to process rotation")]
         [ArgHints("deg", "URLARG", "0 to 360")]
         [Route(HttpVerbs.Post, "/RotateTo/{deg}/{token}")]
         public object RotateTo(string deg, string token)
@@ -232,7 +232,7 @@ namespace BetterSecondBot.HttpService
 
 
         [About("Attempt to teleport to a new region")]
-        [ReturnHints("Error Unable to Teleport to location")]
+        [ReturnHintsFailure("Error Unable to Teleport to location")]
         [ReturnHints("Accepted")]
         [ArgHints("region", "URLARG", "the name of the region we are going to")]
         [ArgHints("x", "URLARG", "X location to teleport to")]
@@ -256,7 +256,7 @@ namespace BetterSecondBot.HttpService
 
 
         [About("Attempt to teleport to a new region via a SL url")]
-        [ReturnHints("slurl is empty")]
+        [ReturnHintsFailure("slurl is empty")]
         [ReturnHints("True|False")]
         [ArgHints("slurl", "Text", "a full SLurl")]
         [Route(HttpVerbs.Post, "/TeleportSLURL/{token}")]

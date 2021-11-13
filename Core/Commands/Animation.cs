@@ -19,7 +19,7 @@ namespace BetterSecondBot.HttpService
         [About("Toggles if animation requests from this avatar (used for remote poseballs) are accepted")]
         [ReturnHints("Granted perm animation")]
         [ReturnHints("Removed perm animation")]
-        [ReturnHints("avatar lookup")]
+        [ReturnHintsFailure("avatar lookup")]
         [ArgHints("avatar", "URLARG", "UUID (or Firstname Lastname)")]
         [Route(HttpVerbs.Get, "/AddToAllowAnimations/{avatar}/{token}")]
         public object AddToAllowAnimations(string avatar, string token)
@@ -43,7 +43,7 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Attempts to play a gesture")]
-        [ReturnHints("Error with gesture")]
+        [ReturnHintsFailure("Error with gesture")]
         [ReturnHints("Accepted")]
         [ArgHints("gesture", "URLARG", "Inventory UUID of the gesture")]
         [Route(HttpVerbs.Get, "/PlayGesture/{gesture}/{token}")]

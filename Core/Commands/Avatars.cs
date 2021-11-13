@@ -18,7 +18,7 @@ namespace BetterSecondBot.HttpService
 
         [About("an improved version of near me with extra details<br/>NearMeDetails is a object formated as follows<br/><ul><li>id</li><li>name</li><li>x</li><li>y</li><li>z</li><li>range</li></ul>")]
         [ReturnHints("array NearMeDetails")]
-        [ReturnHints("Error not in a sim")]
+        [ReturnHintsFailure("Error not in a sim")]
         [Route(HttpVerbs.Get, "/NearmeWithDetails/{token}")]
         public object NearmeWithDetails(string token)
         {
@@ -51,7 +51,7 @@ namespace BetterSecondBot.HttpService
 
         [About("returns a list of all known avatars nearby")]
         [ReturnHints("array UUID = Name")]
-        [ReturnHints("Error not in a sim")]
+        [ReturnHintsFailure("Error not in a sim")]
         [Route(HttpVerbs.Get, "/Nearme/{token}")]
         public object Nearme(string token)
         {

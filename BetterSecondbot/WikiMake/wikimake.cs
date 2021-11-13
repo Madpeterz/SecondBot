@@ -391,13 +391,18 @@ namespace BetterSecondBot.WikiMake
                     }
 
                     string[] returnvalues = HTTP.getReturnsValues(workspace, c);
-                    if (returnvalues.Length > 0)
+                    string[] returnvaluesfailure = HTTP.getReturnsFailureValues(workspace, c);
+                    if ((returnvalues.Length > 0) || (returnvaluesfailure.Length > 0))
                     {
-                        sb.Append("<hr/><h4>Possible replys</h4>");
-                        sb.Append("<ul>");
+                        sb.Append("<hr/><h4>Replys</h4>");
+                        sb.Append("<ul class=\"list-unstyled\">");
                         foreach (string entry in returnvalues)
                         {
-                            sb.Append("<li>"+entry+"</li>");
+                            sb.Append("<li class=\"text-success\">☑ " + entry+"</li>");
+                        }
+                        foreach (string entry in returnvaluesfailure)
+                        {
+                            sb.Append("<li class=\"text-danger\">❌ <strong>" + entry + "</strong></li>");
                         }
                         sb.Append("</ul>");
                     }
@@ -512,6 +517,7 @@ namespace BetterSecondBot.WikiMake
                 CustomAttributeData About = null;
                 List<CustomAttributeData> ArgHints = new List<CustomAttributeData>();
                 List<CustomAttributeData> ReturnValues = new List<CustomAttributeData>();
+                List<CustomAttributeData> ReturnValuesFailures = new List<CustomAttributeData>();
 
                 foreach (CustomAttributeData At in M.CustomAttributes)
                 {
@@ -534,6 +540,10 @@ namespace BetterSecondBot.WikiMake
                     else if (At.AttributeType.Name == "ReturnHints")
                     {
                         ReturnValues.Add(At);
+                    }
+                    else if (At.AttributeType.Name == "ReturnHintsFailure")
+                    {
+                        ReturnValuesFailures.Add(At);
                     }
                 }
                 if (httpverb != null)
@@ -561,6 +571,10 @@ namespace BetterSecondBot.WikiMake
                     foreach (CustomAttributeData cad in ReturnValues)
                     {
                         C.returns.Add(cad.ConstructorArguments[0].Value.ToString());
+                    }
+                    foreach (CustomAttributeData cad in ReturnValuesFailures)
+                    {
+                        C.returnsFailure.Add(cad.ConstructorArguments[0].Value.ToString());
                     }
                     C.Setup();
                     Endpoint.callable.Add(C);
@@ -631,7 +645,23 @@ namespace BetterSecondBot.WikiMake
             return new string[] { };
         }
 
-
+        public string[] getReturnsFailureValues(string endpoint, string command)
+        {
+            foreach (Endpoint End in endpoints)
+            {
+                if (End.name == endpoint)
+                {
+                    foreach (APIcall api in End.callable)
+                    {
+                        if (api.name == command)
+                        {
+                            return api.returnsFailure.ToArray();
+                        }
+                    }
+                }
+            }
+            return new string[] { };
+        }
 
         public int getCommandArgCount(string endpoint, string command)
         {
@@ -734,13 +764,14 @@ namespace BetterSecondBot.WikiMake
         public string about = "A API call that is missing its about value";
         public Dictionary<string, KeyValuePair<string, string>> values = new Dictionary<string, KeyValuePair<string, string>>();
         public List<string> returns = new List<string>();
+        public List<string> returnsFailure = new List<string>();
         public bool RequiresToken = true;
 
         public virtual void Setup()
         {
             if (RequiresToken == true)
             {
-                returns.Add("Token not accepted");
+                returnsFailure.Add("Token not accepted");
                 values.Add(
                     "token",
                     new KeyValuePair<string, string>(

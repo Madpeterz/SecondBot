@@ -362,7 +362,7 @@ namespace OpenMetaverse
         #region Private Fields
 
         private GridClient Client;
-        private int priceUpload = 0;
+        private int priceUpload = 10;
         public static bool SORT_INVENTORY = false;
 
         /// <summary>Constructor</summary>

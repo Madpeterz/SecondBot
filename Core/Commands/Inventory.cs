@@ -9,12 +9,51 @@ using System.Text;
 using OpenMetaverse;
 using System.Linq;
 using BetterSecondBotShared.Static;
+using System.IO;
+using OpenMetaverse.Assets;
 
 namespace BetterSecondBot.HttpService
 {
     public class HTTP_Inventory : WebApiControllerWithTokens
     {
         public HTTP_Inventory(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
+
+
+        [About("Does a thing")]
+        [ReturnHints("ok")]
+        [ArgHints("sourcePath", "Text", "The path to the wavefile")]
+        [ArgHints("inventoryName", "URLARG", "the name in secondlife")]
+        [Route(HttpVerbs.Post, "/UploadMediaWave/{inventoryName}/{token}")]
+        public object UploadMediaWave([FormField] string sourcePath, string inventoryName, string token)
+        {
+            if (tokens.Allow(token, "inventory", "UploadMediaWave", handleGetClientIP()) == false)
+            {
+                return Failure("Token not accepted", "UploadMediaWave");
+            }
+            byte[] audioData = File.ReadAllBytes(sourcePath);
+            InventoryFolder AA = bot.GetClient.Inventory.Store.RootFolder;
+            List<InventoryBase> T = bot.GetClient.Inventory.Store.GetContents(AA);
+            AA = null;
+            foreach (InventoryBase R in T)
+            {
+                if (R.Name == "Sounds")
+                {
+                    AA = (InventoryFolder)R;
+                    break;
+                }
+            }
+            AssetSound S = new AssetSound();
+            S.AssetData = audioData;
+            S.Encode();
+
+            bot.GetClient.Inventory.RequestCreateItemFromAsset(S.AssetData, inventoryName, "", AssetType.Sound, InventoryType.Sound, AA.UUID, uploadFinished);
+            return BasicReply("ok", "UploadMediaWave");
+        }
+        private void uploadFinished(bool success, string status, UUID itemID, UUID assetID)
+        {
+            bot.GetClient.Self.Chat("Success: " + success + " status:" + status + " Inv: " + itemID.ToString() + " Ass:" + assetID.ToString(), 0, ChatType.Normal);
+        }
+
 
         [About("rezs the item at the bots current location")]
         [ReturnHints("UUID of rezzed item")]

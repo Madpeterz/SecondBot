@@ -18,10 +18,10 @@ namespace BetterSecondBot.HttpService
 
         [About("Updates the relay target (you can have 1 of each type)<br/>Clear will disable them all")]
         [ReturnHints("cleared")]
-        [ReturnHints("set/avatar")]
-        [ReturnHints("set/http")]
-        [ReturnHints("set/channel")]
-        [ReturnHints("Not a vaild option")]
+        [ReturnHints("set/avatar [ok]")]
+        [ReturnHints("set/http [ok]")]
+        [ReturnHints("set/channel [ok]")]
+        [ReturnHintsFailure("Not a vaild option")]
         [ArgHints("target","URLARG", "Options: Channel (Any number),Avatar UUID,HTTPurl<br/>Clear")]
         [Route(HttpVerbs.Get, "/DialogRelay/{target}/{token}")]
         public object DialogRelay(string target,string token)
@@ -41,17 +41,17 @@ namespace BetterSecondBot.HttpService
             if (avataruuid != UUID.Zero)
             {
                 bot.SetRelayDialogsAvatar(avataruuid);
-                return BasicReply("set/avatar", "DialogRelay", new [] { target });
+                return BasicReply("set/avatar [ok]", "DialogRelay", new [] { target });
             }
             if (target.StartsWith("http") == true)
             {
                 bot.SetRelayDialogsHTTP(target);
-                return BasicReply("set/http", "DialogRelay", new [] { target });
+                return BasicReply("set/http [ok]", "DialogRelay", new [] { target });
             }
             if (int.TryParse(target, out int channel) == true)
             {
                 bot.SetRelayDialogsChannel(channel);
-                return BasicReply("set/channel", "DialogRelay", new [] { target });
+                return BasicReply("set/channel [ok]", "DialogRelay", new [] { target });
             }
             return Failure("Not a vaild option", "DialogRelay", new [] { target });
             
@@ -60,7 +60,7 @@ namespace BetterSecondBot.HttpService
         [About("Makes the bot interact with the dialog [dialogid] with the button [buttontext]")]
         [ReturnHints("true")]
         [ReturnHints("false")]
-        [ReturnHints("bad dialog id")]
+        [ReturnHintsFailure("bad dialog id")]
         [ArgHints("dialogid", "URLARG", "The ID for the dialog")]
         [ArgHints("buttontext", "URLARG", "The button text to push")]
         [Route(HttpVerbs.Get, "/DialogResponce/{dialogid}/{buttontext}/{token}")]
@@ -79,7 +79,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Should the bot track dialogs and send them to the relays setup?")]
         [ReturnHints("updated")]
-        [ReturnHints("bad status")]
+        [ReturnHintsFailure("bad status")]
         [ArgHints("status", "URLARG", "true or false")]
         [Route(HttpVerbs.Get, "/DialogTrack/{status}/{token}")]
         public object DialogTrack(string status, string token)

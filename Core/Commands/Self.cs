@@ -1,15 +1,12 @@
 ﻿using BetterSecondBot.bottypes;
-using BetterSecondBot.Static;
 using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using OpenMetaverse;
-using Newtonsoft.Json;
-using BetterSecondBotShared.Static;
 using System.Linq;
+using BetterSecondBotShared.Static;
 
 namespace BetterSecondBot.HttpService
 {
@@ -17,9 +14,22 @@ namespace BetterSecondBot.HttpService
     {
         public HTTP_Self(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
+        [About("Makes the bot teleport to its home region")]
+        [ReturnHints("ok")]
+        [Route(HttpVerbs.Get, "/GoHome/{token}")]
+        public object GoHome(string token)
+        {
+            if (tokens.Allow(token, "self", "GoHome", handleGetClientIP()) == false)
+            {
+                return Failure("Token not accepted", "GoHome");
+            }
+            bot.GotoNextHomeRegion();
+            return BasicReply("ok", "GoHome");
+        }
+
         [About("Makes the bot turn to face avatar and point at them (if found)")]
         [ReturnHints("ok")]
-        [ReturnHints("Cant find UUID in sim")]
+        [ReturnHintsFailure("Cant find UUID in sim")]
         [Route(HttpVerbs.Get, "/PointAt/{avatar}/{token}")]
         public object PointAt(string avatar, string token)
         {
@@ -44,7 +54,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Reads a value from the KeyValue storage (temp unless SQL is enabled)")]
         [ReturnHints("value")]
-        [ReturnHints("Unknown Key: KeyName")]
+        [ReturnHintsFailure("Unknown Key: KeyName")]
         [ArgHints("Key", "URLARG", "the key we are trying to read from")]
         [Route(HttpVerbs.Get, "/ReadKeyValue/{Key}/{token}")]
         public object ReadKeyValue(string Key, string token)
@@ -62,6 +72,8 @@ namespace BetterSecondBot.HttpService
 
         [About("sets a value for KeyValue storage (temp unless SQL is enabled)")]
         [ReturnHints("ok")]
+        [ReturnHintsFailure("Key is empty")]
+        [ReturnHintsFailure("Value is empty")]
         [ArgHints("Key", "URLARG", "the key we are trying to set")]
         [ArgHints("Value", "string", "the value we are tring to put on the key")]
         [Route(HttpVerbs.Post, "/SetKeyValue/{Key}/{token}")]
@@ -69,7 +81,15 @@ namespace BetterSecondBot.HttpService
         {
             if (tokens.Allow(token, "self", "SetKeyValue", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "SetKeyValue", new[] { Key });
+                return Failure("Token not accepted", "SetKeyValue", new[] { Key, Value });
+            }
+            if (helpers.isempty(Key) == false)
+            {
+                return Failure("Key is empty", "SetKeyValue", new[] { Key, Value });
+            }
+            if (helpers.isempty(Value) == false)
+            {
+                return Failure("Value is empty", "SetKeyValue", new[] { Key, Value });
             }
             bot.setLocalKeyStorage(Key, Value);
             return BasicReply("ok", "SetKeyValue");
@@ -77,7 +97,7 @@ namespace BetterSecondBot.HttpService
 
         [About("Reads a value from the KeyValue storage (temp unless SQL is enabled)")]
         [ReturnHints("ok")]
-        [ReturnHints("Unknown Key: KeyName")]
+        [ReturnHintsFailure("Key is empty")]
         [ArgHints("Key", "URLARG", "the key we are trying to clear")]
         [Route(HttpVerbs.Get, "/ClearKeyValue/{Key}/{token}")]
         public object ClearKeyValue(string Key, string token)
@@ -86,13 +106,17 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Token not accepted", "ClearKeyValue", new[] { Key });
             }
+            if (helpers.isempty(Key) == false)
+            {
+                return Failure("Key is empty", "SetKeyValue", new[] { Key });
+            }
             bot.clearLocalKeyStorage(Key);
             return BasicReply("ok", "SetKeyValue");
         }
 
         [About("Makes the bot sit on the ground or on a object if it can see it")]
         [ReturnHints("ok")]
-        [ReturnHints("Invaild object UUID")]
+        [ReturnHintsFailure("Invaild object UUID")]
         [ArgHints("target", "URLARG", "ground or a object UUID")]
         [Route(HttpVerbs.Get, "/Sit/{target}/{token}")]
         public object Sit(string target, string token)
@@ -130,8 +154,8 @@ namespace BetterSecondBot.HttpService
 
         [About("Makes the bot sit on the ground or on a object if it can see it")]
         [ReturnHints("true|false")]
-        [ReturnHints("Invaild object UUID")]
-        [ReturnHints("Unable to see object")]
+        [ReturnHintsFailure("Invaild object UUID")]
+        [ReturnHintsFailure("Unable to see object")]
         [ArgHints("target", "URLARG", "object UUID")]
         [Route(HttpVerbs.Get, "/ClickObject/{object}/{token}")]
         public object ClickObject(string target, string token)
@@ -144,7 +168,11 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Invaild object UUID", "ClickObject", new [] { target });
             }
+
+            bot.GetClient.Self.PointAtEffect(bot.GetClient.Self.AgentID, objectuuid, new Vector3d(0, 0, 0), PointAtType.Select, new UUID("1df9eb92-62fa-15e5-4bfb-5931f1525274"));
+
             Dictionary<uint, Primitive> objectsentrys = bot.GetClient.Network.CurrentSim.ObjectsPrimitives.Copy();
+
             bool found_object = false;
             foreach (KeyValuePair<uint, Primitive> entry in objectsentrys)
             {
@@ -192,6 +220,8 @@ namespace BetterSecondBot.HttpService
             return BasicReply("ok", "Logout");
         }
 
+
+
         [About("Makes the bot kill itself you monster - without making a sound")]
         [ReturnHints("ok")]
         [Route(HttpVerbs.Get, "/Bye/{token}")]
@@ -222,10 +252,10 @@ namespace BetterSecondBot.HttpService
         }
 
         [About("Gets the last 5 commands issued to the bot")]
-        [ReturnHints("avatar lookup")]
-        [ReturnHints("Invaild state")]
-        [ReturnHints("Invaild sticky")]
-        [ReturnHints("Invaild flag")]
+        [ReturnHintsFailure("avatar lookup")]
+        [ReturnHintsFailure("Invaild state")]
+        [ReturnHintsFailure("Invaild sticky")]
+        [ReturnHintsFailure("Invaild flag")]
         [ArgHints("avatar", "URLARG", "avatar uuid or Firstname Lastname")]
         [ArgHints("flag", "URLARG", "friend, group, animation, teleport or command")]
         [ArgHints("state", "URLARG", "State to set the flag to true or false")]
