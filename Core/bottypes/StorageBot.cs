@@ -419,6 +419,16 @@ namespace BetterSecondBot.bottypes
             base.AfterBotLoginHandler();
         }
 
+        protected override void BotChatControler(string message, string sender_name, UUID sender_uuid, bool avatar, bool group, UUID group_uuid, bool localchat, bool fromme)
+        {
+            if(avatar == true)
+            {
+                AddAvatarToDB(sender_uuid, sender_name);
+            }
+            base.BotChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
+
+        }
+
         protected void Key2NameEvent(object sender,UUIDNameReplyEventArgs e)
         {
             foreach(KeyValuePair<UUID,string> pair in e.Names)
