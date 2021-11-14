@@ -347,12 +347,6 @@ namespace BetterSecondBot.bottypes
             {
                 // Old style [non json] to json converter [to be phased out]
                 string[] S1 = message.Split(new[] { "#|#" }, StringSplitOptions.RemoveEmptyEntries);
-                /*
-                 * Groupchat|||5e667f5a-50ba-1981-060d-ed869947636a~#~Rental started (Via land buy)
-Avatar: Bart Rhys
-Region: La Konga
- Parcel: 16384sqm 1/4 Sim 5340 Prims 4250L$ Week/No Club/ (PRICE FIXED)
-                 */
                 string outputto = "none";
                 if (S1.Length == 2)
                 {
