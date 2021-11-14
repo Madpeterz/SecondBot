@@ -21,16 +21,55 @@ namespace BetterSecondBot.HttpService
         [Route(HttpVerbs.Get, "/ListSculptys/{token}")]
         public object ListSculptys(string token)
         {
-            Dictionary<string, string> Sculpts = new Dictionary<string, string>();
             Dictionary<uint, Primitive> objects_copy = bot.GetClient.Network.CurrentSim.ObjectsPrimitives.Copy();
+
+            Dictionary<uint, uint> mapLocalID = new Dictionary<uint, uint>();
             foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
             {
-                if (Obj.Value.Type == PrimType.Sculpt)
+                mapLocalID.Add(Obj.Value.LocalID, Obj.Key);
+            }
+            List<SculptysInfo> reply = new List<SculptysInfo>();
+            foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
+            {
+                if (Obj.Value.Sculpt != null)
                 {
-                    Sculpts.Add(Obj.Value.ID.ToString(), Obj.Value.Position.ToString());
+                    if (PrimType.Sculpt.Equals(Obj.Value.Type) == true)
+                    {
+                        Vector3 pos = Obj.Value.Position;
+                        string name = "?";
+                        if (Obj.Value.NameValues != null)
+                        {
+                            name = Obj.Value.NameValues[0].Value.ToString();
+                        }
+                        UUID key = Obj.Value.ID;
+                        UUID owner = Obj.Value.OwnerID;
+                        bool asLink = false;
+                        if (Obj.Value.ParentID > 0)
+                        {
+                            if(mapLocalID.ContainsKey(Obj.Value.ParentID) == true)
+                            {
+                                Primitive wip = objects_copy[mapLocalID[Obj.Value.ParentID]];
+                                pos = wip.Position;
+                                asLink = true;
+                                owner = wip.OwnerID;
+                                if (wip.NameValues != null)
+                                {
+                                    name = wip.NameValues[0].Value.ToString();
+                                }
+                                key = wip.ID;
+                            }
+                        }
+                        SculptysInfo A = new SculptysInfo();
+                        A.isLinked = asLink.ToString();
+                        A.name = name.ToString();
+                        A.owner = owner.ToString();
+                        A.uuid = key.ToString();
+                        A.pos = pos.ToString();
+                        reply.Add(A);
+                    }
                 }
             }
-            return BasicReply(JsonConvert.SerializeObject(Sculpts), "ListSculptys");
+            return BasicReply(JsonConvert.SerializeObject(reply), "ListSculptys");
         }
 
         [About("Fetchs the current bot")]
@@ -130,5 +169,15 @@ namespace BetterSecondBot.HttpService
             pos.Add("z", (int)Math.Round(bot.GetClient.Self.SimPosition.Z));
             return BasicReply(JsonConvert.SerializeObject(pos), "GetPosition");
         }
+    }
+
+    public class SculptysInfo
+    {
+        public string name = "";
+        public string isLinked = "False";
+        public string owner = "?";
+        public string uuid = "?";
+        public string pos = "<0,0,0>";
+
     }
 }
