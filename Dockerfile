@@ -10,7 +10,7 @@ COPY ["Core/Core.csproj", "Core/"]
 COPY ["Shared/Shared.csproj", "Shared/"]
 COPY ["LibreMetaverse/LibreMetaverse.csproj", "LibreMetaverse/"]
 COPY ["LibreMetaverse.StructuredData/LibreMetaverse.StructuredData.csproj", "LibreMetaverse.StructuredData/"]
-COPY ["LibreMetaverseTypes/LibreMetaverse.Types.csproj", "LibreMetaverseTypes/"]
+COPY ["LibreMetaverseTypes/LibreMetaverse.Types.csproj", "LibreMetaverse.Types/"]
 RUN dotnet restore "BetterSecondbot/BetterSecondbot.csproj"
 COPY . .
 WORKDIR "/src/BetterSecondbot"
