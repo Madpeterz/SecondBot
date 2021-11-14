@@ -846,8 +846,6 @@ namespace OpenMetaverse
         /// </summary>
         /// <param name="assetID">Use UUID.Zero if you do not have the 
         /// asset ID but have all the necessary permissions</param>
-        /// <param name="assetType"></param>
-        /// <param name="priority">Whether to prioritize this asset download or not</param>
         /// <param name="transfer"></param>
         /// <param name="callback"></param>
         private void RequestInventoryAssetHTTP(UUID assetID, AssetDownload transfer, AssetReceivedCallback callback)
@@ -1128,7 +1126,7 @@ namespace OpenMetaverse
                                             Logger.Log("Bake upload failed during asset upload", Helpers.LogLevel.Warning, Client);
                                             callback(UUID.Zero);
                                         };
-                                    upload.BeginGetResponse(textureData, "application/octet-stream", Client.Settings.CAPS_TIMEOUT);
+                                    upload.PostRequestAsync(textureData, "application/octet-stream", Client.Settings.CAPS_TIMEOUT);
                                     return;
                                 }
                             }
@@ -1137,7 +1135,7 @@ namespace OpenMetaverse
                         Logger.Log("Bake upload failed during uploader retrieval", Helpers.LogLevel.Warning, Client);
                         callback(UUID.Zero);
                     };
-                request.BeginGetResponse(new OSDMap(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(new OSDMap(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
             {

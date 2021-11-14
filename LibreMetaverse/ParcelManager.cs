@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
+ * Copyright (c) 2021, Sjofn LLC
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without 
@@ -570,10 +571,11 @@ namespace OpenMetaverse
         public bool ObscureMusic;
         /// <summary>A struct containing media details</summary>
         public ParcelMedia Media;
+        /// <summary>Parcel privacy see avatars outside/inside parcel</summary>
         public bool SeeAVs;
-        /// <summary> true if avatars outside can hear any sounds avatars inside play</summary>
+        /// <summary>Parcel privacy play sounds attached to avatars outside/inside parcel</summary>
         public bool AnyAVSounds;
-        /// <summary> true if group members outside can hear any sounds avatars inside play</summary>
+        /// <summary>Parcel privacy play sounds for group members</summary>
         public bool GroupAVSounds;
 
         /// <summary>
@@ -636,8 +638,8 @@ namespace OpenMetaverse
                     ObscureMusic = ObscureMusic,
                     ParcelFlags = Flags,
                     PassHours = PassHours,
-                    PassPrice = (uint)PassPrice,
-                    SalePrice = (uint)SalePrice,
+                    PassPrice = (uint) PassPrice,
+                    SalePrice = (uint) SalePrice,
                     SnapshotID = SnapshotID,
                     UserLocation = UserLocation,
                     UserLookAt = UserLookAt,
@@ -648,7 +650,7 @@ namespace OpenMetaverse
 
                 OSDMap body = req.Serialize();
 
-                request.BeginGetResponse(body, OSDFormat.Xml, simulator.Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(body, OSDFormat.Xml, simulator.Client.Settings.CAPS_TIMEOUT);
             }
             else
             {
@@ -1669,9 +1671,9 @@ namespace OpenMetaverse
 
                 try
                 {
-                    OSD result = request.GetResponse(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                    OSDMap result = request.PostRequest(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT) as OSDMap;
                     RemoteParcelRequestReply response = new RemoteParcelRequestReply();
-                    response.Deserialize((OSDMap)result);
+                    response.Deserialize(result);
                     return response.ParcelID;
                 }
                 catch (Exception)
@@ -1708,7 +1710,7 @@ namespace OpenMetaverse
                         response.Deserialize((OSDMap)result);
 
                         CapsClient summaryRequest = new CapsClient(response.ScriptResourceSummary, "ScriptResourceSummary");
-                        OSD summaryResponse = summaryRequest.GetResponse(Client.Settings.CAPS_TIMEOUT);
+                        OSD summaryResponse = summaryRequest.GetRequest(Client.Settings.CAPS_TIMEOUT);
 
                         LandResourcesInfo res = new LandResourcesInfo();
                         res.Deserialize((OSDMap)summaryResponse);
@@ -1716,7 +1718,7 @@ namespace OpenMetaverse
                         if (response.ScriptResourceDetails != null && getDetails)
                         {
                             CapsClient detailRequest = new CapsClient(response.ScriptResourceDetails, "ScriptResourceDetails");
-                            OSD detailResponse = detailRequest.GetResponse(Client.Settings.CAPS_TIMEOUT);
+                            OSD detailResponse = detailRequest.GetRequest(Client.Settings.CAPS_TIMEOUT);
                             res.Deserialize((OSDMap)detailResponse);
                         }
                         callback(true, res);
@@ -1729,7 +1731,7 @@ namespace OpenMetaverse
                 };
 
                 LandResourcesRequest param = new LandResourcesRequest {ParcelID = parcelID};
-                request.BeginGetResponse(param.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(param.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
 
             }
             catch (Exception ex)
@@ -1854,6 +1856,7 @@ namespace OpenMetaverse
                 SeeAVs = msg.SeeAVs,
                 AnyAVSounds = msg.AnyAVSounds,
                 GroupAVSounds = msg.GroupAVSounds
+                
             };
 
             ParcelResult result = msg.RequestResult;

@@ -1,5 +1,6 @@
 ﻿/*
  * Copyright (c) 2006-2016, openmetaverse.co
+ * Copyright (c) 2021, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without 
@@ -164,7 +165,10 @@ namespace OpenMetaverse.ImportExport
                     bitmap = resized;
                 }
 
-                material.TextureData = OpenJPEG.EncodeFromImage(bitmap, false);
+                using (var writer = new OpenJpegDotNet.IO.Writer(bitmap))
+                {
+                    material.TextureData = writer.Encode();
+                }
 
                 Logger.Log("Successfully encoded " + fname, Helpers.LogLevel.Info);
             }

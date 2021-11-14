@@ -24,9 +24,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OggVorbisEncoder;
 using System;
 using System.IO;
-using OggVorbisEncoder;
 
 namespace OpenMetaverse.Assets
 {
@@ -47,13 +47,18 @@ namespace OpenMetaverse.Assets
         public AssetSound(UUID assetID, byte[] assetData)
             : base(assetID, assetData)
         {
+            if ((assetID != UUID.Zero) && (assetData.Length > 0))
+            {
+                encodedAudio = true;
+            }
         }
 
+        protected bool encodedAudio = false;
+
         /// <summary>
-        /// TODO: Encodes a sound file
+        /// Converts a byte data for a wave PCM file @ 44100 to a OGG encoding
         /// </summary>
-        bool encodedAudio = false;
-        public override void Encode() 
+        public override void Encode()
         {
             if (encodedAudio == false)
             {
@@ -63,7 +68,7 @@ namespace OpenMetaverse.Assets
         }
 
         /// <summary>
-        /// TODO: Decode a sound file
+        /// its already ogg just play it or convert it yourself
         /// </summary>
         /// <returns>true</returns>
         public override bool Decode() { return true; }
@@ -125,7 +130,7 @@ namespace OpenMetaverse.Assets
         private static readonly int WriteBufferSize = 512;
         private static byte[] GenerateFile(float[][] floatSamples, int sampleRate, int channels)
         {
-            using MemoryStream outputData = new MemoryStream();
+            MemoryStream outputData = new MemoryStream();
 
             // Stores all the static vorbis bitstream settings
             var info = VorbisInfo.InitVariableBitRate(channels, sampleRate, 0.5f);

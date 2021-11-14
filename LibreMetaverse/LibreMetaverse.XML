@@ -1076,7 +1076,7 @@
             <summary>Raised when our agent succeeds or fails to join a group chat session</summary>
         </member>
         <member name="F:OpenMetaverse.AgentManager.m_AlertMessage">
-            <summary>The event subscribers. null if no subcribers</summary>
+            <summary>The event subscribers. null if no subscribers</summary>
         </member>
         <member name="M:OpenMetaverse.AgentManager.OnAlertMessage(OpenMetaverse.AlertMessageEventArgs)">
             <summary>Raises the AlertMessage event</summary>
@@ -1334,6 +1334,11 @@
         <member name="M:OpenMetaverse.AgentManager.RetrieveInstantMessages">
             <summary>
             Request any instant messages sent while the client was offline to be resent.
+            </summary>
+        </member>
+        <member name="M:OpenMetaverse.AgentManager.RetrieveInstantMessagesLegacy">
+            <summary>
+            Request offline instant messages via the legacy LLUDP packet
             </summary>
         </member>
         <member name="M:OpenMetaverse.AgentManager.InstantMessage(OpenMetaverse.UUID,System.String)">
@@ -1834,9 +1839,16 @@
         </member>
         <member name="M:OpenMetaverse.AgentManager.UpdateInterests(OpenMetaverse.Avatar.Interests)">
             <summary>
-            Update agents profile interests
+            Update agent's profile interests
             </summary>
             <param name="interests">selection of interests from <seealso cref="T:OpenMetaverse.Avatar.Interests"/> struct</param>
+        </member>
+        <member name="M:OpenMetaverse.AgentManager.UpdateProfileNotes(OpenMetaverse.UUID,System.String)">
+            <summary>
+            Update agent's private notes for target avatar
+            </summary>
+            <param name="target">target avatar for notes</param>
+            <param name="notes">notes to store</param>
         </member>
         <member name="M:OpenMetaverse.AgentManager.SetHeightWidth(System.UInt16,System.UInt16)">
             <summary>
@@ -2934,14 +2946,13 @@
         <member name="T:OpenMetaverse.AlertMessageEventArgs">
             <summary>Data sent by the simulator containing urgent messages</summary>
         </member>
-        <member name="P:OpenMetaverse.AlertMessageEventArgs.Message">
-            <summary>Get the alert message</summary>
-        </member>
-        <member name="M:OpenMetaverse.AlertMessageEventArgs.#ctor(System.String)">
+        <member name="M:OpenMetaverse.AlertMessageEventArgs.#ctor(System.String,System.String,OpenMetaverse.StructuredData.OSDMap)">
             <summary>
             Construct a new instance of the AlertMessageEventArgs class
             </summary>
-            <param name="message">The alert message</param>
+            <param name="message">user readable message</param>
+            <param name="notificationid">notification id for alert, may be null</param>
+            <param name="extraparams">any extra params in OSD format, may be null</param>
         </member>
         <member name="T:OpenMetaverse.ScriptControlEventArgs">
             <summary>Data sent by a script requesting to take or release specified controls to your agent</summary>
@@ -4684,8 +4695,6 @@
             </summary>
             <param name="assetID">Use UUID.Zero if you do not have the 
             asset ID but have all the necessary permissions</param>
-            <param name="assetType"></param>
-            <param name="priority">Whether to prioritize this asset download or not</param>
             <param name="transfer"></param>
             <param name="callback"></param>
         </member>
@@ -5665,12 +5674,12 @@
         </member>
         <member name="M:OpenMetaverse.Assets.AssetSound.Encode">
             <summary>
-            TODO: Encodes a sound file
+            Converts a byte data for a wave PCM file @ 44100 to a OGG encoding
             </summary>
         </member>
         <member name="M:OpenMetaverse.Assets.AssetSound.Decode">
             <summary>
-            TODO: Decode a sound file
+            its already ogg just play it or convert it yourself
             </summary>
             <returns>true</returns>
         </member>
@@ -5684,9 +5693,6 @@
         </member>
         <member name="F:OpenMetaverse.Assets.AssetTexture.Image">
             <summary>A <seealso cref="T:OpenMetaverse.Imaging.ManagedImage"/> object containing image data</summary>
-        </member>
-        <member name="F:OpenMetaverse.Assets.AssetTexture.LayerInfo">
-            <summary></summary>
         </member>
         <member name="F:OpenMetaverse.Assets.AssetTexture.Components">
             <summary></summary>
@@ -5719,13 +5725,6 @@
             <seealso cref="T:OpenMetaverse.Imaging.ManagedImage"/> object <seealso cref="F:OpenMetaverse.Assets.AssetTexture.Image"/>
             </summary>
             <returns>True if the decoding was successful, otherwise false</returns>
-        </member>
-        <member name="M:OpenMetaverse.Assets.AssetTexture.DecodeLayerBoundaries">
-            <summary>
-            Decodes the begin and end byte positions for each quality layer in
-            the image
-            </summary>
-            <returns></returns>
         </member>
         <member name="T:OpenMetaverse.Assets.AssetWearable">
             <summary>
@@ -6108,6 +6107,21 @@
             <summary>Raised when the simulator sends us data containing
             the interests listed in an agents profile</summary>
         </member>
+        <member name="F:OpenMetaverse.AvatarManager.m_AvatarNotesReply">
+            <summary>The event subscribers, null of no subscribers</summary>
+        </member>
+        <member name="M:OpenMetaverse.AvatarManager.OnAvatarNotesReply(OpenMetaverse.AvatarNotesReplyEventArgs)">
+            <summary>Raises the AvatarNotesReply Event</summary>
+             <param name="e">A AvatarNotesReplyEventArgs object containing
+             the data sent from the simulator</param>
+        </member>
+        <member name="F:OpenMetaverse.AvatarManager.m_AvatarNotesReplyLock">
+            <summary>Thread sync lock object</summary>
+        </member>
+        <member name="E:OpenMetaverse.AvatarManager.AvatarNotesReply">
+            <summary>Raised when the simulator sends us data containing
+            the private notes listed in an agents profile</summary>
+        </member>
         <member name="F:OpenMetaverse.AvatarManager.m_AvatarPropertiesReply">
             <summary>The event subscribers, null of no subscribers</summary>
         </member>
@@ -6328,6 +6342,12 @@
             </summary>
             <param name="name">The name to search for</param>
             <param name="queryID">An ID to associate with this query</param>
+        </member>
+        <member name="M:OpenMetaverse.AvatarManager.RequestAvatarNotes(OpenMetaverse.UUID)">
+            <summary>
+            Request avatar notes from simulator
+            </summary>
+            <param name="avatarid">Target agent UUID</param>
         </member>
         <member name="M:OpenMetaverse.AvatarManager.RequestAvatarPicks(OpenMetaverse.UUID)">
             <summary>
@@ -6553,6 +6573,15 @@
             <summary>Get the ID of the agent</summary>
         </member>
         <member name="P:OpenMetaverse.AvatarInterestsReplyEventArgs.Interests">
+            <summary>Get the interests of the agent</summary>
+        </member>
+        <member name="T:OpenMetaverse.AvatarNotesReplyEventArgs">
+            <summary>Represents the private notes from the profile of an agent</summary>
+        </member>
+        <member name="P:OpenMetaverse.AvatarNotesReplyEventArgs.AvatarID">
+            <summary>Get the ID of the agent</summary>
+        </member>
+        <member name="P:OpenMetaverse.AvatarNotesReplyEventArgs.Notes">
             <summary>Get the interests of the agent</summary>
         </member>
         <member name="T:OpenMetaverse.AvatarPropertiesReplyEventArgs">
@@ -6885,6 +6914,36 @@
             <summary>
             Poses set in the animation metadata for the hands.
             </summary>
+        </member>
+        <member name="M:OpenMetaverse.Http.CapsClient.#ctor(System.Uri)">
+            <summary>
+            CapsClient Ctor 
+            </summary>
+            <param name="capability"><seealso cref="T:System.Uri"/> for simulator capability</param>
+        </member>
+        <member name="M:OpenMetaverse.Http.CapsClient.#ctor(System.Uri,System.String)">
+            <summary>
+            CapsClient Ctor with name
+            </summary>
+            <param name="capability"><seealso cref="T:System.Uri"/> for simulator capability</param>
+            <param name="cap_name">Simulator capability name</param>
+        </member>
+        <member name="M:OpenMetaverse.Http.CapsClient.#ctor(System.Uri,System.String,System.Security.Cryptography.X509Certificates.X509Certificate2)">
+            <summary>
+            CapsClient Ctor with name and certificate
+            </summary>
+            <param name="capability"><seealso cref="T:System.Uri"/> for simulator capability</param>
+            <param name="cap_name">Simulator capability name</param>
+            <param name="clientCert"><seealso cref="T:System.Security.Cryptography.X509Certificates.X509Certificate2"/> client certificate</param>
+        </member>
+        <member name="M:OpenMetaverse.Http.CapsClient.serializeData(OpenMetaverse.StructuredData.OSD,OpenMetaverse.StructuredData.OSDFormat,System.Byte[]@,System.String@)">
+            <summary>
+            Serializes OSD data for http request
+            </summary>
+            <param name="data"><seealso cref="T:OpenMetaverse.StructuredData.OSD"/>formatted data for input</param>
+            <param name="format">Format to serialize data to</param>
+            <param name="serializedData">Output serialized data as byte array</param>
+            <param name="contentType">content-type string of serialized data</param>
         </member>
         <member name="F:OpenMetaverse.Http.EventQueueClient.REQUEST_TIMEOUT">
             <summary>Viewer defauls to 30 for main grid, 60 for others</summary>
@@ -12546,8 +12605,16 @@
             <summary>
             Accept a friendship request
             </summary>
-            <param name="fromAgentID">agentID of avatatar to form friendship with</param>
+            <param name="fromAgentID">agentID of avatar to form friendship with</param>
             <param name="imSessionID">imSessionID of the friendship request message</param>
+        </member>
+        <member name="M:OpenMetaverse.FriendsManager.AcceptFriendshipCapability(OpenMetaverse.UUID)">
+            <summary>
+            Accept friendship request. Only to be used if request was sent via Offline Msg cap
+            This can be determined by the presence of a <seealso cref="P:OpenMetaverse.InstantMessageEventArgs.Simulator"/>
+            value in <seealso cref="T:OpenMetaverse.InstantMessageEventArgs" />
+            </summary>
+            <param name="fromAgentID">agentID of avatar to form friendship with</param>
         </member>
         <member name="M:OpenMetaverse.FriendsManager.DeclineFriendship(OpenMetaverse.UUID,OpenMetaverse.UUID)">
             <summary>
@@ -12555,6 +12622,14 @@
             </summary>
             <param name="fromAgentID"><seealso cref="T:OpenMetaverse.UUID"/> of friend</param>
             <param name="imSessionID">imSessionID of the friendship request message</param>
+        </member>
+        <member name="M:OpenMetaverse.FriendsManager.DeclineFriendshipCap(OpenMetaverse.UUID)">
+            <summary>
+            Decline friendship request. Only to be used if request was sent via Offline Msg cap
+            This can be determined by the presence of a <seealso cref="P:OpenMetaverse.InstantMessageEventArgs.Simulator"/>
+            value in <seealso cref="T:OpenMetaverse.InstantMessageEventArgs" />
+            </summary>
+            <param name="fronAgentID"><seealso cref="T:OpenMetaverse.UUID"/> of friend</param>
         </member>
         <member name="M:OpenMetaverse.FriendsManager.OfferFriendship(OpenMetaverse.UUID)">
             <summary>
@@ -12653,7 +12728,7 @@
             <summary>
             Construct a new instance of the FriendsReadyEventArgs class
             </summary>
-            <param name="Count">The total number of people loaded into the friend list.</param>
+            <param name="count">The total number of people loaded into the friend list.</param>
         </member>
         <member name="T:OpenMetaverse.FriendInfoEventArgs">
             <summary>Contains information on a member of our friends list</summary>
@@ -14840,94 +14915,6 @@
             origin, suitable for feeding directly into OpenGL
             </summary>
             <returns>A byte array containing raw texture data</returns>
-        </member>
-        <member name="T:OpenMetaverse.Imaging.OpenJPEG">
-            <summary>
-            A Wrapper around openjpeg to encode and decode images to and from byte arrays
-            </summary>
-        </member>
-        <member name="F:OpenMetaverse.Imaging.OpenJPEG.TGA_HEADER_SIZE">
-            <summary>TGA Header size</summary>
-        </member>
-        <member name="T:OpenMetaverse.Imaging.OpenJPEG.J2KLayerInfo">
-            <summary>
-            Defines the beginning and ending file positions of a layer in an
-            LRCP-progression JPEG2000 file
-            </summary>
-        </member>
-        <member name="T:OpenMetaverse.Imaging.OpenJPEG.MarshalledImage">
-            <summary>
-            This structure is used to marshal both encoded and decoded images.
-            MUST MATCH THE STRUCT IN dotnet.h!
-            </summary>
-        </member>
-        <member name="T:OpenMetaverse.Imaging.OpenJPEG.MarshalledPacket">
-            <summary>
-            Information about a single packet in a JPEG2000 stream
-            </summary>
-        </member>
-        <member name="F:OpenMetaverse.Imaging.OpenJPEG.MarshalledPacket.start_pos">
-            <summary>Packet start position</summary>
-        </member>
-        <member name="F:OpenMetaverse.Imaging.OpenJPEG.MarshalledPacket.end_ph_pos">
-            <summary>Packet header end position</summary>
-        </member>
-        <member name="F:OpenMetaverse.Imaging.OpenJPEG.MarshalledPacket.end_pos">
-            <summary>Packet end position</summary>
-        </member>
-        <member name="F:OpenMetaverse.Imaging.OpenJPEG.OpenJPEGLock">
-            <summary>OpenJPEG is not threadsafe, so this object is used to lock
-            during calls into unmanaged code</summary>
-        </member>
-        <member name="M:OpenMetaverse.Imaging.OpenJPEG.Encode(OpenMetaverse.Imaging.ManagedImage,System.Boolean)">
-            <summary>
-            Encode a <seealso cref="T:OpenMetaverse.Imaging.ManagedImage"/> object into a byte array
-            </summary>
-            <param name="image">The <seealso cref="T:OpenMetaverse.Imaging.ManagedImage"/> object to encode</param>
-            <param name="lossless">true to enable lossless conversion, only useful for small images ie: sculptmaps</param>
-            <returns>A byte array containing the encoded Image object</returns>
-        </member>
-        <member name="M:OpenMetaverse.Imaging.OpenJPEG.Encode(OpenMetaverse.Imaging.ManagedImage)">
-            <summary>
-            Encode a <seealso cref="T:OpenMetaverse.Imaging.ManagedImage"/> object into a byte array
-            </summary>
-            <param name="image">The <seealso cref="T:OpenMetaverse.Imaging.ManagedImage"/> object to encode</param>
-            <returns>a byte array of the encoded image</returns>
-        </member>
-        <member name="M:OpenMetaverse.Imaging.OpenJPEG.DecodeToImage(System.Byte[],OpenMetaverse.Imaging.ManagedImage@,System.Drawing.Image@)">
-            <summary>
-            Decode JPEG2000 data to an <seealso cref="T:System.Drawing.Image"/> and
-            <seealso cref="T:OpenMetaverse.Imaging.ManagedImage"/>
-            </summary>
-            <param name="encoded">JPEG2000 encoded data</param>
-            <param name="managedImage">ManagedImage object to decode to</param>
-            <param name="image">Image object to decode to</param>
-            <returns>True if the decode succeeds, otherwise false</returns>
-        </member>
-        <member name="M:OpenMetaverse.Imaging.OpenJPEG.DecodeToImage(System.Byte[],OpenMetaverse.Imaging.ManagedImage@)">
-            <summary>
-            
-            </summary>
-            <param name="encoded"></param>
-            <param name="managedImage"></param>
-            <returns></returns>
-        </member>
-        <member name="M:OpenMetaverse.Imaging.OpenJPEG.DecodeLayerBoundaries(System.Byte[],OpenMetaverse.Imaging.OpenJPEG.J2KLayerInfo[]@,System.Int32@)">
-            <summary>
-            
-            </summary>
-            <param name="encoded"></param>
-            <param name="layerInfo"></param>
-            <param name="components"></param>
-            <returns></returns>
-        </member>
-        <member name="M:OpenMetaverse.Imaging.OpenJPEG.EncodeFromImage(System.Drawing.Bitmap,System.Boolean)">
-            <summary>
-            Encode a <seealso cref="T:System.Drawing.Bitmap"/> object into a byte array
-            </summary>
-            <param name="bitmap">The source <seealso cref="T:System.Drawing.Bitmap"/> object to encode</param>
-            <param name="lossless">true to enable lossless decoding</param>
-            <returns>A byte array containing the source Bitmap object</returns>
         </member>
         <member name="T:OpenMetaverse.Imaging.LoadTGAClass">
             <summary>
@@ -25503,7 +25490,7 @@
             Loads in inventory cache file into the inventory structure. Note only valid to call after login has been successful.
             </summary>
             <param name="filename">Name of the cache file to load</param>
-            <returns>The number of inventory items sucessfully reconstructed into the inventory node tree</returns>
+            <returns>The number of inventory items successfully reconstructed into the inventory node tree</returns>
         </member>
         <member name="P:OpenMetaverse.Inventory.Item(OpenMetaverse.UUID)">
             <summary>
@@ -26337,7 +26324,23 @@
             <param name="ownerIDs">Owners of the inventory items</param>
             <seealso cref="M:OpenMetaverse.InventoryManager.OnItemReceived(OpenMetaverse.ItemReceivedEventArgs)"/>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:OpenMetaverse.InventoryManager.FolderContentsWithReply(OpenMetaverse.UUID,OpenMetaverse.UUID,System.Boolean,System.Boolean,OpenMetaverse.InventorySortOrder,System.Int32,System.Boolean)" -->
+        <member name="M:OpenMetaverse.InventoryManager.FolderContentsWithReply(OpenMetaverse.UUID,OpenMetaverse.UUID,System.Boolean,System.Boolean,OpenMetaverse.InventorySortOrder,System.Int32,System.Boolean)">
+            <summary>
+            FolderContentsWithReply
+            Get contents of a folder
+            </summary>
+            <param name="folder">The <seealso cref="T:OpenMetaverse.UUID"/> of the folder to search</param>
+            <param name="owner">The <seealso cref="T:OpenMetaverse.UUID"/> of the folders owner</param>
+            <param name="folders">true to retrieve folders</param>
+            <param name="items">true to retrieve items</param>
+            <param name="order">sort order to return results in</param>
+            <param name="timeoutMS">a integer representing the number of milliseconds to wait for results</param>
+            <param name="fast_loading">when false uses links and does not attempt to get the real object</param>
+            <returns>keypair with a status message, and List<seealso cref="T:OpenMetaverse.InventoryBase"/>
+            if the status message is retry you should check again in a bit is is currently loading
+            links using RequestFetchInventoryCap
+            </returns>
+        </member>
         <member name="M:OpenMetaverse.InventoryManager.FolderContents(OpenMetaverse.UUID,OpenMetaverse.UUID,System.Boolean,System.Boolean,OpenMetaverse.InventorySortOrder,System.Int32,System.Boolean)">
             <summary>
             Get contents of a folder
@@ -26827,7 +26830,7 @@
             <summary>
             Recurse inventory category and return folders and items. Does NOT contain parent folder being searched
             </summary>
-            <param name="folder">Inventory category to recursively search</param>
+            <param name="folderID">Inventory category to recursively search</param>
             <param name="owner">Owner of folder</param>
             <param name="cats">reference to list of categories</param>
             <param name="items">reference to list of items</param>
@@ -32227,11 +32230,14 @@
         <member name="F:OpenMetaverse.Parcel.Media">
             <summary>A struct containing media details</summary>
         </member>
+        <member name="F:OpenMetaverse.Parcel.SeeAVs">
+            <summary>Parcel privacy see avatars outside/inside parcel</summary>
+        </member>
         <member name="F:OpenMetaverse.Parcel.AnyAVSounds">
-            <summary> true if avatars outside can hear any sounds avatars inside play</summary>
+            <summary>Parcel privacy play sounds attached to avatars outside/inside parcel</summary>
         </member>
         <member name="F:OpenMetaverse.Parcel.GroupAVSounds">
-            <summary> true if group members outside can hear any sounds avatars inside play</summary>
+            <summary>Parcel privacy play sounds for group members</summary>
         </member>
         <member name="M:OpenMetaverse.Parcel.ToString">
             <summary>
@@ -34372,11 +34378,6 @@
             GridClient initializes an Inventory store for the library.
             </summary>
         </member>
-        <member name="F:OpenMetaverse.Settings.HTTP_INVENTORY">
-            <summary>
-            Use Caps for fetching inventory where available
-            </summary>
-        </member>
         <member name="F:OpenMetaverse.Settings.TRANSFER_TIMEOUT">
             <summary>Number of milliseconds before an asset transfer will time
             out</summary>
@@ -34510,10 +34511,6 @@
             periodically return a 502 error which signals for the client to
             re-establish a connection. Set this to true to log those 502 errors</summary>
         </member>
-        <member name="F:OpenMetaverse.Settings.FETCH_MISSING_INVENTORY">
-            <summary>If true, any reference received for a folder or item
-            the library is not aware of will automatically be fetched</summary>
-        </member>
         <member name="F:OpenMetaverse.Settings.DISABLE_AGENT_UPDATE_DUPLICATE_CHECK">
             <summary>If true, and <code>SEND_AGENT_UPDATES</code> is true,
             AgentUpdate packets will continuously be sent out to give the bot
@@ -34584,9 +34581,6 @@
         </member>
         <member name="F:OpenMetaverse.Settings.THROTTLE_OUTGOING_PACKETS">
             <summary>Throttle outgoing packet rate</summary>
-        </member>
-        <member name="F:OpenMetaverse.Settings.CLIENT_IDENTIFICATION_TAG">
-            <summary>UUID of a texture used by some viewers to indentify type of client used</summary>
         </member>
         <member name="F:OpenMetaverse.Settings.USE_HTTP_TEXTURES">
             <summary>
@@ -36606,6 +36600,47 @@
             <summary>
             Holds the Params array of all the avatar appearance parameters
             </summary>
+        </member>
+        <member name="F:LibreMetaverse.UserReport.Client">
+            <summary>A reference to the current <seealso cref="T:OpenMetaverse.GridClient"/> instance</summary>
+        </member>
+        <member name="M:LibreMetaverse.UserReport.#ctor(OpenMetaverse.GridClient)">
+            <summary>
+            Construct a new instance of the UserReport class
+            </summary>
+            <param name="client">A reference to the current <seealso cref="T:OpenMetaverse.GridClient"/> instance</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:LibreMetaverse.UserReport.FetchAbuseReportCategories" -->
+        <!-- Badly formed XML comment ignored for member "M:LibreMetaverse.UserReport.FetchAbuseReportCategories(System.String)" -->
+        <member name="M:LibreMetaverse.UserReport.SendUserReport(LibreMetaverse.UserReport.ReportType,System.Int32,OpenMetaverse.UUID,OpenMetaverse.UUID,OpenMetaverse.UUID,System.String,OpenMetaverse.UUID,OpenMetaverse.Vector3,System.String,System.String)">
+            <summary>
+            Sends user report first by trying SendUserReport sim cap, falling back to legacy
+            </summary>
+            <param name="reportType"></param>
+            <param name="category"></param>
+            <param name="screenshotId"></param>
+            <param name="objectId"></param>
+            <param name="abuserId"></param>
+            <param name="abuseRegionName"></param>
+            <param name="abuseRegionId"></param>
+            <param name="pos"></param>
+            <param name="summary"></param>
+            <param name="details"></param>
+        </member>
+        <member name="M:LibreMetaverse.UserReport.SendUserReportLegacy(LibreMetaverse.UserReport.ReportType,System.Int32,OpenMetaverse.UUID,OpenMetaverse.UUID,OpenMetaverse.UUID,System.String,OpenMetaverse.UUID,OpenMetaverse.Vector3,System.String,System.String)">
+            <summary>
+            Sends user report using legacy lludp packet
+            </summary>
+            <param name="reportType"></param>
+            <param name="category"></param>
+            <param name="screenshotId"></param>
+            <param name="objectId"></param>
+            <param name="abuserId"></param>
+            <param name="abuseRegionName"></param>
+            <param name="abuseRegionId"></param>
+            <param name="pos"></param>
+            <param name="summary"></param>
+            <param name="details"></param>
         </member>
         <member name="T:ThreadUtil">
             <summary>

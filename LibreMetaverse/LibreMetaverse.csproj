@@ -13,8 +13,9 @@
     <OutputType>Library</OutputType>
     <RootNamespace>LibreMetaverse</RootNamespace>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-	  <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <Configurations>Debug;Release;DockerBuild</Configurations>
+	<EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
+    <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -24,7 +25,41 @@
     <DebugSymbols>True</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <Optimize>False</Optimize>
-    <OutputPath></OutputPath>
+    <OutputPath>..\bin\</OutputPath>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <RemoveIntegerChecks>False</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <NoStdLib>False</NoStdLib>
+    <NoWarn>1591,1574,0419</NoWarn>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugSymbols>True</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <Optimize>False</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <RemoveIntegerChecks>False</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <NoStdLib>False</NoStdLib>
+    <NoWarn>1591,1574,0419</NoWarn>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugSymbols>True</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <Optimize>False</Optimize>
+    <OutputPath>..\bin\</OutputPath>
     <RegisterForComInterop>False</RegisterForComInterop>
     <RemoveIntegerChecks>False</RemoveIntegerChecks>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
@@ -51,29 +86,58 @@
     <NoWarn>1591,1574,0419</NoWarn>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DockerBuild|x64'">
-		<ErrorReport>none</ErrorReport>
-		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-		<PublishTrimmed>false</PublishTrimmed>
-		<PublishSingleFile>false</PublishSingleFile>
-		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-		<RuntimeIdentifier>linux-x64</RuntimeIdentifier>
-	</PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>LibreMetaverse.XML</DocumentationFile>
+    <DebugSymbols>False</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <Optimize>True</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <RemoveIntegerChecks>False</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <NoStdLib>False</NoStdLib>
+    <NoWarn>1591,1574,0419</NoWarn>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>LibreMetaverse.XML</DocumentationFile>
+    <DebugSymbols>False</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <Optimize>True</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <RemoveIntegerChecks>False</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <NoStdLib>False</NoStdLib>
+    <NoWarn>1591,1574,0419</NoWarn>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.12" />
     <PackageReference Include="Microsoft.Experimental.Collections" Version="1.0.6-e190117-3" />
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="5.0.2" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="5.0.10" />
     <PackageReference Include="OggVorbisEncoder" Version="1.2.0" />
-    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+    <PackageReference Include="OpenJpegDotNet-LMV" Version="2.4.0.5" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
     <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
     <PackageReference Include="XmlRpcCore" Version="3.1.2.77" />
-    <PackageReference Include="zlib.net-mutliplatform" Version="1.0.4" />
+    <PackageReference Include="zlib.net-mutliplatform" Version="1.0.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibreMetaverse.StructuredData\LibreMetaverse.StructuredData.csproj" />
-    <ProjectReference Include="..\LibreMetaverseTypes\LibreMetaverse.Types.csproj" />
+    <ProjectReference Include="..\LibreMetaverse.Types\LibreMetaverse.Types.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\LICENSE.txt">
@@ -89,11 +153,8 @@
     <Version>1.2.0</Version>
     <Authors>Sjofn LLC, OpenMetaverse Developers</Authors>
     <Product>LibreMetaverse</Product>
-    <Copyright>Copyright © OpenMetaverse Developers 2008, 2017. Copyright © Sjofn LLC 2018-2019. All rights reserved.</Copyright>
+    <Copyright>Copyright © OpenMetaverse Developers 2008, 2017. Copyright © Sjofn LLC 2018-2021. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <RepositoryUrl>https://github.com/cinderblocks/libremetaverse</RepositoryUrl>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DockerBuild|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 </Project>

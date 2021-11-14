@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
+ * Copyright (c) 2019-2021, Sjofn LLC
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without 
@@ -1047,7 +1048,7 @@ namespace OpenMetaverse
             remove { lock (m_GroupChatJoinedLock) { m_GroupChatJoined -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<AlertMessageEventArgs> m_AlertMessage;
 
         /// <summary>Raises the AlertMessage event</summary>
@@ -1549,6 +1550,7 @@ namespace OpenMetaverse
             Client.Network.RegisterLoginResponseCallback(Network_OnLoginResponse);
             // Alert Messages
             Client.Network.RegisterCallback(PacketType.AlertMessage, AlertMessageHandler);
+            Client.Network.RegisterCallback(PacketType.AgentAlertMessage, AgentAlertMessageHandler);
             // script control change messages, ie: when an in-world LSL script wants to take control of your agent.
             Client.Network.RegisterCallback(PacketType.ScriptControlChange, ScriptControlChangeHandler);
             // Camera Constraint (probably needs to move to AgentManagerCamera TODO:
@@ -1616,6 +1618,26 @@ namespace OpenMetaverse
         /// Request any instant messages sent while the client was offline to be resent.
         /// </summary>
         public void RetrieveInstantMessages()
+        {
+            Uri offlineMsgsCap = Client.Network.CurrentSim.Caps.CapabilityURI("ReadOfflineMsgs");
+            if (offlineMsgsCap == null 
+                || Client.Network.CurrentSim.Caps.CapabilityURI("AcceptFriendship") == null
+                || Client.Network.CurrentSim.Caps.CapabilityURI("AcceptGroupInvite") == null)
+            {
+                // fallback to lludp
+                RetrieveInstantMessagesLegacy();
+                return;
+            }
+
+            var request = new CapsClient(offlineMsgsCap);
+            request.OnComplete += OfflineMessageHandlerCallback;
+            request.GetRequestAsync(Client.Settings.CAPS_TIMEOUT);
+        }
+
+        /// <summary>
+        /// Request offline instant messages via the legacy LLUDP packet
+        /// </summary>
+        private void RetrieveInstantMessagesLegacy()
         {
             RetrieveInstantMessagesPacket p = new RetrieveInstantMessagesPacket
             {
@@ -1902,7 +1924,7 @@ namespace OpenMetaverse
             if (request != null)
             {
                 ChatSessionAcceptInvitation acceptInvite = new ChatSessionAcceptInvitation {SessionID = session_id};
-                request.BeginGetResponse(acceptInvite.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(acceptInvite.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
 
                 lock (GroupChatSessions.Dictionary)
                     if (!GroupChatSessions.ContainsKey(session_id))
@@ -1941,7 +1963,7 @@ namespace OpenMetaverse
 
                 startConference.SessionID = tmp_session_id;
 
-                request.BeginGetResponse(startConference.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(startConference.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
             {
@@ -3255,7 +3277,7 @@ namespace OpenMetaverse
         }
 
         /// <summary>
-        /// Update agents profile interests
+        /// Update agent's profile interests
         /// </summary>
         /// <param name="interests">selection of interests from <seealso cref="T:OpenMetaverse.Avatar.Interests"/> struct</param>
         public void UpdateInterests(Avatar.Interests interests)
@@ -3278,6 +3300,29 @@ namespace OpenMetaverse
             };
 
             Client.Network.SendPacket(aiup);
+        }
+
+        /// <summary>
+        /// Update agent's private notes for target avatar
+        /// </summary>
+        /// <param name="target">target avatar for notes</param>
+        /// <param name="notes">notes to store</param>
+        public void UpdateProfileNotes(UUID target, string notes)
+        {
+            AvatarNotesUpdatePacket anup = new AvatarNotesUpdatePacket
+            {
+                AgentData =
+                {
+                    AgentID = id,
+                    SessionID = sessionID
+                },
+                Data =
+                {
+                    TargetID = target,
+                    Notes = Utils.StringToBytes(notes)
+                }
+            };
+            Client.Network.SendPacket(anup);
         }
 
         /// <summary>
@@ -3693,7 +3738,7 @@ namespace OpenMetaverse
                     }
                 };
 
-                request.BeginGetResponse(Client.Settings.CAPS_TIMEOUT);
+                request.GetRequestAsync(Client.Settings.CAPS_TIMEOUT);
             }
             catch (Exception ex)
             {
@@ -3731,7 +3776,7 @@ namespace OpenMetaverse
                 NewDisplayName = newName
             };
 
-            request.BeginGetResponse(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+            request.PostRequestAsync(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
         }
 
         /// <summary>
@@ -3750,7 +3795,7 @@ namespace OpenMetaverse
                 };
 
                 CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("UpdateAgentLanguage");
-                request?.BeginGetResponse(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request?.PostRequestAsync(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             catch (Exception ex)
             {
@@ -3808,11 +3853,12 @@ namespace OpenMetaverse
                 }
 
             };
-            OSDMap req = new OSDMap();
-            OSDMap prefs = new OSDMap {["max"] = access};
-            req["access_prefs"] = prefs;
+            OSDMap req = new OSDMap
+            {
+                ["access_prefs"] = new OSDMap { ["max"] = access }
+            };
 
-            request.BeginGetResponse(req, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+            request.PostRequestAsync(req, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
         }
 
         /// <summary>
@@ -3851,7 +3897,7 @@ namespace OpenMetaverse
             var postData = new OSDMap {
                 ["hover_height"] = hoverHeight
             };
-            request.BeginGetResponse(postData, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+            request.PostRequestAsync(postData, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
         }
 
         #endregion Misc
@@ -3891,6 +3937,59 @@ namespace OpenMetaverse
                 message.BinaryBucket = im.MessageBlock.BinaryBucket;
 
                 OnInstantMessage(new InstantMessageEventArgs(message, simulator));
+            }
+        }
+
+        protected void OfflineMessageHandlerCallback(CapsClient client, OSD response, Exception error)
+        {
+            if (error != null) {
+                Logger.Log($"Failed to retrieve offline messages from the simulator: {error.Message}",
+                    Helpers.LogLevel.Warning);
+                RetrieveInstantMessagesLegacy();
+                return; 
+            }
+
+            if (m_InstantMessage == null) return; // don't bother if we don't have any listeners
+
+            if (response == null || !(response is OSDMap respMap) 
+                || respMap.Count == 0 || respMap.ContainsKey("messages"))
+            {
+                Logger.Log($"Failed to retrieve offline messages because the capability returned some goofy shit.",
+                    Helpers.LogLevel.Warning);
+                RetrieveInstantMessagesLegacy();
+                return;
+            }
+
+            if (respMap["messages"] is OSDArray msgArray)
+            {
+                foreach (var osd in msgArray)
+                {
+                    var msg = (OSDMap)osd;
+
+                    InstantMessage message;
+                    message.FromAgentID = msg["from_agent_id"].AsUUID();
+                    message.FromAgentName = msg["from_agent_name"].AsString();
+                    message.ToAgentID = msg["to_agent_id"].AsUUID();
+                    message.RegionID = msg["region_id"].AsUUID();
+                    message.Dialog = (InstantMessageDialog)msg["dialog"].AsInteger();
+                    message.IMSessionID = msg["transaction-id"].AsUUID();
+                    message.Timestamp = new DateTime(msg["timestamp"].AsInteger());
+                    message.Message = msg["message"].AsString();
+                    message.Offline = msg.ContainsKey("offline")
+                        ? (InstantMessageOnline)msg["offline"].AsInteger() 
+                        : InstantMessageOnline.Offline;
+                    message.ParentEstateID = msg.ContainsKey("parent_estate_id")
+                        ? msg["parent_estate_id"].AsUInteger() : 1;
+                    message.Position = msg.ContainsKey("position")
+                        ? msg["position"].AsVector3()
+                        : new Vector3(msg["local_x"], msg["local_y"], msg["local_z"]);
+                    message.BinaryBucket = msg.ContainsKey("binary_bucket")
+                        ? msg["binary_bucket"].AsBinary() : new byte[] { 0 };
+                    message.GroupIM = msg.ContainsKey("from_group")
+                        ? msg["from_group"].AsBoolean() : false;
+
+                    OnInstantMessage(new InstantMessageEventArgs(message, null));
+                }                
             }
         }
 
@@ -4671,7 +4770,7 @@ namespace OpenMetaverse
                     AgentID = memberID
                 };
 
-                request.BeginGetResponse(req.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(req.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
             {
@@ -4689,7 +4788,31 @@ namespace OpenMetaverse
 
             AlertMessagePacket alert = (AlertMessagePacket)packet;
 
-            OnAlertMessage(new AlertMessageEventArgs(Utils.BytesToString(alert.AlertData.Message)));
+            string message = Utils.BytesToString(alert.AlertData.Message);
+
+            if (alert.AlertInfo.Length > 0)
+            {
+                string notificationid = Utils.BytesToString(alert.AlertInfo[0].Message);
+                OSDMap extra = (alert.AlertInfo[0].ExtraParams != null && alert.AlertInfo[0].ExtraParams.Length > 0)
+                    ? OSDParser.Deserialize(alert.AlertInfo[0].ExtraParams) as OSDMap
+                    : null;
+                OnAlertMessage(new AlertMessageEventArgs(message, notificationid, extra));
+            }
+            else
+            {
+                OnAlertMessage(new AlertMessageEventArgs(message, null, null));
+            }
+        }
+
+        protected void AgentAlertMessageHandler(object sender, PacketReceivedEventArgs e)
+        {
+            if (m_AlertMessage == null) return;
+            Packet packet = e.Packet;
+
+            AgentAlertMessagePacket alert = (AgentAlertMessagePacket)packet;
+            // HACK: Agent alerts support modal and Generic Alerts do not, but it's all the same for
+            //       my simplified ass right now.
+            OnAlertMessage(new AlertMessageEventArgs(Utils.BytesToString(alert.AlertData.Message), null, null));
         }
 
         /// <summary>Process an incoming packet and raise the appropriate events</summary>
@@ -5307,16 +5430,21 @@ namespace OpenMetaverse
     /// <summary>Data sent by the simulator containing urgent messages</summary>
     public class AlertMessageEventArgs : EventArgs
     {
-        /// <summary>Get the alert message</summary>
         public string Message { get; }
+        public string NotificationId { get; }
+        public OSDMap ExtraParams { get; }
 
         /// <summary>
         /// Construct a new instance of the AlertMessageEventArgs class
         /// </summary>
-        /// <param name="message">The alert message</param>
-        public AlertMessageEventArgs(string message)
+        /// <param name="message">user readable message</param>
+        /// <param name="notificationid">notification id for alert, may be null</param>
+        /// <param name="extraparams">any extra params in OSD format, may be null</param>
+        public AlertMessageEventArgs(string message, string notificationid, OSDMap extraparams)
         {
             Message = message;
+            NotificationId = notificationid;
+            ExtraParams = extraparams;
         }
     }
 

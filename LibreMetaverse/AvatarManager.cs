@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
+ * Copyright (c) 2021, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -277,6 +278,29 @@ namespace OpenMetaverse
         {
             add { lock (m_AvatarInterestsReplyLock) { m_AvatarInterestsReply += value; } }
             remove { lock (m_AvatarInterestsReplyLock) { m_AvatarInterestsReply -= value; } }
+        }
+
+        /// <summary>The event subscribers, null of no subscribers</summary>
+        private EventHandler<AvatarNotesReplyEventArgs> m_AvatarNotesReply;
+
+        ///<summary>Raises the AvatarNotesReply Event</summary>
+        /// <param name="e">A AvatarNotesReplyEventArgs object containing
+        /// the data sent from the simulator</param>
+        protected virtual void OnAvatarNotesReply(AvatarNotesReplyEventArgs e)
+        {
+            EventHandler<AvatarNotesReplyEventArgs> handler = m_AvatarNotesReply;
+            handler?.Invoke(this, e);
+        }
+
+        /// <summary>Thread sync lock object</summary>
+        private readonly object m_AvatarNotesReplyLock = new object();
+
+        /// <summary>Raised when the simulator sends us data containing
+        /// the private notes listed in an agents profile</summary>
+        public event EventHandler<AvatarNotesReplyEventArgs> AvatarNotesReply
+        {
+            add { lock (m_AvatarNotesReplyLock) { m_AvatarNotesReply += value; } }
+            remove { lock (m_AvatarNotesReplyLock) { m_AvatarNotesReply -= value; } }
         }
 
         /// <summary>The event subscribers, null of no subscribers</summary>
@@ -561,6 +585,7 @@ namespace OpenMetaverse
             Client.Network.RegisterCallback(PacketType.AvatarPropertiesReply, AvatarPropertiesHandler);
             // Client.Network.RegisterCallback(PacketType.AvatarStatisticsReply, AvatarStatisticsHandler);
             Client.Network.RegisterCallback(PacketType.AvatarInterestsReply, AvatarInterestsHandler);
+            Client.Network.RegisterCallback(PacketType.AvatarNotesReply, AvatarNotesHandler);
 
             // Avatar group callback
             Client.Network.RegisterCallback(PacketType.AvatarGroupsReply, AvatarGroupsReplyHandler);
@@ -709,7 +734,7 @@ namespace OpenMetaverse
                                           callback(false, null, null);
                                       }
                                   };
-            cap.BeginGetResponse(null, string.Empty, Client.Settings.CAPS_TIMEOUT);
+            cap.GetRequestAsync(Client.Settings.CAPS_TIMEOUT);
         }
 
         /// <summary>
@@ -750,6 +775,36 @@ namespace OpenMetaverse
                     Data = {Name = Utils.StringToBytes(name)}
                 };
             Client.Network.SendPacket(aprp);
+        }
+
+        /// <summary>
+        /// Request avatar notes from simulator
+        /// </summary>
+        /// <param name="avatarid">Target agent UUID</param>
+        public void RequestAvatarNotes(UUID avatarid)
+        {
+            GenericMessagePacket gmp = new GenericMessagePacket
+            {
+                AgentData =
+                {
+                    AgentID = Client.Self.AgentID,
+                    SessionID = Client.Self.SessionID,
+                    TransactionID = UUID.Zero
+                },
+                MethodData =
+                {
+                    Method = Utils.StringToBytes("avatarnotesrequest"),
+                    Invoice = UUID.Zero
+                },
+                ParamList = new GenericMessagePacket.ParamListBlock[1]
+            };
+
+            gmp.ParamList[0] =
+                new GenericMessagePacket.ParamListBlock
+                {
+                    Parameter = Utils.StringToBytes(avatarid.ToString())
+                };
+            Client.Network.SendPacket(gmp);
         }
 
         /// <summary>
@@ -991,21 +1046,27 @@ namespace OpenMetaverse
                         BornOn = Utils.BytesToString(reply.PropertiesData.BornOn)
                     };
 
-                //properties.CharterMember = Utils.BytesToString(reply.PropertiesData.CharterMember);
-                uint charter = Utils.BytesToUInt(reply.PropertiesData.CharterMember);
-                if (charter == 0)
+                if (reply.PropertiesData.CharterMember.Length == 1)
                 {
-                    properties.CharterMember = "Resident";
+                    uint charter = Utils.BytesToUInt(reply.PropertiesData.CharterMember);
+                    if (charter == 0)
+                    {
+                        properties.CharterMember = "Resident";
+                    }
+                    else if (charter == 1)
+                    {
+                        properties.CharterMember = "Trial";
+                    }
+                    else if (charter == 2)
+                    {
+                        properties.CharterMember = "Charter";
+                    }
+                    else if (charter == 3)
+                    {
+                        properties.CharterMember = "Employee";
+                    }
                 }
-                else if (charter == 2)
-                {
-                    properties.CharterMember = "Charter";
-                }
-                else if (charter == 3)
-                {
-                    properties.CharterMember = "Linden";
-                }
-                else
+                else if (reply.PropertiesData.CharterMember.Length > 1)
                 {
                     properties.CharterMember = Utils.BytesToString(reply.PropertiesData.CharterMember);
                 }
@@ -1035,6 +1096,18 @@ namespace OpenMetaverse
                     LanguagesText = Utils.BytesToString(airp.PropertiesData.LanguagesText)
                 };
                 OnAvatarInterestsReply(new AvatarInterestsReplyEventArgs(airp.AgentData.AvatarID, interests));
+            }
+        }
+
+        protected void AvatarNotesHandler(object sender, PacketReceivedEventArgs e)
+        {
+            if (m_AvatarNotesReply != null)
+            {
+                Packet packet = e.Packet;
+                AvatarNotesReplyPacket anrp = (AvatarNotesReplyPacket)packet;
+                string notes = Utils.BytesToString(anrp.Data.Notes);
+
+                OnAvatarNotesReply(new AvatarNotesReplyEventArgs(anrp.Data.TargetID, notes));
             }
         }
 
@@ -1489,6 +1562,22 @@ namespace OpenMetaverse
         {
             this.AvatarID = avatarID;
             this.Interests = interests;
+        }
+    }
+
+    /// <summary>Represents the private notes from the profile of an agent</summary>
+    public class AvatarNotesReplyEventArgs : EventArgs
+    {
+        /// <summary>Get the ID of the agent</summary>
+        public UUID AvatarID { get; }
+
+        /// <summary>Get the interests of the agent</summary>
+        public string Notes { get; }
+
+        public AvatarNotesReplyEventArgs(UUID avatarID, string notes)
+        {
+            this.AvatarID = avatarID;
+            this.Notes = notes;
         }
     }
 

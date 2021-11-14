@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
+ * Copyright (c) 2021, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -37,6 +38,8 @@ namespace OpenMetaverse
     /// happen at login or dynamically</remarks>
     public class Settings
     {
+        public static string USER_AGENT = "LibreMetaverse";
+
         #region Login/Networking Settings
 
         /// <summary>Main grid login server</summary>
@@ -80,10 +83,6 @@ namespace OpenMetaverse
         /// GridClient initializes an Inventory store for the library.
         /// </summary>
         public const bool ENABLE_LIBRARY_STORE = true;
-        /// <summary>
-        /// Use Caps for fetching inventory where available
-        /// </summary>
-        public bool HTTP_INVENTORY = true;
 
         #endregion
 
@@ -202,7 +201,7 @@ namespace OpenMetaverse
         /// <summary>Should we connect to multiple sims? This will allow
         /// viewing in to neighboring simulators and sim crossings
         /// (Experimental)</summary>
-        public bool MULTIPLE_SIMS = true;
+        public bool MULTIPLE_SIMS = false;
 
         /// <summary>If true, all object update packets will be decoded in to
         /// native objects. If false, only updates for our own agent will be
@@ -226,10 +225,6 @@ namespace OpenMetaverse
         /// periodically return a 502 error which signals for the client to
         /// re-establish a connection. Set this to true to log those 502 errors</summary>
         public bool LOG_ALL_CAPS_ERRORS = false;
-
-        /// <summary>If true, any reference received for a folder or item
-        /// the library is not aware of will automatically be fetched</summary>
-        public bool FETCH_MISSING_INVENTORY = true;
 
         /// <summary>If true, and <code>SEND_AGENT_UPDATES</code> is true,
         /// AgentUpdate packets will continuously be sent out to give the bot
@@ -310,9 +305,6 @@ namespace OpenMetaverse
         /// <summary>Throttle outgoing packet rate</summary>
         public bool THROTTLE_OUTGOING_PACKETS = true;
 
-        /// <summary>UUID of a texture used by some viewers to indentify type of client used</summary>
-        public UUID CLIENT_IDENTIFICATION_TAG = UUID.Zero;
-
         #endregion
         #region Texture Pipeline
 
@@ -347,7 +339,12 @@ namespace OpenMetaverse
         /// You will get no output on the console. This behavior can be overriden by creating
         /// a logger configuration file for log4net
         /// </summary>
+#if DEBUG
+        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.Debug;
+#else
         public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.None;
+#endif
+
 
         /// <summary>Attach avatar names to log messages</summary>
         public bool LOG_NAMES = true;
@@ -362,7 +359,7 @@ namespace OpenMetaverse
         #region Private Fields
 
         private GridClient Client;
-        private int priceUpload = 10;
+        private int priceUpload = 0;
         public static bool SORT_INVENTORY = false;
 
         /// <summary>Constructor</summary>

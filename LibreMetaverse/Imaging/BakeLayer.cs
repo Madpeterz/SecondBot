@@ -428,8 +428,8 @@ namespace OpenMetaverse.Imaging
 
         private bool MaskBelongsToBake(string mask)
         {
-            return (bakeType != BakeType.LowerBody || !mask.Contains("upper")) 
-                   && (bakeType != BakeType.LowerBody || !mask.Contains("shirt")) 
+            return (bakeType != BakeType.LowerBody || !mask.Contains("upper"))
+                   && (bakeType != BakeType.LowerBody || !mask.Contains("shirt"))
                    && (bakeType != BakeType.UpperBody || !mask.Contains("lower"));
         }
 
@@ -472,7 +472,7 @@ namespace OpenMetaverse.Imaging
                     loadedAlpha = false;
                     alpha = 0;
                     alphaInv = 0;
-                    
+
                     if (sourceHasAlpha)
                     {
                         if (sourceAlpha.Length > i)

@@ -29,8 +29,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using OpenMetaverse.Http;
 using OpenMetaverse.Messages.Linden;
 using OpenMetaverse.StructuredData;
@@ -377,7 +375,7 @@ namespace OpenMetaverse
         #region String Arrays
 
         /// <summary>Partial mapping of FolderTypes to folder names</summary>
-        private static readonly string[] _NewFolderNames = new []
+        private static readonly string[] _NewFolderNames = new string[]
         {
             "Textures",         //  0
             "Sounds",           //  1
@@ -486,7 +484,7 @@ namespace OpenMetaverse
             // Register extra parameters with login and parse the inventory data that comes back
             Client.Network.RegisterLoginResponseCallback(
                 Network_OnLoginResponse,
-                new [] {
+                new string[] {
                     "inventory-root", "inventory-skeleton", "inventory-lib-root",
                     "inventory-lib-owner", "inventory-skel-lib"});
         }
@@ -548,8 +546,7 @@ namespace OpenMetaverse
             if (itemIDs.Count != ownerIDs.Count)
                 throw new ArgumentException("itemIDs and ownerIDs must contain the same number of entries");
 
-            if (Client.Settings.HTTP_INVENTORY &&
-                Client.Network.CurrentSim.Caps != null &&
+            if (Client.Network.CurrentSim.Caps != null &&
                 Client.Network.CurrentSim.Caps.CapabilityURI("FetchInventory2") != null)
             {
                 RequestFetchInventoryCap(itemIDs, ownerIDs);
@@ -590,8 +587,7 @@ namespace OpenMetaverse
             if (itemIDs.Count != ownerIDs.Count)
                 throw new ArgumentException("itemIDs and ownerIDs must contain the same number of entries");
 
-            if (Client.Settings.HTTP_INVENTORY &&
-                Client.Network.CurrentSim.Caps != null &&
+            if (Client.Network.CurrentSim.Caps != null &&
                 Client.Network.CurrentSim.Caps.CapabilityURI("FetchInventory2") != null)
             {
                 CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("FetchInventory2");
@@ -633,7 +629,7 @@ namespace OpenMetaverse
 
                 OSDRequest["items"] = items;
 
-                request.BeginGetResponse(OSDRequest, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(OSDRequest, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
         }
         /// <summary>
@@ -647,7 +643,7 @@ namespace OpenMetaverse
         /// <param name="order">sort order to return results in</param>
         /// <param name="timeoutMS">a integer representing the number of milliseconds to wait for results</param>
         /// <param name="fast_loading">when false uses links and does not attempt to get the real object</param>
-        /// <returns>keypair with a status message, and List<InventoryBase>
+        /// <returns>keypair with a status message, and List<seealso cref="InventoryBase"/>
         /// if the status message is retry you should check again in a bit is is currently loading
         /// links using RequestFetchInventoryCap
         /// </returns>
@@ -764,8 +760,7 @@ namespace OpenMetaverse
         {
             string cap = owner == Client.Self.AgentID ? "FetchInventoryDescendents2" : "FetchLibDescendents2";
 
-            if (Client.Settings.HTTP_INVENTORY &&
-                Client.Network.CurrentSim.Caps != null &&
+            if (Client.Network.CurrentSim.Caps != null &&
                 Client.Network.CurrentSim.Caps.CapabilityURI(cap) != null)
             {
                 RequestFolderContentsCap(folder, owner, folders, items, order);
@@ -909,8 +904,8 @@ namespace OpenMetaverse
                     }
                     catch (Exception exc)
                     {
-                        Logger.Log($"Failed to fetch inventory descendants: {exc.Message}\n" +
-                                   $"{exc.StackTrace.ToString()}",
+                        Logger.Log($"Failed to fetch inventory descendants: {exc.Message}" + Environment.NewLine +
+                                   $"{exc.StackTrace}",
                                    Helpers.LogLevel.Warning, Client);
                         foreach (var f in batch)
                         {
@@ -937,11 +932,11 @@ namespace OpenMetaverse
                 }
                 OSDMap req = new OSDMap(1) { ["folders"] = requestedFolders };
 
-                request.BeginGetResponse(req, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(req, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             catch (Exception ex)
             {
-                Logger.Log($"Failed to fetch inventory descendants: {ex.Message}\n" +
+                Logger.Log($"Failed to fetch inventory descendants: {ex.Message}" + Environment.NewLine +
                            $"{ex.StackTrace}",
                            Helpers.LogLevel.Warning, Client);
                 foreach (var f in batch)
@@ -1771,38 +1766,36 @@ namespace OpenMetaverse
         /// (EveryoneMask, GroupMask, and NextOwnerMask of Permissions struct are supported)</param>
         /// <param name="callback">Delegate that will receive feedback on success or failure</param>
         public void RequestCreateItemFromAsset(byte[] data, string name, string description, AssetType assetType,
-            InventoryType invType, UUID folderID, Permissions permissions, ItemCreatedFromAssetCallback callback, int uploadCost=10)
+            InventoryType invType, UUID folderID, Permissions permissions, ItemCreatedFromAssetCallback callback)
         {
             if (Client.Network.CurrentSim == null || Client.Network.CurrentSim.Caps == null)
                 throw new Exception("NewFileAgentInventory capability is not currently available");
 
             CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("NewFileAgentInventory");
 
-            if (request != null)
-            {
-                OSDMap query = new OSDMap
-                {
-                    {"folder_id", OSD.FromUUID(folderID)},
-                    {"asset_type", OSD.FromString(Utils.AssetTypeToString(assetType))},
-                    {"inventory_type", OSD.FromString(Utils.InventoryTypeToString(invType))},
-                    {"name", OSD.FromString(name)},
-                    {"description", OSD.FromString(description)},
-                    {"everyone_mask", OSD.FromInteger((int) permissions.EveryoneMask)},
-                    {"group_mask", OSD.FromInteger((int) permissions.GroupMask)},
-                    {"next_owner_mask", OSD.FromInteger((int) permissions.NextOwnerMask)},
-                    {"expected_upload_cost", uploadCost}
-                };
-
-                // Make the request
-                request.OnComplete += CreateItemFromAssetResponse;
-                request.UserData = new object[] { callback, data, Client.Settings.CAPS_TIMEOUT, query };
-
-                request.BeginGetResponse(query, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
-            }
-            else
-            {
+            if (request == null) { 
                 throw new Exception("NewFileAgentInventory capability is not currently available");
             }
+
+            OSDMap query = new OSDMap
+            {
+                {"folder_id", OSD.FromUUID(folderID)},
+                {"asset_type", OSD.FromString(Utils.AssetTypeToString(assetType))},
+                {"inventory_type", OSD.FromString(Utils.InventoryTypeToString(invType))},
+                {"name", OSD.FromString(name)},
+                {"description", OSD.FromString(description)},
+                {"everyone_mask", OSD.FromInteger((int) permissions.EveryoneMask)},
+                {"group_mask", OSD.FromInteger((int) permissions.GroupMask)},
+                {"next_owner_mask", OSD.FromInteger((int) permissions.NextOwnerMask)},
+                {"expected_upload_cost", OSD.FromInteger(Client.Settings.UPLOAD_COST)}
+            };
+
+            // Make the request
+            request.OnComplete += CreateItemFromAssetResponse;
+            request.UserData = new object[] { callback, data, Client.Settings.CAPS_TIMEOUT, query };
+
+            request.PostRequestAsync(query, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+
         }
 
         /// <summary>
@@ -2009,7 +2002,7 @@ namespace OpenMetaverse
                     ObjectID = objectID
                 };
 
-                request.BeginGetResponse(message.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(message.Serialize(),OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
             {
@@ -2163,7 +2156,7 @@ namespace OpenMetaverse
                 // Make the request
                 request.OnComplete += UploadInventoryAssetResponse;
                 request.UserData = new object[] { new KeyValuePair<InventoryUploadedAssetCallback, byte[]>(callback, data), notecardID };
-                request.BeginGetResponse(query, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(query, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
             {
@@ -2196,7 +2189,7 @@ namespace OpenMetaverse
                 // Make the request
                 request.OnComplete += UploadInventoryAssetResponse;
                 request.UserData = new object[] { new KeyValuePair<InventoryUploadedAssetCallback, byte[]>(callback, data), notecardID };
-                request.BeginGetResponse(query, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(query, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
             {
@@ -2224,7 +2217,7 @@ namespace OpenMetaverse
                 // Make the request
                 request.OnComplete += UploadInventoryAssetResponse;
                 request.UserData = new object[] { new KeyValuePair<InventoryUploadedAssetCallback, byte[]>(callback, data), gestureID };
-                request.BeginGetResponse(query, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(query, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
             {
@@ -2253,7 +2246,7 @@ namespace OpenMetaverse
 
                 request.OnComplete += new CapsClient.CompleteCallback(UpdateScriptAgentInventoryResponse);
                 request.UserData = new object[2] { new KeyValuePair<ScriptUpdatedCallback, byte[]>(callback, data), itemID };
-                request.BeginGetResponse(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
             {
@@ -2286,7 +2279,7 @@ namespace OpenMetaverse
 
                 request.OnComplete += new CapsClient.CompleteCallback(UpdateScriptAgentInventoryResponse);
                 request.UserData = new object[2] { new KeyValuePair<ScriptUpdatedCallback, byte[]>(callback, data), itemID };
-                request.BeginGetResponse(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
             {
@@ -2563,7 +2556,7 @@ namespace OpenMetaverse
         /// <summary>
         /// Recurse inventory category and return folders and items. Does NOT contain parent folder being searched
         /// </summary>
-        /// <param name="folder">Inventory category to recursively search</param>
+        /// <param name="folderID">Inventory category to recursively search</param>
         /// <param name="owner">Owner of folder</param>
         /// <param name="cats">reference to list of categories</param>
         /// <param name="items">reference to list of items</param>
@@ -3609,7 +3602,7 @@ namespace OpenMetaverse
                         imp.MessageBlock.BinaryBucket = Utils.EmptyBytes;
                     }
 
-                    Client.Network.SendPacket(imp, e.Simulator);
+                    Client.Network.SendPacket(imp, e.Simulator ?? Client.Network.CurrentSim);
                 }
                 catch (Exception ex)
                 {
@@ -3660,7 +3653,7 @@ namespace OpenMetaverse
                 CapsClient upload = new CapsClient(new Uri(uploadURL), "CreateItemFromAsset");
                 upload.OnComplete += CreateItemFromAssetResponse;
                 upload.UserData = new object[] { callback, itemData, millisecondsTimeout, request };
-                upload.BeginGetResponse(itemData, "application/octet-stream", millisecondsTimeout);
+                upload.PostRequestAsync(itemData, "application/octet-stream", millisecondsTimeout);
             }
             else if (status == "complete")
             {
@@ -3739,7 +3732,7 @@ namespace OpenMetaverse
                         CapsClient upload = new CapsClient(uploadURL, "UploadItemResponse");
                         upload.OnComplete += UploadInventoryAssetResponse;
                         upload.UserData = new object[2] { kvp, (UUID)(((object[])client.UserData)[1]) };
-                        upload.BeginGetResponse(itemData, "application/octet-stream", Client.Settings.CAPS_TIMEOUT);
+                        upload.PostRequestAsync(itemData, "application/octet-stream", Client.Settings.CAPS_TIMEOUT);
                     }
                     else
                     {
@@ -3810,7 +3803,7 @@ namespace OpenMetaverse
                 CapsClient upload = new CapsClient(new Uri(uploadURL), "ScriptAgentInventoryResponse");
                 upload.OnComplete += UpdateScriptAgentInventoryResponse;
                 upload.UserData = new object[2] { kvp, (UUID)(((object[])client.UserData)[1]) };
-                upload.BeginGetResponse(itemData, "application/octet-stream", Client.Settings.CAPS_TIMEOUT);
+                upload.PostRequestAsync(itemData, "application/octet-stream", Client.Settings.CAPS_TIMEOUT);
             }
             else if (status == "complete" && callback != null)
             {

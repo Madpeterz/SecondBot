@@ -149,16 +149,9 @@ namespace OpenMetaverse.ImportExport
             resources["mesh_list"] = meshList;
 
             OSDArray textureList = new OSDArray();
-            for (int i = 0; i < Images.Count; i++)
+            foreach (var img in Images)
             {
-                if (upload)
-                {
-                    textureList.Add(new OSDBinary(Images[i]));
-                }
-                else
-                {
-                    textureList.Add(new OSDBinary(Utils.EmptyBytes));
-                }
+                textureList.Add(upload ? new OSDBinary(img) : new OSDBinary(Utils.EmptyBytes));
             }
 
             resources["texture_list"] = textureList;
@@ -262,11 +255,11 @@ namespace OpenMetaverse.ImportExport
                     return;
                 }
 
-                Logger.Log("Response from mesh upload prepare:\n" + OSDParser.SerializeLLSDNotationFormatted(result), Helpers.LogLevel.Debug);
+                Logger.Log("Response from mesh upload prepare:" + Environment.NewLine + OSDParser.SerializeLLSDNotationFormatted(result), Helpers.LogLevel.Debug);
                 callback?.Invoke(result);
             };
 
-            request.BeginGetResponse(req, OSDFormat.Xml, 3 * 60 * 1000);
+            request.PostRequestAsync(req, OSDFormat.Xml, 3 * 60 * 1000);
 
         }
 
@@ -287,11 +280,12 @@ namespace OpenMetaverse.ImportExport
                     return;
                 }
                 OSDMap res = (OSDMap)result;
-                Logger.Log("Response from mesh upload perform:\n" + OSDParser.SerializeLLSDNotationFormatted(result), Helpers.LogLevel.Debug);
+                Logger.Log("Response from mesh upload perform:" + Environment.NewLine 
+                    + OSDParser.SerializeLLSDNotationFormatted(result), Helpers.LogLevel.Debug);
                 callback?.Invoke(res);
             };
 
-            request.BeginGetResponse(AssetResources(true), OSDFormat.Xml, 60 * 1000);
+            request.PostRequestAsync(AssetResources(true), OSDFormat.Xml, 60 * 1000);
         }
 
 

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
+ * Copyright (c) 2021, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without 
@@ -226,8 +227,10 @@ namespace OpenMetaverse
                 if (item.ParentUUID != UUID.Zero && !Items.TryGetValue(item.ParentUUID, out itemParent))
                 {
                     // OK, we have no data on the parent, let's create a fake one.
-                    InventoryFolder fakeParent = new InventoryFolder(item.ParentUUID);
-                    fakeParent.DescendentCount = 1; // Dear god, please forgive me.
+                    InventoryFolder fakeParent = new InventoryFolder(item.ParentUUID)
+                    {
+                        DescendentCount = 1 // Dear god, please forgive me.
+                    };
                     itemParent = new InventoryNode(fakeParent);
                     Items[item.ParentUUID] = itemParent;
                     // Unfortunately, this breaks the nice unified tree
@@ -235,13 +238,6 @@ namespace OpenMetaverse
                     // As soon as we get the parent, the tree repairs itself.
                     //Logger.DebugLog("Attempting to update inventory child of " +
                     //    item.ParentUUID.ToString() + " when we have no local reference to that folder", Client);
-
-                    if (Client.Settings.FETCH_MISSING_INVENTORY)
-                    {
-                        // Fetch the parent
-                        List<UUID> fetchreq = new List<UUID>(1) {item.ParentUUID};
-
-                    }
                 }
 
                 InventoryNode itemNode;
@@ -367,7 +363,7 @@ namespace OpenMetaverse
         /// Loads in inventory cache file into the inventory structure. Note only valid to call after login has been successful.
         /// </summary>
         /// <param name="filename">Name of the cache file to load</param>
-        /// <returns>The number of inventory items sucessfully reconstructed into the inventory node tree</returns>
+        /// <returns>The number of inventory items successfully reconstructed into the inventory node tree</returns>
         public int RestoreFromDisk(string filename)
         {
             List<InventoryNode> nodes = new List<InventoryNode>();
@@ -381,10 +377,9 @@ namespace OpenMetaverse
                 using (Stream stream = File.Open(filename, FileMode.Open))
                 {
                     BinaryFormatter bformatter = new BinaryFormatter();
-
                     while (stream.Position < stream.Length)
                     {
-                        OpenMetaverse.InventoryNode node = (InventoryNode)bformatter.Deserialize(stream);
+                        var node = (InventoryNode)bformatter.Deserialize(stream);
                         nodes.Add(node);
                         item_count++;
                     }

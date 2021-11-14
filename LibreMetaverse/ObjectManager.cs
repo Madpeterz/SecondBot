@@ -1301,7 +1301,7 @@ namespace OpenMetaverse
         /// <param name="name">A string containing the new name of the object</param>
         public void SetName(Simulator simulator, uint localID, string name)
         {
-            SetNames(simulator, new uint[] { localID }, new [] { name });
+            SetNames(simulator, new uint[] { localID }, new string[] { name });
         }
 
         /// <summary>
@@ -1336,7 +1336,7 @@ namespace OpenMetaverse
         /// <param name="description">A string containing the new description of the object</param>
         public void SetDescription(Simulator simulator, uint localID, string description)
         {
-            SetDescriptions(simulator, new uint[] { localID }, new [] { description });
+            SetDescriptions(simulator, new uint[] { localID }, new string[] { description });
         }
 
         /// <summary>
@@ -1696,7 +1696,7 @@ namespace OpenMetaverse
                         }
                     };
 
-                request.BeginGetResponse(req.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(req.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
             {
@@ -1725,7 +1725,7 @@ namespace OpenMetaverse
                             Logger.Log("ObjectMediaUpdate: " + error.Message, Helpers.LogLevel.Error, Client);
                         }
                     };
-                request.BeginGetResponse(req.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(req.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
             {
@@ -1781,7 +1781,7 @@ namespace OpenMetaverse
                         }
                     };
 
-                request.BeginGetResponse(req.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                request.PostRequestAsync(req.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
             }
             else
             {

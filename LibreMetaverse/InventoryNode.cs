@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
+ * Copyright (c) 2021, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -34,7 +35,7 @@ namespace OpenMetaverse
     {
         private InventoryBase data;
         private InventoryNode parent;
-        private UUID parentID; //used for de-seralization 
+        private UUID parentID; //used for deseralization 
         private InventoryNodeDictionary nodes;
         private bool needsUpdate = true;
         [NonSerialized]
@@ -67,7 +68,7 @@ namespace OpenMetaverse
         /// <summary></summary>
         public InventoryNodeDictionary Nodes
         {
-            get { return nodes ?? (nodes = new InventoryNodeDictionary(this)); }
+            get => nodes ?? (nodes = new InventoryNodeDictionary(this));
             set => nodes = value;
         }
 
@@ -103,8 +104,8 @@ namespace OpenMetaverse
         /// </summary>
         public bool NeedsUpdate
         {
-            get { return needsUpdate; }
-            set { needsUpdate = value; }
+            get => needsUpdate;
+            set => needsUpdate = value;
         }
 
         public InventoryNode()
@@ -151,8 +152,8 @@ namespace OpenMetaverse
             Type type = (Type)info.GetValue("Type", typeof(Type));
          
 	    // Construct a new inventory object based on the Type stored in Type
-            System.Reflection.ConstructorInfo ctr = type.GetConstructor(new Type[] {typeof(SerializationInfo),typeof(StreamingContext)});
-            data = (InventoryBase) ctr.Invoke(new Object[] { info, ctxt });
+            System.Reflection.ConstructorInfo ctr = type.GetConstructor(new[] {typeof(SerializationInfo),typeof(StreamingContext)});
+            data = (InventoryBase) ctr.Invoke(new object[] { info, ctxt });
         }
 
         public override string ToString()

@@ -171,33 +171,40 @@
             <param name="c"></param>
             <returns></returns>
         </member>
+        <member name="M:OpenMetaverse.StructuredData.OSDParser.DeserializeLLSDXml(System.IO.Stream)">
+            <summary>
+            Deserialize LLSD/XML stream
+            </summary>
+            <param name="xmlStream">a <see cref="T:System.IO.Stream" /> containing the serialized data</param>
+            <returns></returns>
+        </member>
         <member name="M:OpenMetaverse.StructuredData.OSDParser.DeserializeLLSDXml(System.Byte[])">
             <summary>
-            
+            Deserialize LLSD/XML stream
             </summary>
-            <param name="xmlData"></param>
+            <param name="xmlData">Data as a byte array</param>
             <returns></returns>
         </member>
         <member name="M:OpenMetaverse.StructuredData.OSDParser.DeserializeLLSDXml(System.String)">
             <summary>
-            
+            Deserialize LLSD/XML stream
             </summary>
-            <param name="xmlData"></param>
+            <param name="xmlData">Serialized data as a <see cref="T:System.String" /></param>
             <returns></returns>
         </member>
-        <member name="M:OpenMetaverse.StructuredData.OSDParser.DeserializeLLSDXml(System.Xml.XmlTextReader)">
+        <member name="M:OpenMetaverse.StructuredData.OSDParser.DeserializeLLSDXml(System.Xml.XmlReader)">
             <summary>
-            
+            Deserialize LLSD/XML stream
             </summary>
-            <param name="xmlData"></param>
+            <param name="xmlData">Serialized data as a <see cref="T:System.Xml.XmlReader" /></param>
             <returns></returns>
         </member>
         <member name="M:OpenMetaverse.StructuredData.OSDParser.SerializeLLSDXmlBytes(OpenMetaverse.StructuredData.OSD)">
             <summary>
-            
+            Serialize an OSD object in LLSD/XML
             </summary>
-            <param name="data"></param>
-            <returns></returns>
+            <param name="data">OSD object to serialize</param>
+            <returns>Serialized data as a byte aray</returns>
         </member>
         <member name="M:OpenMetaverse.StructuredData.OSDParser.SerializeLLSDXmlString(OpenMetaverse.StructuredData.OSD)">
             <summary>
@@ -206,22 +213,14 @@
             <param name="data"></param>
             <returns></returns>
         </member>
-        <member name="M:OpenMetaverse.StructuredData.OSDParser.SerializeLLSDXmlElement(System.Xml.XmlTextWriter,OpenMetaverse.StructuredData.OSD)">
+        <member name="M:OpenMetaverse.StructuredData.OSDParser.SerializeLLSDXmlElement(System.Xml.XmlWriter,OpenMetaverse.StructuredData.OSD)">
             <summary>
             
             </summary>
             <param name="writer"></param>
             <param name="data"></param>
         </member>
-        <member name="M:OpenMetaverse.StructuredData.OSDParser.TryValidateLLSDXml(System.Xml.XmlTextReader,System.String@)">
-            <summary>
-            
-            </summary>
-            <param name="xmlData"></param>
-            <param name="error"></param>
-            <returns></returns>
-        </member>
-        <member name="M:OpenMetaverse.StructuredData.OSDParser.ParseLLSDXmlElement(System.Xml.XmlTextReader)">
+        <member name="M:OpenMetaverse.StructuredData.OSDParser.ParseLLSDXmlElement(System.Xml.XmlReader)">
             <summary>
             
             </summary>
