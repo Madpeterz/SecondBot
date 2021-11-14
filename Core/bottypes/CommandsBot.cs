@@ -276,7 +276,7 @@ namespace BetterSecondBot.bottypes
                 {
                     if (message == "fakerestart")
                     {
-                        AlertMessageEventArgs Alertargs = new AlertMessageEventArgs("this is a fake restart message");
+                        AlertMessageEventArgs Alertargs = new AlertMessageEventArgs("this is a fake restart message",new Random().Next(99999).ToString(), new OpenMetaverse.StructuredData.OSDMap());
                         AlertEvent(this, Alertargs);
                         return;
                     }
