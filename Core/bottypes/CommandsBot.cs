@@ -6,13 +6,11 @@ using OpenMetaverse;
 using OpenMetaverse.Assets;
 using BetterSecondBotShared.Static;
 using BetterSecondBotShared.logs;
-using System.Threading;
 using BetterSecondBot.HttpService;
 using Core.Static;
 using System.Reflection;
 using Newtonsoft.Json;
 using System.Net.Http;
-using Newtonsoft.Json.Linq;
 using BetterSecondBotShared.Json;
 
 namespace BetterSecondBot.bottypes
@@ -284,39 +282,9 @@ namespace BetterSecondBot.bottypes
                     }
 
                 }
+                JsonApiDefine APIE = JsonConvert.DeserializeObject<JsonApiDefine>(message);
 
-                JObject json = JObject.Parse(message);
-                string signing_code = "";
-                
-                if (json.ContainsKey("cmd") == false)
-                {
-                    return;
-                }
-                string cmd = json.GetValue("cmd").ToString();
-                if (frommaster == false)
-                {
-                    if (json.ContainsKey("signing") == true)
-                    {
-                        signing_code = json.GetValue("signing").ToString();
-                    }
-                }
-                string[] args = new string[] { };
-                if (json.ContainsKey("args") == true)
-                {
-                    List<string> argsL = new List<string>();
-                    foreach(JToken A in json.GetValue("args").ToList())
-                    {
-                        argsL.Add(A.ToString());
-                    }
-                    args = argsL.ToArray();
-                }
-                string replyto = "";
-                if (json.ContainsKey("reply") == true)
-                {
-                    replyto = json.GetValue("reply").ToString();
-                }
-
-                CoreCommandLib(sender_uuid, frommaster, cmd, args, signing_code, replyto);
+                CoreCommandLib(sender_uuid, frommaster, APIE.cmd, APIE.args, APIE.signing, APIE.reply);
             }
             catch (Exception e)
             {
@@ -340,23 +308,23 @@ namespace BetterSecondBot.bottypes
             }
             try
             {
-                JObject json = JObject.Parse(message);
+                JsonApiDefine APIE = JsonConvert.DeserializeObject<JsonApiDefine>(message);
                 JsonChatControler(message, sender_name, sender_uuid, avatar, group, group_uuid, localchat, fromme);
             }
             catch
             {
                 // Old style [non json] to json converter [to be phased out]
-                string[] S1 = message.Split(new[] { "#|#" }, StringSplitOptions.RemoveEmptyEntries);
+                string signing_code = "";
+                string[] S1 = message.Split(new[] { "@@@" }, StringSplitOptions.RemoveEmptyEntries);
+                if (S1.Length == 2)
+                {
+                    signing_code = S1[1];
+                }
+                S1 = S1[0].Split(new[] { "#|#" }, StringSplitOptions.RemoveEmptyEntries);
                 string outputto = "none";
                 if (S1.Length == 2)
                 {
                     outputto = S1[1];
-                }
-                string signing_code = "";
-                S1 = S1[0].Split(new[] { "@@@" }, StringSplitOptions.RemoveEmptyEntries);
-                if (S1.Length == 2)
-                {
-                    signing_code = S1[1];
                 }
                 S1 = S1[0].Split(new[] { "|||" }, StringSplitOptions.RemoveEmptyEntries);
                 string[] args = new string[] { };
