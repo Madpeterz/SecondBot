@@ -86,7 +86,7 @@
     <RegisterForComInterop>False</RegisterForComInterop>
     <RemoveIntegerChecks>False</RemoveIntegerChecks>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>3</WarningLevel>
     <NoStdLib>False</NoStdLib>
     <NoWarn>1591,1574,0419</NoWarn>
     <PlatformTarget>AnyCPU</PlatformTarget>
