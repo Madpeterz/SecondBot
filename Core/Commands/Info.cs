@@ -17,59 +17,62 @@ namespace BetterSecondBot.HttpService
         public HTTP_Info(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
         [About("Lists objects that are sculpty type in the current sim that the bot can see")]
-        [ReturnHints("A json object of [UUID=Pos]")]
+        [ReturnHints("A json object")]
         [Route(HttpVerbs.Get, "/ListSculptys/{token}")]
         public object ListSculptys(string token)
         {
             Dictionary<uint, Primitive> objects_copy = bot.GetClient.Network.CurrentSim.ObjectsPrimitives.Copy();
 
             Dictionary<uint, uint> mapLocalID = new Dictionary<uint, uint>();
+            Dictionary<uint, Primitive> sculpts = new Dictionary<uint, Primitive>();
             foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
             {
                 mapLocalID.Add(Obj.Value.LocalID, Obj.Key);
-            }
-            List<SculptysInfo> reply = new List<SculptysInfo>();
-            foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
-            {
-                if (Obj.Value.Sculpt != null)
+                if (PrimType.Sculpt.Equals(Obj.Value.Type) == true)
                 {
-                    if (PrimType.Sculpt.Equals(Obj.Value.Type) == true)
-                    {
-                        Vector3 pos = Obj.Value.Position;
-                        string name = "?";
-                        if (Obj.Value.NameValues != null)
-                        {
-                            name = Obj.Value.NameValues[0].Value.ToString();
-                        }
-                        UUID key = Obj.Value.ID;
-                        UUID owner = Obj.Value.OwnerID;
-                        bool asLink = false;
-                        if (Obj.Value.ParentID > 0)
-                        {
-                            if(mapLocalID.ContainsKey(Obj.Value.ParentID) == true)
-                            {
-                                Primitive wip = objects_copy[mapLocalID[Obj.Value.ParentID]];
-                                pos = wip.Position;
-                                asLink = true;
-                                owner = wip.OwnerID;
-                                if (wip.NameValues != null)
-                                {
-                                    name = wip.NameValues[0].Value.ToString();
-                                }
-                                key = wip.ID;
-                            }
-                        }
-                        SculptysInfo A = new SculptysInfo();
-                        A.isLinked = asLink.ToString();
-                        A.name = name.ToString();
-                        A.owner = owner.ToString();
-                        A.uuid = key.ToString();
-                        A.pos = pos.ToString();
-                        reply.Add(A);
-                    }
+                    sculpts.Add(Obj.Key, Obj.Value);
                 }
             }
-            return BasicReply(JsonConvert.SerializeObject(reply), "ListSculptys");
+            List<SculptysInfo> reply = new List<SculptysInfo>();
+            foreach (KeyValuePair<uint, Primitive> Obj in sculpts)
+            {
+                Vector3 pos = Obj.Value.Position;
+                string name = "?";
+                if (Obj.Value.NameValues != null)
+                {
+                    name = Obj.Value.NameValues[0].Value.ToString();
+                }
+                UUID key = Obj.Value.ID;
+                UUID owner = Obj.Value.OwnerID;
+                bool asLink = false;
+                if (Obj.Value.ParentID > 0)
+                {
+                    if(mapLocalID.ContainsKey(Obj.Value.ParentID) == true)
+                    {
+                        Primitive wip = objects_copy[mapLocalID[Obj.Value.ParentID]];
+                        pos = wip.Position;
+                        asLink = true;
+                        owner = wip.OwnerID;
+                        if (wip.NameValues != null)
+                        {
+                            name = wip.NameValues[0].Value.ToString();
+                        }
+                        key = wip.ID;
+                    }
+                }
+                SculptysInfo A = new SculptysInfo();
+                A.isLinked = asLink.ToString();
+                A.name = name.ToString();
+                A.owner = owner.ToString();
+                A.uuid = key.ToString();
+                A.pos = pos.ToString();
+                reply.Add(A);
+            }
+            if (reply.Count == 0)
+            {
+                return Failure("No objects found", "ListSculptys");
+            }
+            return BasicReply(JsonConvert.SerializeObject(reply), "ListSculptys",new string[] { });
         }
 
         [About("Fetchs the current bot")]
