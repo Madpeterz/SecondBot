@@ -18,10 +18,27 @@ namespace BetterSecondBot.HttpService
     {
         public HTTP_Inventory(SecondBot mainbot, TokenStorage setuptokens) : base(mainbot, setuptokens) { }
 
+        
 
-        [About("Does a thing")]
+        [About("Attachs an event for inventory changes")]
+        [ReturnHints("cleared")]
+        [ReturnHints("No action")]
+        [ReturnHints("Event added")]
+        [ArgHints("inventoryType", "URLARG", "Types: texture,sound,callcard,landmark,clothing,object,notecard,lsltext,lslbyte,animatn,gesture,mesh")]
+        [ArgHints("outputTarget", "text", "HTTP url, channel, avatar UUID or clear to remove all events for the selected type")]
+        [Route(HttpVerbs.Post, "/SetInventoryUpdate/{inventoryType}/{token}")]
+        public object SetInventoryUpdate(string inventoryType, [FormField] string outputTarget, string token)
+        {
+            if (tokens.Allow(token, "inventory", "SetInventoryUpdate", handleGetClientIP()) == false)
+            {
+                return Failure("Token not accepted", "SetInventoryUpdate");
+            }
+            return BasicReply(bot.addInventoryUpdateEvent(inventoryType, outputTarget), "SetInventoryUpdate");
+        }
+
+        [About("Uploads a new sound file to inventory")]
         [ReturnHints("ok")]
-        [ArgHints("sourcePath", "Text", "The path to the wavefile")]
+        [ArgHints("sourcePath", "Text", "accepts a file path to a wave PCM file @ 44100")]
         [ArgHints("inventoryName", "URLARG", "the name in secondlife")]
         [Route(HttpVerbs.Post, "/UploadMediaWave/{inventoryName}/{token}")]
         public object UploadMediaWave([FormField] string sourcePath, string inventoryName, string token)
@@ -46,12 +63,8 @@ namespace BetterSecondBot.HttpService
             S.AssetData = audioData;
             S.Encode();
 
-            bot.GetClient.Inventory.RequestCreateItemFromAsset(S.AssetData, inventoryName, "", AssetType.Sound, InventoryType.Sound, AA.UUID, uploadFinished);
+            bot.GetClient.Inventory.RequestCreateItemFromAsset(S.AssetData, inventoryName, "", AssetType.Sound, InventoryType.Sound, AA.UUID, null);
             return BasicReply("ok", "UploadMediaWave");
-        }
-        private void uploadFinished(bool success, string status, UUID itemID, UUID assetID)
-        {
-            bot.GetClient.Self.Chat("Success: " + success + " status:" + status + " Inv: " + itemID.ToString() + " Ass:" + assetID.ToString(), 0, ChatType.Normal);
         }
 
 
