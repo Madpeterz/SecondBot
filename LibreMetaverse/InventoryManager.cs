@@ -3569,6 +3569,7 @@ namespace OpenMetaverse
                     if (args.Accept)
                     {
                         // Accept the inventory offer
+
                         switch (e.IM.Dialog)
                         {
                             case InstantMessageDialog.InventoryOffered:
@@ -3582,6 +3583,7 @@ namespace OpenMetaverse
                                 break;
                         }
                         imp.MessageBlock.BinaryBucket = args.FolderID.GetBytes();
+                        RequestFetchInventory(objectID, e.IM.ToAgentID);
                     }
                     else
                     {
