@@ -251,13 +251,19 @@ namespace BetterSecondBot.HttpService
             return bot.GetLastCommands(5);
         }
 
-        [About("Gets the last 5 commands issued to the bot")]
+        [About("Sets the bot to accept a request type from the avatar (or a object owned by the avatar)\n " +
+            "friend: friend request \n " +
+            "group: group invite \n " +
+            "animation: trigger animation request [from a object]\n" +
+            "teleport: teleport lure\n" +
+            "inventory: Inventory transfer\n" +
+            "command: A non signed command")]
         [ReturnHintsFailure("avatar lookup")]
         [ReturnHintsFailure("Invaild state")]
         [ReturnHintsFailure("Invaild sticky")]
         [ReturnHintsFailure("Invaild flag")]
         [ArgHints("avatar", "URLARG", "avatar uuid or Firstname Lastname")]
-        [ArgHints("flag", "URLARG", "friend, group, animation, teleport or command")]
+        [ArgHints("flag", "URLARG", "friend, group, animation, teleport, inventory or command")]
         [ArgHints("state", "URLARG", "State to set the flag to true or false")]
         [ArgHints("sticky", "URLARG", "if true the permissing will not expire after the first use otherwise false")]
         [Route(HttpVerbs.Get, "/SetPermFlag/{avatar}/{flag}/{state}/{sticky}/{token}")]
@@ -282,7 +288,7 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Invaild sticky", "SetPermFlag", new [] { avatar, flag, state, sticky });
             }
-            string[] AcceptedFlags = new [] { "friend", "group", "animation", "teleport", "command" };
+            string[] AcceptedFlags = new [] { "friend", "group", "animation", "teleport", "command", "inventory" };
             if (AcceptedFlags.Contains(flag) == false)
             {
                 return Failure("Invaild flag", "SetPermFlag", new [] { avatar, flag, state, sticky });
