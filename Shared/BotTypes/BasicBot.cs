@@ -12,7 +12,7 @@ namespace BetterSecondBotShared.bottypes
 {
     public abstract class BasicBot
     {
-
+        protected UUID master_uuid = UUID.Zero;
         protected BasicBot()
         {
             LastStatusMessage = "No status";
@@ -219,6 +219,45 @@ namespace BetterSecondBotShared.bottypes
         {
         }
 
+
+        protected LoginParams LoginLocation(LoginParams LP, bool use_home_region_redirect)
+        {
+            if (helpers.notempty(myconfig.Basic_LoginLocation) == false)
+            {
+                myconfig.Basic_LoginLocation = "home";
+                Info("LoginLocation: is empty using home!");
+                return LP;
+            }
+
+            if (use_home_region_redirect == true)
+            {
+                if(myconfig.Basic_LoginLocation == "home")
+                {
+                    LP.Start = "last";
+                }
+                else
+                {
+                    LP.Start = "home";
+                }
+                Info("LoginLocation: Recovery mode [Using "+ LP.Start+"]");
+                myconfig.Basic_LoginLocation = LP.Start;
+                LP.LoginLocation = "";
+                return LP;
+            }
+            if ((myconfig.Basic_LoginLocation != "home") && (myconfig.Basic_LoginLocation != "last"))
+            {
+                LP.Start = "custom";
+                LP.LoginLocation = myconfig.Basic_LoginLocation;
+                Info("LoginLocation: First login using->" + LP.LoginLocation);
+                return LP;
+            }
+
+            LP.Start = myconfig.Basic_LoginLocation;
+            LP.LoginLocation = "";
+            Info("LoginLocation: First login using->" + LP.Start);
+            return LP;
+        }
+
         public virtual void Start(bool use_home_region_redirect)
         {
             Client = new GridClient();
@@ -238,6 +277,7 @@ namespace BetterSecondBotShared.bottypes
                 AgentVersion = version;
             }
             Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, AgentChannel, AgentVersion);
+            Lp = LoginLocation(Lp, use_home_region_redirect);
             if (myconfig.Setting_loginURI != "secondlife")
             {
                 if (myconfig.Setting_loginURI != null)
@@ -248,44 +288,6 @@ namespace BetterSecondBotShared.bottypes
                         Lp = new LoginParams(Client, bits[0], bits[1], myconfig.Basic_BotPassword, AgentChannel, AgentVersion, myconfig.Setting_loginURI);
                     }
                 }
-            }
-            if (helpers.notempty(myconfig.Basic_LoginLocation) == false)
-            {
-                myconfig.Basic_LoginLocation = "home";
-                Info("Basic_LoginLocation: is empty using home!");
-            }
-            if (use_home_region_redirect == false)
-            {
-                if ((myconfig.Basic_LoginLocation != "home") && (myconfig.Basic_LoginLocation != "last"))
-                {
-                    Lp.Start = "home";
-                    Lp.LoginLocation = myconfig.Basic_LoginLocation;
-                    Info("Basic_LoginLocation: First login using->" + Lp.LoginLocation);
-                }
-            }
-            else
-            {
-                if ((myconfig.Basic_LoginLocation != "home") && (myconfig.Basic_LoginLocation != "last"))
-                {
-                    Info("Recovery login: using home not custom location!");
-                    Lp.Start = "home";
-                    myconfig.Basic_LoginLocation = "home";
-                }
-                else if (Lp.Start == "home")
-                {
-                    Info("Recovery login: using last location");
-                    Lp.Start = "last";
-                    myconfig.Basic_LoginLocation = "last";
-                }
-                else
-                {
-                    Info("Recovery login: using home location");
-                    Lp.Start = "home";
-
-                }
-
-                Lp.Start = myconfig.Basic_LoginLocation;
-
             }
             if (reconnect == false)
             {
