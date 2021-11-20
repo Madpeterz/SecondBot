@@ -14,7 +14,7 @@ namespace BetterSecondBot.bottypes
 {
     public abstract class StorageBot : AttachableBot
     {
-        protected UUID master_uuid = UUID.Zero;
+        
         public UUID getMaster_uuid { get { return master_uuid; } }
 
         protected Dictionary<string, long> AvatarStorageLastUsed = new Dictionary<string, long>();
