@@ -478,63 +478,9 @@ namespace BetterSecondBot.bottypes
             return "{ status: \"" + statusreply.Key.ToString() + "\", message: \""+ statusreply.Value+"\" command: \""+command+"\", args: \""+string.Join("~#~",args)+"\" }";
         }
 
-        protected HttpClient HTTPclient = new HttpClient();
+        
 
-        protected void SmartCommandReply(bool run_status, string target, string output, string command)
-        {
-            string mode = "CHAT";
-            UUID target_avatar = UUID.Zero;
-            int target_channel = 0;
-            if (target.StartsWith("http://"))
-            {
-                mode = "HTTP";
-            }
-            else if (UUID.TryParse(target, out target_avatar) == true)
-            {
-                mode = "IM";
-            }
-            else
-            {
-                if (int.TryParse(target, out target_channel) == false)
-                {
-                    mode = "None";
-                }
-            }
-            if (mode == "CHAT")
-            {
-                if (target_channel >= 0)
-                {
-                    Client.Self.Chat(output, target_channel, ChatType.Normal);
-                }
-                else
-                {
-                    run_status = false;
-                    LogFormater.Crit("[SmartReply] output Channel must be zero or higher");
-                }
-            }
-            else if (mode == "IM")
-            {
-                Client.Self.InstantMessage(target_avatar, output);
-            }
-            else if (mode == "HTTP")
-            {
-                Dictionary<string, string> values = new Dictionary<string, string>
-                    {
-                        { "reply", output },
-                        { "command", command },
-                    };
 
-                var content = new FormUrlEncodedContent(values);
-                try
-                {
-                    HTTPclient.PostAsync(target, content);
-                }
-                catch (Exception e)
-                {
-                    LogFormater.Crit("[SmartReply] HTTP failed: " + e.Message + "");
-                }
-            }
-        }
 
 
 
