@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using BetterSecondBotShared.logs;
 using BetterSecondBotShared.Static;
+using Newtonsoft.Json;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
 using OpenMetaverse.Packets;
@@ -136,6 +138,30 @@ namespace BetterSecondBot.bottypes
 
     public class EventsBot : VoidEventBot
     {
+        private Dictionary<string, List<string>> inventoryUpdateEvent = new Dictionary<string, List<string>>();
+
+        public string addInventoryUpdateEvent(string inventoryType, string outputTarget)
+        {
+            if(outputTarget == "clear")
+            {
+                if(inventoryUpdateEvent.ContainsKey(inventoryType) == true)
+                {
+                    inventoryUpdateEvent.Remove(inventoryType);
+                }
+                return "cleared";
+            }
+            if(inventoryUpdateEvent.ContainsKey(inventoryType) == false)
+            {
+                inventoryUpdateEvent.Add(inventoryType, new List<string>());
+            }
+            if(inventoryUpdateEvent[inventoryType].Contains(outputTarget) == false)
+            {
+                inventoryUpdateEvent[inventoryType].Add(outputTarget);
+                return "Event added";
+            }
+            return "No action";
+        }
+
         private EventHandler<SimChangedEventArgs> _ChangeSim;
         private EventHandler<AlertMessageEventArgs> _AlertMessage;
         private EventHandler<LoginProgressEventArgs> _LoginProgess;
@@ -423,10 +449,105 @@ namespace BetterSecondBot.bottypes
                 Client.Friends.FriendNames += AvatarFriendNames;
                 Client.Self.AlertMessage += AlertEvent;
                 Client.Network.SimChanged += ChangeSim;
+                Client.Inventory.InventoryObjectOffered += InventoryOffered;
+                Client.Inventory.ItemReceived += InventoryUpdate;
                 delay_group_fetch = helpers.UnixTimeNow() + 10;
             }
             AllowActions = true;
             base.AfterBotLoginHandler();
+        }
+
+        protected virtual void InventoryUpdate(object o, ItemReceivedEventArgs E)
+        {
+            jsonInventoryUpdate A = new jsonInventoryUpdate();
+            A.itemCreator = E.Item.CreatorID.ToString();
+            A.itemName = E.Item.Name;
+            A.itemUUID = E.Item.UUID.ToString();
+            A.itemInventoryUUID = E.Item.AssetUUID.ToString();
+            A.itemType = E.Item.AssetType.ToString().ToLowerInvariant();
+            if (inventoryUpdateEvent.ContainsKey(A.itemType) == false)
+            {
+                return;
+            }
+            string encoded = JsonConvert.SerializeObject(A);
+            foreach (string updateEvents in inventoryUpdateEvent[A.itemType])
+            {
+                SmartCommandReply(true, updateEvents, encoded, "inventoryUpdateEvent");
+            }
+        }
+
+        protected void SmartCommandReply(bool run_status, string target, string output, string command)
+        {
+            string mode = "CHAT";
+            UUID target_avatar = UUID.Zero;
+            int target_channel = 0;
+            if (target.StartsWith("http://"))
+            {
+                mode = "HTTP";
+            }
+            else if (UUID.TryParse(target, out target_avatar) == true)
+            {
+                mode = "IM";
+            }
+            else
+            {
+                if (int.TryParse(target, out target_channel) == false)
+                {
+                    mode = "None";
+                }
+            }
+            if (mode == "CHAT")
+            {
+                if (target_channel >= 0)
+                {
+                    Client.Self.Chat(output, target_channel, ChatType.Normal);
+                }
+                else
+                {
+                    run_status = false;
+                    LogFormater.Crit("[SmartReply] output Channel must be zero or higher");
+                }
+            }
+            else if (mode == "IM")
+            {
+                Client.Self.InstantMessage(target_avatar, output);
+            }
+            else if (mode == "HTTP")
+            {
+                Dictionary<string, string> values = new Dictionary<string, string>
+                    {
+                        { "reply", output },
+                        { "command", command },
+                    };
+
+                var content = new FormUrlEncodedContent(values);
+                try
+                {
+                    HTTPclient.PostAsync(target, content);
+                }
+                catch (Exception e)
+                {
+                    LogFormater.Crit("[SmartReply] HTTP failed: " + e.Message + "");
+                }
+            }
+        }
+        protected HttpClient HTTPclient = new HttpClient();
+
+        protected virtual void InventoryOffered(object o, InventoryObjectOfferedEventArgs E)
+        {
+            if(Accept_action_from("inventory", E.Offer.FromAgentID) == true)
+            {
+                E.Accept = true;
+                Remove_action_from("inventory", E.Offer.FromAgentID);
+                return;
+            }
+            if(E.Offer.FromAgentID == master_uuid)
+            {
+                E.Accept = true;
+                return;
+            }
+            E.Accept = false;
+            return;
         }
 
 
@@ -593,5 +714,14 @@ namespace BetterSecondBot.bottypes
                 LogFormater.Info("Group invite event from: " + e.IM.FromAgentName + " Rejected");
             }
         }
+    }
+
+    public class jsonInventoryUpdate
+    {
+        public string itemName;
+        public string itemCreator;
+        public string itemUUID;
+        public string itemInventoryUUID;
+        public string itemType;
     }
 }
