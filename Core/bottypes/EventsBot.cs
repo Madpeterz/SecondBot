@@ -451,28 +451,64 @@ namespace BetterSecondBot.bottypes
                 Client.Network.SimChanged += ChangeSim;
                 Client.Inventory.InventoryObjectOffered += InventoryOffered;
                 Client.Inventory.ItemReceived += InventoryUpdate;
+                Client.Inventory.TaskItemReceived += TaskItemReceived;
                 delay_group_fetch = helpers.UnixTimeNow() + 10;
             }
             AllowActions = true;
             base.AfterBotLoginHandler();
         }
 
-        protected virtual void InventoryUpdate(object o, ItemReceivedEventArgs E)
+        List<UUID> suppressDupUpdates = new List<UUID>();
+        protected virtual void TaskItemReceived(object o, TaskItemReceivedEventArgs E)
         {
-            jsonInventoryUpdate A = new jsonInventoryUpdate();
-            A.itemCreator = E.Item.CreatorID.ToString();
-            A.itemName = E.Item.Name;
-            A.itemUUID = E.Item.UUID.ToString();
-            A.itemInventoryUUID = E.Item.AssetUUID.ToString();
-            A.itemType = E.Item.AssetType.ToString().ToLowerInvariant();
+            if (suppressDupUpdates.Contains(E.ItemID) == false)
+            {
+                suppressDupUpdates.Add(E.ItemID);
+                InventoryItem itm = Client.Inventory.FetchItem(E.ItemID, Client.Self.AgentID, 3000);
+                if (itm != null)
+                {
+                    jsonInventoryUpdate A = new jsonInventoryUpdate();
+                    A.itemCreator = itm.CreatorID.ToString();
+                    A.itemName = itm.Name;
+                    A.itemUUID = itm.UUID.ToString();
+                    A.itemInventoryUUID = itm.AssetUUID.ToString();
+                    A.itemType = itm.AssetType.ToString().ToLowerInvariant();
+                    InventoryUpdateEvent(A);
+                }
+            }
+        }
+
+        protected virtual void InventoryUpdateEvent(jsonInventoryUpdate A)
+        {
             if (inventoryUpdateEvent.ContainsKey(A.itemType) == false)
             {
                 return;
             }
             string encoded = JsonConvert.SerializeObject(A);
+            
             foreach (string updateEvents in inventoryUpdateEvent[A.itemType])
             {
                 SmartCommandReply(true, updateEvents, encoded, "inventoryUpdateEvent");
+            }
+
+            if (suppressDupUpdates.Count > 15)
+            {
+                suppressDupUpdates.RemoveAt(0);
+            }
+        }
+
+        protected virtual void InventoryUpdate(object o, ItemReceivedEventArgs E)
+        {
+            if (suppressDupUpdates.Contains(E.Item.UUID) == false)
+            {
+                suppressDupUpdates.Add(E.Item.UUID);
+                jsonInventoryUpdate A = new jsonInventoryUpdate();
+                A.itemCreator = E.Item.CreatorID.ToString();
+                A.itemName = E.Item.Name;
+                A.itemUUID = E.Item.UUID.ToString();
+                A.itemInventoryUUID = E.Item.AssetUUID.ToString();
+                A.itemType = E.Item.AssetType.ToString().ToLowerInvariant();
+                InventoryUpdateEvent(A);
             }
         }
 
