@@ -463,34 +463,38 @@ namespace OpenMetaverse
                 return;
 
             // Home
+            HomeRegion = 0;
+            HomePosition = Vector3.Zero;
+            HomeLookAt = Vector3.Zero;
             if (reply.ContainsKey("home"))
             {
-                OSD osdHome = OSDParser.DeserializeLLSDNotation(reply["home"].ToString());
-
-                if (osdHome.Type == OSDType.Map)
+                try
                 {
-                    var home = (OSDMap)osdHome;
+                    OSD osdHome = OSDParser.DeserializeLLSDNotation(reply["home"].ToString());
 
-                    OSD homeRegion;
-                    if (home.TryGetValue("region_handle", out homeRegion) && homeRegion.Type == OSDType.Array)
+                    if (osdHome.Type == OSDType.Map)
                     {
-                        OSDArray homeArray = (OSDArray)homeRegion;
-                        if (homeArray.Count == 2)
-                            HomeRegion = Utils.UIntsToLong((uint)homeArray[0].AsInteger(),
-                                                           (uint)homeArray[1].AsInteger());
-                        else
-                            HomeRegion = 0;
-                    }
+                        var home = (OSDMap)osdHome;
 
-                    HomePosition = ParseVector3("position", home);
-                    HomeLookAt = ParseVector3("look_at", home);
+                        OSD homeRegion;
+                        if (home.TryGetValue("region_handle", out homeRegion) && homeRegion.Type == OSDType.Array)
+                        {
+                            OSDArray homeArray = (OSDArray)homeRegion;
+                            if (homeArray.Count == 2)
+                                HomeRegion = Utils.UIntsToLong((uint)homeArray[0].AsInteger(),
+                                                               (uint)homeArray[1].AsInteger());
+                            else
+                                HomeRegion = 0;
+                        }
+
+                        HomePosition = ParseVector3("position", home);
+                        HomeLookAt = ParseVector3("look_at", home);
+                    }
                 }
-            }
-            else
-            {
-                HomeRegion = 0;
-                HomePosition = Vector3.Zero;
-                HomeLookAt = Vector3.Zero;
+                catch (Exception e)
+                {
+                    Logger.Log("Unable to unpack home location: " + e.Message, Helpers.LogLevel.Warning);
+                }
             }
 
             CircuitCode = (int)ParseUInt("circuit_code", reply);
