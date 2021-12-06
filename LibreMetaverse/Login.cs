@@ -154,7 +154,7 @@ namespace OpenMetaverse
         /// <summary>LoginLocation used to set the starting region and location (overrides Start) example: "Tentacles/128/64/109"</summary>
         /// <remarks>Leave empty to use the starting location</remarks>
         public string LoginLocation;
-        
+
 
         /// <summary>
         /// Default constructor, initializes sane default values
@@ -715,7 +715,7 @@ namespace OpenMetaverse
         public static UUID ParseMappedUUID(string key, string key2, OSDMap reply)
         {
             OSD folderOSD;
-            if (!reply.TryGetValue(key, out folderOSD) || folderOSD.Type != OSDType.Array) {return UUID.Zero;}
+            if (!reply.TryGetValue(key, out folderOSD) || folderOSD.Type != OSDType.Array) { return UUID.Zero; }
 
             OSDArray array = (OSDArray)folderOSD;
             if (array.Count == 1 && array[0].Type == OSDType.Map)
@@ -731,7 +731,7 @@ namespace OpenMetaverse
 
         public static UUID ParseMappedUUID(string key, string key2, Hashtable reply)
         {
-            if (!reply.ContainsKey(key) || !(reply[key] is ArrayList)) {return UUID.Zero;}
+            if (!reply.ContainsKey(key) || !(reply[key] is ArrayList)) { return UUID.Zero; }
 
             var array = (ArrayList)reply[key];
             if (array.Count == 1 && array[0] is Hashtable)
@@ -748,22 +748,22 @@ namespace OpenMetaverse
             List<InventoryFolder> folders = new List<InventoryFolder>();
 
             OSD skeleton;
-            if (!reply.TryGetValue(key, out skeleton) || skeleton.Type != OSDType.Array) {return folders.ToArray();}
+            if (!reply.TryGetValue(key, out skeleton) || skeleton.Type != OSDType.Array) { return folders.ToArray(); }
 
             OSDArray array = (OSDArray)skeleton;
 
             folders.AddRange(from t in array
-                where t.Type == OSDType.Map
-                select (OSDMap)t
+                             where t.Type == OSDType.Map
+                             select (OSDMap)t
                 into map
-                select new InventoryFolder(map["folder_id"].AsUUID())
-                {
-                    PreferredType = (FolderType)map["type_default"].AsInteger(),
-                    Version = map["version"].AsInteger(),
-                    OwnerID = owner,
-                    ParentUUID = map["parent_id"].AsUUID(),
-                    Name = map["name"].AsString()
-                });
+                             select new InventoryFolder(map["folder_id"].AsUUID())
+                             {
+                                 PreferredType = (FolderType)map["type_default"].AsInteger(),
+                                 Version = map["version"].AsInteger(),
+                                 OwnerID = owner,
+                                 ParentUUID = map["parent_id"].AsUUID(),
+                                 Name = map["name"].AsString()
+                             });
 
             return folders.ToArray();
         }
@@ -773,19 +773,19 @@ namespace OpenMetaverse
             var folders = new List<InventoryFolder>();
 
             OSD skeleton;
-            if (!reply.TryGetValue(key, out skeleton) || skeleton.Type != OSDType.Array) {return folders.ToArray();}
+            if (!reply.TryGetValue(key, out skeleton) || skeleton.Type != OSDType.Array) { return folders.ToArray(); }
             OSDArray array = (OSDArray)skeleton;
             folders.AddRange(from t in array
-                where t.Type == OSDType.Map
-                select (OSDMap)t
+                             where t.Type == OSDType.Map
+                             select (OSDMap)t
                 into map
-                select new InventoryFolder(map["folder_id"].AsUUID())
-                {
-                    Name = map["name"].AsString(),
-                    ParentUUID = map["parent_id"].AsUUID(),
-                    PreferredType = (FolderType)map["type_default"].AsInteger(),
-                    Version = map["version"].AsInteger()
-                });
+                             select new InventoryFolder(map["folder_id"].AsUUID())
+                             {
+                                 Name = map["name"].AsString(),
+                                 ParentUUID = map["parent_id"].AsUUID(),
+                                 PreferredType = (FolderType)map["type_default"].AsInteger(),
+                                 Version = map["version"].AsInteger()
+                             });
             return folders.ToArray();
         }
 
@@ -796,7 +796,7 @@ namespace OpenMetaverse
 
             var folders = new List<InventoryFolder>();
 
-            if (!reply.ContainsKey(key) || !(reply[key] is ArrayList)) {return folders.ToArray();}
+            if (!reply.ContainsKey(key) || !(reply[key] is ArrayList)) { return folders.ToArray(); }
 
             ArrayList array = (ArrayList)reply[key];
             foreach (object t in array)
@@ -935,7 +935,7 @@ namespace OpenMetaverse
             ServerCertificateCustomValidationCallback = delegate { return true; },
             AllowAutoRedirect = true
         });
-        
+
         private LoginParams CurrentContext = null;
         private readonly AutoResetEvent LoginEvent = new AutoResetEvent(false);
         private LoginStatus InternalStatusCode = LoginStatus.None;
@@ -1034,7 +1034,7 @@ namespace OpenMetaverse
         public void BeginLogin(LoginParams loginParams)
         {
             // FIXME: Now that we're using CAPS we could cancel the current login and start a new one
-            if (CurrentContext != null) {throw new Exception("Login already in progress");}
+            if (CurrentContext != null) { throw new Exception("Login already in progress"); }
 
             LoginEvent.Reset();
             CurrentContext = loginParams;
@@ -1133,12 +1133,12 @@ namespace OpenMetaverse
 
             if (string.IsNullOrEmpty(loginParams.Channel))
             {
-                Logger.Log("Viewer channel not set. This is a TOS violation on some grids.", 
+                Logger.Log("Viewer channel not set. This is a TOS violation on some grids.",
                     Helpers.LogLevel.Warning);
                 loginParams.Channel = $"{Settings.USER_AGENT}";
             }
 
-            if((loginParams.Start != "home") && (loginParams.Start != "last"))
+            if ((loginParams.Start != "home") && (loginParams.Start != "last"))
             {
                 loginParams.Start = "home";
                 Logger.Log("The Start option only accepts home or last! please use LoginLocation to set a custom login location!", Helpers.LogLevel.Warning);
@@ -1147,15 +1147,15 @@ namespace OpenMetaverse
             if (string.IsNullOrEmpty(loginParams.LoginLocation) == false)
             {
                 string[] bits = loginParams.LoginLocation.Split('/');
-                if(bits.Count() == 4)
+                if (bits.Count() == 4)
                 {
-                    if(int.TryParse(bits[1],out int X) == true)
+                    if (int.TryParse(bits[1], out int X) == true)
                     {
                         if (int.TryParse(bits[2], out int Y) == true)
                         {
                             if (int.TryParse(bits[3], out int Z) == true)
                             {
-                                Logger.Log("Setting login location to: "+ loginParams.LoginLocation, Helpers.LogLevel.Info);
+                                Logger.Log("Setting login location to: " + loginParams.LoginLocation, Helpers.LogLevel.Info);
                                 loginParams.Start = StartLocation(bits[0], X, Y, Z);
                             }
                         }
@@ -1169,7 +1169,7 @@ namespace OpenMetaverse
             #endregion
 
             // TODO: Allow a user callback to be defined for handling the cert
-            ServicePointManager.ServerCertificateValidationCallback = 
+            ServicePointManager.ServerCertificateValidationCallback =
                 (sender, certificate, chain, sslPolicyErrors) => true;
 
             if (Client.Settings.USE_LLSD_LOGIN)
@@ -1287,7 +1287,7 @@ namespace OpenMetaverse
                             cts.CancelAfter(cc.Timeout);
                             var loginResponse = await HTTP_CLIENT.PostAsXmlRpcAsync(cc.URI, request, cts.Token);
                             cts.Dispose();
-                            
+
                             LoginReplyXmlRpcHandler(loginResponse, loginParams);
                         }
                         catch (Exception e)

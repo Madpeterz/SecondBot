@@ -3569,7 +3569,6 @@ namespace OpenMetaverse
                     if (args.Accept)
                     {
                         // Accept the inventory offer
-
                         switch (e.IM.Dialog)
                         {
                             case InstantMessageDialog.InventoryOffered:
