@@ -454,12 +454,14 @@ namespace BetterSecondBot.WikiMake
                     sb.Replace("[[RETURNROOT]]", "../");
 
                     mdWiki.AppendLine("[[URLENDPOINT]]/[[WORKSPACE]]/[[COMMAND]]/[[URLADDON]]");
+                    mdWiki.AppendLine(" ");
                     mdWiki.AppendLine("Method: [[APIMETHOD]]");
+                    mdWiki.AppendLine(" ");
                     mdWiki.AppendLine("OR");
                     mdWiki.AppendLine(CommandExample.ToString());
-                    mdWiki.AppendLine("OR");
+                    mdWiki.AppendLine(" ");
                     mdWiki.AppendLine("[[HELP]]");
-
+                    mdWiki.AppendLine(" ");
                     string target_file = "" + area + "" + workspace + "" + c + ".html";
                     io.WriteFile(target_file, sb.ToString());
                     mdWiki.AppendLine("***Args helper***");

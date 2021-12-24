@@ -3,11 +3,14 @@
 ### AddToAllowAnimations
  
 http://localhost:8080/animation/AddToAllowAnimations/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 AddToAllowAnimations|||{avatar}
-OR
+ 
 Toggles if animation requests from this avatar (used for remote poseballs) are accepted
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Granted perm animation
@@ -26,11 +29,14 @@ Toggles if animation requests from this avatar (used for remote poseballs) are a
 ### PlayGesture
  
 http://localhost:8080/animation/PlayGesture/{gesture}/{token}
+ 
 Method: Get
+ 
 OR
 PlayGesture|||{gesture}
-OR
+ 
 Attempts to play a gesture
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Accepted
@@ -47,11 +53,14 @@ Attempts to play a gesture
 ### ResetAnimations
  
 http://localhost:8080/animation/ResetAnimations/{token}
+ 
 Method: Get
+ 
 OR
 ResetAnimations
-OR
+ 
 Resets the animation stack for the bot
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Accepted
@@ -68,11 +77,14 @@ Resets the animation stack for the bot
 ### NearmeWithDetails
  
 http://localhost:8080/avatars/NearmeWithDetails/{token}
+ 
 Method: Get
+ 
 OR
 NearmeWithDetails
-OR
+ 
 an improved version of near me with extra details<br/>NearMeDetails is a object formated as follows<br/><ul><li>id</li><li>name</li><li>x</li><li>y</li><li>z</li><li>range</li></ul>
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array NearMeDetails
@@ -89,11 +101,14 @@ an improved version of near me with extra details<br/>NearMeDetails is a object 
 ### Nearme
  
 http://localhost:8080/avatars/Nearme/{token}
+ 
 Method: Get
+ 
 OR
 Nearme
-OR
+ 
 returns a list of all known avatars nearby
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array UUID = Name
@@ -112,11 +127,14 @@ returns a list of all known avatars nearby
 ### LocalChatHistory
  
 http://localhost:8080/chat/LocalChatHistory/{token}
+ 
 Method: Get
+ 
 OR
 LocalChatHistory
-OR
+ 
 fetchs the last 20 localchat messages
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array string
@@ -131,11 +149,14 @@ fetchs the last 20 localchat messages
 ### Say
  
 http://localhost:8080/chat/Say/{channel}/{token}
+ 
 Method: Post
+ 
 OR
 Say|||{channel}~#~{message}
-OR
+ 
 sends a message to localchat
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array string
@@ -154,11 +175,14 @@ sends a message to localchat
 ### IM
  
 http://localhost:8080/chat/IM/{avatar}/{token}
+ 
 Method: Post
+ 
 OR
 IM|||{avatar}~#~{message}
-OR
+ 
 sends a im to the selected avatar
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -177,11 +201,14 @@ sends a im to the selected avatar
 ### chatwindows
  
 http://localhost:8080/chat/chatwindows/{token}
+ 
 Method: Get
+ 
 OR
 chatwindows
-OR
+ 
 gets a full list of all chat windows
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array UUID = Name
@@ -196,11 +223,14 @@ gets a full list of all chat windows
 ### listwithunread
  
 http://localhost:8080/chat/listwithunread/{token}
+ 
 Method: Get
+ 
 OR
 listwithunread
-OR
+ 
 gets a list of chat windows with unread messages
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array of UUID
@@ -215,11 +245,14 @@ gets a list of chat windows with unread messages
 ### haveunreadims
  
 http://localhost:8080/chat/haveunreadims/{token}
+ 
 Method: Get
+ 
 OR
 haveunreadims
-OR
+ 
 gets if there are any unread im messages at all
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] True|False
@@ -234,11 +267,14 @@ gets if there are any unread im messages at all
 ### getimchat
  
 http://localhost:8080/chat/getimchat/{window}/{token}
+ 
 Method: Get
+ 
 OR
 getimchat|||{window}
-OR
+ 
 gets the chat from the selected window
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Array of text
@@ -257,11 +293,14 @@ gets the chat from the selected window
 ### GetToken
  
 http://localhost:8080/core/GetToken/
+ 
 Method: Post
+ 
 OR
 GetToken|||{authcode}~#~{unixtimegiven}
-OR
+ 
 Requests a new token (Vaild for 10 mins) <br/>to use with all other requests
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] A new token with full system scope
@@ -276,11 +315,14 @@ Requests a new token (Vaild for 10 mins) <br/>to use with all other requests
 ### Hello
  
 http://localhost:8080/core/Hello/
+ 
 Method: Get
+ 
 OR
 Hello
-OR
+ 
 Used to check HTTP connections
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] world
@@ -293,11 +335,14 @@ Used to check HTTP connections
 ### Delay
  
 http://localhost:8080/core/Delay/{token}
+ 
 Method: Get
+ 
 OR
 Delay
-OR
+ 
 Delays a thead by X ms<br/>Mostly pointless but good if your doing custom commands
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -314,11 +359,14 @@ Delays a thead by X ms<br/>Mostly pointless but good if your doing custom comman
 ### LogoutUI
  
 http://localhost:8080/core/LogoutUI/{token}
+ 
 Method: Get
+ 
 OR
 LogoutUI
-OR
+ 
 Removes the given token from the accepted token pool
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -335,11 +383,14 @@ Removes the given token from the accepted token pool
 ### DialogRelay
  
 http://localhost:8080/dialogs/DialogRelay/{target}/{token}
+ 
 Method: Get
+ 
 OR
 DialogRelay|||{target}
-OR
+ 
 Updates the relay target (you can have 1 of each type)<br/>Clear will disable them all
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] cleared
@@ -362,11 +413,14 @@ Updates the relay target (you can have 1 of each type)<br/>Clear will disable th
 ### DialogResponce
  
 http://localhost:8080/dialogs/DialogResponce/{dialogid}/{buttontext}/{token}
+ 
 Method: Get
+ 
 OR
 DialogResponce|||{dialogid}~#~{buttontext}
-OR
+ 
 Makes the bot interact with the dialog [dialogid] with the button [buttontext]
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true
@@ -385,11 +439,14 @@ Makes the bot interact with the dialog [dialogid] with the button [buttontext]
 ### DialogTrack
  
 http://localhost:8080/dialogs/DialogTrack/{status}/{token}
+ 
 Method: Get
+ 
 OR
 DialogTrack|||{status}
-OR
+ 
 Should the bot track dialogs and send them to the relays setup?
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] updated
@@ -408,11 +465,14 @@ Should the bot track dialogs and send them to the relays setup?
 ### Discord_AddRole
  
 http://localhost:8080/discord/Discord_AddRole/{serverid}/{roleid}/{memberid}/{token}
+ 
 Method: Get
+ 
 OR
 Discord_AddRole|||{serverid}~#~{roleid}~#~{memberid}
-OR
+ 
 Adds a discord server role to the selected member
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -429,11 +489,14 @@ Adds a discord server role to the selected member
 ### Discord_BanMember
  
 http://localhost:8080/discord/Discord_BanMember/{serverid}/{memberid}/{token}
+ 
 Method: Post
+ 
 OR
 Discord_BanMember|||{serverid}~#~{memberid}~#~{why}
-OR
+ 
 Adds the selected user to the ban list - Disallows rejoining untill they are removed from the list
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -452,11 +515,14 @@ Adds the selected user to the ban list - Disallows rejoining untill they are rem
 ### Discord_BulkClear_Messages
  
 http://localhost:8080/discord/Discord_BulkClear_Messages/{serverid}/{memberid}/{token}
+ 
 Method: Get
+ 
 OR
 Discord_BulkClear_Messages|||{serverid}~#~{memberid}
-OR
+ 
 Clears messages on the server sent by the member in the last 13 days, 22hours 59mins
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -473,12 +539,15 @@ Clears messages on the server sent by the member in the last 13 days, 22hours 59
 ### Discord_Dm_Member
  
 http://localhost:8080/discord/Discord_Dm_Member/{serverid}/{memberid}/{token}
+ 
 Method: Post
+ 
 OR
 Discord_Dm_Member|||{serverid}~#~{memberid}~#~{message}
-OR
+ 
 Sends a message directly to the user [They must be in the server]
  This command requires the SERVER MEMBERS INTENT found in discord app dev
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -495,15 +564,18 @@ Sends a message directly to the user [They must be in the server]
 ### Discord_MembersList
  
 http://localhost:8080/discord/Discord_MembersList/{serverid}/{token}
+ 
 Method: Get
+ 
 OR
 Discord_MembersList|||{serverid}
-OR
+ 
 Returns a list of members in a server 
  collection is userid: username 
  if the user has set a nickname: userid: nickname|username 
  This command requires Discord full client mode enabled and connected
  !!!! This command also requires: Privileged Gateway Intents / SERVER MEMBERS INTENT set to true on the discord bot api area !!!
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] mixed array of userid: nickname|username  or   userid:username
@@ -520,11 +592,14 @@ Returns a list of members in a server
 ### Discord_MessageChannel
  
 http://localhost:8080/discord/Discord_MessageChannel/{serverid}/{channelid}/{tts}/{token}
+ 
 Method: Post
+ 
 OR
 Discord_MessageChannel|||{serverid}~#~{channelid}~#~{tts}~#~{message}
-OR
+ 
 Sends a message to the selected channel - Optional TTS usage
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -543,11 +618,14 @@ Sends a message to the selected channel - Optional TTS usage
 ### Discord_MuteMember
  
 http://localhost:8080/discord/Discord_MuteMember/{serverid}/{memberid}/{mode}/{token}
+ 
 Method: Get
+ 
 OR
 Discord_MuteMember|||{serverid}~#~{memberid}~#~{mode}
-OR
+ 
 Sends a message to the selected channel - Optional TTS usage
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] mixed array of userid: nickname|username  or   userid:username
@@ -564,12 +642,15 @@ Sends a message to the selected channel - Optional TTS usage
 ### Discord_Role_GetSettings
  
 http://localhost:8080/discord/Discord_Role_GetSettings/{serverid}/{memberid}/{mode}/{token}
+ 
 Method: Get
+ 
 OR
 Discord_Role_GetSettings|||{serverid}~#~{memberid}~#~{mode}
-OR
+ 
 returns a collection of settings for the given role 
  This command requires Discord full client mode enabled and connected
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] KeyPair of status: KeyPair[] item = value
@@ -586,14 +667,17 @@ returns a collection of settings for the given role
 ### Discord_Role_UpdatePerms
  
 http://localhost:8080/discord/Discord_Role_UpdatePerms/{serverid}/{roleid}/{token}
+ 
 Method: Post
+ 
 OR
 Discord_Role_UpdatePerms|||{serverid}~#~{roleid}~#~{flagscsv}
-OR
+ 
 Updates perm flags for the selected role 
  example CSV format: Speak=True,SendMessages=False 
  for a full list of perms see output of Discord_Role_GetSettings 
  This command requires Discord full client mode enabled and connected
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -610,14 +694,17 @@ Updates perm flags for the selected role
 ### Discord_RoleCreate
  
 http://localhost:8080/discord/Discord_RoleCreate/{serverid}/{role}/{token}
+ 
 Method: Get
+ 
 OR
 Discord_RoleCreate|||{serverid}~#~{role}
-OR
+ 
 Updates perm flags for the selected role 
  example CSV format: Speak=True,SendMessages=False 
  for a full list of perms see output of Discord_Role_GetSettings 
  This command requires Discord full client mode enabled and connected
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] KeyPair of statusmessage=roleid or 0
@@ -634,12 +721,15 @@ Updates perm flags for the selected role
 ### Discord_RoleList
  
 http://localhost:8080/discord/Discord_RoleList/{serverid}/{token}
+ 
 Method: Get
+ 
 OR
 Discord_RoleList|||{serverid}
-OR
+ 
 Returns a list of roles and their ids in collection 
  This command requires Discord full client mode enabled and connected
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] KeyPair of status: KeyPair of roleid: rolename
@@ -656,12 +746,15 @@ Returns a list of roles and their ids in collection
 ### Discord_RoleRemove
  
 http://localhost:8080/discord/Discord_RoleRemove/{serverid}/{token}
+ 
 Method: Get
+ 
 OR
 Discord_RoleRemove|||{serverid}
-OR
+ 
 Remove a role from a server 
  This command requires Discord full client mode enabled and connected
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -678,11 +771,14 @@ Remove a role from a server
 ### Discord_TextChannels_List
  
 http://localhost:8080/discord/Discord_TextChannels_List/{serverid}/{token}
+ 
 Method: Get
+ 
 OR
 Discord_TextChannels_List|||{serverid}
-OR
+ 
 Returns a list of text channels in a server
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array of channelid: name
@@ -701,11 +797,14 @@ Returns a list of text channels in a server
 ### SimRestart
  
 http://localhost:8080/estate/SimRestart/{delay}/{mode}/{token}
+ 
 Method: Get
+ 
 OR
 SimRestart|||{delay}~#~{mode}
-OR
+ 
 Sends the message to the current sim
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] restarting
@@ -724,11 +823,14 @@ Sends the message to the current sim
 ### SimMessage
  
 http://localhost:8080/estate/SimMessage/{token}
+ 
 Method: Post
+ 
 OR
 SimMessage|||{message}
-OR
+ 
 Sends the message to the current sim
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -747,11 +849,14 @@ Sends the message to the current sim
 ### GetSimTexture
  
 http://localhost:8080/estate/GetSimTexture/{regionname}/{token}
+ 
 Method: Get
+ 
 OR
 GetSimTexture|||{regionname}
-OR
+ 
 Fetchs the regions map tile
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Texture UUID
@@ -768,11 +873,14 @@ Fetchs the regions map tile
 ### EstateParcelReclaim
  
 http://localhost:8080/estate/EstateParcelReclaim/{token}
+ 
 Method: Get
+ 
 OR
 EstateParcelReclaim
-OR
+ 
 Reclaims ownership of the current parcel
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -789,11 +897,14 @@ Reclaims ownership of the current parcel
 ### GetSimGlobalPos
  
 http://localhost:8080/estate/GetSimGlobalPos/{token}
+ 
 Method: Get
+ 
 OR
 GetSimGlobalPos
-OR
+ 
 Reclaims ownership of the current parcel
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -810,11 +921,14 @@ Reclaims ownership of the current parcel
 ### GetEstateBanList
  
 http://localhost:8080/estate/GetEstateBanList/{token}
+ 
 Method: Get
+ 
 OR
 GetEstateBanList
-OR
+ 
 Requests the estate banlist
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ban list json
@@ -829,11 +943,14 @@ Requests the estate banlist
 ### UpdateEstateBanlist
  
 http://localhost:8080/estate/UpdateEstateBanlist/{avatar}/{mode}/{global}/{token}
+ 
 Method: Get
+ 
 OR
 UpdateEstateBanlist|||{avatar}~#~{mode}~#~{global}
-OR
+ 
 Attempts to add/remove the avatar to/from the Estate banlist
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Unban request accepted
@@ -858,11 +975,14 @@ Attempts to add/remove the avatar to/from the Estate banlist
 ### Friendslist
  
 http://localhost:8080/friends/Friendslist/{token}
+ 
 Method: Get
+ 
 OR
 Friendslist
-OR
+ 
 Gets the friendslist <br/>Formated as follows<br/>friendreplyobject<br/><ul><li>name: String</li><li>id: String</li><li>online: bool</li></ul>
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array UUID = friendreplyobject
@@ -877,12 +997,15 @@ Gets the friendslist <br/>Formated as follows<br/>friendreplyobject<br/><ul><li>
 ### FriendFullPerms
  
 http://localhost:8080/friends/FriendFullPerms/{avatar}/{state}/{token}
+ 
 Method: Get
+ 
 OR
 FriendFullPerms|||{avatar}~#~{state}
-OR
+ 
 Updates the friend perms for avatar avatar to State 
  if true grants (Online/Map/Modify) perms
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] granted
@@ -905,12 +1028,15 @@ Updates the friend perms for avatar avatar to State
 ### FriendRequest
  
 http://localhost:8080/friends/FriendRequest/{avatar}/{state}/{token}
+ 
 Method: Get
+ 
 OR
 FriendRequest|||{avatar}~#~{state}
-OR
+ 
 Updates the friend perms for avatar avatar to State 
  if true grants (Online/Map/Modify) perms
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Request sent
@@ -937,11 +1063,14 @@ Updates the friend perms for avatar avatar to State
 ### Balance
  
 http://localhost:8080/funds/Balance/{token}
+ 
 Method: Get
+ 
 OR
 Balance
-OR
+ 
 Requests the current balance and requests the balance to update.
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Current fund level
@@ -958,11 +1087,14 @@ Requests the current balance and requests the balance to update.
 ### PayAvatar
  
 http://localhost:8080/funds/PayAvatar/{avatar}/{amount}/{token}
+ 
 Method: Get
+ 
 OR
 PayAvatar|||{avatar}~#~{amount}
-OR
+ 
 Makes the bot pay a avatar
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Accepted
@@ -985,11 +1117,14 @@ Makes the bot pay a avatar
 ### PayObject
  
 http://localhost:8080/funds/PayObject/{object}/{primname}/{amount}/{token}
+ 
 Method: Get
+ 
 OR
 PayObject|||{object}~#~{primname}~#~{amount}
-OR
+ 
 Makes the bot pay a object
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -1016,11 +1151,14 @@ Makes the bot pay a object
 ### IsGroupMember
  
 http://localhost:8080/group/IsGroupMember/{group}/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 IsGroupMember|||{group}~#~{avatar}
-OR
+ 
 Checks if the given UUID is in the given group<br/>Note: if group membership data is more than 60 secs old this will return Updating<br/>Please wait and retry later
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Membership reply with [membershipStatus,AvatarUUID,AvatarnameIfKnown,GroupUUID]
@@ -1043,11 +1181,14 @@ Checks if the given UUID is in the given group<br/>Note: if group membership dat
 ### GetGroupMembers
  
 http://localhost:8080/group/GetGroupMembers/{group}/{token}
+ 
 Method: Get
+ 
 OR
 GetGroupMembers|||{group}
-OR
+ 
 Gets membership of a group
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] list of UUIDS of group members
@@ -1070,11 +1211,14 @@ Gets membership of a group
 ### GroupBan
  
 http://localhost:8080/group/GroupBan/{group}/{avatar}/{state}/{token}
+ 
 Method: Get
+ 
 OR
 GroupBan|||{group}~#~{avatar}~#~{state}
-OR
+ 
 Attempts to ban/unban a given avatar from a group
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ? request accepted
@@ -1099,11 +1243,14 @@ Attempts to ban/unban a given avatar from a group
 ### GroupEject
  
 http://localhost:8080/group/GroupEject/{group}/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 GroupEject|||{group}~#~{avatar}
-OR
+ 
 Eject selected avatar from group
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Requested
@@ -1130,12 +1277,15 @@ Eject selected avatar from group
 ### GroupAddRole
  
 http://localhost:8080/group/GroupAddRole/{group}/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 GroupAddRole|||{group}~#~{avatar}
-OR
+ 
 Adds the avatar to the Group with the role 
  if they are not in the group then it invites them at that role
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Roles updated
@@ -1164,11 +1314,14 @@ Adds the avatar to the Group with the role
 ### GroupInvite
  
 http://localhost:8080/group/GroupInvite/{group}/{avatar}/{role}/{token}
+ 
 Method: Get
+ 
 OR
 GroupInvite|||{group}~#~{avatar}~#~{role}
-OR
+ 
 Invites selected avatar to the group with the selected role
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Invite sent
@@ -1195,11 +1348,14 @@ Invites selected avatar to the group with the selected role
 ### Groupnotice
  
 http://localhost:8080/group/Groupnotice/{group}/{token}
+ 
 Method: Post
+ 
 OR
 Groupnotice|||{group}~#~{title}~#~{message}
-OR
+ 
 Sends a group notice (No attachments please use GroupnoticeWithAttachment to attach items!)
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Sending notice
@@ -1224,11 +1380,14 @@ Sends a group notice (No attachments please use GroupnoticeWithAttachment to att
 ### GroupActiveTitle
  
 http://localhost:8080/group/GroupActiveTitle/{group}/{role}/{token}
+ 
 Method: Get
+ 
 OR
 GroupActiveTitle|||{group}~#~{role}
-OR
+ 
 Activates the selected title
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Switching title
@@ -1249,11 +1408,14 @@ Activates the selected title
 ### GroupActiveGroup
  
 http://localhost:8080/group/GroupActiveGroup/{group}/{token}
+ 
 Method: Get
+ 
 OR
 GroupActiveGroup|||{group}
-OR
+ 
 Sets the selected group to the active group
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Switching active group
@@ -1272,11 +1434,14 @@ Sets the selected group to the active group
 ### GroupnoticeWithAttachment
  
 http://localhost:8080/group/GroupnoticeWithAttachment/{group}/{attachment}/{token}
+ 
 Method: Post
+ 
 OR
 GroupnoticeWithAttachment|||{group}~#~{title}~#~{message}~#~{attachment}
-OR
+ 
 Sends a group notice with an attachment
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Sending notice with attachment
@@ -1303,11 +1468,14 @@ Sends a group notice with an attachment
 ### GetGroupList
  
 http://localhost:8080/group/GetGroupList/{token}
+ 
 Method: Get
+ 
 OR
 GetGroupList
-OR
+ 
 fetchs a list of all groups known to the bot
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array UUID=name
@@ -1322,11 +1490,14 @@ fetchs a list of all groups known to the bot
 ### GetGroupRoles
  
 http://localhost:8080/group/GetGroupRoles/{group}/{token}
+ 
 Method: Get
+ 
 OR
 GetGroupRoles|||{group}
-OR
+ 
 Requests the roles for the selected group<br/>Replys with GroupRoleDetails object formated as follows <ul><li>UpdateUnderway (Bool)</li><li>RoleDataAge (Int) [default -1]</li><li>Roles (KeyPair array of UUID=Name)</li></ul><br/>
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] GroupRoleDetails object
@@ -1347,11 +1518,14 @@ Requests the roles for the selected group<br/>Replys with GroupRoleDetails objec
 ### GroupchatListAllUnreadGroups
  
 http://localhost:8080/group/GroupchatListAllUnreadGroups/{token}
+ 
 Method: Get
+ 
 OR
 GroupchatListAllUnreadGroups
-OR
+ 
 fetchs a list of all groups with unread messages
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array UUID
@@ -1366,11 +1540,14 @@ fetchs a list of all groups with unread messages
 ### GroupchatGroupHasUnread
  
 http://localhost:8080/group/GroupchatGroupHasUnread/{group}/{token}
+ 
 Method: Get
+ 
 OR
 GroupchatGroupHasUnread|||{group}
-OR
+ 
 fetchs a list of all groups with unread messages
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -1389,11 +1566,14 @@ fetchs a list of all groups with unread messages
 ### GroupchatAnyUnread
  
 http://localhost:8080/group/GroupchatAnyUnread/{token}
+ 
 Method: Get
+ 
 OR
 GroupchatAnyUnread
-OR
+ 
 checks if there are any groups with unread messages
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] True|False
@@ -1408,11 +1588,14 @@ checks if there are any groups with unread messages
 ### GroupchatClearAll
  
 http://localhost:8080/group/GroupchatClearAll/{token}
+ 
 Method: Get
+ 
 OR
 GroupchatClearAll
-OR
+ 
 Clears all group chat buffers at once
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -1427,11 +1610,14 @@ Clears all group chat buffers at once
 ### GroupchatHistory
  
 http://localhost:8080/group/GroupchatHistory/{group}/{token}
+ 
 Method: Get
+ 
 OR
 GroupchatHistory|||{group}
-OR
+ 
 fetchs the groupchat history
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Group Chat
@@ -1448,11 +1634,14 @@ fetchs the groupchat history
 ### Groupchat
  
 http://localhost:8080/group/Groupchat/{group}/{token}
+ 
 Method: Post
+ 
 OR
 Groupchat|||{group}~#~{message}
-OR
+ 
 sends a message to the groupchat
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Sending
@@ -1475,11 +1664,14 @@ sends a message to the groupchat
 ### ListSculptys
  
 http://localhost:8080/info/ListSculptys/{token}
+ 
 Method: Get
+ 
 OR
 ListSculptys
-OR
+ 
 Lists objects that are sculpty type in the current sim that the bot can see
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] A json object
@@ -1494,11 +1686,14 @@ Lists objects that are sculpty type in the current sim that the bot can see
 ### Version
  
 http://localhost:8080/info/Version/{token}
+ 
 Method: Get
+ 
 OR
 Version
-OR
+ 
 Fetchs the current bot
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] The build ID of the bot
@@ -1513,11 +1708,14 @@ Fetchs the current bot
 ### Name
  
 http://localhost:8080/info/Name/{token}
+ 
 Method: Get
+ 
 OR
 Name
-OR
+ 
 Fetchs the name of the bot
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Firstname Lastname
@@ -1532,11 +1730,14 @@ Fetchs the name of the bot
 ### ParcelName
  
 http://localhost:8080/info/ParcelName/{token}
+ 
 Method: Get
+ 
 OR
 ParcelName
-OR
+ 
 Fetchs the current parcels name
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Parcelname
@@ -1555,11 +1756,14 @@ Fetchs the current parcels name
 ### UnixTimeNow
  
 http://localhost:8080/info/UnixTimeNow/{token}
+ 
 Method: Get
+ 
 OR
 UnixTimeNow
-OR
+ 
 Requests the current unixtime at the bot
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Unixtime
@@ -1574,11 +1778,14 @@ Requests the current unixtime at the bot
 ### SimName
  
 http://localhost:8080/info/SimName/{token}
+ 
 Method: Get
+ 
 OR
 SimName
-OR
+ 
 Fetchs the current region name
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Regionname
@@ -1595,11 +1802,14 @@ Fetchs the current region name
 ### GetPosition
  
 http://localhost:8080/info/GetPosition/{token}
+ 
 Method: Get
+ 
 OR
 GetPosition
-OR
+ 
 Fetchs the current location of the bot
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array of X,Y,Z values
@@ -1618,11 +1828,14 @@ Fetchs the current location of the bot
 ### SetInventoryUpdate
  
 http://localhost:8080/inventory/SetInventoryUpdate/{inventoryType}/{token}
+ 
 Method: Post
+ 
 OR
 SetInventoryUpdate|||{inventoryType}~#~{outputTarget}
-OR
+ 
 Attachs an event for inventory changes
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] cleared
@@ -1641,11 +1854,14 @@ Attachs an event for inventory changes
 ### UploadMediaWave
  
 http://localhost:8080/inventory/UploadMediaWave/{inventoryName}/{token}
+ 
 Method: Post
+ 
 OR
 UploadMediaWave|||{sourcePath}~#~{inventoryName}
-OR
+ 
 Uploads a new sound file to inventory
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -1660,11 +1876,14 @@ Uploads a new sound file to inventory
 ### RezObject
  
 http://localhost:8080/inventory/RezObject/{item}/{token}
+ 
 Method: Get
+ 
 OR
 RezObject|||{item}
-OR
+ 
 rezs the item at the bots current location
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] UUID of rezzed item
@@ -1683,11 +1902,14 @@ rezs the item at the bots current location
 ### RenameInventory
  
 http://localhost:8080/inventory/RenameInventory/{item}/{token}
+ 
 Method: Post
+ 
 OR
 RenameInventory|||{item}~#~{newname}
-OR
+ 
 renames a folder or inventory item
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -1708,11 +1930,14 @@ renames a folder or inventory item
 ### DeleteInventoryItem
  
 http://localhost:8080/inventory/DeleteInventoryItem/{item}/{token}
+ 
 Method: Get
+ 
 OR
 DeleteInventoryItem|||{item}
-OR
+ 
 Attempts to Remove the given inventory item
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -1729,11 +1954,14 @@ Attempts to Remove the given inventory item
 ### DeleteInventoryFolder
  
 http://localhost:8080/inventory/DeleteInventoryFolder/{folder}/{token}
+ 
 Method: Get
+ 
 OR
 DeleteInventoryFolder|||{folder}
-OR
+ 
 Attempts to Remove the given inventory folder
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -1750,11 +1978,14 @@ Attempts to Remove the given inventory folder
 ### Attach
  
 http://localhost:8080/inventory/Attach/{item}/{token}
+ 
 Method: Get
+ 
 OR
 Attach|||{item}
-OR
+ 
 Attempts to attach the given inventory item
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -1771,11 +2002,14 @@ Attempts to attach the given inventory item
 ### Detach
  
 http://localhost:8080/inventory/Detach/{item}/{token}
+ 
 Method: Get
+ 
 OR
 Detach|||{item}
-OR
+ 
 Attempts to Remove the given inventory folder
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -1792,11 +2026,14 @@ Attempts to Remove the given inventory folder
 ### Outfit
  
 http://localhost:8080/inventory/Outfit/{name}/{token}
+ 
 Method: Get
+ 
 OR
 Outfit|||{name}
-OR
+ 
 Replaces the current avatar outfit with the Clothing/[NAME] folder<br/>Please note: This does not use the outfits folder!<br/>Please do not use links in the folder!
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -1819,11 +2056,14 @@ Replaces the current avatar outfit with the Clothing/[NAME] folder<br/>Please no
 ### InventoryPurgeNotecards
  
 http://localhost:8080/inventory/InventoryPurgeNotecards/{token}
+ 
 Method: Get
+ 
 OR
 InventoryPurgeNotecards
-OR
+ 
 Searchs the notecards folder for notecards, any older than 31 days are deleted.<br/>Depending on the number of notecards this might require multiple calls!
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -1840,11 +2080,14 @@ Searchs the notecards folder for notecards, any older than 31 days are deleted.<
 ### getRealUUID
  
 http://localhost:8080/inventory/getRealUUID/{item}/{token}
+ 
 Method: Get
+ 
 OR
 getRealUUID|||{item}
-OR
+ 
 converts a inventory uuid to a realworld uuid<br/>Needed for texture preview
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Asset UUID or UUID zero
@@ -1861,11 +2104,14 @@ converts a inventory uuid to a realworld uuid<br/>Needed for texture preview
 ### SendItem
  
 http://localhost:8080/inventory/SendItem/{item}/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 SendItem|||{item}~#~{avatar}
-OR
+ 
 sends a item to an avatar
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -1888,11 +2134,14 @@ sends a item to an avatar
 ### SendFolder
  
 http://localhost:8080/inventory/SendFolder/{item}/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 SendFolder|||{item}~#~{avatar}
-OR
+ 
 Sends a folder to an avatar
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -1915,11 +2164,14 @@ Sends a folder to an avatar
 ### TransferInventoryToObject
  
 http://localhost:8080/inventory/TransferInventoryToObject/{item}/{object}/{running}/{token}
+ 
 Method: Get
+ 
 OR
 TransferInventoryToObject|||{item}~#~{object}~#~{running}
-OR
+ 
 Transfers a item [ARG 2] to a objects inventory [ARG 1] (And if set with the script running state [ARG 3])
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Transfering running script
@@ -1946,11 +2198,14 @@ Transfers a item [ARG 2] to a objects inventory [ARG 1] (And if set with the scr
 ### InventoryFolders
  
 http://localhost:8080/inventory/InventoryFolders/{token}
+ 
 Method: Get
+ 
 OR
 InventoryFolders
-OR
+ 
 Requests the inventory folder layout as a json object InventoryMapFolder<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>subfolders: InventoryMapFolder[]</li></ul>
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array of InventoryMapFolder
@@ -1967,11 +2222,14 @@ Requests the inventory folder layout as a json object InventoryMapFolder<br/>For
 ### InventoryFoldersLimited
  
 http://localhost:8080/inventory/InventoryFoldersLimited/{targetfolder}/{token}
+ 
 Method: Get
+ 
 OR
 InventoryFoldersLimited|||{targetfolder}
-OR
+ 
 Requests folders limited to selected folder
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] single InventoryMapFolder
@@ -1988,11 +2246,14 @@ Requests folders limited to selected folder
 ### InventoryContents
  
 http://localhost:8080/inventory/InventoryContents/{folderUUID}/{token}
+ 
 Method: Get
+ 
 OR
 InventoryContents|||{folderUUID}
-OR
+ 
 Requests the contents of a folder as an array of InventoryMapItem<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>typename: String</li></ul>
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] array of InventoryMapItem
@@ -2011,11 +2272,14 @@ Requests the contents of a folder as an array of InventoryMapItem<br/>Formated a
 ### AutoPilot
  
 http://localhost:8080/movement/AutoPilot/{x}/{y}/{z}/{token}
+ 
 Method: Get
+ 
 OR
 AutoPilot|||{x}~#~{y}~#~{z}
-OR
+ 
 uses the AutoPilot to move to a location
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Error Unable to AutoPilot to location
@@ -2036,11 +2300,14 @@ uses the AutoPilot to move to a location
 ### AutoPilotStop
  
 http://localhost:8080/movement/AutoPilotStop/{token}
+ 
 Method: Get
+ 
 OR
 AutoPilotStop
-OR
+ 
 Attempt to teleport to a new region
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2055,11 +2322,14 @@ Attempt to teleport to a new region
 ### SendTeleportLure
  
 http://localhost:8080/movement/SendTeleportLure/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 SendTeleportLure|||{avatar}
-OR
+ 
 Make the bot request the target avatar teleport to the bot
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2076,11 +2346,14 @@ Make the bot request the target avatar teleport to the bot
 ### RequestTeleport
  
 http://localhost:8080/movement/RequestTeleport/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 RequestTeleport|||{avatar}
-OR
+ 
 Sends a teleport request (Move the bot to the avatar)
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2097,11 +2370,14 @@ Sends a teleport request (Move the bot to the avatar)
 ### Fly
  
 http://localhost:8080/movement/Fly/{mode}/{token}
+ 
 Method: Get
+ 
 OR
 Fly|||{mode}
-OR
+ 
 Makes the bot fly (or not)
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2118,11 +2394,14 @@ Makes the bot fly (or not)
 ### RotateToFaceVector
  
 http://localhost:8080/movement/RotateToFaceVector/{token}
+ 
 Method: Post
+ 
 OR
 RotateToFaceVector|||{vector}
-OR
+ 
 Rotates the bot to face a vector from its current location
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -2141,11 +2420,14 @@ Rotates the bot to face a vector from its current location
 ### RotateToFace
  
 http://localhost:8080/movement/RotateToFace/{avatar}/{token}
+ 
 Method: Post
+ 
 OR
 RotateToFace|||{avatar}
-OR
+ 
 Rotates the bot to face a avatar
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -2164,11 +2446,14 @@ Rotates the bot to face a avatar
 ### RotateTo
  
 http://localhost:8080/movement/RotateTo/{deg}/{token}
+ 
 Method: Post
+ 
 OR
 RotateTo|||{deg}
-OR
+ 
 Rotates the avatar to face a rotation from north in Degrees
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2185,11 +2470,14 @@ Rotates the avatar to face a rotation from north in Degrees
 ### Teleport
  
 http://localhost:8080/movement/Teleport/{region}/{x}/{y}/{z}/{token}
+ 
 Method: Get
+ 
 OR
 Teleport|||{region}~#~{x}~#~{y}~#~{z}
-OR
+ 
 Attempt to teleport to a new region
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] Accepted
@@ -2206,11 +2494,14 @@ Attempt to teleport to a new region
 ### TeleportSLURL
  
 http://localhost:8080/movement/TeleportSLURL/{token}
+ 
 Method: Post
+ 
 OR
 TeleportSLURL|||{slurl}
-OR
+ 
 Attempt to teleport to a new region via a SL url
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] True|False
@@ -2229,11 +2520,14 @@ Attempt to teleport to a new region via a SL url
 ### NotecardAdd
  
 http://localhost:8080/notecard/NotecardAdd/{collection}/{token}
+ 
 Method: Post
+ 
 OR
 NotecardAdd|||{collection}~#~{content}
-OR
+ 
 Adds content to the Collection<br/> Also creates the Collection if it does not exist
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2252,11 +2546,14 @@ Adds content to the Collection<br/> Also creates the Collection if it does not e
 ### NotecardClear
  
 http://localhost:8080/notecard/NotecardClear/{collection}/{token}
+ 
 Method: Get
+ 
 OR
 NotecardClear|||{collection}
-OR
+ 
 Clears the contents of a collection
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2273,11 +2570,14 @@ Clears the contents of a collection
 ### NotecardSend
  
 http://localhost:8080/notecard/NotecardSend/{avatar}/{collection}/{notecardname}/{token}
+ 
 Method: Get
+ 
 OR
 NotecardSend|||{avatar}~#~{collection}~#~{notecardname}
-OR
+ 
 Sends a notecard to a avatar using the text in the prebuilt collection [see NotecardAdd] and also clears the collection just before sending [see NotecardClear]
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2300,11 +2600,14 @@ Sends a notecard to a avatar using the text in the prebuilt collection [see Note
 ### NotecardDirectSend
  
 http://localhost:8080/notecard/NotecardDirectSend/{avatar}/{notecardname}/{token}
+ 
 Method: Post
+ 
 OR
 NotecardDirectSend|||{avatar}~#~{content}~#~{notecardname}
-OR
+ 
 Creates and sends a notecard in one command good if you are using HTTP otherwise see [NotecardSend]
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2327,11 +2630,14 @@ Creates and sends a notecard in one command good if you are using HTTP otherwise
 ### SetParcelSale
  
 http://localhost:8080/parcel/SetParcelSale/{amount}/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 SetParcelSale|||{amount}~#~{avatar}
-OR
+ 
 Sets the current parcel for sale Also marks the parcel for sale
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2352,11 +2658,14 @@ Sets the current parcel for sale Also marks the parcel for sale
 ### GetParcelTraffic
  
 http://localhost:8080/parcel/GetParcelTraffic/{token}
+ 
 Method: Get
+ 
 OR
 GetParcelTraffic
-OR
+ 
 Gets the parcel Dwell (Traffic) value and returns it via the reply target
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] traffic value
@@ -2375,11 +2684,14 @@ Gets the parcel Dwell (Traffic) value and returns it via the reply target
 ### SetParcelLandingZone
  
 http://localhost:8080/parcel/SetParcelLandingZone/{x}/{y}/{z}/{token}
+ 
 Method: Get
+ 
 OR
 SetParcelLandingZone|||{x}~#~{y}~#~{z}
-OR
+ 
 Changes the parcel landing mode to point and sets the landing point
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2400,11 +2712,14 @@ Changes the parcel landing mode to point and sets the landing point
 ### SetParcelName
  
 http://localhost:8080/parcel/SetParcelName/{name}/{token}
+ 
 Method: Get
+ 
 OR
 SetParcelName|||{name}
-OR
+ 
 Updates the current parcels name
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2425,11 +2740,14 @@ Updates the current parcels name
 ### SetParcelDesc
  
 http://localhost:8080/parcel/SetParcelDesc/{token}
+ 
 Method: Post
+ 
 OR
 SetParcelDesc|||{desc}
-OR
+ 
 Updates the current parcels description
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2448,11 +2766,14 @@ Updates the current parcels description
 ### GetParcelDesc
  
 http://localhost:8080/parcel/GetParcelDesc/{token}
+ 
 Method: Get
+ 
 OR
 GetParcelDesc
-OR
+ 
 Fetchs the current parcels desc
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2471,11 +2792,14 @@ Fetchs the current parcels desc
 ### GetParcelFlags
  
 http://localhost:8080/parcel/GetParcelFlags/{token}
+ 
 Method: Get
+ 
 OR
 GetParcelFlags
-OR
+ 
 gets the flags for the parcel
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2494,11 +2818,14 @@ gets the flags for the parcel
 ### ParcelEject
  
 http://localhost:8080/parcel/ParcelEject/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 ParcelEject|||{avatar}
-OR
+ 
 Ejects an avatar
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2515,11 +2842,14 @@ Ejects an avatar
 ### AbandonLand
  
 http://localhost:8080/parcel/AbandonLand/{token}
+ 
 Method: Get
+ 
 OR
 AbandonLand
-OR
+ 
 Abandons the parcel the bot is currently on, returning it to Linden's or Estate owner
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2534,11 +2864,14 @@ Abandons the parcel the bot is currently on, returning it to Linden's or Estate 
 ### ParcelBan
  
 http://localhost:8080/parcel/ParcelBan/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 ParcelBan|||{avatar}
-OR
+ 
 Bans an avatar from a parcel
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2561,11 +2894,14 @@ Bans an avatar from a parcel
 ### ParcelUnBan
  
 http://localhost:8080/parcel/ParcelUnBan/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 ParcelUnBan|||{avatar}
-OR
+ 
 Unbans an avatar from a parcel
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2588,11 +2924,14 @@ Unbans an avatar from a parcel
 ### SetParcelMusic
  
 http://localhost:8080/parcel/SetParcelMusic/{musicurl}/{token}
+ 
 Method: Get
+ 
 OR
 SetParcelMusic|||{musicurl}
-OR
+ 
 Updates the current parcels name
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -2611,11 +2950,14 @@ Updates the current parcels name
 ### SetParcelFlag
  
 http://localhost:8080/parcel/SetParcelFlag/{token}
+ 
 Method: Post
+ 
 OR
 SetParcelFlag|||{escapedflagdata}
-OR
+ 
 Updates the current parcels name
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -2644,11 +2986,14 @@ Updates the current parcels name
 ### ParcelReturnTargeted
  
 http://localhost:8080/parcel/ParcelReturnTargeted/{avatar}/{token}
+ 
 Method: Get
+ 
 OR
 ParcelReturnTargeted|||{avatar}
-OR
+ 
 Returns all objects from the current parcel for the selected avatar
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2669,11 +3014,14 @@ Returns all objects from the current parcel for the selected avatar
 ### ParcelDeedToGroup
  
 http://localhost:8080/parcel/ParcelDeedToGroup/{token}
+ 
 Method: Get
+ 
 OR
 ParcelDeedToGroup
-OR
+ 
 transfers the current parcel ownership to the assigned group
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2696,11 +3044,14 @@ transfers the current parcel ownership to the assigned group
 ### ParcelBuy
  
 http://localhost:8080/parcel/ParcelBuy/{amount}/{token}
+ 
 Method: Get
+ 
 OR
 ParcelBuy|||{amount}
-OR
+ 
 Attempts to buy the parcel the bot is standing on, the amount must match the sale price for the land!
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2729,11 +3080,14 @@ Attempts to buy the parcel the bot is standing on, the amount must match the sal
 ### ParcelFreeze
  
 http://localhost:8080/parcel/ParcelFreeze/{avatar}/{state}/{token}
+ 
 Method: Get
+ 
 OR
 ParcelFreeze|||{avatar}~#~{state}
-OR
+ 
 Freezes an avatar
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2752,11 +3106,14 @@ Freezes an avatar
 ### GetParcelBanlist
  
 http://localhost:8080/parcel/GetParcelBanlist/{token}
+ 
 Method: Get
+ 
 OR
 GetParcelBanlist
-OR
+ 
 Fetchs the parcel ban list of the parcel the bot is currently on<br/>If the name returned is lookup the bot is currently requesting the avatar name
+ 
 ***Args helper***
  
 - [:x:] json object: GetParcelBanlistObject
@@ -2775,11 +3132,14 @@ Fetchs the parcel ban list of the parcel the bot is currently on<br/>If the name
 ### UnRezObject
  
 http://localhost:8080/parcel/UnRezObject/{objectuuid}/{token}
+ 
 Method: Get
+ 
 OR
 UnRezObject|||{objectuuid}
-OR
+ 
 Returns a rezzed object
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2798,10 +3158,12 @@ Returns a rezzed object
 ### ParcelSetMedia
  
 http://localhost:8080/parcel/ParcelSetMedia/{token}
+ 
 Method: Get
+ 
 OR
 ParcelSetMedia|||{escapedflagdata}
-OR
+ 
 Updates the current parcels media settings 
 MediaAutoScale=Bool (True|False)
 MediaLoop=Bool (True|False)
@@ -2811,6 +3173,7 @@ MediaDesc=String
 MediaHeight=Int (256 to 1024)
 MediaWidth=Int (256 to 1024)
 MediaType=String ["IMG-PNG","IMG-JPG","VID-MP4","VID-AVI" or "Custom-MIME_TYPE_CODE"]
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2831,11 +3194,14 @@ MediaType=String ["IMG-PNG","IMG-JPG","VID-MP4","VID-AVI" or "Custom-MIME_TYPE_C
 ### GoHome
  
 http://localhost:8080/self/GoHome/{token}
+ 
 Method: Get
+ 
 OR
 GoHome
-OR
+ 
 Makes the bot teleport to its home region
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2850,11 +3216,14 @@ Makes the bot teleport to its home region
 ### PointAt
  
 http://localhost:8080/self/PointAt/{token}
+ 
 Method: Get
+ 
 OR
 PointAt
-OR
+ 
 Makes the bot turn to face avatar and point at them (if found)
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2871,11 +3240,14 @@ Makes the bot turn to face avatar and point at them (if found)
 ### ReadKeyValue
  
 http://localhost:8080/self/ReadKeyValue/{Key}/{token}
+ 
 Method: Get
+ 
 OR
 ReadKeyValue|||{Key}
-OR
+ 
 Reads a value from the KeyValue storage (temp unless SQL is enabled)
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] value
@@ -2892,11 +3264,14 @@ Reads a value from the KeyValue storage (temp unless SQL is enabled)
 ### SetKeyValue
  
 http://localhost:8080/self/SetKeyValue/{Key}/{token}
+ 
 Method: Post
+ 
 OR
 SetKeyValue|||{Key}~#~{Value}
-OR
+ 
 sets a value for KeyValue storage (temp unless SQL is enabled)
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2915,11 +3290,14 @@ sets a value for KeyValue storage (temp unless SQL is enabled)
 ### ClearKeyValue
  
 http://localhost:8080/self/ClearKeyValue/{Key}/{token}
+ 
 Method: Get
+ 
 OR
 ClearKeyValue|||{Key}
-OR
+ 
 Reads a value from the KeyValue storage (temp unless SQL is enabled)
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2936,11 +3314,14 @@ Reads a value from the KeyValue storage (temp unless SQL is enabled)
 ### Sit
  
 http://localhost:8080/self/Sit/{target}/{token}
+ 
 Method: Get
+ 
 OR
 Sit|||{target}
-OR
+ 
 Makes the bot sit on the ground or on a object if it can see it
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2957,11 +3338,14 @@ Makes the bot sit on the ground or on a object if it can see it
 ### Stand
  
 http://localhost:8080/self/Stand/{token}
+ 
 Method: Get
+ 
 OR
 Stand
-OR
+ 
 Makes the bot stand up if sitting (also resets animations)
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -2976,11 +3360,14 @@ Makes the bot stand up if sitting (also resets animations)
 ### ClickObject
  
 http://localhost:8080/self/ClickObject/{target}/{token}
+ 
 Method: Get
+ 
 OR
 ClickObject|||{target}
-OR
+ 
 Makes the bot sit on the ground or on a object if it can see it
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] true|false
@@ -2999,11 +3386,14 @@ Makes the bot sit on the ground or on a object if it can see it
 ### Logoff
  
 http://localhost:8080/self/Logoff/{token}
+ 
 Method: Get
+ 
 OR
 Logoff
-OR
+ 
 Makes the bot kill itself you monster
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -3018,11 +3408,14 @@ Makes the bot kill itself you monster
 ### Logout
  
 http://localhost:8080/self/Logout/{token}
+ 
 Method: Get
+ 
 OR
 Logout
-OR
+ 
 Makes the bot kill itself you monster
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -3037,11 +3430,14 @@ Makes the bot kill itself you monster
 ### Bye
  
 http://localhost:8080/self/Bye/{token}
+ 
 Method: Get
+ 
 OR
 Bye
-OR
+ 
 Makes the bot kill itself you monster - without making a sound
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] ok
@@ -3056,11 +3452,14 @@ Makes the bot kill itself you monster - without making a sound
 ### GetLastCommands
  
 http://localhost:8080/self/GetLastCommands/{token}
+ 
 Method: Get
+ 
 OR
 GetLastCommands
-OR
+ 
 Gets the last 5 commands issued to the bot
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] list of commands
@@ -3075,10 +3474,12 @@ Gets the last 5 commands issued to the bot
 ### SetPermFlag
  
 http://localhost:8080/self/SetPermFlag/{avatar}/{flag}/{state}/{sticky}/{token}
+ 
 Method: Get
+ 
 OR
 SetPermFlag|||{avatar}~#~{flag}~#~{state}~#~{sticky}
-OR
+ 
 Sets the bot to accept a request type from the avatar (or a object owned by the avatar)
  friend: friend request 
  group: group invite 
@@ -3086,6 +3487,7 @@ Sets the bot to accept a request type from the avatar (or a object owned by the 
 teleport: teleport lure
 inventory: Inventory transfer
 command: A non signed command
+ 
 ***Args helper***
  
 - [:x:] avatar lookup
@@ -3108,11 +3510,14 @@ command: A non signed command
 ### FetchNextNotecard
  
 http://localhost:8080/streamadmin/FetchNextNotecard/{token}
+ 
 Method: Post
+ 
 OR
 FetchNextNotecard|||{endpoint}~#~{endpointcode}
-OR
+ 
 A streamadin command
+ 
 ***Args helper***
  
 - [:heavy_check_mark:] True|False
