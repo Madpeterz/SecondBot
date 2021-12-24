@@ -51,6 +51,21 @@ namespace BetterSecondBot.HttpService
             return Failure("ok", "SetParcelSale", new [] { amount, avatar });
         }
 
+        [About("Gets the parcel Dwell (Traffic) value and returns it via the reply target")]
+        [ReturnHints("traffic value")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [Route(HttpVerbs.Get, "/GetParcelTraffic/{token}")]
+        public object GetParcelTraffic(string token)
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel(token, "parcel", "GetParcelTraffic");
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value, "GetParcelTraffic");
+            }
+            return BasicReply(targetparcel.Dwell.ToString(), "GetParcelTraffic");
+        }
+
         [About("Changes the parcel landing mode to point and sets the landing point")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Error not in a sim")]
