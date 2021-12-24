@@ -22,6 +22,7 @@ namespace BetterSecondBot.WikiMake
         protected SimpleIO io;
         protected Dictionary<string, string> seen_command_names = new Dictionary<string, string>();
 
+        protected StringBuilder mdWiki = new StringBuilder();
 
         public string CreateRoot()
         {
@@ -90,6 +91,8 @@ namespace BetterSecondBot.WikiMake
                     }
                 }
                 string workspace = shared_interface.GetCommandWorkspace(c);
+
+
                 StringBuilder sb = new StringBuilder();
                 sb.Append(html_header);
                 sb.Append("<h3>Build: ");
@@ -141,6 +144,9 @@ namespace BetterSecondBot.WikiMake
                     sb.Append(ExampleCall.ToString());
                     sb.Append("<hr style='border-top: 1px dashed #dcdcdc;'>");
                 }
+                    
+
+
                 sb.Append("[[HELP]]");
                 if (arg_types.Length > 0)
                 {
@@ -161,12 +167,12 @@ namespace BetterSecondBot.WikiMake
                             Required = "";
                         }
                         sb.Append("<tr><td>" + (loop + 1).ToString() + "</td><td>" + arg_types[loop] + "</td><td>" + Required + "</td><td>" + hint + "</td></tr>");
+
                         loop++;
                     }
                     sb.Append("</tbody></table>");
                 }
                 sb.Append(html_footer);
-
                 sb.Replace("[[COMMAND]]", c);
                 sb.Replace("[[HELP]]", shared_interface.GetCommandHelp(c));
                 sb.Replace("[[MINARGS]]", minargs.ToString());
@@ -309,6 +315,15 @@ namespace BetterSecondBot.WikiMake
             // create commands
             HTTPCommands("Commands", HTTP);
 
+            mdWiki.AppendLine("View as [HTML](https://wiki.blackatom.live/files/Commands.html)");
+            mdWiki.AppendLine(" ");
+            mdWiki.AppendLine("Host it yourself: [+Docker image](https://hub.docker.com/r/madpeter/secondbot_wiki)");
+            mdWiki.AppendLine(" ");
+            mdWiki.AppendLine("---");
+            mdWiki.AppendLine("# Commands list");
+
+            io.WriteFile("../commands.md", mdWiki.ToString());
+
             HTTP = null;
             LogFormater.Info("[WIKI] Done with area");
         }
@@ -330,10 +345,15 @@ namespace BetterSecondBot.WikiMake
         {
             foreach (string workspace in HTTP.getEndPoints())
             {
-
+                mdWiki.AppendLine("## " + workspace);
+                mdWiki.AppendLine(" ");
                 foreach (string c in HTTP.getEndpointCommands(workspace))
                 {
+                    mdWiki.AppendLine("### "+ c);
+                    mdWiki.AppendLine(" ");
                     StringBuilder sb = new StringBuilder();
+                    StringBuilder mdWikiArgs = new StringBuilder();
+                    StringBuilder mdWIkiReplys = new StringBuilder();
                     sb.Append(html_header);
                     sb.Append("<h3>Build: ");
                     sb.Append(buildVersion);
@@ -347,13 +367,17 @@ namespace BetterSecondBot.WikiMake
                     sb.Append("[[URLENDPOINT]]/[[WORKSPACE]]/[[COMMAND]]/[[URLADDON]]<br/>");
                     sb.Append("Method: [[APIMETHOD]]");
                     sb.Append("<br/> OR <br/>");
+
+                    StringBuilder CommandExample = new StringBuilder();
                     Dictionary<string, KeyValuePair<string, string>> values = HTTP.getCommandArgs(workspace, c);
+                    CommandExample.Append("[[COMMAND]]");
                     sb.Append("[[COMMAND]]");
                     string addon = "";
                     List<string> argsim = new List<string>(values.Keys);
                     argsim.Remove("token");
                     if(argsim.Count > 0)
                     {
+                        CommandExample.Append("|||");
                         sb.Append("|||");
                     }
                     foreach (string entry in argsim)
@@ -362,6 +386,7 @@ namespace BetterSecondBot.WikiMake
                         sb.Append("{");
                         sb.Append(entry);
                         sb.Append("}");
+                        CommandExample.Append(addon+"{"+entry+"}");
                         addon = "~#~";
                     }
                     sb.Append("<br/><br/>");
@@ -369,14 +394,18 @@ namespace BetterSecondBot.WikiMake
                     
                     int ValueCount = values.Count;
 
+                    
                     if (ValueCount > 0)
                     {
                         sb.Append("<hr/><h4>Args helper</h4>");
                         sb.Append("<table class='table table-striped table-bordered'><thead><tr><td>Name</td><th>Type</th><th>Hint</th></tr></thead><tbody>");
+                        mdWikiArgs.AppendLine("|Name|Type|Hint|");
+                        mdWikiArgs.AppendLine("| ------ | ------- | ---------------------------- |");
                         foreach (KeyValuePair<string, KeyValuePair<string, string>> entry in values)
                         {
                             string hint = entry.Value.Value;
                             string type = entry.Value.Key;
+
                             if (entry.Value.Key.Contains("Optional") == true)
                             {
                                 type = type.Replace("Optional", "{Optional} ");
@@ -386,6 +415,7 @@ namespace BetterSecondBot.WikiMake
                                 type = "URL arg";
                             }
                             sb.Append("<tr><td>" + entry.Key + "</td><td>" + type + "</td><td>" + hint + "</td></tr>");
+                            mdWikiArgs.AppendLine("| "+ entry.Key+ " | " + type + " | " + hint + " |");
                         }
                         sb.Append("</tbody></table>");
                     }
@@ -396,17 +426,21 @@ namespace BetterSecondBot.WikiMake
                     {
                         sb.Append("<hr/><h4>Replys</h4>");
                         sb.Append("<ul class=\"list-unstyled\">");
+                        
                         foreach (string entry in returnvalues)
                         {
                             sb.Append("<li class=\"text-success\">☑ " + entry+"</li>");
+                            mdWIkiReplys.AppendLine("- [:heavy_check_mark:] " + entry);
                         }
                         foreach (string entry in returnvaluesfailure)
                         {
                             sb.Append("<li class=\"text-danger\">❌ <strong>" + entry + "</strong></li>");
+                            mdWIkiReplys.AppendLine("- [:x:] " + entry);
                         }
                         sb.Append("</ul>");
                     }
                     sb = DebugModeCreateWiki.MenuActive(sb, area);
+
                     sb.Append(html_footer);
                     sb.Replace("[[COMMAND]]", c);
                     sb.Replace("[[URLENDPOINT]]", "http://localhost:8080");
@@ -418,8 +452,34 @@ namespace BetterSecondBot.WikiMake
                     sb.Replace("[[AREA]]", area);
                     sb.Replace("[[SUBFOLDER]]", "");
                     sb.Replace("[[RETURNROOT]]", "../");
+
+                    mdWiki.AppendLine("[[URLENDPOINT]]/[[WORKSPACE]]/[[COMMAND]]/[[URLADDON]]");
+                    mdWiki.AppendLine("Method: [[APIMETHOD]]");
+                    mdWiki.AppendLine("OR");
+                    mdWiki.AppendLine(CommandExample.ToString());
+                    mdWiki.AppendLine("OR");
+                    mdWiki.AppendLine("[[HELP]]");
+
                     string target_file = "" + area + "" + workspace + "" + c + ".html";
                     io.WriteFile(target_file, sb.ToString());
+                    mdWiki.AppendLine("***Args helper***");
+                    mdWiki.AppendLine(" ");
+                    mdWiki.AppendLine(mdWIkiReplys.ToString());
+                    mdWiki.AppendLine("***Replys***");
+                    mdWiki.AppendLine(" ");
+                    mdWiki.AppendLine(mdWIkiReplys.ToString());
+                    mdWiki.AppendLine(" ");
+
+                    mdWiki.Replace("[[COMMAND]]", c);
+                    mdWiki.Replace("[[URLENDPOINT]]", "http://localhost:8080");
+                    mdWiki.Replace("[[APIMETHOD]]", HTTP.getCommandMethod(workspace, c));
+                    mdWiki.Replace("[[URLADDON]]", getURLargs(values));
+                    mdWiki.Replace("[[HELP]]", HTTP.getCommandAbout(workspace, c));
+                    mdWiki.Replace("[[MINARGS]]", ValueCount.ToString());
+                    mdWiki.Replace("[[WORKSPACE]]", workspace);
+                    mdWiki.Replace("[[AREA]]", area);
+                    mdWiki.Replace("[[SUBFOLDER]]", "");
+                    mdWiki.Replace("[[RETURNROOT]]", "../");
                 }
             }
         }
