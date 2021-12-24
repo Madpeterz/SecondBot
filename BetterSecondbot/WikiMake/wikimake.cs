@@ -458,6 +458,7 @@ namespace BetterSecondBot.WikiMake
                     mdWiki.AppendLine("Method: [[APIMETHOD]]");
                     mdWiki.AppendLine(" ");
                     mdWiki.AppendLine("OR");
+                    mdWiki.AppendLine(" ");
                     mdWiki.AppendLine(CommandExample.ToString());
                     mdWiki.AppendLine(" ");
                     mdWiki.AppendLine("[[HELP]]");

@@ -7,6 +7,7 @@ http://localhost:8080/animation/AddToAllowAnimations/{avatar}/{token}
 Method: Get
  
 OR
+ 
 AddToAllowAnimations|||{avatar}
  
 Toggles if animation requests from this avatar (used for remote poseballs) are accepted
@@ -33,6 +34,7 @@ http://localhost:8080/animation/PlayGesture/{gesture}/{token}
 Method: Get
  
 OR
+ 
 PlayGesture|||{gesture}
  
 Attempts to play a gesture
@@ -57,6 +59,7 @@ http://localhost:8080/animation/ResetAnimations/{token}
 Method: Get
  
 OR
+ 
 ResetAnimations
  
 Resets the animation stack for the bot
@@ -81,6 +84,7 @@ http://localhost:8080/avatars/NearmeWithDetails/{token}
 Method: Get
  
 OR
+ 
 NearmeWithDetails
  
 an improved version of near me with extra details<br/>NearMeDetails is a object formated as follows<br/><ul><li>id</li><li>name</li><li>x</li><li>y</li><li>z</li><li>range</li></ul>
@@ -105,6 +109,7 @@ http://localhost:8080/avatars/Nearme/{token}
 Method: Get
  
 OR
+ 
 Nearme
  
 returns a list of all known avatars nearby
@@ -131,6 +136,7 @@ http://localhost:8080/chat/LocalChatHistory/{token}
 Method: Get
  
 OR
+ 
 LocalChatHistory
  
 fetchs the last 20 localchat messages
@@ -153,6 +159,7 @@ http://localhost:8080/chat/Say/{channel}/{token}
 Method: Post
  
 OR
+ 
 Say|||{channel}~#~{message}
  
 sends a message to localchat
@@ -179,6 +186,7 @@ http://localhost:8080/chat/IM/{avatar}/{token}
 Method: Post
  
 OR
+ 
 IM|||{avatar}~#~{message}
  
 sends a im to the selected avatar
@@ -205,6 +213,7 @@ http://localhost:8080/chat/chatwindows/{token}
 Method: Get
  
 OR
+ 
 chatwindows
  
 gets a full list of all chat windows
@@ -227,6 +236,7 @@ http://localhost:8080/chat/listwithunread/{token}
 Method: Get
  
 OR
+ 
 listwithunread
  
 gets a list of chat windows with unread messages
@@ -249,6 +259,7 @@ http://localhost:8080/chat/haveunreadims/{token}
 Method: Get
  
 OR
+ 
 haveunreadims
  
 gets if there are any unread im messages at all
@@ -271,6 +282,7 @@ http://localhost:8080/chat/getimchat/{window}/{token}
 Method: Get
  
 OR
+ 
 getimchat|||{window}
  
 gets the chat from the selected window
@@ -297,6 +309,7 @@ http://localhost:8080/core/GetToken/
 Method: Post
  
 OR
+ 
 GetToken|||{authcode}~#~{unixtimegiven}
  
 Requests a new token (Vaild for 10 mins) <br/>to use with all other requests
@@ -319,6 +332,7 @@ http://localhost:8080/core/Hello/
 Method: Get
  
 OR
+ 
 Hello
  
 Used to check HTTP connections
@@ -339,6 +353,7 @@ http://localhost:8080/core/Delay/{token}
 Method: Get
  
 OR
+ 
 Delay
  
 Delays a thead by X ms<br/>Mostly pointless but good if your doing custom commands
@@ -363,6 +378,7 @@ http://localhost:8080/core/LogoutUI/{token}
 Method: Get
  
 OR
+ 
 LogoutUI
  
 Removes the given token from the accepted token pool
@@ -387,6 +403,7 @@ http://localhost:8080/dialogs/DialogRelay/{target}/{token}
 Method: Get
  
 OR
+ 
 DialogRelay|||{target}
  
 Updates the relay target (you can have 1 of each type)<br/>Clear will disable them all
@@ -417,6 +434,7 @@ http://localhost:8080/dialogs/DialogResponce/{dialogid}/{buttontext}/{token}
 Method: Get
  
 OR
+ 
 DialogResponce|||{dialogid}~#~{buttontext}
  
 Makes the bot interact with the dialog [dialogid] with the button [buttontext]
@@ -443,6 +461,7 @@ http://localhost:8080/dialogs/DialogTrack/{status}/{token}
 Method: Get
  
 OR
+ 
 DialogTrack|||{status}
  
 Should the bot track dialogs and send them to the relays setup?
@@ -469,6 +488,7 @@ http://localhost:8080/discord/Discord_AddRole/{serverid}/{roleid}/{memberid}/{to
 Method: Get
  
 OR
+ 
 Discord_AddRole|||{serverid}~#~{roleid}~#~{memberid}
  
 Adds a discord server role to the selected member
@@ -493,6 +513,7 @@ http://localhost:8080/discord/Discord_BanMember/{serverid}/{memberid}/{token}
 Method: Post
  
 OR
+ 
 Discord_BanMember|||{serverid}~#~{memberid}~#~{why}
  
 Adds the selected user to the ban list - Disallows rejoining untill they are removed from the list
@@ -519,6 +540,7 @@ http://localhost:8080/discord/Discord_BulkClear_Messages/{serverid}/{memberid}/{
 Method: Get
  
 OR
+ 
 Discord_BulkClear_Messages|||{serverid}~#~{memberid}
  
 Clears messages on the server sent by the member in the last 13 days, 22hours 59mins
@@ -543,6 +565,7 @@ http://localhost:8080/discord/Discord_Dm_Member/{serverid}/{memberid}/{token}
 Method: Post
  
 OR
+ 
 Discord_Dm_Member|||{serverid}~#~{memberid}~#~{message}
  
 Sends a message directly to the user [They must be in the server]
@@ -568,6 +591,7 @@ http://localhost:8080/discord/Discord_MembersList/{serverid}/{token}
 Method: Get
  
 OR
+ 
 Discord_MembersList|||{serverid}
  
 Returns a list of members in a server 
@@ -596,6 +620,7 @@ http://localhost:8080/discord/Discord_MessageChannel/{serverid}/{channelid}/{tts
 Method: Post
  
 OR
+ 
 Discord_MessageChannel|||{serverid}~#~{channelid}~#~{tts}~#~{message}
  
 Sends a message to the selected channel - Optional TTS usage
@@ -622,6 +647,7 @@ http://localhost:8080/discord/Discord_MuteMember/{serverid}/{memberid}/{mode}/{t
 Method: Get
  
 OR
+ 
 Discord_MuteMember|||{serverid}~#~{memberid}~#~{mode}
  
 Sends a message to the selected channel - Optional TTS usage
@@ -646,6 +672,7 @@ http://localhost:8080/discord/Discord_Role_GetSettings/{serverid}/{memberid}/{mo
 Method: Get
  
 OR
+ 
 Discord_Role_GetSettings|||{serverid}~#~{memberid}~#~{mode}
  
 returns a collection of settings for the given role 
@@ -671,6 +698,7 @@ http://localhost:8080/discord/Discord_Role_UpdatePerms/{serverid}/{roleid}/{toke
 Method: Post
  
 OR
+ 
 Discord_Role_UpdatePerms|||{serverid}~#~{roleid}~#~{flagscsv}
  
 Updates perm flags for the selected role 
@@ -698,6 +726,7 @@ http://localhost:8080/discord/Discord_RoleCreate/{serverid}/{role}/{token}
 Method: Get
  
 OR
+ 
 Discord_RoleCreate|||{serverid}~#~{role}
  
 Updates perm flags for the selected role 
@@ -725,6 +754,7 @@ http://localhost:8080/discord/Discord_RoleList/{serverid}/{token}
 Method: Get
  
 OR
+ 
 Discord_RoleList|||{serverid}
  
 Returns a list of roles and their ids in collection 
@@ -750,6 +780,7 @@ http://localhost:8080/discord/Discord_RoleRemove/{serverid}/{token}
 Method: Get
  
 OR
+ 
 Discord_RoleRemove|||{serverid}
  
 Remove a role from a server 
@@ -775,6 +806,7 @@ http://localhost:8080/discord/Discord_TextChannels_List/{serverid}/{token}
 Method: Get
  
 OR
+ 
 Discord_TextChannels_List|||{serverid}
  
 Returns a list of text channels in a server
@@ -801,6 +833,7 @@ http://localhost:8080/estate/SimRestart/{delay}/{mode}/{token}
 Method: Get
  
 OR
+ 
 SimRestart|||{delay}~#~{mode}
  
 Sends the message to the current sim
@@ -827,6 +860,7 @@ http://localhost:8080/estate/SimMessage/{token}
 Method: Post
  
 OR
+ 
 SimMessage|||{message}
  
 Sends the message to the current sim
@@ -853,6 +887,7 @@ http://localhost:8080/estate/GetSimTexture/{regionname}/{token}
 Method: Get
  
 OR
+ 
 GetSimTexture|||{regionname}
  
 Fetchs the regions map tile
@@ -877,6 +912,7 @@ http://localhost:8080/estate/EstateParcelReclaim/{token}
 Method: Get
  
 OR
+ 
 EstateParcelReclaim
  
 Reclaims ownership of the current parcel
@@ -901,6 +937,7 @@ http://localhost:8080/estate/GetSimGlobalPos/{token}
 Method: Get
  
 OR
+ 
 GetSimGlobalPos
  
 Reclaims ownership of the current parcel
@@ -925,6 +962,7 @@ http://localhost:8080/estate/GetEstateBanList/{token}
 Method: Get
  
 OR
+ 
 GetEstateBanList
  
 Requests the estate banlist
@@ -947,6 +985,7 @@ http://localhost:8080/estate/UpdateEstateBanlist/{avatar}/{mode}/{global}/{token
 Method: Get
  
 OR
+ 
 UpdateEstateBanlist|||{avatar}~#~{mode}~#~{global}
  
 Attempts to add/remove the avatar to/from the Estate banlist
@@ -979,6 +1018,7 @@ http://localhost:8080/friends/Friendslist/{token}
 Method: Get
  
 OR
+ 
 Friendslist
  
 Gets the friendslist <br/>Formated as follows<br/>friendreplyobject<br/><ul><li>name: String</li><li>id: String</li><li>online: bool</li></ul>
@@ -1001,6 +1041,7 @@ http://localhost:8080/friends/FriendFullPerms/{avatar}/{state}/{token}
 Method: Get
  
 OR
+ 
 FriendFullPerms|||{avatar}~#~{state}
  
 Updates the friend perms for avatar avatar to State 
@@ -1032,6 +1073,7 @@ http://localhost:8080/friends/FriendRequest/{avatar}/{state}/{token}
 Method: Get
  
 OR
+ 
 FriendRequest|||{avatar}~#~{state}
  
 Updates the friend perms for avatar avatar to State 
@@ -1067,6 +1109,7 @@ http://localhost:8080/funds/Balance/{token}
 Method: Get
  
 OR
+ 
 Balance
  
 Requests the current balance and requests the balance to update.
@@ -1091,6 +1134,7 @@ http://localhost:8080/funds/PayAvatar/{avatar}/{amount}/{token}
 Method: Get
  
 OR
+ 
 PayAvatar|||{avatar}~#~{amount}
  
 Makes the bot pay a avatar
@@ -1121,6 +1165,7 @@ http://localhost:8080/funds/PayObject/{object}/{primname}/{amount}/{token}
 Method: Get
  
 OR
+ 
 PayObject|||{object}~#~{primname}~#~{amount}
  
 Makes the bot pay a object
@@ -1155,6 +1200,7 @@ http://localhost:8080/group/IsGroupMember/{group}/{avatar}/{token}
 Method: Get
  
 OR
+ 
 IsGroupMember|||{group}~#~{avatar}
  
 Checks if the given UUID is in the given group<br/>Note: if group membership data is more than 60 secs old this will return Updating<br/>Please wait and retry later
@@ -1185,6 +1231,7 @@ http://localhost:8080/group/GetGroupMembers/{group}/{token}
 Method: Get
  
 OR
+ 
 GetGroupMembers|||{group}
  
 Gets membership of a group
@@ -1215,6 +1262,7 @@ http://localhost:8080/group/GroupBan/{group}/{avatar}/{state}/{token}
 Method: Get
  
 OR
+ 
 GroupBan|||{group}~#~{avatar}~#~{state}
  
 Attempts to ban/unban a given avatar from a group
@@ -1247,6 +1295,7 @@ http://localhost:8080/group/GroupEject/{group}/{avatar}/{token}
 Method: Get
  
 OR
+ 
 GroupEject|||{group}~#~{avatar}
  
 Eject selected avatar from group
@@ -1281,6 +1330,7 @@ http://localhost:8080/group/GroupAddRole/{group}/{avatar}/{token}
 Method: Get
  
 OR
+ 
 GroupAddRole|||{group}~#~{avatar}
  
 Adds the avatar to the Group with the role 
@@ -1318,6 +1368,7 @@ http://localhost:8080/group/GroupInvite/{group}/{avatar}/{role}/{token}
 Method: Get
  
 OR
+ 
 GroupInvite|||{group}~#~{avatar}~#~{role}
  
 Invites selected avatar to the group with the selected role
@@ -1352,6 +1403,7 @@ http://localhost:8080/group/Groupnotice/{group}/{token}
 Method: Post
  
 OR
+ 
 Groupnotice|||{group}~#~{title}~#~{message}
  
 Sends a group notice (No attachments please use GroupnoticeWithAttachment to attach items!)
@@ -1384,6 +1436,7 @@ http://localhost:8080/group/GroupActiveTitle/{group}/{role}/{token}
 Method: Get
  
 OR
+ 
 GroupActiveTitle|||{group}~#~{role}
  
 Activates the selected title
@@ -1412,6 +1465,7 @@ http://localhost:8080/group/GroupActiveGroup/{group}/{token}
 Method: Get
  
 OR
+ 
 GroupActiveGroup|||{group}
  
 Sets the selected group to the active group
@@ -1438,6 +1492,7 @@ http://localhost:8080/group/GroupnoticeWithAttachment/{group}/{attachment}/{toke
 Method: Post
  
 OR
+ 
 GroupnoticeWithAttachment|||{group}~#~{title}~#~{message}~#~{attachment}
  
 Sends a group notice with an attachment
@@ -1472,6 +1527,7 @@ http://localhost:8080/group/GetGroupList/{token}
 Method: Get
  
 OR
+ 
 GetGroupList
  
 fetchs a list of all groups known to the bot
@@ -1494,6 +1550,7 @@ http://localhost:8080/group/GetGroupRoles/{group}/{token}
 Method: Get
  
 OR
+ 
 GetGroupRoles|||{group}
  
 Requests the roles for the selected group<br/>Replys with GroupRoleDetails object formated as follows <ul><li>UpdateUnderway (Bool)</li><li>RoleDataAge (Int) [default -1]</li><li>Roles (KeyPair array of UUID=Name)</li></ul><br/>
@@ -1522,6 +1579,7 @@ http://localhost:8080/group/GroupchatListAllUnreadGroups/{token}
 Method: Get
  
 OR
+ 
 GroupchatListAllUnreadGroups
  
 fetchs a list of all groups with unread messages
@@ -1544,6 +1602,7 @@ http://localhost:8080/group/GroupchatGroupHasUnread/{group}/{token}
 Method: Get
  
 OR
+ 
 GroupchatGroupHasUnread|||{group}
  
 fetchs a list of all groups with unread messages
@@ -1570,6 +1629,7 @@ http://localhost:8080/group/GroupchatAnyUnread/{token}
 Method: Get
  
 OR
+ 
 GroupchatAnyUnread
  
 checks if there are any groups with unread messages
@@ -1592,6 +1652,7 @@ http://localhost:8080/group/GroupchatClearAll/{token}
 Method: Get
  
 OR
+ 
 GroupchatClearAll
  
 Clears all group chat buffers at once
@@ -1614,6 +1675,7 @@ http://localhost:8080/group/GroupchatHistory/{group}/{token}
 Method: Get
  
 OR
+ 
 GroupchatHistory|||{group}
  
 fetchs the groupchat history
@@ -1638,6 +1700,7 @@ http://localhost:8080/group/Groupchat/{group}/{token}
 Method: Post
  
 OR
+ 
 Groupchat|||{group}~#~{message}
  
 sends a message to the groupchat
@@ -1668,6 +1731,7 @@ http://localhost:8080/info/ListSculptys/{token}
 Method: Get
  
 OR
+ 
 ListSculptys
  
 Lists objects that are sculpty type in the current sim that the bot can see
@@ -1690,6 +1754,7 @@ http://localhost:8080/info/Version/{token}
 Method: Get
  
 OR
+ 
 Version
  
 Fetchs the current bot
@@ -1712,6 +1777,7 @@ http://localhost:8080/info/Name/{token}
 Method: Get
  
 OR
+ 
 Name
  
 Fetchs the name of the bot
@@ -1734,6 +1800,7 @@ http://localhost:8080/info/ParcelName/{token}
 Method: Get
  
 OR
+ 
 ParcelName
  
 Fetchs the current parcels name
@@ -1760,6 +1827,7 @@ http://localhost:8080/info/UnixTimeNow/{token}
 Method: Get
  
 OR
+ 
 UnixTimeNow
  
 Requests the current unixtime at the bot
@@ -1782,6 +1850,7 @@ http://localhost:8080/info/SimName/{token}
 Method: Get
  
 OR
+ 
 SimName
  
 Fetchs the current region name
@@ -1806,6 +1875,7 @@ http://localhost:8080/info/GetPosition/{token}
 Method: Get
  
 OR
+ 
 GetPosition
  
 Fetchs the current location of the bot
@@ -1832,6 +1902,7 @@ http://localhost:8080/inventory/SetInventoryUpdate/{inventoryType}/{token}
 Method: Post
  
 OR
+ 
 SetInventoryUpdate|||{inventoryType}~#~{outputTarget}
  
 Attachs an event for inventory changes
@@ -1858,6 +1929,7 @@ http://localhost:8080/inventory/UploadMediaWave/{inventoryName}/{token}
 Method: Post
  
 OR
+ 
 UploadMediaWave|||{sourcePath}~#~{inventoryName}
  
 Uploads a new sound file to inventory
@@ -1880,6 +1952,7 @@ http://localhost:8080/inventory/RezObject/{item}/{token}
 Method: Get
  
 OR
+ 
 RezObject|||{item}
  
 rezs the item at the bots current location
@@ -1906,6 +1979,7 @@ http://localhost:8080/inventory/RenameInventory/{item}/{token}
 Method: Post
  
 OR
+ 
 RenameInventory|||{item}~#~{newname}
  
 renames a folder or inventory item
@@ -1934,6 +2008,7 @@ http://localhost:8080/inventory/DeleteInventoryItem/{item}/{token}
 Method: Get
  
 OR
+ 
 DeleteInventoryItem|||{item}
  
 Attempts to Remove the given inventory item
@@ -1958,6 +2033,7 @@ http://localhost:8080/inventory/DeleteInventoryFolder/{folder}/{token}
 Method: Get
  
 OR
+ 
 DeleteInventoryFolder|||{folder}
  
 Attempts to Remove the given inventory folder
@@ -1982,6 +2058,7 @@ http://localhost:8080/inventory/Attach/{item}/{token}
 Method: Get
  
 OR
+ 
 Attach|||{item}
  
 Attempts to attach the given inventory item
@@ -2006,6 +2083,7 @@ http://localhost:8080/inventory/Detach/{item}/{token}
 Method: Get
  
 OR
+ 
 Detach|||{item}
  
 Attempts to Remove the given inventory folder
@@ -2030,6 +2108,7 @@ http://localhost:8080/inventory/Outfit/{name}/{token}
 Method: Get
  
 OR
+ 
 Outfit|||{name}
  
 Replaces the current avatar outfit with the Clothing/[NAME] folder<br/>Please note: This does not use the outfits folder!<br/>Please do not use links in the folder!
@@ -2060,6 +2139,7 @@ http://localhost:8080/inventory/InventoryPurgeNotecards/{token}
 Method: Get
  
 OR
+ 
 InventoryPurgeNotecards
  
 Searchs the notecards folder for notecards, any older than 31 days are deleted.<br/>Depending on the number of notecards this might require multiple calls!
@@ -2084,6 +2164,7 @@ http://localhost:8080/inventory/getRealUUID/{item}/{token}
 Method: Get
  
 OR
+ 
 getRealUUID|||{item}
  
 converts a inventory uuid to a realworld uuid<br/>Needed for texture preview
@@ -2108,6 +2189,7 @@ http://localhost:8080/inventory/SendItem/{item}/{avatar}/{token}
 Method: Get
  
 OR
+ 
 SendItem|||{item}~#~{avatar}
  
 sends a item to an avatar
@@ -2138,6 +2220,7 @@ http://localhost:8080/inventory/SendFolder/{item}/{avatar}/{token}
 Method: Get
  
 OR
+ 
 SendFolder|||{item}~#~{avatar}
  
 Sends a folder to an avatar
@@ -2168,6 +2251,7 @@ http://localhost:8080/inventory/TransferInventoryToObject/{item}/{object}/{runni
 Method: Get
  
 OR
+ 
 TransferInventoryToObject|||{item}~#~{object}~#~{running}
  
 Transfers a item [ARG 2] to a objects inventory [ARG 1] (And if set with the script running state [ARG 3])
@@ -2202,6 +2286,7 @@ http://localhost:8080/inventory/InventoryFolders/{token}
 Method: Get
  
 OR
+ 
 InventoryFolders
  
 Requests the inventory folder layout as a json object InventoryMapFolder<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>subfolders: InventoryMapFolder[]</li></ul>
@@ -2226,6 +2311,7 @@ http://localhost:8080/inventory/InventoryFoldersLimited/{targetfolder}/{token}
 Method: Get
  
 OR
+ 
 InventoryFoldersLimited|||{targetfolder}
  
 Requests folders limited to selected folder
@@ -2250,6 +2336,7 @@ http://localhost:8080/inventory/InventoryContents/{folderUUID}/{token}
 Method: Get
  
 OR
+ 
 InventoryContents|||{folderUUID}
  
 Requests the contents of a folder as an array of InventoryMapItem<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>typename: String</li></ul>
@@ -2276,6 +2363,7 @@ http://localhost:8080/movement/AutoPilot/{x}/{y}/{z}/{token}
 Method: Get
  
 OR
+ 
 AutoPilot|||{x}~#~{y}~#~{z}
  
 uses the AutoPilot to move to a location
@@ -2304,6 +2392,7 @@ http://localhost:8080/movement/AutoPilotStop/{token}
 Method: Get
  
 OR
+ 
 AutoPilotStop
  
 Attempt to teleport to a new region
@@ -2326,6 +2415,7 @@ http://localhost:8080/movement/SendTeleportLure/{avatar}/{token}
 Method: Get
  
 OR
+ 
 SendTeleportLure|||{avatar}
  
 Make the bot request the target avatar teleport to the bot
@@ -2350,6 +2440,7 @@ http://localhost:8080/movement/RequestTeleport/{avatar}/{token}
 Method: Get
  
 OR
+ 
 RequestTeleport|||{avatar}
  
 Sends a teleport request (Move the bot to the avatar)
@@ -2374,6 +2465,7 @@ http://localhost:8080/movement/Fly/{mode}/{token}
 Method: Get
  
 OR
+ 
 Fly|||{mode}
  
 Makes the bot fly (or not)
@@ -2398,6 +2490,7 @@ http://localhost:8080/movement/RotateToFaceVector/{token}
 Method: Post
  
 OR
+ 
 RotateToFaceVector|||{vector}
  
 Rotates the bot to face a vector from its current location
@@ -2424,6 +2517,7 @@ http://localhost:8080/movement/RotateToFace/{avatar}/{token}
 Method: Post
  
 OR
+ 
 RotateToFace|||{avatar}
  
 Rotates the bot to face a avatar
@@ -2450,6 +2544,7 @@ http://localhost:8080/movement/RotateTo/{deg}/{token}
 Method: Post
  
 OR
+ 
 RotateTo|||{deg}
  
 Rotates the avatar to face a rotation from north in Degrees
@@ -2474,6 +2569,7 @@ http://localhost:8080/movement/Teleport/{region}/{x}/{y}/{z}/{token}
 Method: Get
  
 OR
+ 
 Teleport|||{region}~#~{x}~#~{y}~#~{z}
  
 Attempt to teleport to a new region
@@ -2498,6 +2594,7 @@ http://localhost:8080/movement/TeleportSLURL/{token}
 Method: Post
  
 OR
+ 
 TeleportSLURL|||{slurl}
  
 Attempt to teleport to a new region via a SL url
@@ -2524,6 +2621,7 @@ http://localhost:8080/notecard/NotecardAdd/{collection}/{token}
 Method: Post
  
 OR
+ 
 NotecardAdd|||{collection}~#~{content}
  
 Adds content to the Collection<br/> Also creates the Collection if it does not exist
@@ -2550,6 +2648,7 @@ http://localhost:8080/notecard/NotecardClear/{collection}/{token}
 Method: Get
  
 OR
+ 
 NotecardClear|||{collection}
  
 Clears the contents of a collection
@@ -2574,6 +2673,7 @@ http://localhost:8080/notecard/NotecardSend/{avatar}/{collection}/{notecardname}
 Method: Get
  
 OR
+ 
 NotecardSend|||{avatar}~#~{collection}~#~{notecardname}
  
 Sends a notecard to a avatar using the text in the prebuilt collection [see NotecardAdd] and also clears the collection just before sending [see NotecardClear]
@@ -2604,6 +2704,7 @@ http://localhost:8080/notecard/NotecardDirectSend/{avatar}/{notecardname}/{token
 Method: Post
  
 OR
+ 
 NotecardDirectSend|||{avatar}~#~{content}~#~{notecardname}
  
 Creates and sends a notecard in one command good if you are using HTTP otherwise see [NotecardSend]
@@ -2634,6 +2735,7 @@ http://localhost:8080/parcel/SetParcelSale/{amount}/{avatar}/{token}
 Method: Get
  
 OR
+ 
 SetParcelSale|||{amount}~#~{avatar}
  
 Sets the current parcel for sale Also marks the parcel for sale
@@ -2662,6 +2764,7 @@ http://localhost:8080/parcel/GetParcelTraffic/{token}
 Method: Get
  
 OR
+ 
 GetParcelTraffic
  
 Gets the parcel Dwell (Traffic) value and returns it via the reply target
@@ -2688,6 +2791,7 @@ http://localhost:8080/parcel/SetParcelLandingZone/{x}/{y}/{z}/{token}
 Method: Get
  
 OR
+ 
 SetParcelLandingZone|||{x}~#~{y}~#~{z}
  
 Changes the parcel landing mode to point and sets the landing point
@@ -2716,6 +2820,7 @@ http://localhost:8080/parcel/SetParcelName/{name}/{token}
 Method: Get
  
 OR
+ 
 SetParcelName|||{name}
  
 Updates the current parcels name
@@ -2744,6 +2849,7 @@ http://localhost:8080/parcel/SetParcelDesc/{token}
 Method: Post
  
 OR
+ 
 SetParcelDesc|||{desc}
  
 Updates the current parcels description
@@ -2770,6 +2876,7 @@ http://localhost:8080/parcel/GetParcelDesc/{token}
 Method: Get
  
 OR
+ 
 GetParcelDesc
  
 Fetchs the current parcels desc
@@ -2796,6 +2903,7 @@ http://localhost:8080/parcel/GetParcelFlags/{token}
 Method: Get
  
 OR
+ 
 GetParcelFlags
  
 gets the flags for the parcel
@@ -2822,6 +2930,7 @@ http://localhost:8080/parcel/ParcelEject/{avatar}/{token}
 Method: Get
  
 OR
+ 
 ParcelEject|||{avatar}
  
 Ejects an avatar
@@ -2846,6 +2955,7 @@ http://localhost:8080/parcel/AbandonLand/{token}
 Method: Get
  
 OR
+ 
 AbandonLand
  
 Abandons the parcel the bot is currently on, returning it to Linden's or Estate owner
@@ -2868,6 +2978,7 @@ http://localhost:8080/parcel/ParcelBan/{avatar}/{token}
 Method: Get
  
 OR
+ 
 ParcelBan|||{avatar}
  
 Bans an avatar from a parcel
@@ -2898,6 +3009,7 @@ http://localhost:8080/parcel/ParcelUnBan/{avatar}/{token}
 Method: Get
  
 OR
+ 
 ParcelUnBan|||{avatar}
  
 Unbans an avatar from a parcel
@@ -2928,6 +3040,7 @@ http://localhost:8080/parcel/SetParcelMusic/{musicurl}/{token}
 Method: Get
  
 OR
+ 
 SetParcelMusic|||{musicurl}
  
 Updates the current parcels name
@@ -2954,6 +3067,7 @@ http://localhost:8080/parcel/SetParcelFlag/{token}
 Method: Post
  
 OR
+ 
 SetParcelFlag|||{escapedflagdata}
  
 Updates the current parcels name
@@ -2990,6 +3104,7 @@ http://localhost:8080/parcel/ParcelReturnTargeted/{avatar}/{token}
 Method: Get
  
 OR
+ 
 ParcelReturnTargeted|||{avatar}
  
 Returns all objects from the current parcel for the selected avatar
@@ -3018,6 +3133,7 @@ http://localhost:8080/parcel/ParcelDeedToGroup/{token}
 Method: Get
  
 OR
+ 
 ParcelDeedToGroup
  
 transfers the current parcel ownership to the assigned group
@@ -3048,6 +3164,7 @@ http://localhost:8080/parcel/ParcelBuy/{amount}/{token}
 Method: Get
  
 OR
+ 
 ParcelBuy|||{amount}
  
 Attempts to buy the parcel the bot is standing on, the amount must match the sale price for the land!
@@ -3084,6 +3201,7 @@ http://localhost:8080/parcel/ParcelFreeze/{avatar}/{state}/{token}
 Method: Get
  
 OR
+ 
 ParcelFreeze|||{avatar}~#~{state}
  
 Freezes an avatar
@@ -3110,6 +3228,7 @@ http://localhost:8080/parcel/GetParcelBanlist/{token}
 Method: Get
  
 OR
+ 
 GetParcelBanlist
  
 Fetchs the parcel ban list of the parcel the bot is currently on<br/>If the name returned is lookup the bot is currently requesting the avatar name
@@ -3136,6 +3255,7 @@ http://localhost:8080/parcel/UnRezObject/{objectuuid}/{token}
 Method: Get
  
 OR
+ 
 UnRezObject|||{objectuuid}
  
 Returns a rezzed object
@@ -3162,6 +3282,7 @@ http://localhost:8080/parcel/ParcelSetMedia/{token}
 Method: Get
  
 OR
+ 
 ParcelSetMedia|||{escapedflagdata}
  
 Updates the current parcels media settings 
@@ -3198,6 +3319,7 @@ http://localhost:8080/self/GoHome/{token}
 Method: Get
  
 OR
+ 
 GoHome
  
 Makes the bot teleport to its home region
@@ -3220,6 +3342,7 @@ http://localhost:8080/self/PointAt/{token}
 Method: Get
  
 OR
+ 
 PointAt
  
 Makes the bot turn to face avatar and point at them (if found)
@@ -3244,6 +3367,7 @@ http://localhost:8080/self/ReadKeyValue/{Key}/{token}
 Method: Get
  
 OR
+ 
 ReadKeyValue|||{Key}
  
 Reads a value from the KeyValue storage (temp unless SQL is enabled)
@@ -3268,6 +3392,7 @@ http://localhost:8080/self/SetKeyValue/{Key}/{token}
 Method: Post
  
 OR
+ 
 SetKeyValue|||{Key}~#~{Value}
  
 sets a value for KeyValue storage (temp unless SQL is enabled)
@@ -3294,6 +3419,7 @@ http://localhost:8080/self/ClearKeyValue/{Key}/{token}
 Method: Get
  
 OR
+ 
 ClearKeyValue|||{Key}
  
 Reads a value from the KeyValue storage (temp unless SQL is enabled)
@@ -3318,6 +3444,7 @@ http://localhost:8080/self/Sit/{target}/{token}
 Method: Get
  
 OR
+ 
 Sit|||{target}
  
 Makes the bot sit on the ground or on a object if it can see it
@@ -3342,6 +3469,7 @@ http://localhost:8080/self/Stand/{token}
 Method: Get
  
 OR
+ 
 Stand
  
 Makes the bot stand up if sitting (also resets animations)
@@ -3364,6 +3492,7 @@ http://localhost:8080/self/ClickObject/{target}/{token}
 Method: Get
  
 OR
+ 
 ClickObject|||{target}
  
 Makes the bot sit on the ground or on a object if it can see it
@@ -3390,6 +3519,7 @@ http://localhost:8080/self/Logoff/{token}
 Method: Get
  
 OR
+ 
 Logoff
  
 Makes the bot kill itself you monster
@@ -3412,6 +3542,7 @@ http://localhost:8080/self/Logout/{token}
 Method: Get
  
 OR
+ 
 Logout
  
 Makes the bot kill itself you monster
@@ -3434,6 +3565,7 @@ http://localhost:8080/self/Bye/{token}
 Method: Get
  
 OR
+ 
 Bye
  
 Makes the bot kill itself you monster - without making a sound
@@ -3456,6 +3588,7 @@ http://localhost:8080/self/GetLastCommands/{token}
 Method: Get
  
 OR
+ 
 GetLastCommands
  
 Gets the last 5 commands issued to the bot
@@ -3478,6 +3611,7 @@ http://localhost:8080/self/SetPermFlag/{avatar}/{flag}/{state}/{sticky}/{token}
 Method: Get
  
 OR
+ 
 SetPermFlag|||{avatar}~#~{flag}~#~{state}~#~{sticky}
  
 Sets the bot to accept a request type from the avatar (or a object owned by the avatar)
@@ -3514,6 +3648,7 @@ http://localhost:8080/streamadmin/FetchNextNotecard/{token}
 Method: Post
  
 OR
+ 
 FetchNextNotecard|||{endpoint}~#~{endpointcode}
  
 A streamadin command
