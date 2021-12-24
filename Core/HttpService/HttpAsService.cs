@@ -55,6 +55,7 @@ namespace BetterSecondBot.HttpService
             };
             string targetfile = "scoped_tokens.json";
             SimpleIO io = new SimpleIO();
+            io.ChangeRoot(Bot.use_folder);
             if (SimpleIO.FileType(targetfile, "json") == false)
             {
                 io.WriteJsonTokens(LoadedTokens, targetfile);
