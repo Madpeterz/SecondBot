@@ -467,7 +467,7 @@ namespace BetterSecondBot.WikiMake
                     io.WriteFile(target_file, sb.ToString());
                     mdWiki.AppendLine("***Args helper***");
                     mdWiki.AppendLine(" ");
-                    mdWiki.AppendLine(mdWIkiReplys.ToString());
+                    mdWiki.AppendLine(mdWikiArgs.ToString());
                     mdWiki.AppendLine("***Replys***");
                     mdWiki.AppendLine(" ");
                     mdWiki.AppendLine(mdWIkiReplys.ToString());

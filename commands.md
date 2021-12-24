@@ -20,10 +20,10 @@ Toggles if animation requests from this avatar (used for remote poseballs) are a
  
 ***Args helper***
  
-- [:heavy_check_mark:] Granted perm animation
-- [:heavy_check_mark:] Removed perm animation
-- [:x:] avatar lookup
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | UUID (or Firstname Lastname) |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -47,9 +47,10 @@ Attempts to play a gesture
  
 ***Args helper***
  
-- [:heavy_check_mark:] Accepted
-- [:x:] Error with gesture
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| gesture | URL arg | Inventory UUID of the gesture |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -72,8 +73,9 @@ Resets the animation stack for the bot
  
 ***Args helper***
  
-- [:heavy_check_mark:] Accepted
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -97,9 +99,9 @@ an improved version of near me with extra details<br/>NearMeDetails is a object 
  
 ***Args helper***
  
-- [:heavy_check_mark:] array NearMeDetails
-- [:x:] Error not in a sim
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -122,9 +124,9 @@ returns a list of all known avatars nearby
  
 ***Args helper***
  
-- [:heavy_check_mark:] array UUID = Name
-- [:x:] Error not in a sim
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -149,8 +151,9 @@ fetchs the last 20 localchat messages
  
 ***Args helper***
  
-- [:heavy_check_mark:] array string
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -172,10 +175,11 @@ sends a message to localchat
  
 ***Args helper***
  
-- [:heavy_check_mark:] array string
-- [:x:] Message empty
-- [:x:] Invaild channel
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| channel | URL arg | the channel to output on (>=0) |
+| message | Text | the message to send |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -199,10 +203,11 @@ sends a im to the selected avatar
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Message empty
-- [:x:] avatar lookup
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | a UUID or Firstname Lastname |
+| message | Text | the message to send |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -226,8 +231,9 @@ gets a full list of all chat windows
  
 ***Args helper***
  
-- [:heavy_check_mark:] array UUID = Name
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -249,8 +255,9 @@ gets a list of chat windows with unread messages
  
 ***Args helper***
  
-- [:heavy_check_mark:] array of UUID
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -272,8 +279,9 @@ gets if there are any unread im messages at all
  
 ***Args helper***
  
-- [:heavy_check_mark:] True|False
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -295,9 +303,10 @@ gets the chat from the selected window
  
 ***Args helper***
  
-- [:heavy_check_mark:] Array of text
-- [:x:] Window UUID invaild
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| window | URL arg | the UUID of the chat window |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -322,8 +331,10 @@ Requests a new token (Vaild for 10 mins) <br/>to use with all other requests
  
 ***Args helper***
  
-- [:heavy_check_mark:] A new token with full system scope
-- [:x:] Authcode not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| authcode | text | the first 10 chars of SHA1(unixtime+WebUIkey)<br/>unixtime can be +- 30 of the bots time. |
+| unixtimegiven | number | the unixtime you made this request |
 
 ***Replys***
  
@@ -345,7 +356,6 @@ Used to check HTTP connections
  
 ***Args helper***
  
-- [:heavy_check_mark:] world
 
 ***Replys***
  
@@ -366,9 +376,9 @@ Delays a thead by X ms<br/>Mostly pointless but good if your doing custom comman
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Invaild amount
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -391,8 +401,9 @@ Removes the given token from the accepted token pool
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -416,12 +427,10 @@ Updates the relay target (you can have 1 of each type)<br/>Clear will disable th
  
 ***Args helper***
  
-- [:heavy_check_mark:] cleared
-- [:heavy_check_mark:] set/avatar [ok]
-- [:heavy_check_mark:] set/http [ok]
-- [:heavy_check_mark:] set/channel [ok]
-- [:x:] Not a vaild option
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| target | URL arg | Options: Channel (Any number),Avatar UUID,HTTPurl<br/>Clear |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -447,10 +456,11 @@ Makes the bot interact with the dialog [dialogid] with the button [buttontext]
  
 ***Args helper***
  
-- [:heavy_check_mark:] true
-- [:heavy_check_mark:] false
-- [:x:] bad dialog id
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| dialogid | URL arg | The ID for the dialog |
+| buttontext | URL arg | The button text to push |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -474,9 +484,10 @@ Should the bot track dialogs and send them to the relays setup?
  
 ***Args helper***
  
-- [:heavy_check_mark:] updated
-- [:x:] bad status
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| status | URL arg | true or false |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -501,9 +512,12 @@ Adds a discord server role to the selected member
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Discord client not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| roleid | URL arg | the role id we are giving |
+| memberid | URL arg | who we are giving it to |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -526,10 +540,12 @@ Adds the selected user to the ban list - Disallows rejoining untill they are rem
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Discord client not ready
-- [:x:] Why empty
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| memberid | URL arg | who we are giving it to |
+| why | string | why they are being banned |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -553,9 +569,11 @@ Clears messages on the server sent by the member in the last 13 days, 22hours 59
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Discord client not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| memberid | URL arg | who we are giving it to |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -579,9 +597,12 @@ Sends a message directly to the user [They must be in the server]
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Discord client not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| memberid | URL arg | who we are giving it to |
+| message | Text | what we are sending |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -608,9 +629,10 @@ Returns a list of members in a server
  
 ***Args helper***
  
-- [:heavy_check_mark:] mixed array of userid: nickname|username  or   userid:username
-- [:x:] Discord client not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -633,10 +655,13 @@ Sends a message to the selected channel - Optional TTS usage
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Discord client not ready
-- [:x:] message empty
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| channelid | URL arg | the channel id to apply this action to |
+| tts | URL arg | shoud tts be enabled true or false |
+| message | Text | what we are sending |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -660,9 +685,12 @@ Sends a message to the selected channel - Optional TTS usage
  
 ***Args helper***
  
-- [:heavy_check_mark:] mixed array of userid: nickname|username  or   userid:username
-- [:x:] Discord client not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| memberid | URL arg | who we are giving it to |
+| mode | URL arg | should we mute them "true" or unmute "false" |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -686,9 +714,12 @@ returns a collection of settings for the given role
  
 ***Args helper***
  
-- [:heavy_check_mark:] KeyPair of status: KeyPair[] item = value
-- [:x:] Discord client not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| memberid | URL arg | who we are giving it to |
+| mode | URL arg | should we mute them "true" or unmute "false" |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -714,9 +745,12 @@ Updates perm flags for the selected role
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Discord client not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| roleid | URL arg | who we are giving it to |
+| flagscsv | Text | what we are setting |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -742,9 +776,11 @@ Updates perm flags for the selected role
  
 ***Args helper***
  
-- [:heavy_check_mark:] KeyPair of statusmessage=roleid or 0
-- [:x:] Discord client not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| role | URL arg | the name of the role we are creating |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -768,9 +804,10 @@ Returns a list of roles and their ids in collection
  
 ***Args helper***
  
-- [:heavy_check_mark:] KeyPair of status: KeyPair of roleid: rolename
-- [:x:] Discord client not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -794,9 +831,10 @@ Remove a role from a server
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Discord client not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -819,9 +857,10 @@ Returns a list of text channels in a server
  
 ***Args helper***
  
-- [:heavy_check_mark:] array of channelid: name
-- [:x:] Discord client not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| serverid | URL arg | the server id to apply this action to |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -846,10 +885,12 @@ Sends the message to the current sim
  
 ***Args helper***
  
-- [:heavy_check_mark:] restarting
-- [:x:] Not an estate manager here
-- [:x:] canceled
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| delay | URL arg | How long to delay the restart for (30 to 240 secs) - defaults to 240 if out of bounds 
+set to 0 if your canceling! |
+| mode | URL arg | true to start a restart, false to cancel |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -873,10 +914,10 @@ Sends the message to the current sim
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Not an estate manager here
-- [:x:] Message empty
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| message | Text | What the message is |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -900,9 +941,10 @@ Fetchs the regions map tile
  
 ***Args helper***
  
-- [:heavy_check_mark:] Texture UUID
-- [:x:] Unable to find region
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| regionname | URL arg | the name of the region we are fetching |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -925,9 +967,9 @@ Reclaims ownership of the current parcel
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Not an estate manager here
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -950,9 +992,9 @@ Reclaims ownership of the current parcel
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Not an estate manager here
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -975,8 +1017,9 @@ Requests the estate banlist
  
 ***Args helper***
  
-- [:heavy_check_mark:] ban list json
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -998,12 +1041,12 @@ Attempts to add/remove the avatar to/from the Estate banlist
  
 ***Args helper***
  
-- [:heavy_check_mark:] Unban request accepted
-- [:heavy_check_mark:] Ban request accepted
-- [:x:] Unable to find avatar UUID
-- [:x:] Unable to process global value please use true or false
-- [:x:] Not an estate manager on region {REGIONNAME}
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | the uuid avatar you wish to ban |
+| mode | URL arg | What action would you like to take<br/>Defaults to remove if not given "add" |
+| global | URL arg | if true this the ban/unban will be applyed to all estates the bot has access to |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1031,8 +1074,9 @@ Gets the friendslist <br/>Formated as follows<br/>friendreplyobject<br/><ul><li>
  
 ***Args helper***
  
-- [:heavy_check_mark:] array UUID = friendreplyobject
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1055,12 +1099,11 @@ Updates the friend perms for avatar avatar to State
  
 ***Args helper***
  
-- [:heavy_check_mark:] granted
-- [:heavy_check_mark:] removed
-- [:x:] Not A friend
-- [:x:] state invaild
-- [:x:] avatar lookup
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | A avatar uuid or Firstname Lastname |
+| state | URL arg | true: Grant perms, false: Remove perms |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1087,13 +1130,11 @@ Updates the friend perms for avatar avatar to State
  
 ***Args helper***
  
-- [:heavy_check_mark:] Request sent
-- [:heavy_check_mark:] Removed
-- [:x:] Already a friend
-- [:x:] Not in friendslist
-- [:x:] state invaild
-- [:x:] avatar lookup
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | A avatar uuid or Firstname Lastname |
+| state | URL arg | true: Send invite, false: Remove from friendslist |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1122,9 +1163,9 @@ Requests the current balance and requests the balance to update.
  
 ***Args helper***
  
-- [:heavy_check_mark:] Current fund level
-- [:x:] Funds commands are disabled
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1147,12 +1188,11 @@ Makes the bot pay a avatar
  
 ***Args helper***
  
-- [:heavy_check_mark:] Accepted
-- [:x:] avatar lookup
-- [:x:] Amount out of range
-- [:x:] Invaild amount
-- [:x:] Transfer funds to avatars disabled
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | the avatars UUID or Firstname Lastname |
+| amount | URL arg | the amount to pay (from 1 to current balance) |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1178,13 +1218,12 @@ Makes the bot pay a object
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Primname is empty
-- [:x:] Invaild object UUID
-- [:x:] Invaild amount
-- [:x:] Amount out of range
-- [:x:] Funds commands are disabled
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| object | URL arg | UUID of the object to pay |
+| primname | URL arg | The name of the prim on the object to pay |
+| amount | URL arg | the amount to pay (from 1 to current balance) |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1213,12 +1252,11 @@ Checks if the given UUID is in the given group<br/>Note: if group membership dat
  
 ***Args helper***
  
-- [:heavy_check_mark:] Membership reply with [membershipStatus,AvatarUUID,AvatarnameIfKnown,GroupUUID]
-- [:x:] Updating
-- [:x:] Unknown group
-- [:x:] Invaild group UUID
-- [:x:] avatar lookup
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| avatar | URL arg | the UUID of the avatar you wish to check with |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1244,12 +1282,10 @@ Gets membership of a group
  
 ***Args helper***
  
-- [:heavy_check_mark:] list of UUIDS of group members
-- [:x:] Updating
-- [:x:] Unknown group
-- [:x:] Invaild group UUID
-- [:x:] avatar lookup
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1275,13 +1311,12 @@ Attempts to ban/unban a given avatar from a group
  
 ***Args helper***
  
-- [:heavy_check_mark:] ? request accepted
-- [:x:] Updating
-- [:x:] Unknown group
-- [:x:] Invaild group UUID
-- [:x:] avatar lookup
-- [:x:] Missing group GroupBanAccess power
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| avatar | URL arg | the UUID of the avatar or Firstname Lastname |
+| state | URL arg | true to ban false to unban |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1308,14 +1343,11 @@ Eject selected avatar from group
  
 ***Args helper***
  
-- [:heavy_check_mark:] Requested
-- [:x:] Updating
-- [:x:] Unknown group
-- [:x:] Invaild group UUID
-- [:x:] Not in group
-- [:x:] avatar lookup
-- [:x:] Missing group Eject power
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| avatar | URL arg | the UUID of the avatar you wish to check with |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1344,15 +1376,11 @@ Adds the avatar to the Group with the role
  
 ***Args helper***
  
-- [:heavy_check_mark:] Roles updated
-- [:heavy_check_mark:] Invite sent
-- [:x:] Updating
-- [:x:] Unknown group
-- [:x:] Invaild group UUID
-- [:x:] Invaild role UUID
-- [:x:] Not in group
-- [:x:] avatar lookup
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| avatar | URL arg | the UUID of the avatar you wish to check with |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1381,14 +1409,12 @@ Invites selected avatar to the group with the selected role
  
 ***Args helper***
  
-- [:heavy_check_mark:] Invite sent
-- [:heavy_check_mark:] Already in group
-- [:x:] Updating
-- [:x:] Unknown group
-- [:x:] Invaild group UUID
-- [:x:] avatar lookup
-- [:x:] Missing group Invite power
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| avatar | URL arg | the UUID of the avatar you wish to check with |
+| role | URL arg | the UUID of the role to invite them at the word "everyone" |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1416,13 +1442,12 @@ Sends a group notice (No attachments please use GroupnoticeWithAttachment to att
  
 ***Args helper***
  
-- [:heavy_check_mark:] Sending notice
-- [:x:] Unknown group
-- [:x:] Invaild group UUID
-- [:x:] Title empty
-- [:x:] Message empty
-- [:x:] Missing group Notice power
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| title | Text | The title of the group notice |
+| message | Text | The body of the group notice |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1449,11 +1474,11 @@ Activates the selected title
  
 ***Args helper***
  
-- [:heavy_check_mark:] Switching title
-- [:x:] Unknown group
-- [:x:] Invaild group UUID
-- [:x:] Invaild role UUID
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| role | URL arg | tje UUID of the role |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1478,10 +1503,10 @@ Sets the selected group to the active group
  
 ***Args helper***
  
-- [:heavy_check_mark:] Switching active group
-- [:x:] Unknown group
-- [:x:] Invaild group UUID
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1505,14 +1530,13 @@ Sends a group notice with an attachment
  
 ***Args helper***
  
-- [:heavy_check_mark:] Sending notice with attachment
-- [:x:] Unknown group
-- [:x:] Invaild group UUID
-- [:x:] Invaild inventory UUID
-- [:x:] Title empty
-- [:x:] Message empty
-- [:x:] Missing group Notice power
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| title | Text | The title of the group notice |
+| message | Text | The body of the group notice |
+| attachment | URL arg | the UUID of inventory you wish to attach |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1540,8 +1564,9 @@ fetchs a list of all groups known to the bot
  
 ***Args helper***
  
-- [:heavy_check_mark:] array UUID=name
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1563,11 +1588,10 @@ Requests the roles for the selected group<br/>Replys with GroupRoleDetails objec
  
 ***Args helper***
  
-- [:heavy_check_mark:] GroupRoleDetails object
-- [:x:] Group is not currently known
-- [:x:] Invaild group UUID
-- [:x:] Updating
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1592,8 +1616,9 @@ fetchs a list of all groups with unread messages
  
 ***Args helper***
  
-- [:heavy_check_mark:] array UUID
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1615,10 +1640,10 @@ fetchs a list of all groups with unread messages
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Unknown group
-- [:x:] group value is invaild
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1642,8 +1667,9 @@ checks if there are any groups with unread messages
  
 ***Args helper***
  
-- [:heavy_check_mark:] True|False
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1665,8 +1691,9 @@ Clears all group chat buffers at once
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1688,9 +1715,10 @@ fetchs the groupchat history
  
 ***Args helper***
  
-- [:heavy_check_mark:] Group Chat
-- [:x:] Group UUID invaild
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | the UUID of the group |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1713,11 +1741,11 @@ sends a message to the groupchat
  
 ***Args helper***
  
-- [:heavy_check_mark:] Sending
-- [:x:] Group UUID invaild
-- [:x:] Opening groupchat - Please retry later
-- [:x:] Missing group JoinChat power
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| group | URL arg | UUID of the group |
+| message | Text | the message to send |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1744,8 +1772,9 @@ Lists objects that are sculpty type in the current sim that the bot can see
  
 ***Args helper***
  
-- [:heavy_check_mark:] A json object
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1767,8 +1796,9 @@ Fetchs the current bot
  
 ***Args helper***
  
-- [:heavy_check_mark:] The build ID of the bot
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1790,8 +1820,9 @@ Fetchs the name of the bot
  
 ***Args helper***
  
-- [:heavy_check_mark:] Firstname Lastname
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1813,10 +1844,9 @@ Fetchs the current parcels name
  
 ***Args helper***
  
-- [:heavy_check_mark:] Parcelname
-- [:x:] Error parcel not found
-- [:x:] Error not in a sim
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1840,8 +1870,9 @@ Requests the current unixtime at the bot
  
 ***Args helper***
  
-- [:heavy_check_mark:] Unixtime
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1863,9 +1894,9 @@ Fetchs the current region name
  
 ***Args helper***
  
-- [:heavy_check_mark:] Regionname
-- [:x:] Error not in a sim
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1888,9 +1919,9 @@ Fetchs the current location of the bot
  
 ***Args helper***
  
-- [:heavy_check_mark:] array of X,Y,Z values
-- [:x:] Error not in a sim
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1915,10 +1946,11 @@ Attachs an event for inventory changes
  
 ***Args helper***
  
-- [:heavy_check_mark:] cleared
-- [:heavy_check_mark:] No action
-- [:heavy_check_mark:] Event added
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| inventoryType | URL arg | Types: texture,sound,callcard,landmark,clothing,object,notecard,lsltext,lslbyte,animatn,gesture,mesh |
+| outputTarget | text | HTTP url, channel, avatar UUID or clear to remove all events for the selected type |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1942,8 +1974,11 @@ Uploads a new sound file to inventory
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| sourcePath | Text | accepts a file path to a wave PCM file @ 44100 |
+| inventoryName | URL arg | the name in secondlife |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1965,10 +2000,10 @@ rezs the item at the bots current location
  
 ***Args helper***
  
-- [:heavy_check_mark:] UUID of rezzed item
-- [:heavy_check_mark:] Invaild item UUID
-- [:heavy_check_mark:] Unable to find item
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| item | URL arg | UUID of item to rez |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -1992,11 +2027,11 @@ renames a folder or inventory item
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:heavy_check_mark:] invaild item uuid
-- [:heavy_check_mark:] Item name is to short
-- [:heavy_check_mark:] Unable to find inventory item
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| item | URL arg | UUID of item/folder to name |
+| newname | Text | What we are changing it to |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2021,9 +2056,10 @@ Attempts to Remove the given inventory item
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:heavy_check_mark:] invaild item uuid
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| item | URL arg | UUID of item |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2046,9 +2082,10 @@ Attempts to Remove the given inventory folder
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:heavy_check_mark:] invaild folder uuid
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| folder | URL arg | UUID of folder |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2071,9 +2108,10 @@ Attempts to attach the given inventory item
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:heavy_check_mark:] invaild item uuid
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| item | URL arg | UUID of item |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2096,9 +2134,10 @@ Attempts to Remove the given inventory folder
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:heavy_check_mark:] invaild item uuid
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| item | URL arg | UUID of item |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2121,12 +2160,10 @@ Replaces the current avatar outfit with the Clothing/[NAME] folder<br/>Please no
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:heavy_check_mark:] Named folder value is empty
-- [:heavy_check_mark:] Cant find Clothing folder
-- [:heavy_check_mark:] Cant find target folder
-- [:heavy_check_mark:] target folder is empty or so full I cant get it in 5 secs...
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| name | URL arg | Name of the folder |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2152,9 +2189,9 @@ Searchs the notecards folder for notecards, any older than 31 days are deleted.<
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:heavy_check_mark:] Unable to find notecard folder
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2177,9 +2214,10 @@ converts a inventory uuid to a realworld uuid<br/>Needed for texture preview
  
 ***Args helper***
  
-- [:heavy_check_mark:] Asset UUID or UUID zero
-- [:heavy_check_mark:] Invaild item uuid
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| item | URL arg | inventory level UUID of item |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2202,12 +2240,11 @@ sends a item to an avatar
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:heavy_check_mark:] Failed
-- [:heavy_check_mark:] Invaild avatar uuid
-- [:heavy_check_mark:] Invaild item uuid
-- [:heavy_check_mark:] Unable to find item
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| item | URL arg | UUID of item |
+| avatar | URL arg | a UUID or Firstname Lastname |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2233,12 +2270,11 @@ Sends a folder to an avatar
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:heavy_check_mark:] Failed
-- [:heavy_check_mark:] Invaild avatar uuid
-- [:heavy_check_mark:] Invaild folter uuid
-- [:heavy_check_mark:] Unable to find folder
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| item | URL arg | UUID of item |
+| avatar | URL arg | a UUID or Firstname Lastname |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2264,14 +2300,12 @@ Transfers a item [ARG 2] to a objects inventory [ARG 1] (And if set with the scr
  
 ***Args helper***
  
-- [:heavy_check_mark:] Transfering running script
-- [:heavy_check_mark:] Transfering inventory
-- [:heavy_check_mark:] Invaild item uuid
-- [:heavy_check_mark:] Invaild object uuid
-- [:heavy_check_mark:] Unable to find inventory
-- [:heavy_check_mark:] Unable to find object
-- [:heavy_check_mark:] Invaild running
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| item | URL arg | UUID of item |
+| object | URL arg | the uuid of the object |
+| running | URL arg | true if you wish the transfered script to be running otherwise false |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2299,9 +2333,9 @@ Requests the inventory folder layout as a json object InventoryMapFolder<br/>For
  
 ***Args helper***
  
-- [:heavy_check_mark:] array of InventoryMapFolder
-- [:heavy_check_mark:] Error
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2324,9 +2358,10 @@ Requests folders limited to selected folder
  
 ***Args helper***
  
-- [:heavy_check_mark:] single InventoryMapFolder
-- [:heavy_check_mark:] Error
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| targetfolder | URL arg | the UUID of the folder or root |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2349,9 +2384,10 @@ Requests the contents of a folder as an array of InventoryMapItem<br/>Formated a
  
 ***Args helper***
  
-- [:heavy_check_mark:] array of InventoryMapItem
-- [:heavy_check_mark:] Invaild folder UUID
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| folderUUID | URL arg | the folder to fetch (Found via: inventory/folders) |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2376,11 +2412,12 @@ uses the AutoPilot to move to a location
  
 ***Args helper***
  
-- [:heavy_check_mark:] Error Unable to AutoPilot to location
-- [:heavy_check_mark:] ok
-- [:x:] Convert to vector has failed
-- [:x:] ?  value out of range 0-?
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| x | URL arg | X location to AutoPilot to |
+| y | URL arg | y location to AutoPilot to |
+| z | URL arg | z location to AutoPilot to |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2405,8 +2442,9 @@ Attempt to teleport to a new region
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2428,9 +2466,10 @@ Make the bot request the target avatar teleport to the bot
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Invaild avatar UUID
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | Avatar UUID or Firstname Lastname |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2453,9 +2492,10 @@ Sends a teleport request (Move the bot to the avatar)
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Invaild avatar UUID
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | Avatar UUID or Firstname Lastname |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2478,9 +2518,10 @@ Makes the bot fly (or not)
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Invaild mode
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| mode | URL arg | true: Start flying, false: stop flying (super fun at height) |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2503,10 +2544,10 @@ Rotates the bot to face a vector from its current location
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Invaild vector
-- [:x:] Vector ? value is out of range 0-?
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| vector | Text | a vector to face eg <123,45,44> |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2530,10 +2571,10 @@ Rotates the bot to face a avatar
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Invaild avatar UUID
-- [:x:] Unable to see avatar
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | An avatar UUID or Firstname Lastname |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2557,9 +2598,10 @@ Rotates the avatar to face a rotation from north in Degrees
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Unable to process rotation
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| deg | URL arg | 0 to 360 |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2582,9 +2624,13 @@ Attempt to teleport to a new region
  
 ***Args helper***
  
-- [:heavy_check_mark:] Accepted
-- [:x:] Error Unable to Teleport to location
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| region | URL arg | the name of the region we are going to |
+| x | URL arg | X location to teleport to |
+| y | URL arg | y location to teleport to |
+| z | URL arg | z location to teleport to |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2607,9 +2653,10 @@ Attempt to teleport to a new region via a SL url
  
 ***Args helper***
  
-- [:heavy_check_mark:] True|False
-- [:x:] slurl is empty
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| slurl | Text | a full SLurl |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2634,10 +2681,11 @@ Adds content to the Collection<br/> Also creates the Collection if it does not e
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Collection value is empty
-- [:x:] Content value is empty
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| collection | URL arg | The name of the collection |
+| content | String | The text to add to the collection |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2661,9 +2709,10 @@ Clears the contents of a collection
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Collection value is empty
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| collection | URL arg | The name of the collection |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2686,12 +2735,12 @@ Sends a notecard to a avatar using the text in the prebuilt collection [see Note
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Collection value is empty
-- [:x:] Notecardname value is empty
-- [:x:] Invaild avatar uuid
-- [:x:] No content in notecard storage ?
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | The UUID or Name of an avatar |
+| collection | URL arg | The name of the collection |
+| notecardname | URL arg | What to call the created notecard |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2717,11 +2766,12 @@ Creates and sends a notecard in one command good if you are using HTTP otherwise
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] notecardname value is empty
-- [:x:] Content value is empty
-- [:x:] Invaild avatar uuid
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | The UUID or Name of an avatar |
+| content | String | The text to add to the collection |
+| notecardname | URL arg | What to call the created notecard |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2748,11 +2798,11 @@ Sets the current parcel for sale Also marks the parcel for sale
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Invaild amount
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| amount | URL arg | The amount to sell the parcel for from 1 to 9999999 |
+| avatar | URL arg | Avatar uuid or Firstname Lastname or "none" who we are locking the sale to |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2777,10 +2827,9 @@ Gets the parcel Dwell (Traffic) value and returns it via the reply target
  
 ***Args helper***
  
-- [:heavy_check_mark:] traffic value
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2804,11 +2853,12 @@ Changes the parcel landing mode to point and sets the landing point
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Invaild amount
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| x | URL arg | X point for landing |
+| y | URL arg | Y point for landing |
+| z | URL arg | Z point for landing |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2833,11 +2883,10 @@ Updates the current parcels name
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Parcel name is empty
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| name | URL arg | The new name of the parcel |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2862,10 +2911,10 @@ Updates the current parcels description
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| desc | Text | The new desc of the parcel |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2889,10 +2938,9 @@ Fetchs the current parcels desc
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2916,10 +2964,9 @@ gets the flags for the parcel
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2943,9 +2990,10 @@ Ejects an avatar
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Invaild avatar
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | uuid of the avatar or Firstname Lastname |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2968,8 +3016,9 @@ Abandons the parcel the bot is currently on, returning it to Linden's or Estate 
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -2991,12 +3040,10 @@ Bans an avatar from a parcel
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Invaild avatar
-- [:x:] Avatar is in the blacklist
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | uuid of the avatar or Firstname Lastname |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3022,12 +3069,10 @@ Unbans an avatar from a parcel
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Invaild avatar
-- [:x:] Avatar is already unbanned
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | uuid of the avatar or Firstname Lastname |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3053,10 +3098,10 @@ Updates the current parcels name
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| musicurl | URL arg | The new name of the parcel |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3080,15 +3125,10 @@ Updates the current parcels name
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Incorrect perms to control parcel
-- [:x:] No accepted flags
-- [:x:] Unable to set flag ...
-- [:x:] Flag: ? is unknown
-- [:x:] Flag: ? missing "="
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| escapedflagdata | Text | repeatable flag data split by ::: formated Flag=True|False |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3117,11 +3157,10 @@ Returns all objects from the current parcel for the selected avatar
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Invaild avatar UUID
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | avatar uuid or Firstname Lastname |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3146,12 +3185,9 @@ transfers the current parcel ownership to the assigned group
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Invaild group uuid
-- [:x:] Not in group
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3177,15 +3213,10 @@ Attempts to buy the parcel the bot is standing on, the amount must match the sal
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Parcel not for sale
-- [:x:] Parcel not for sale
-- [:x:] Parcel sale locked to other avatars
-- [:x:] Parcel sale price and amount do not match
-- [:x:] Invaild amount
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| amount | URL arg | amount to pay for the parcel (min 1) |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3214,10 +3245,11 @@ Freezes an avatar
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Invaild avatar UUID
-- [:x:] Invaild state
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | avatar uuid or Firstname Lastname |
+| state | URL arg | setting state to false will unfreeze or true to freeze |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3241,10 +3273,9 @@ Fetchs the parcel ban list of the parcel the bot is currently on<br/>If the name
  
 ***Args helper***
  
-- [:x:] json object: GetParcelBanlistObject
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3268,10 +3299,10 @@ Returns a rezzed object
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Invaild object uuid
-- [:x:] Unable to find object
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| objectuuid | URL arg | object UUID to unrez |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3303,10 +3334,10 @@ MediaType=String ["IMG-PNG","IMG-JPG","VID-MP4","VID-AVI" or "Custom-MIME_TYPE_C
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Error not in a sim
-- [:x:] Parcel data not ready
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| escapedflagdata | Text | repeatable flag data split by ::: formated Flag=True|False |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3332,8 +3363,9 @@ Makes the bot teleport to its home region
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3355,9 +3387,9 @@ Makes the bot turn to face avatar and point at them (if found)
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Cant find UUID in sim
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3380,9 +3412,10 @@ Reads a value from the KeyValue storage (temp unless SQL is enabled)
  
 ***Args helper***
  
-- [:heavy_check_mark:] value
-- [:x:] Unknown Key: KeyName
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| Key | URL arg | the key we are trying to read from |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3405,10 +3438,11 @@ sets a value for KeyValue storage (temp unless SQL is enabled)
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Key is empty
-- [:x:] Value is empty
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| Key | URL arg | the key we are trying to set |
+| Value | string | the value we are tring to put on the key |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3432,9 +3466,10 @@ Reads a value from the KeyValue storage (temp unless SQL is enabled)
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Key is empty
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| Key | URL arg | the key we are trying to clear |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3457,9 +3492,10 @@ Makes the bot sit on the ground or on a object if it can see it
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Invaild object UUID
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| target | URL arg | ground or a object UUID |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3482,8 +3518,9 @@ Makes the bot stand up if sitting (also resets animations)
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3505,10 +3542,10 @@ Makes the bot sit on the ground or on a object if it can see it
  
 ***Args helper***
  
-- [:heavy_check_mark:] true|false
-- [:x:] Invaild object UUID
-- [:x:] Unable to see object
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| target | URL arg | object UUID |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3532,8 +3569,9 @@ Makes the bot kill itself you monster
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3555,8 +3593,9 @@ Makes the bot kill itself you monster
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3578,8 +3617,9 @@ Makes the bot kill itself you monster - without making a sound
  
 ***Args helper***
  
-- [:heavy_check_mark:] ok
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3601,8 +3641,9 @@ Gets the last 5 commands issued to the bot
  
 ***Args helper***
  
-- [:heavy_check_mark:] list of commands
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3630,11 +3671,13 @@ command: A non signed command
  
 ***Args helper***
  
-- [:x:] avatar lookup
-- [:x:] Invaild state
-- [:x:] Invaild sticky
-- [:x:] Invaild flag
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| avatar | URL arg | avatar uuid or Firstname Lastname |
+| flag | URL arg | friend, group, animation, teleport, inventory or command |
+| state | URL arg | State to set the flag to true or false |
+| sticky | URL arg | if true the permissing will not expire after the first use otherwise false |
+| token | URL arg | the api access token |
 
 ***Replys***
  
@@ -3661,14 +3704,11 @@ A streamadin command
  
 ***Args helper***
  
-- [:heavy_check_mark:] True|False
-- [:x:] Bad reply:  ...
-- [:x:] Endpoint is empty
-- [:x:] Endpointcode is empty
-- [:x:] HTTP status code: ...
-- [:x:] Error: ...
-- [:x:] Notecard title is to short
-- [:x:] Token not accepted
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| endpoint | Text | The end point |
+| endpointcode | Text | The end point code |
+| token | URL arg | the api access token |
 
 ***Replys***
  
