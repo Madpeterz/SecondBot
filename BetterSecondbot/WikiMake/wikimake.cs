@@ -304,6 +304,13 @@ namespace BetterSecondBot.WikiMake
 
         protected void HTTPWiki()
         {
+            mdWiki.AppendLine("View as [HTML](https://wiki.blackatom.live/files/Commands.html)");
+            mdWiki.AppendLine(" ");
+            mdWiki.AppendLine("Host it yourself: [+Docker image](https://hub.docker.com/r/madpeter/secondbot_wiki)");
+            mdWiki.AppendLine(" ");
+            mdWiki.AppendLine("---");
+            mdWiki.AppendLine("# Commands list");
+
             LogFormater.Info("[WIKI] Starting area HTTP endpoint");
             HTTPendpoint HTTP = new HTTPendpoint();
 
@@ -314,13 +321,6 @@ namespace BetterSecondBot.WikiMake
 
             // create commands
             HTTPCommands("Commands", HTTP);
-
-            mdWiki.AppendLine("View as [HTML](https://wiki.blackatom.live/files/Commands.html)");
-            mdWiki.AppendLine(" ");
-            mdWiki.AppendLine("Host it yourself: [+Docker image](https://hub.docker.com/r/madpeter/secondbot_wiki)");
-            mdWiki.AppendLine(" ");
-            mdWiki.AppendLine("---");
-            mdWiki.AppendLine("# Commands list");
 
             io.WriteFile("../commands.md", mdWiki.ToString());
 

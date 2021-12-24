@@ -1,3 +1,9 @@
+View as [HTML](https://wiki.blackatom.live/files/Commands.html)
+ 
+Host it yourself: [+Docker image](https://hub.docker.com/r/madpeter/secondbot_wiki)
+ 
+---
+# Commands list
 ## animation
  
 ### AddToAllowAnimations
@@ -3676,9 +3682,3 @@ A streamadin command
 - [:x:] Token not accepted
 
  
-View as [HTML](https://wiki.blackatom.live/files/Commands.html)
- 
-Host it yourself: [+Docker image](https://hub.docker.com/r/madpeter/secondbot_wiki)
- 
----
-# Commands list
