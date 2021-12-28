@@ -104,7 +104,7 @@ namespace BetterSecondBotShared.bottypes
                 // search for file called "commands.cmd"
                 JsonCommandsfile LoadedCommands = new JsonCommandsfile
                 {
-                    CustomCommands = new [] { "sayexample!!!say|||Hello{-}delay|||2500{-}say|||Bye" }
+                    CustomCommands = new [] { "sayexample!!!say|||0~#~Hello{-}delay|||2500{-}say|||0~#~Bye" }
                 };
                 string CommandsFile = "custom_commands.json";
                 SimpleIO io = new SimpleIO();
