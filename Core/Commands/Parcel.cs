@@ -457,21 +457,26 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure(tests.Value, "ParcelBuy", new [] { amount });
             }
+            if ((targetparcel.AuthBuyerID != UUID.Zero) && (targetparcel.AuthBuyerID != bot.GetClient.Self.AgentID))
+            {
+                return Failure("Parcel sale locked to other avatars", "ParcelBuy", new[] { amount });
+            }
+            int minAmount = 1;
+            if (targetparcel.AuthBuyerID != bot.GetClient.Self.AgentID)
+            {
+                minAmount = 0;
+            }
             if (int.TryParse(amount, out int amountvalue) == false)
             {
                 return Failure("Invaild amount", "ParcelBuy", new [] { amount });
             }
-            if (amountvalue < 1)
+            if (amountvalue < minAmount)
             {
                 return Failure("Invaild amount", "ParcelBuy", new [] { amount });
             };
             if (targetparcel.Flags.HasFlag(ParcelFlags.ForSale) == false)
             {
                 return Failure("Parcel not for sale", "ParcelBuy", new [] { amount });
-            }
-            if ((targetparcel.AuthBuyerID != UUID.Zero) && (targetparcel.AuthBuyerID != bot.GetClient.Self.AgentID))
-            {
-                return Failure("Parcel sale locked to other avatars", "ParcelBuy", new [] { amount });
             }
             if (targetparcel.SalePrice != amountvalue)
             {
