@@ -38,11 +38,21 @@ namespace BetterSecondBot.HttpService
             {
                 return Failure("Invaild amount", "SetParcelSale", new [] { amount, avatar });
             }
-            if((amountvalue < 1) || (amountvalue > 9999999))
+
+            int minAmount = 1;
+            avataruuid = UUID.Zero;
+            if (avatar != "none")
+            {
+                ProcessAvatar(avatar);
+                if(avataruuid != UUID.Zero)
+                {
+                    minAmount = 0;
+                }
+            }
+            if ((amountvalue < minAmount) || (amountvalue > 9999999))
             {
                 return Failure("Invaild amount", "SetParcelSale", new [] { amount, avatar });
             }
-            ProcessAvatar(avatar);
             targetparcel.SalePrice = amountvalue;
             targetparcel.AuthBuyerID = avataruuid;
             parcel_static.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
