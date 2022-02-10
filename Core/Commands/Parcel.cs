@@ -462,7 +462,7 @@ namespace BetterSecondBot.HttpService
                 return Failure("Parcel sale locked to other avatars", "ParcelBuy", new[] { amount });
             }
             int minAmount = 1;
-            if (targetparcel.AuthBuyerID != bot.GetClient.Self.AgentID)
+            if (targetparcel.AuthBuyerID == bot.GetClient.Self.AgentID)
             {
                 minAmount = 0;
             }
