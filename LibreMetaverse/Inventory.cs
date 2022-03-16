@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
- * Copyright (c) 2021, Sjofn LLC.
+ * Copyright (c) 2021-2022, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without 
@@ -133,7 +133,7 @@ namespace OpenMetaverse
             set 
             {
                 UpdateNodeFor(value);
-                _RootNode = Items[value.UUID];
+                RootNode = Items[value.UUID];
             }
         }
 
@@ -146,28 +146,25 @@ namespace OpenMetaverse
             set
             {
                 UpdateNodeFor(value);
-                _LibraryRootNode = Items[value.UUID];
+                LibraryRootNode = Items[value.UUID];
             }
         }
 
-        private InventoryNode _LibraryRootNode;
-        private InventoryNode _RootNode;
-        
         /// <summary>
         /// The root node of the avatars inventory
         /// </summary>
-        public InventoryNode RootNode => _RootNode;
+        public InventoryNode RootNode { get; private set; }
 
         /// <summary>
         /// The root node of the default shared library
         /// </summary>
-        public InventoryNode LibraryRootNode => _LibraryRootNode;
+        public InventoryNode LibraryRootNode { get; private set; }
 
-        public UUID Owner { get; }
+        public UUID Owner { get; private set; }
 
         private GridClient Client;
         //private InventoryManager Manager;
-        public Dictionary<UUID, InventoryNode> Items = new Dictionary<UUID, InventoryNode>();
+        public Dictionary<UUID, InventoryNode> Items;
 
         public Inventory(GridClient client, InventoryManager manager)
             : this(client, manager, client.Self.AgentID) { }
@@ -345,7 +342,7 @@ namespace OpenMetaverse
                     BinaryFormatter bformatter = new BinaryFormatter();
                     lock (Items)
                     {
-                        Logger.Log("Caching " + Items.Count.ToString() + " inventory items to " + filename, Helpers.LogLevel.Info);
+                        Logger.Log($"Caching {Items.Count} inventory items to {filename}", Helpers.LogLevel.Info);
                         foreach (KeyValuePair<UUID, InventoryNode> kvp in Items)
                         {
                             bformatter.Serialize(stream, kvp.Value);
@@ -355,7 +352,7 @@ namespace OpenMetaverse
 	        }
             catch (Exception e)
             {
-                Logger.Log("Error saving inventory cache to disk :"+e.Message,Helpers.LogLevel.Error);
+                Logger.Log("Error saving inventory cache to disk", Helpers.LogLevel.Error, e);
             }
         }
 
@@ -387,11 +384,11 @@ namespace OpenMetaverse
             }
             catch (Exception e)
             {
-                Logger.Log("Error accessing inventory cache file :" + e.Message, Helpers.LogLevel.Error);
+                Logger.Log("Error accessing inventory cache file", Helpers.LogLevel.Error, e);
                 return -1;
             }
 
-            Logger.Log("Read " + item_count.ToString() + " items from inventory cache file", Helpers.LogLevel.Info);
+            Logger.Log($"Read {item_count} items from inventory cache file", Helpers.LogLevel.Info);
 
             item_count = 0;
             List<InventoryNode> del_nodes = new List<InventoryNode>(); //nodes that we have processed and will delete
@@ -473,7 +470,7 @@ namespace OpenMetaverse
                 del_nodes.Clear();
             }
 
-            Logger.Log("Reassembled " + item_count.ToString() + " items from inventory cache file", Helpers.LogLevel.Info);
+            Logger.Log($"Reassembled {item_count} items from inventory cache file", Helpers.LogLevel.Info);
             return item_count;
         }
 
@@ -501,9 +498,10 @@ namespace OpenMetaverse
                 {
                     // Log a warning if there is a UUID mismatch, this will cause problems
                     if (value.UUID != uuid)
-                        Logger.Log("Inventory[uuid]: uuid " + uuid.ToString() + " is not equal to value.UUID " +
-                            value.UUID.ToString(), Helpers.LogLevel.Warning, Client);
-
+                    {
+                        Logger.Log($"Inventory[uuid]: uuid {uuid} is not equal to value.UUID {value.UUID}",
+                            Helpers.LogLevel.Warning, Client);
+                    }
                     UpdateNodeFor(value);
                 }
                 else

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021, Sjofn LLC
+ * Copyright (c) 2019-2022, Sjofn LLC
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -166,7 +166,7 @@ namespace LibreMetaverse
             }
         }
 
-        public async Task RemoveCategory(UUID categoryUuid, Action<bool> callback)
+        public async Task RemoveCategory(UUID categoryUuid, Action<bool, UUID> callback)
         {
             var cap = getInventoryCap();
             if (cap == null)
@@ -204,11 +204,11 @@ namespace LibreMetaverse
             }
             finally
             {
-                callback?.Invoke(success);
+                callback?.Invoke(success, categoryUuid);
             }
         }
 
-        public async Task RemoveItem(UUID itemUuid, Action<bool> callback)
+        public async Task RemoveItem(UUID itemUuid, Action<bool, UUID> callback)
         {
             var cap = getInventoryCap();
             if (cap == null)
@@ -247,7 +247,7 @@ namespace LibreMetaverse
             }
             finally
             {
-                callback?.Invoke(success);
+                callback?.Invoke(success, itemUuid);
             }
         }
 

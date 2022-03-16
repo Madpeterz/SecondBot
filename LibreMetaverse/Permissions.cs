@@ -29,9 +29,6 @@ using OpenMetaverse.StructuredData;
 
 namespace OpenMetaverse
 {
-    /// <summary>
-    /// 
-    /// </summary>
     [Flags]
     public enum PermissionMask : uint
     {
@@ -47,9 +44,6 @@ namespace OpenMetaverse
         All = (1 << 13) | (1 << 14) | (1 << 15) | (1 << 19)
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     [Flags]
     public enum PermissionWho : byte
     {
@@ -67,10 +61,7 @@ namespace OpenMetaverse
         All = 0x1F
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    [Serializable()]
+    [Serializable]
     public struct Permissions
     {
         public PermissionMask BaseMask;

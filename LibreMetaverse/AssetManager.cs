@@ -28,7 +28,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Net;
 using OpenMetaverse.Packets;
 using OpenMetaverse.Assets;
 using OpenMetaverse.Http;
@@ -163,7 +162,7 @@ namespace OpenMetaverse
     {
         public UUID ID;
         public int Size;
-        public byte[] AssetData = Utils.EmptyBytes;
+        public byte[] AssetData;
         public int Transferred;
         public bool Success;
         public AssetType AssetType;

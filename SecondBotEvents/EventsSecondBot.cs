@@ -11,7 +11,7 @@ namespace SecondBotEvents
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to Secondbot [Events build] version: " + AssemblyInfo.GetGitHash());
-            EventsSecondBot worker = new EventsSecondBot();
+            EventsSecondBot worker = new EventsSecondBot(args);
 
             while(worker.exit() == false)
             {
@@ -22,15 +22,56 @@ namespace SecondBotEvents
 
     internal class EventsSecondBot
     {
-        protected http HttpService = null;
-        public EventsSecondBot()
+        public http HttpService = null;
+        public BotClient botClient = null;
+
+        public string getVersion()
+        {
+            return AssemblyInfo.GetGitHash();
+        }
+
+        public bool fromEnv = false;
+        public string fromFolder = "";
+        public EventsSecondBot(string[] args)
+        {
+            if (SecondbotHelpers.notempty(Environment.GetEnvironmentVariable("basic_username")) == true)
+            {
+                fromEnv = true;
+            }
+            restartServices();
+        }
+        public void restartServices()
+        {
+            stopServices();
+            startServices();
+        }
+        protected void startServices()
         {
             HttpService = new http(this);
+            HttpService.start();
+            botClient = new BotClient(this);
+            botClient.start();
+
         }
+        protected void stopServices()
+        {
+            if (HttpService != null)
+            {
+                HttpService.stop();
+            }
+            if(botClient != null)
+            {
+                botClient.stop();
+            }
+            HttpService = null;
+            botClient = null;
+        }
+
         public bool exit()
         {
             return false;
         }
+
     }
 
     public static class AssemblyInfo

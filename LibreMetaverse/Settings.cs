@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
- * Copyright (c) 2021, Sjofn LLC.
+ * Copyright (c) 2021-2022, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -59,6 +59,9 @@ namespace OpenMetaverse
 
         /// <summary>Use XML-RPC Login or LLSD Login, default is XML-RPC Login</summary>
         public bool USE_LLSD_LOGIN = false;
+
+        /// <summary>Client is Multi-Factor Authentication enabled</summary>
+        public bool MFA_ENABLED = false;
 
         /// <summary>
         /// Maximum number of HTTP connections to open to a particular endpoint.
@@ -201,7 +204,7 @@ namespace OpenMetaverse
         /// <summary>Should we connect to multiple sims? This will allow
         /// viewing in to neighboring simulators and sim crossings
         /// (Experimental)</summary>
-        public bool MULTIPLE_SIMS = false;
+        public bool MULTIPLE_SIMS = true;
 
         /// <summary>If true, all object update packets will be decoded in to
         /// native objects. If false, only updates for our own agent will be
@@ -297,7 +300,7 @@ namespace OpenMetaverse
 
         /// <summary>Cost of uploading an asset</summary>
         /// <remarks>Read-only since this value is dynamically fetched at login</remarks>
-        public int UPLOAD_COST => priceUpload;
+        public int UPLOAD_COST { get; private set; } = 0;
 
         /// <summary>Maximum number of times to resend a failed packet</summary>
         public int MAX_RESEND_COUNT = 3;
@@ -339,12 +342,7 @@ namespace OpenMetaverse
         /// You will get no output on the console. This behavior can be overriden by creating
         /// a logger configuration file for log4net
         /// </summary>
-#if DEBUG
         public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.Debug;
-#else
-        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.None;
-#endif
-
 
         /// <summary>Attach avatar names to log messages</summary>
         public bool LOG_NAMES = true;
@@ -359,7 +357,6 @@ namespace OpenMetaverse
         #region Private Fields
 
         private GridClient Client;
-        private int priceUpload = 0;
         public static bool SORT_INVENTORY = false;
 
         /// <summary>Constructor</summary>
@@ -380,7 +377,7 @@ namespace OpenMetaverse
         {
             EconomyDataPacket econ = (EconomyDataPacket)e.Packet;
 
-            priceUpload = econ.Info.PriceUpload;
+            UPLOAD_COST = econ.Info.PriceUpload;
         }
 
         #endregion

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
- * Copyright (c) 2019-2021, Sjofn LLC.
+ * Copyright (c) 2019-2022, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without 
@@ -279,7 +279,7 @@ namespace OpenMetaverse.Http
                         int totalBytesRead = 0;
                         int totalSize = nolength ? 0 : size;
 
-                        while ((bytesRead = responseStream.Read(buffer, offset, size)) != 0)
+                        while (responseStream != null && (bytesRead = responseStream.Read(buffer, offset, size)) != 0)
                         {
                             totalBytesRead += bytesRead;
 

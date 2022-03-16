@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2021, Sjofn LLC
+ * Copyright (c) 2021-2022, Sjofn LLC
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenMetaverse;
 using OpenMetaverse.Http;
 using OpenMetaverse.Packets;
@@ -58,7 +59,7 @@ namespace LibreMetaverse
         /// <summary>
         /// Fetch a list of Abuse Report categories from the simulator
         /// </summary>
-        /// <returns>Returns Dictionary<string, string> of Abuse Report categories from the server</returns>
+        /// <returns>Returns Dictionary of Abuse Report categories from the server</returns>
         public Dictionary<string, string> FetchAbuseReportCategories()
         {
             return FetchAbuseReportCategories(null);
@@ -68,7 +69,7 @@ namespace LibreMetaverse
         /// Fetch a list of Abuse Report categories from the simulator
         /// </summary>
         /// <param name="lang">language to return categories in</param>
-        /// <returns>Returns Dictionary<string, string> of Abuse Report categories from the server</returns>
+        /// <returns>Returns Dictionary of Abuse Report categories from the server</returns>
         public Dictionary<string, string> FetchAbuseReportCategories(string lang)
         {
             Dictionary<string, string> reportCategories = null;
@@ -92,15 +93,12 @@ namespace LibreMetaverse
                             Helpers.LogLevel.Info);
                         return;
                     }
-                    if (result != null && result is OSDMap respMap && respMap.ContainsKey("categories"))
+                    if (result is OSDMap respMap && respMap.ContainsKey("categories"))
                     {
-                        reportCategories = new Dictionary<string, string>();
                         var categories = respMap["categories"] as OSDArray;
-                        foreach (OSDMap row in categories)
-                        {
-                            reportCategories.Add(
-                                row["description_localized"].AsString(), row["category"].AsString());
-                        }
+                        reportCategories = categories.Cast<OSDMap>().ToDictionary(
+                            row => row["description_localized"].AsString(), 
+                            row => row["category"].AsString());
                     }
                 };
                 request.GetRequestAsync(Client.Settings.CAPS_TIMEOUT);
@@ -143,7 +141,7 @@ namespace LibreMetaverse
                 ["abuse-region-id"] = UUID.Zero,
                 ["position"] = pos,
                 ["summary"] = summary,
-                ["version-string"] = $"<3 LibreMetaverse",
+                ["version-string"] = "<3 LibreMetaverse",
                 ["details"] = details
             };
 
@@ -213,7 +211,7 @@ namespace LibreMetaverse
 
                     Summary = Utils.StringToBytes(summary),
                     Details = Utils.StringToBytes(details),
-                    VersionString = Utils.StringToBytes($"<3 LibreMetaverse")
+                    VersionString = Utils.StringToBytes("<3 LibreMetaverse")
                 }
             };
             Client.Network.SendPacket(urp);

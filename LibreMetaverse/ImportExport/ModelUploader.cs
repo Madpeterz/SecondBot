@@ -26,10 +26,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
 using OpenMetaverse.StructuredData;
 using OpenMetaverse.Http;
 
@@ -183,9 +179,8 @@ namespace OpenMetaverse.ImportExport
                     return;
                 }
 
-                if (result is OSDMap)
+                if (result is OSDMap res)
                 {
-                    var res = (OSDMap)result;
                     Uri uploader = new Uri(res["uploader"]);
                     PerformUpload(uploader, (contents =>
                     {

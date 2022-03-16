@@ -25,7 +25,6 @@
  */
 
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using System.Drawing;
@@ -536,7 +535,7 @@ namespace OpenMetaverse.Imaging
         /// </summary>
         /// <param name="dest">Destination image</param>
         /// <param name="src">Source image</param>
-        /// <returns>Sanitization was succefull</returns>
+        /// <returns>Sanitization was successful</returns>
         private bool SanitizeLayers(ManagedImage dest, ManagedImage src)
         {
             if (dest == null || src == null) return false;

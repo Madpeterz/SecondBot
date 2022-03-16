@@ -25,8 +25,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using OpenMetaverse.StructuredData;
 
 namespace OpenMetaverse
@@ -46,6 +44,7 @@ namespace OpenMetaverse
             /// <summary>
             /// Particle source pattern
             /// </summary>
+            [Flags]
             public enum SourcePattern : byte
             {
                 /// <summary>None</summary>

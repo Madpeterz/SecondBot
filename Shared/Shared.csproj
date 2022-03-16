@@ -9,10 +9,4 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\LibreMetaverse.StructuredData\LibreMetaverse.StructuredData.csproj" />
-    <ProjectReference Include="..\LibreMetaverse.Types\LibreMetaverse.Types.csproj" />
-    <ProjectReference Include="..\LibreMetaverse\LibreMetaverse.csproj" />
-  </ItemGroup>
-
 </Project>
