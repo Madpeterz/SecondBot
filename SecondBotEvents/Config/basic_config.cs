@@ -12,7 +12,7 @@ namespace SecondBotEvents.Config
             filename = "basic";
             settings.Add("username");
             settings.Add("password");
-            settings.Add("loginuri");
+            settings.Add("loginURI");
         }
 
         public string getUsername()
@@ -44,7 +44,7 @@ namespace SecondBotEvents.Config
 
         public string getLoginURI()
         {
-            return readSetting("loginuri", "secondlife");
+            return readSetting("loginURI", "secondlife");
         }
     }
 }

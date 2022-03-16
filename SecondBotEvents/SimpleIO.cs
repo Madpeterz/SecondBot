@@ -10,11 +10,13 @@ namespace SecondBotEvents
         protected string root_folder = "";
         public void ChangeRoot(string A)
         {
-
             root_folder = A;
-            if (DirExists(root_folder) == false)
+            if (root_folder != "")
             {
-                System.IO.Directory.CreateDirectory(root_folder);
+                if (DirExists(root_folder) == false)
+                {
+                    System.IO.Directory.CreateDirectory(root_folder);
+                }
             }
         }
         public static bool DirExists(string target_folder)

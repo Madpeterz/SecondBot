@@ -4,9 +4,16 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <StartupObject>SecondBotEvents.Startup</StartupObject>
+	  <MSBuildGitHashCommand>git rev-parse --short HEAD</MSBuildGitHashCommand>
+	  <MSBuildGitHashValidate>False</MSBuildGitHashValidate>
+	  <MSBuildGitHashSuppressDirtyWarning>False</MSBuildGitHashSuppressDirtyWarning>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MSBuildGitHash" Version="2.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 

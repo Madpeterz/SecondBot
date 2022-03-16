@@ -32,11 +32,17 @@ namespace SecondBotEvents
 
         public bool fromEnv = false;
         public string fromFolder = "";
+        protected bool exitNow = false;
         public EventsSecondBot(string[] args)
         {
             if (SecondbotHelpers.notempty(Environment.GetEnvironmentVariable("basic_username")) == true)
             {
                 fromEnv = true;
+            }
+            fromFolder = "defaultBot";
+            if (args.Length == 1)
+            {
+                fromFolder = args[0];
             }
             restartServices();
         }
@@ -50,6 +56,12 @@ namespace SecondBotEvents
             HttpService = new http(this);
             HttpService.start();
             botClient = new BotClient(this);
+            if(botClient.basicCfg.isLoaded() == false)
+            {
+                Console.WriteLine("Config is not loaded :(");
+                exitNow = true;
+                return;
+            }
             botClient.start();
 
         }
@@ -69,7 +81,7 @@ namespace SecondBotEvents
 
         public bool exit()
         {
-            return false;
+            return exitNow;
         }
 
     }

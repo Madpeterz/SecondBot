@@ -40,19 +40,19 @@ namespace SecondBotEvents.Services
             {
                 resetClient();
             }
-            LoginParams loginParams = new LoginParams();
-            loginParams.AgreeToTos = true;
-            loginParams.Version = "Build: " + master.getVersion();
-            loginParams.FirstName = basicCfg.getFirstName();
-            loginParams.LastName = basicCfg.getLastName();
-            loginParams.Password = basicCfg.getPassword();
-            loginParams.Timeout = 4000;
-            loginParams.URI = basicCfg.getLoginURI();
-            if (loginParams.URI == "secondlife")
+            LoginParams loginParams = new LoginParams(
+                client,
+                basicCfg.getFirstName(), 
+                basicCfg.getLastName(), 
+                basicCfg.getPassword(), 
+                "secondbot", 
+                master.getVersion()
+            );
+            if (basicCfg.getLoginURI() != "secondlife")
             {
-                loginParams.URI = Settings.AGNI_LOGIN_SERVER;
+                loginParams.URI = basicCfg.getLoginURI();
             }
-            client.Network.Login(loginParams);
+            client.Network.BeginLogin(loginParams);
         }
     }
 }
