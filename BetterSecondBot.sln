@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30907.101
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Secondbot", "Secondbot", "{4388BA41-F3FC-4A0E-AA00-50E9ED45A027}"
 EndProject
@@ -26,6 +26,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse.StructuredData", "LibreMetaverse.StructuredData\LibreMetaverse.StructuredData.csproj", "{89D7A3E5-0000-0000-0000-000000000000}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreMetaverse.Types", "LibreMetaverse.Types\LibreMetaverse.Types.csproj", "{B37B02AD-0000-0000-0000-000000000000}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecondBotEvents", "SecondBotEvents\SecondBotEvents.csproj", "{571AB1AF-4C74-4C37-AC5B-9B63383AC791}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -148,6 +150,24 @@ Global
 		{B37B02AD-0000-0000-0000-000000000000}.Release|x64.Build.0 = Release|x64
 		{B37B02AD-0000-0000-0000-000000000000}.Release|x86.ActiveCfg = Release|x86
 		{B37B02AD-0000-0000-0000-000000000000}.Release|x86.Build.0 = Release|x86
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.Debug|x64.Build.0 = Debug|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.Debug|x86.Build.0 = Debug|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.DockerBuild|Any CPU.ActiveCfg = Debug|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.DockerBuild|Any CPU.Build.0 = Debug|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.DockerBuild|x64.ActiveCfg = Debug|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.DockerBuild|x64.Build.0 = Debug|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.DockerBuild|x86.ActiveCfg = Debug|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.DockerBuild|x86.Build.0 = Debug|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.Release|Any CPU.Build.0 = Release|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.Release|x64.ActiveCfg = Release|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.Release|x64.Build.0 = Release|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.Release|x86.ActiveCfg = Release|Any CPU
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -159,6 +179,7 @@ Global
 		{27C70F3A-0000-0000-0000-000000000000} = {E9B97D05-D5FB-4CA9-99C3-839248621C21}
 		{89D7A3E5-0000-0000-0000-000000000000} = {E9B97D05-D5FB-4CA9-99C3-839248621C21}
 		{B37B02AD-0000-0000-0000-000000000000} = {E9B97D05-D5FB-4CA9-99C3-839248621C21}
+		{571AB1AF-4C74-4C37-AC5B-9B63383AC791} = {4388BA41-F3FC-4A0E-AA00-50E9ED45A027}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EC43F382-FAF2-49CC-8E23-5DDF87592DFA}
