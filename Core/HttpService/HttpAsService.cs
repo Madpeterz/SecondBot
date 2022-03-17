@@ -201,60 +201,6 @@ namespace BetterSecondBot.HttpService
 
 
 
-    [AttributeUsage(AttributeTargets.Method)]
-    public class About : Attribute
-    {
-        public string about = "";
-        public About(string about)
-        {
-            this.about = about;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public class NeedsToken : Attribute
-    {
-        public bool needsToken = true;
-        public NeedsToken(bool needsToken)
-        {
-            this.needsToken = needsToken;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class ReturnHints : Attribute
-    {
-        public string hint = "";
-        public bool good = true;
-        public ReturnHints(string hint)
-        {
-            this.hint = hint;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class ReturnHintsFailure : ReturnHints
-    {
-        public ReturnHintsFailure(string hint): base(hint)
-        {
-            this.good = false;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class ArgHints : Attribute
-    {
-        public string name = "";
-        public string typename = "";
-        public string about = "";
-
-        public ArgHints(string name,string typename, string about)
-        {
-            this.name = name;
-            this.typename = typename;
-            this.about = about;
-        }
-    }
 
 
 

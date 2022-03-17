@@ -8,40 +8,40 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public abstract class config
+    public abstract class Config
     {
         protected Dictionary<string, string> mysettings = new Dictionary<string, string>();
         protected List<string> settings = new List<string>();
         protected string filename = "config";
         protected bool loaded = false;
-        public config(bool fromENV, string fromFolder="")
+        public Config(bool fromENV, string fromFolder="")
         {
-            makeSettings();
-            loadSettings(fromENV, fromFolder);
+            MakeSettings();
+            LoadSettings(fromENV, fromFolder);
         }
 
-        public bool isLoaded()
+        public bool IsLoaded()
         {
             return loaded;
         }
 
-        protected void loadSettings(bool fromENV, string fromFolder = "")
+        protected void LoadSettings(bool fromENV, string fromFolder = "")
         {
             if(fromENV == true)
             {
-                loadSettingsFromEnv();
+                LoadSettingsFromEnv();
                 return;
             }
-            loadSettingsFromFile(fromFolder);
+            LoadSettingsFromFile(fromFolder);
         }
 
-        protected void makeSettingsFile(string fromFolder)
+        protected void MakeSettingsFile(string fromFolder)
         {
             Dictionary<string, string> saveMe = new Dictionary<string, string>();
             Type thisType = this.GetType();
             foreach (string setting in settings)
             {
-                string reader = "get"+ StringExtensions.FirstCharToUpper(setting);
+                string reader = "Get"+ StringExtensions.FirstCharToUpper(setting);
                 MethodInfo theMethod = thisType.GetMethod(reader);
                 string value = theMethod.Invoke(this, null).ToString();
                 saveMe.Add(setting, value);
@@ -52,14 +52,14 @@ namespace SecondBotEvents.Config
             IO.WriteFile(writeFile, JsonConvert.SerializeObject(saveMe));
 
         }
-        protected void loadSettingsFromFile(string fromFolder)
+        protected void LoadSettingsFromFile(string fromFolder)
         {
             SimpleIO IO = new SimpleIO();
             IO.ChangeRoot(fromFolder);
             string readfile = filename + ".json";
             if (IO.Exists(readfile) == false)
             {
-                makeSettingsFile(fromFolder);
+                MakeSettingsFile(fromFolder);
                 return;
             }
             JObject result = JObject.Parse(IO.ReadFile(readfile));
@@ -80,7 +80,7 @@ namespace SecondBotEvents.Config
             loaded = true;
         }
 
-        protected void loadSettingsFromEnv()
+        protected void LoadSettingsFromEnv()
         {
             foreach (string setting in settings)
             {
@@ -96,18 +96,38 @@ namespace SecondBotEvents.Config
             loaded = true;
         }
 
-        protected virtual void makeSettings()
+        protected virtual void MakeSettings()
         {
 
         }
 
-        protected string readSetting(string key, string defaultValue)
+        protected string ReadSettingAsString(string key, string defaultValue)
         {
             if (mysettings.ContainsKey(key) == false)
             {
                 return defaultValue;
             }
             return mysettings[key];
+        }
+
+        protected bool ReadSettingAsBool(string key,bool defaultValue=false)
+        {
+            bool result = bool.TryParse(ReadSettingAsString(key, defaultValue.ToString()), out bool enabled);
+            if (result == false)
+            {
+                return defaultValue;
+            }
+            return enabled;
+        }
+
+        protected int ReadSettingAsInt(string key, int defaultValue = 30)
+        {
+            bool result = int.TryParse(ReadSettingAsString(key, defaultValue.ToString()), out int value);
+            if (result == false)
+            {
+                return defaultValue;
+            }
+            return value;
         }
     }
 }

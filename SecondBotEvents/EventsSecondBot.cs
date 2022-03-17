@@ -13,21 +13,22 @@ namespace SecondBotEvents
             Console.WriteLine("Welcome to Secondbot [Events build] version: " + AssemblyInfo.GetGitHash());
             EventsSecondBot worker = new EventsSecondBot(args);
 
-            while(worker.exit() == false)
+            while(worker.Exit() == false)
             {
                 Thread.Sleep(1000);
             }
         }
     }
 
-    internal class EventsSecondBot
+    public class EventsSecondBot
     {
-        public http HttpService = null;
-        public BotClient botClient = null;
+        public HttpService HttpService = null;
+        public CommandsService CommandsService = null;
+        public BotClientService botClient = null;
 
 
-        private EventHandler<botClientNotice> botclient_eventNotices;
-        public event EventHandler<botClientNotice> botClientNoticeEvent
+        private EventHandler<BotClientNotice> botclient_eventNotices;
+        public event EventHandler<BotClientNotice> BotClientNoticeEvent
         {
             add { lock (botclient_event_attach) { botclient_eventNotices += value; } }
             remove { lock (botclient_event_attach) { botclient_eventNotices -= value; } }
@@ -35,13 +36,13 @@ namespace SecondBotEvents
 
         private readonly object botclient_event_attach = new object();
 
-        public void triggerBotClientEvent(bool asRestart)
+        public void TriggerBotClientEvent(bool asRestart)
         {
-            EventHandler<botClientNotice> handler = botclient_eventNotices;
-            handler?.Invoke(this, new botClientNotice(asRestart));
+            EventHandler<BotClientNotice> handler = botclient_eventNotices;
+            handler?.Invoke(this, new BotClientNotice(asRestart));
         }
 
-        public string getVersion()
+        public string GetVersion()
         {
             return AssemblyInfo.GetGitHash();
         }
@@ -60,43 +61,45 @@ namespace SecondBotEvents
             {
                 fromFolder = args[0];
             }
-            restartServices();
+            RestartServices();
         }
 
-        public void restartServices()
+        public void RestartServices()
         {
-            stopServices();
-            startServices();
+            StopServices();
+            StartServices();
         }
-        protected void startServices()
+        protected void StartServices()
         {
-            HttpService = new http(this);
-            HttpService.start();
-            botClient = new BotClient(this);
-            if(botClient.basicCfg.isLoaded() == false)
+            botClient = new BotClientService(this);
+            HttpService = new HttpService(this);
+            CommandsService = new CommandsService(this);
+            if (botClient.IsLoaded() == false)
             {
                 Console.WriteLine("Config is not loaded :(");
                 exitNow = true;
                 return;
             }
-            botClient.start();
+            HttpService.Start();
+            CommandsService.Start();
+            botClient.Start();
 
         }
-        protected void stopServices()
+        protected void StopServices()
         {
             if (HttpService != null)
             {
-                HttpService.stop();
+                HttpService.Stop();
             }
             if(botClient != null)
             {
-                botClient.stop();
+                botClient.Stop();
             }
             HttpService = null;
             botClient = null;
         }
 
-        public bool exit()
+        public bool Exit()
         {
             return exitNow;
         }
@@ -115,10 +118,10 @@ namespace SecondBotEvents
         }
     }
 
-    public class botClientNotice
+    public class BotClientNotice
     {
         public bool isRestart = false;
-        public botClientNotice(bool asRestart=false)
+        public BotClientNotice(bool asRestart=false)
         {
             isRestart = asRestart;
         }
