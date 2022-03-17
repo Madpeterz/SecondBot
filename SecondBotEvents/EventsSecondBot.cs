@@ -25,6 +25,22 @@ namespace SecondBotEvents
         public http HttpService = null;
         public BotClient botClient = null;
 
+
+        private EventHandler<botClientNotice> botclient_eventNotices;
+        public event EventHandler<botClientNotice> botClientNoticeEvent
+        {
+            add { lock (botclient_event_attach) { botclient_eventNotices += value; } }
+            remove { lock (botclient_event_attach) { botclient_eventNotices -= value; } }
+        }
+
+        private readonly object botclient_event_attach = new object();
+
+        public void triggerBotClientEvent(bool asRestart)
+        {
+            EventHandler<botClientNotice> handler = botclient_eventNotices;
+            handler?.Invoke(this, new botClientNotice(asRestart));
+        }
+
         public string getVersion()
         {
             return AssemblyInfo.GetGitHash();
@@ -46,6 +62,7 @@ namespace SecondBotEvents
             }
             restartServices();
         }
+
         public void restartServices()
         {
             stopServices();
@@ -95,6 +112,15 @@ namespace SecondBotEvents
             var asm = typeof(AssemblyInfo).Assembly;
             var attrs = asm.GetCustomAttributes<AssemblyMetadataAttribute>();
             return attrs.FirstOrDefault(a => a.Key == "GitHash")?.Value;
+        }
+    }
+
+    public class botClientNotice
+    {
+        public bool isRestart = false;
+        public botClientNotice(bool asRestart=false)
+        {
+            isRestart = asRestart;
         }
     }
 }

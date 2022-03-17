@@ -342,16 +342,16 @@ namespace OpenMetaverse
         /// You will get no output on the console. This behavior can be overriden by creating
         /// a logger configuration file for log4net
         /// </summary>
-        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.Debug;
+        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.None;
 
         /// <summary>Attach avatar names to log messages</summary>
-        public bool LOG_NAMES = true;
+        public bool LOG_NAMES = false;
 
         /// <summary>Log packet retransmission info</summary>
-        public bool LOG_RESENDS = true;
+        public bool LOG_RESENDS = false;
 
         /// <summary>Log disk cache misses and other info</summary>
-        public bool LOG_DISKCACHE = true;
+        public bool LOG_DISKCACHE = false;
         
         #endregion
         #region Private Fields

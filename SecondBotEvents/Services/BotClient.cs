@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SecondBotEvents.Services
 {
-    internal class BotClient: service
+    internal class BotClient : service
     {
         public GridClient client = null;
         public basic_config basicCfg = null;
@@ -25,27 +25,57 @@ namespace SecondBotEvents.Services
             resetClient();
         }
 
-        public void resetClient()
+        protected void botLoggedOut(object o, LoggedOutEventArgs e)
         {
+            Console.WriteLine("Client service ~ Logged out");
+        }
+
+        protected void botLoggedIn(object o, SimConnectedEventArgs e)
+        {
+            Console.WriteLine("Client service ~ Connected to sim: "+e.Simulator.Name);
+        }
+
+        protected void botLoseSim(object o, SimDisconnectedEventArgs e)
+        {
+            Console.WriteLine("Client service ~ Disconnected from sim: " + e.Simulator.Name);
+        }
+
+        protected void botDisconnected(object o, DisconnectedEventArgs e)
+        {
+            Console.WriteLine("Client service ~ Network lost: " + e.Message);
+        }
+
+        protected void botLoginStatus(object o, LoginProgressEventArgs e)
+        {
+            Console.WriteLine("Client service ~ Login status: " + e.Status.ToString());
+        }
+
+        protected void resetClient()
+        {
+            bool isRestart = false;
             if (client != null)
             {
                 client.Network.Logout();
+                isRestart = true;
             }
             client = null;
             client = new GridClient();
+            master.triggerBotClientEvent(isRestart);
+            client.Network.SimConnected += botLoggedIn;
+            client.Network.LoggedOut += botLoggedOut;
+            client.Network.Disconnected += botDisconnected;
+            client.Network.SimDisconnected += botLoseSim;
+            client.Network.LoginProgress += botLoginStatus;
         }
         public void login()
         {
-            if (client == null)
-            {
-                resetClient();
-            }
+            resetClient();
             LoginParams loginParams = new LoginParams(
                 client,
-                basicCfg.getFirstName(), 
-                basicCfg.getLastName(), 
-                basicCfg.getPassword(), 
-                "secondbot", 
+                basicCfg.getFirstName(),
+                basicCfg.getLastName(),
+                basicCfg.getPassword(),
+                "secondbot",
                 master.getVersion()
             );
             if (basicCfg.getLoginURI() != "secondlife")
@@ -54,5 +84,7 @@ namespace SecondBotEvents.Services
             }
             client.Network.BeginLogin(loginParams);
         }
+
+
     }
 }
