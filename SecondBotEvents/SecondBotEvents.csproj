@@ -10,6 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Discord.Net" Version="3.4.1" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="3.4.1" />
     <PackageReference Include="EmbedIO" Version="3.4.3" />
     <PackageReference Include="MSBuildGitHash" Version="2.0.2">
       <PrivateAssets>all</PrivateAssets>

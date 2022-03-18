@@ -1,11 +1,14 @@
-﻿using EmbedIO;
+﻿using BetterSecondBot.Static;
+using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using SecondBotEvents.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace SecondBotEvents.Commands
 {
@@ -271,6 +274,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHints("Unable to find notecard folder")]
         [Route(HttpVerbs.Get, "/InventoryPurgeNotecards/{token}")]
+        [Obsolete]
         public object InventoryPurgeNotecards(string token)
         {
             if (AllowToken(token) == false)

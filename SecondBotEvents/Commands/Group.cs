@@ -632,6 +632,9 @@ namespace SecondBotEvents.Commands
 
         protected KeyValuePair<bool, string> waitForReady(bool avatar, bool group, UUID groupuuid)
         {
+            /* this function is poorly named
+             * and is ugly :(
+             */ 
             bool exit = false;
             int sleeps = 0;
             string failed_on = "";
@@ -650,7 +653,8 @@ namespace SecondBotEvents.Commands
                 }
                 if ((group == true) && (allok == true))
                 {
-                    allok = !bot.NeedReloadGroupData(groupuuid);
+                    // @todo wait for group loading
+                    allok = true; 
                     failed_on = "Updating";
                 }
                 if (allok == false)

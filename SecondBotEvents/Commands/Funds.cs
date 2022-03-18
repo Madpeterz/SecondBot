@@ -21,7 +21,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            if (bot.GetAllowFunds == false)
+            if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
             {
                 return Failure("Funds commands are disabled", "Balance");
             }
@@ -44,7 +44,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            if (bot.GetAllowFunds == false)
+            if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
             {
                 return Failure("Transfer funds to avatars disabled", "PayAvatar", new [] { avatar, amount });
             }
@@ -82,7 +82,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            if (bot.GetAllowFunds == false)
+            if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
             {
                 return Failure("Funds commands are disabled", "PayObject", new [] { objectuuid, primname, amount });
             }

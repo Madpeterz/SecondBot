@@ -1,9 +1,10 @@
 ﻿using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
+using Newtonsoft.Json;
 using OpenMetaverse;
 using SecondBotEvents.Services;
-
+using System.Collections.Generic;
 
 namespace SecondBotEvents.Commands
 {
@@ -21,7 +22,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()), "LocalChatHistory");
+            return Failure("@todo add local chat history");
         }
 
         [About("sends a message to localchat")]
@@ -52,9 +53,9 @@ namespace SecondBotEvents.Commands
             getClient().Self.Chat(message, channelnum, ChatType.Normal);
             if (channelnum == 0)
             {
-                bot.AddToLocalChat(getClient().Self.Name, message);
+                // @todo add message to localchat
             }
-            return BasicReply(JsonConvert.SerializeObject(bot.getLocalChatHistory()), "Say", new [] { channel, message });
+            return Failure("@todo get localchat history");
             
         }
 
@@ -80,7 +81,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Message empty", "IM", new [] { avatar, message });
             }
-            bot.SendIM(avataruuid, message);
+            master.botClient.SendIM(avataruuid, message);
             return BasicReply("ok", "IM", new [] { avatar, message });
         }
 

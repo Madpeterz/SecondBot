@@ -86,7 +86,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            return BasicReply(bot.MyVersion, "Version");
+            return BasicReply(master.GetVersion(), "Version");
 
         }
 

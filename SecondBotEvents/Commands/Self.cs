@@ -260,10 +260,10 @@ namespace SecondBotEvents.Commands
             }
             if (stateflag == true)
             {
-                bot.Add_action_from(flag, avataruuid, bot.FindAvatarKey2Name(avataruuid), stickyflag);
+                // @todo add stick/normal accept dynamic actions
                 return BasicReply("Added perm: " + flag + " Sticky: " + stickyflag.ToString(), "SetPermFlag", new [] { avatar, flag, state, sticky });
             }
-            bot.Remove_action_from(flag, avataruuid, stickyflag);
+            // @todo remove stick/normal accept dynamic actions
             return BasicReply("Removed perm: " + flag + " Sticky: " + stickyflag.ToString(), "SetPermFlag", new [] { avatar, flag, state, sticky });
         }
 

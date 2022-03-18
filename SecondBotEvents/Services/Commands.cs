@@ -108,7 +108,12 @@ namespace SecondBotEvents.Services
                 case InstantMessageDialog.MessageFromAgent: // shared with SessionSend
                 case InstantMessageDialog.SessionSend:
                     {
-                        if(myConfig.GetOnlySelectedAvs() == false)
+                        if(e.IM.GroupIM == false)
+                        {
+                            acceptMessage = false;
+                            break;
+                        }
+                        if (myConfig.GetOnlySelectedAvs() == false)
                         {
                             acceptMessage = false;
                             break;

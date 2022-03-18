@@ -129,5 +129,15 @@ namespace SecondBotEvents.Config
             }
             return value;
         }
+
+        protected ulong ReadSettingAsUlong(string key, ulong defaultValue = 0)
+        {
+            bool result = ulong.TryParse(ReadSettingAsString(key, defaultValue.ToString()), out ulong value);
+            if (result == false)
+            {
+                return defaultValue;
+            }
+            return value;
+        }
     }
 }

@@ -1,9 +1,13 @@
 ﻿using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
+using Newtonsoft.Json;
 using OpenMetaverse;
 using SecondBotEvents.Services;
+using System;
 using System.Collections.Generic;
+using System.Threading;
+using static OpenMetaverse.ParcelManager;
 
 namespace SecondBotEvents.Commands
 {
@@ -607,7 +611,8 @@ namespace SecondBotEvents.Commands
             }
             foreach (ParcelAccessEntry e in targetparcel.AccessBlackList)
             {
-                string name = bot.FindAvatarKey2Name(e.AgentID);
+                // @todo add avatar key to name
+                string name = "?";
                 reply.entrys.Add(e.AgentID, name);
             }
             reply.reportedEntrys = targetparcel.AccessBlackList.Count;

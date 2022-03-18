@@ -55,6 +55,11 @@ namespace SecondBotEvents.Services
         {
             Console.WriteLine("Client service ~ Login status: " + e.Status.ToString());
         }
+        public void SendIM(UUID avatar, string message)
+        {
+            // @todo add message to IM chat
+            client.Self.InstantMessage(avatar, message);
+        }
 
         protected void ResetClient()
         {

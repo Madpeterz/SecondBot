@@ -1,9 +1,10 @@
 ﻿using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
+using Newtonsoft.Json;
 using OpenMetaverse;
 using SecondBotEvents.Services;
-
+using System.Collections.Generic;
 
 namespace SecondBotEvents.Commands
 {
@@ -138,7 +139,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            return BasicReply(JsonConvert.SerializeObject(bot._lastUpdatedSimBlacklist), "banlist");
+            return Failure("@todo estate blacklist");
         }
 
         [About("Attempts to add/remove the avatar to/from the Estate banlist")]
