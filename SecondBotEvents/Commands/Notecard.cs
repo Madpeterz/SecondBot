@@ -34,8 +34,8 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Content value is empty", "NotecardAdd", new [] { collection, content });
             }
-            bot.NotecardAddContent(collection, content);
-            return BasicReply("ok", "NotecardAdd", new [] { collection, content });
+            return Failure("@todo notecard temp stroage");
+            //return BasicReply("ok", "NotecardAdd", new [] { collection, content });
         }
 
         [About("Clears the contents of a collection")]
@@ -53,8 +53,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Collection value is empty", "NotecardClear", new [] { collection });
             }
-            bot.ClearNotecardStorage(collection);
-            return BasicReply("ok", "NotecardClear", new [] { collection });
+            return Failure("@todo notecard storage");
         }
 
         [About("Sends a notecard to a avatar using the text in the prebuilt collection [see NotecardAdd] and also clears the collection just before sending [see NotecardClear]")]
@@ -86,13 +85,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar uuid", "NotecardSend", new [] { avatar, collection, notecardname });
             }
-            string content = bot.GetNotecardContent(collection);
-            if (content == null)
-            {
-                return Failure("No content in notecard storage " + collection, "NotecardSend", new [] { avatar, collection, notecardname });
-            }
-            bot.ClearNotecardStorage(collection);
-            return BasicReply(bot.SendNotecard(notecardname, content, avataruuid).ToString(), "NotecardSend", new [] { avatar, collection, notecardname });
+            return Failure("@todo notecard storage");
         }
 
         [About("Creates and sends a notecard in one command good if you are using HTTP otherwise see [NotecardSend]")]
@@ -123,7 +116,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar uuid", "NotecardDirectSend", new[] { avatar, content, notecardname });
             }
-            return BasicReply(bot.SendNotecard(notecardname, content, avataruuid).ToString(), "NotecardDirectSend", new[] { avatar, content, notecardname });
+            return Failure("@todo notecard sending");
         }
     }
 }

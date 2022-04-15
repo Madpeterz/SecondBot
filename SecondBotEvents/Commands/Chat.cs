@@ -94,7 +94,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            return BasicReply(JsonConvert.SerializeObject(bot.GetIMChatWindowKeyNames()), "chatwindows");
+            return Failure("@todo chat windows list");
         }
 
         [About("gets a list of chat windows with unread messages")]
@@ -107,14 +107,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Token not accepted");
             }
             List<UUID> unreadimwindows = new List<UUID>();
-            foreach (UUID window in bot.IMChatWindows())
-            {
-                if (bot.ImChatWindowHasUnread(window) == true)
-                {
-                    unreadimwindows.Add(window);
-                }
-            }
-            return BasicReply(JsonConvert.SerializeObject(unreadimwindows), "listwithunread");
+            return Failure("@todo chat windows list unread");
         }
 
         [About("gets if there are any unread im messages at all")]
@@ -126,16 +119,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            bool reply = false;
-            foreach (UUID window in bot.IMChatWindows())
-            {
-                if (bot.ImChatWindowHasUnread(window) == true)
-                {
-                    reply = true;
-                    break;
-                }
-            }
-            return BasicReply(reply.ToString(), "haveunreadims");
+            return Failure("@todo have any unread ims");
         }
 
         [About("gets the chat from the selected window")]
@@ -153,7 +137,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Window UUID invaild", "getimchat", new[] { window });
             }
-            return BasicReply(JsonConvert.SerializeObject(bot.GetIMChatWindow(windowUUID)), "getimchat", new[] { window });
+            return Failure("@todo chat window fetch");
         }
 
     }

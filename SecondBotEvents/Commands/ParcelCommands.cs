@@ -362,7 +362,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value, "SetParcelMusic", new [] { musicurl });
             }
-            bool status = parcel_static.set_parcel_music(bot, targetparcel, musicurl);
+            bool status = parcel_static.set_parcel_music(getClient(), targetparcel, musicurl);
             return BasicReply(status.ToString(), "SetParcelMusic", new [] { musicurl });
         }
 
@@ -417,7 +417,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("No accepted flags", "SetParcelFlag", new [] { escapedflagdata });
             }
-            if (parcel_static.has_parcel_perm(targetparcel, bot) == false)
+            if (parcel_static.has_parcel_perm(targetparcel, getClient()) == false)
             {
                 return Failure("Incorrect perms to control parcel", "SetParcelFlag", new [] { escapedflagdata });
             }
@@ -482,7 +482,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild group uuid", "ParcelDeedToGroup", new [] { group });
             }
-            if (bot.MyGroups.ContainsKey(groupuuid) == false)
+            if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
             {
                 return Failure("Not in group", "ParcelDeedToGroup", new [] { group });
             }
@@ -597,10 +597,7 @@ namespace SecondBotEvents.Commands
                 {
                     if (e.AgentID != UUID.Zero)
                     {
-                        if (bot.FindAvatarKey2Name(e.AgentID) == "lookup")
-                        {
-                            haslookup = true;
-                        }
+                        break;
                     }
                 }
                 if(haslookup == true)

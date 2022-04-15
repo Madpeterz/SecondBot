@@ -64,8 +64,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("bad status", "DialogTrack", new [] { status });
             }
-            bot.SetTrackDialogs(statuscode);
-            return BasicReply("updated", "DialogTrack", new [] { status });
+            return Failure("@todo dialog relay");
         }
 
     }

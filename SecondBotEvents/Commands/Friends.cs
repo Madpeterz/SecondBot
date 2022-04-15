@@ -2,6 +2,7 @@
 using EmbedIO.Routing;
 using OpenMetaverse;
 using SecondBotEvents.Services;
+using Newtonsoft.Json;
 
 
 namespace SecondBotEvents.Commands
@@ -11,7 +12,7 @@ namespace SecondBotEvents.Commands
         public Friends(EventsSecondBot setmaster) : base(setmaster)
         {
         }
-        [About("Gets the friendslist <br/>Formated as follows<br/>friendreplyobject<br/><ul><li>name: String</li><li>id: String</li><li>online: bool</li></ul>")]
+        [About("Gets the friendslist")]
         [ReturnHints("array UUID = friendreplyobject")]
         [Route(HttpVerbs.Get, "/Friendslist/{token}")]
         public object Friendslist(string token)
@@ -20,7 +21,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            return BasicReply(bot.getJsonFriendlist(), "Friendslist");
+            return BasicReply(JsonConvert.SerializeObject(getClient().Friends.FriendList));
         }
 
         [About("Updates the friend perms for avatar avatar to State \n if true grants (Online/Map/Modify) perms")]

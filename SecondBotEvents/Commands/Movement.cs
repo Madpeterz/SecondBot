@@ -105,7 +105,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar UUID", "RequestTeleport", new [] { avatar });
             }
-            bot.Add_action_from("teleport", avataruuid, bot.FindAvatarKey2Name(avataruuid));
+            // @todo action from event log with accept
             getClient().Self.SendTeleportLureRequest(avataruuid, "I would like to teleport to you");
             return BasicReply("ok", "RequestTeleport", new [] { avatar });
         }
@@ -248,7 +248,6 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Error Unable to Teleport to location", "Teleport", new [] { region, x, y, z });
             }
-            bot.SetTeleported();
             return BasicReply("Accepted", "Teleport", new [] { region, x, y, z });
         }
 
@@ -268,7 +267,6 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("slurl is empty", "TeleportSLURL", new [] { slurl });
             }
-            bot.SetTeleported();
             return BasicReply(TeleportRequest(new [] { slurl }).ToString(), "TeleportSLURL", new [] { slurl });
         }
 
@@ -277,11 +275,7 @@ namespace SecondBotEvents.Commands
             getClient().Self.AutoPilotCancel();
             if (args[0].Contains("http://maps.secondlife.com/secondlife/") == true)
             {
-                if (bot.TeleportWithSLurl(args[0]) == "ok")
-                {
-                    return true;
-                }
-                return false;
+                return false; // @todo SL url teleport
             }
             else
             {
@@ -298,9 +292,7 @@ namespace SecondBotEvents.Commands
                     float.TryParse(argvalues[1], out float posX);
                     float.TryParse(argvalues[2], out float posY);
                     float.TryParse(argvalues[3], out float posZ);
-                    bot.SetTeleported();
                     bool status = getClient().Self.Teleport(regionName, new Vector3(posX, posY, posZ));
-                    bot.ResetAnimations();
                     return true;
                 }
                 else

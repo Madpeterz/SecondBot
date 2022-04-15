@@ -23,8 +23,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            bot.GotoNextHomeRegion();
-            return BasicReply("ok", "GoHome");
+            return Failure("@todo home system");
         }
 
         [About("Makes the bot turn to face avatar and point at them (if found)")]
@@ -42,7 +41,6 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Cant find UUID in sim", "PointAt", new [] { avatar });
             }
-            bot.ResetAnimations();
             getClient().Self.Stand();
             getClient().Self.Movement.TurnToward(getClient().Network.CurrentSim.AvatarPositions[avataruuid]);
             getClient().Self.Movement.SendUpdate();
@@ -63,11 +61,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            if (bot.HaveLocalKeyStorage(Key) == true)
-            {
-                return BasicReply(bot.ReadLocalKeyStorage(Key), "ReadKeyValue");
-            }
-            return Failure("Unknown Key: "+Key, "ReadKeyValue");
+            return Failure("@todo key value storage");
         }
 
         [About("sets a value for KeyValue storage (temp unless SQL is enabled)")]
@@ -91,8 +85,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Value is empty", "SetKeyValue", new[] { Key, Value });
             }
-            bot.setLocalKeyStorage(Key, Value);
-            return BasicReply("ok", "SetKeyValue");
+            return Failure("@todo key value storage");
         }
 
         [About("Reads a value from the KeyValue storage (temp unless SQL is enabled)")]
@@ -110,8 +103,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Key is empty", "SetKeyValue", new[] { Key });
             }
-            bot.clearLocalKeyStorage(Key);
-            return BasicReply("ok", "SetKeyValue");
+            return Failure("@todo key value storage");
         }
 
         [About("Makes the bot sit on the ground or on a object if it can see it")]
@@ -148,7 +140,6 @@ namespace SecondBotEvents.Commands
                 return Failure("Token not accepted");
             }
             getClient().Self.Stand();
-            bot.ResetAnimations();
             return BasicReply("ok", "Stand");
         }
 
@@ -195,11 +186,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            if (bot.KillMe == false)
-            {
-                getClient().Self.Chat("Laters im out", 0, ChatType.Normal);
-                bot.KillMePlease();
-            }
+            getClient().Network.BeginLogout();
             return BasicReply("ok", "Logoff");
         }
 
@@ -213,7 +200,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Token not accepted");
             }
             SuccessNoReturn("GetLastCommands");
-            return bot.GetLastCommands(5);
+            return Failure("@todo command storage");
         }
 
         [About("Sets the bot to accept a request type from the avatar (or a object owned by the avatar)\n " +

@@ -62,7 +62,7 @@ namespace SecondBotEvents
             {
                 fromFolder = args[0];
             }
-            RestartServices();
+            StartServices();
         }
 
         public void RestartServices()

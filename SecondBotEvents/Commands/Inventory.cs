@@ -31,7 +31,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            return BasicReply(bot.addInventoryUpdateEvent(inventoryType, outputTarget), "SetInventoryUpdate");
+            return Failure("@todo inventory update events");
         }
 
         [About("Uploads a new sound file to inventory")]
@@ -114,7 +114,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Item name is to short", "RenameInventory", new [] { item, newname });
             }
-            InventoryItem realitem = HelperInventory.getItemByInventoryUUID(bot, target);
+            InventoryItem realitem = HelperInventory.getItemByInventoryUUID(getClient(), target);
             if (realitem == null)
             {
                 return Failure("Unable to find inventory item", "RenameInventory", new [] { item, newname });
@@ -177,7 +177,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("invaild item uuid", "Attach", new [] { item });
             }
-            InventoryItem realitem = HelperInventory.getItemByInventoryUUID(bot, itemuuid);
+            InventoryItem realitem = HelperInventory.getItemByInventoryUUID(getClient(), itemuuid);
             getClient().Appearance.AddAttachments(new List<InventoryItem>() { realitem }, false, false);
             return BasicReply("Ok", "Attach", new [] { item });
         }
@@ -197,7 +197,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("invaild item uuid", "Detach", new [] { item });
             }
-            InventoryItem realitem = HelperInventory.getItemByInventoryUUID(bot, itemuuid);
+            InventoryItem realitem = HelperInventory.getItemByInventoryUUID(getClient(), itemuuid);
             getClient().Appearance.RemoveFromOutfit(realitem);
             return BasicReply("Ok", "Detach", new [] { item });
         }
@@ -331,7 +331,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild item uuid", "getRealUUID", new [] { item });
             }
-            UUID reply = HelperInventory.GetAssetUUID(bot, itemUUID);
+            UUID reply = HelperInventory.GetAssetUUID(getClient(), itemUUID);
             return BasicReply(reply.ToString(), "getRealUUID", new [] { item });
         }
 
@@ -392,7 +392,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild folder uuid", "SendFolder", new [] { folder, avatar });
             }
-            InventoryBase FindFolderHelper = HelperInventory.FindFolder(bot, getClient().Inventory.Store.RootFolder, targetfolder);
+            InventoryBase FindFolderHelper = HelperInventory.FindFolder(getClient(), getClient().Inventory.Store.RootFolder, targetfolder);
             if (FindFolderHelper == null)
             {
                 return Failure("Unable to find folder", "SendFolder", new [] { folder, avatar });
@@ -478,7 +478,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            string reply = HelperInventory.MapFolderJson(bot);
+            string reply = HelperInventory.MapFolderJson(getClient());
             if (reply != null) return BasicReply(reply, "InventoryFolders");
             return Failure("Error", "InventoryFolders");
         }
@@ -494,7 +494,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            string reply = HelperInventory.MapFolderJson(bot, targetfolder,false);
+            string reply = HelperInventory.MapFolderJson(getClient(), targetfolder,false);
             if (reply != null) return BasicReply(reply, "InventoryFoldersLimited");
             return Failure("Error", "InventoryFoldersLimited");
         }
@@ -514,7 +514,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild folder UUID", "InventoryContents", new [] { folderUUID });
             }
-            return BasicReply(HelperInventory.MapFolderInventoryJson(bot, folder), "InventoryContents", new [] { folderUUID });
+            return BasicReply(HelperInventory.MapFolderInventoryJson(getClient(), folder), "InventoryContents", new [] { folderUUID });
         }
     }
 }

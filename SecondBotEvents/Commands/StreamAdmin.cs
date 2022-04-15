@@ -68,14 +68,7 @@ namespace SecondBotEvents.Commands
                 {
                     return Failure("Notecard title is to short", "FetchNextNotecard", new [] { endpoint, endpointcode });
                 }
-                return BasicReply
-                (
-                    bot.SendNotecard(server_reply.NotecardTitle, 
-                    server_reply.NotecardContent, 
-                    (UUID)server_reply.AvatarUUID).ToString(), 
-                    "FetchNextNotecard", 
-                    new [] { endpoint, endpointcode }
-                );
+                return Failure("@todo notecard sending");
             }
             catch (Exception e)
             {
