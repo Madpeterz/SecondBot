@@ -344,56 +344,7 @@ namespace BetterSecondBot.bottypes
 
         protected KeyValuePair<bool,string> callAPIcommand(string command, string[] args)
         {
-            command = commandnameLowerToReal[command.ToLowerInvariant()];
-            try
-            {
-                string ott = Tokens.OneTimeToken();
-                WebApiControllerWithTokens Endpoint = commandEndpoints[endpointcommandmap[command]];
-                MethodInfo theMethod = Endpoint.GetType().GetMethod(command);
-                if (theMethod != null)
-                {
-                    List<string> argsList = args.ToList();
-                    argsList.Add(ott);
-                    string reply = "Inconnect number of args expected: " + theMethod.GetParameters().Count().ToString() + " but got: " + argsList.Count.ToString();
-                    bool status = false;
-                    if (argsList.Count == theMethod.GetParameters().Count())
-                    {
-                        status = true;
-                        try
-                        {
-                            if (Endpoint == null)
-                            {
-                                return new KeyValuePair<bool, string>(false, "Endpoint is null");
-                            }
-                            if (argsList.Count == 0)
-                            {
-                                return new KeyValuePair<bool, string>(false, "Zero args at final check require at min 1");
-                            }
-                            object[] argsWorker = argsList.ToArray<object>();
-                            object processed = theMethod.Invoke(Endpoint, argsWorker);
-                            reply = "Error";
-                            if(processed != null)
-                            {
-                                reply = JsonConvert.SerializeObject(processed);
-                            }
-                            return new KeyValuePair<bool, string>(status, reply);
-                        }
-                        catch (Exception e)
-                        {
-                            return new KeyValuePair<bool, string>(false, e.Message);
-                        }
-                    }
-                    return new KeyValuePair<bool, string>(status, reply);
-                }
-                else
-                {
-                    return new KeyValuePair<bool, string>(false, "theMethod is null");
-                }
-            }
-            catch (Exception e)
-            {
-                return new KeyValuePair<bool, string>(false, e.Message);
-            }
+
         }
 
         protected void CoreCommandLib(UUID sender, bool Master, string command, string[] args, string signingcode, string targetreply)
