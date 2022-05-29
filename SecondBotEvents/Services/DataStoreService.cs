@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace SecondBotEvents.Services
 {
@@ -27,19 +28,66 @@ namespace SecondBotEvents.Services
         }
 
         protected Dictionary<string, UUID> avatarsName2Key = new Dictionary<string, UUID>();
-        protected Dictionary<UUID, string> avatarsKey2Name = new Dictionary<UUID, string>();
 
         protected Dictionary<UUID, string> groupsKey2Name = new Dictionary<UUID, string>();
-        protected Dictionary<string, UUID> groupsName2Key =  new Dictionary<string, UUID>();
+
+        protected Dictionary<UUID, List<UUID>> groupMembers = new Dictionary<UUID, List<UUID>>();
+        protected Dictionary<UUID, Dictionary<UUID, GroupRole>> groupRoles = new Dictionary<UUID, Dictionary<UUID, GroupRole>>();
 
         protected List<string> localChatHistory = new List<string>();
-
 
         protected Dictionary<UUID, List<string>> chatWindows = new Dictionary<UUID, List<string>>(); // sess, list chat
         protected Dictionary<UUID, bool> chatWindowsUnread = new Dictionary<UUID, bool>(); // sess, bool
         protected Dictionary<UUID, bool> chatWindowsIsGroup = new Dictionary<UUID, bool>(); // sess, bool
         protected Dictionary<UUID, UUID> chatWindowsOwner = new Dictionary<UUID, UUID>(); // sess, owner id
 
+        public Dictionary<UUID, string> GetGroups()
+        {
+            return groupsKey2Name;
+        }
+        public bool IsGroupMember(UUID Group, UUID avatar)
+        {
+            if(groupMembers.ContainsKey(Group) == false)
+            {
+                groupMembers.Add(Group, new List<UUID>());
+            }
+            if(groupMembers[Group].Contains(avatar) == false)
+            {
+                bool found = false;
+                AutoResetEvent fetchEvent = new AutoResetEvent(false);
+                EventHandler<GroupMembersReplyEventArgs> callback =
+                    delegate (object sender, GroupMembersReplyEventArgs e)
+                    {
+                        if (e.GroupID == Group)
+                        {
+                            foreach (KeyValuePair<UUID, GroupMember> a in e.Members)
+                            {
+                                if (a.Value.ID == avatar)
+                                {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                    };
+                getClient().Groups.GroupMembersReply += callback;
+                getClient().Groups.RequestGroupMembers(Group);
+
+                fetchEvent.WaitOne(1000, false);
+                getClient().Groups.GroupMembersReply -= callback;
+                return found;
+            }
+            return true;
+        }
+
+        public List<UUID> GetGroupMembers(UUID Group)
+        {
+            if (groupMembers.ContainsKey(Group) == false)
+            {
+                groupMembers.Add(Group, new List<UUID>());
+            }
+            return groupMembers[Group];
+        }
 
         protected void recordChat(UUID sessionID, string fromname, string message)
         {
@@ -61,6 +109,33 @@ namespace SecondBotEvents.Services
                 counter--;
             }
         }
+
+        protected void closeChat(UUID owner)
+        {
+            UUID sessionID = UUID.Zero;
+            if(chatWindowsOwner.ContainsValue(owner) == false)
+            {
+                return;
+            }
+            foreach(KeyValuePair<UUID,UUID> ownermap in chatWindowsOwner)
+            {
+                if(ownermap.Value != owner)
+                {
+                    continue;
+                }
+                sessionID = ownermap.Key;
+            }
+            if(sessionID == UUID.Zero)
+            {
+                return;
+            }
+            chatWindowsOwner.Remove(sessionID);
+            chatWindowsIsGroup.Remove(sessionID);
+            chatWindowsUnread.Remove(sessionID);
+            chatWindows.Remove(sessionID);
+
+        }
+
         protected void openChatWindow(bool group, UUID sessionID, UUID ownerID)
         {
             if (chatWindows.ContainsKey(sessionID) == true)
@@ -109,7 +184,7 @@ namespace SecondBotEvents.Services
             {
                 return groupsKey2Name.ContainsKey(groupId);
             }
-            return groupsName2Key.ContainsKey(name);
+            return groupsKey2Name.ContainsValue(name);
         }
 
         public List<string> getGroupChat(UUID groupId)
@@ -139,13 +214,14 @@ namespace SecondBotEvents.Services
          *  if not the bot will attempt to
          *  lookup the avatar
          */
+
         public bool knownAvatar(string name, UUID avatarId)
         {
-            int currentHash = master.botClient.client.Network.CurrentSim.ObjectsAvatars.GetHashCode();
+            int currentHash = getClient().Network.CurrentSim.ObjectsAvatars.GetHashCode();
             if (currentHash != ObjectsAvatarsHash)
             {
                 ObjectsAvatarsHash = currentHash;
-                List<Avatar> avs = master.botClient.client.Network.CurrentSim.ObjectsAvatars.Copy().Values.ToList();
+                List<Avatar> avs = getClient().Network.CurrentSim.ObjectsAvatars.Copy().Values.ToList();
                 foreach (Avatar A in avs)
                 {
                     addAvatar(A.ID, A.Name);
@@ -153,10 +229,28 @@ namespace SecondBotEvents.Services
             }
             if (avatarId != UUID.Zero)
             {
-                if(avatarsKey2Name.ContainsKey(avatarId) == false)
+                if(avatarsName2Key.ContainsValue(avatarId) == false)
                 {
-                    master.botClient.client.Avatars.RequestAvatarName(avatarId);
-                    return false;
+                    bool hasReply = false;
+                    AutoResetEvent fetchEvent = new AutoResetEvent(false);
+                    EventHandler<UUIDNameReplyEventArgs> callback =
+                        delegate (object sender, UUIDNameReplyEventArgs e)
+                        {
+                            foreach (KeyValuePair<UUID, string> av in e.Names)
+                            {
+                                if (av.Key == avatarId)
+                                {
+                                    hasReply = true;
+                                    fetchEvent.Set();
+                                }
+                            }
+                        };
+                    getClient().Avatars.UUIDNameReply += callback;
+                    getClient().Avatars.RequestAvatarName(avatarId);
+
+                    fetchEvent.WaitOne(1000, false);
+                    getClient().Avatars.UUIDNameReply -= callback;
+                    return hasReply;
                 }
                 return true;
             }
@@ -167,8 +261,31 @@ namespace SecondBotEvents.Services
             }
             if (avatarsName2Key.ContainsKey(name) == false)
             {
-                master.botClient.client.Avatars.RequestAvatarNameSearch(name, UUID.Random());
-                return false;
+                UUID wantedReplyID = UUID.SecureRandom();
+                
+                bool hasReply = false;
+                AutoResetEvent fetchEvent = new AutoResetEvent(false);
+                EventHandler<AvatarPickerReplyEventArgs> callback =
+                    delegate (object sender, AvatarPickerReplyEventArgs e)
+                    {
+                        if (e.QueryID == wantedReplyID)
+                        {
+                            foreach(KeyValuePair<UUID,string> av in e.Avatars)
+                            {
+                                if(av.Value == name)
+                                {
+                                    hasReply = true;
+                                    fetchEvent.Set();
+                                }
+                            }
+                        }
+                    };
+                getClient().Avatars.AvatarPickerReply += callback;
+                getClient().Avatars.RequestAvatarNameSearch(name, wantedReplyID);
+
+                fetchEvent.WaitOne(1000, false);
+                getClient().Avatars.AvatarPickerReply -= callback;
+                return hasReply;
             }
             return true;
         }
@@ -179,7 +296,16 @@ namespace SecondBotEvents.Services
             {
                 return "lookup";
             }
-            return avatarsKey2Name[avatarId];
+            string results = "lookup";
+            foreach (KeyValuePair<string, UUID> av in avatarsName2Key)
+            {
+                if(av.Value == avatarId)
+                {
+                    results = av.Key;
+                    break;
+                }
+            }
+            return results;
         }
 
         public string getAvatarUUID(string name)
@@ -304,43 +430,74 @@ namespace SecondBotEvents.Services
         protected void reset()
         {
             avatarsName2Key = new Dictionary<string, UUID>();
-            avatarsKey2Name = new Dictionary<UUID, string>();
 
             groupsKey2Name = new Dictionary<UUID, string>();
-            groupsName2Key = new Dictionary<string, UUID>();
+
+            groupMembers = new Dictionary<UUID, List<UUID>>();
+            groupRoles = new Dictionary<UUID, Dictionary<UUID, string>>();
 
             localChatHistory = new List<string>();
 
             notecardDataStore = new Dictionary<string, KeyValuePair<string, long>>();
-        }
+
+            chatWindows = new Dictionary<UUID, List<string>>(); // sess, list chat
+            chatWindowsUnread = new Dictionary<UUID, bool>(); // sess, bool
+            chatWindowsIsGroup = new Dictionary<UUID, bool>(); // sess, bool
+            chatWindowsOwner = new Dictionary<UUID, UUID>(); // sess, owner id
+    }
 
 
         protected void BotClientRestart(object o, BotClientNotice e)
         {
             botConnected = false;
             Console.WriteLine("DataStore Service [Attached to new client]");
-            master.botClient.client.Network.LoggedOut += BotLoggedOut;
-            master.botClient.client.Network.SimConnected += BotLoggedIn;
+            getClient().Network.LoggedOut += BotLoggedOut;
+            getClient().Network.SimConnected += BotLoggedIn;
         }
 
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
             botConnected = false;
-            master.botClient.client.Network.SimConnected += BotLoggedIn;
+            getClient().Network.SimConnected += BotLoggedIn;
             Console.WriteLine("DataStore Service [Standby]");
+        }
+
+        protected void GroupRoles(object o, GroupRolesDataReplyEventArgs e)
+        {
+            if(groupRoles.ContainsKey(e.GroupID) == false)
+            {
+                groupRoles.Add(e.GroupID, new Dictionary<UUID, string>());
+            }
+            groupRoles[e.GroupID] = e.Roles;
+        }
+
+        protected void GroupMembers(object o, GroupMembersReplyEventArgs e)
+        {
+            if(groupMembers.ContainsKey(e.GroupID) == true)
+            {
+                groupMembers.Remove(e.GroupID);
+            }
+            groupMembers.Add(e.GroupID, new List<UUID>());
+            foreach (KeyValuePair<UUID,GroupMember> a in e.Members)
+            {
+                groupMembers[e.GroupID].Add(a.Value.ID);
+            }
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
-            master.botClient.client.Network.SimConnected -= BotLoggedIn;
-            master.botClient.client.Groups.CurrentGroups += GroupCurrent;
-            master.botClient.client.Groups.GroupJoinedReply += GroupJoin;
-            master.botClient.client.Groups.GroupLeaveReply += GroupLeave;
-            master.botClient.client.Avatars.UUIDNameReply += AvatarUUIDName;
-            master.botClient.client.Friends.FriendNames += AvatarFriendNames;
-            master.botClient.client.Self.IM += ImEvent;
-            master.botClient.client.Self.ChatFromSimulator += ChatFromSim;
-            master.botClient.client.Groups.RequestCurrentGroups();
+            getClient().Network.SimConnected -= BotLoggedIn;
+            getClient().Groups.CurrentGroups += GroupCurrent;
+            getClient().Groups.GroupJoinedReply += GroupJoin;
+            getClient().Groups.GroupLeaveReply += GroupLeave;
+            getClient().Avatars.UUIDNameReply += AvatarUUIDName;
+            getClient().Friends.FriendNames += AvatarFriendNames;
+            getClient().Self.IM += ImEvent;
+            getClient().Self.ChatFromSimulator += ChatFromSim;
+            getClient().Avatars.AvatarPickerReply += AvatarUUIDNamePicker;
+            getClient().Groups.GroupMembersReply += GroupMembers;
+            getClient().Groups.GroupRoleDataReply += GroupRoles;
+            getClient().Groups.RequestCurrentGroups();
             botConnected = true;
             Console.WriteLine("DataStore Service [Active]");
         }
@@ -362,7 +519,11 @@ namespace SecondBotEvents.Services
                             break;
                         }
                         localChatHistory.Add(e.FromName + ": " + e.Message);
-                        cleanLocalChat();
+                        if (localChatHistory.Count <= myConfig.GetLocalChatHistoryLimit())
+                        {
+                            break;
+                        }
+                        localChatHistory.RemoveAt(0);
                         break;
                     }
                 default:
@@ -383,8 +544,15 @@ namespace SecondBotEvents.Services
                     continue;
                 }
                 groupsKey2Name.Add(G.ID, G.Name);
-                groupsName2Key.Add(G.Name, G.ID);
-                master.botClient.client.Self.RequestJoinGroupChat(G.ID);
+                getClient().Self.RequestJoinGroupChat(G.ID);
+                if (myConfig.GetPrefetchGroupMembers() == true)
+                {
+                    getClient().Groups.RequestGroupMembers(G.ID);
+                }
+                if(myConfig.GetPrefetchGroupRoles() == true)
+                {
+                    getClient().Groups.RequestGroupRoles(G.ID);
+                }
             }
 
             foreach(UUID G in missingGroups)
@@ -395,28 +563,26 @@ namespace SecondBotEvents.Services
                 }
                 string name = groupsKey2Name[G];
                 groupsKey2Name.Remove(G);
-                groupsName2Key.Remove(name);
-                // @todo remove group chat here
+                closeChat(G);
             }
         }
 
         protected void GroupJoin(object o, GroupOperationEventArgs e)
         {
-            master.botClient.client.Groups.RequestCurrentGroups();
+            getClient().Groups.RequestCurrentGroups();
         }
 
         protected void GroupLeave(object o, GroupOperationEventArgs e)
         {
-            master.botClient.client.Groups.RequestCurrentGroups();
+            getClient().Groups.RequestCurrentGroups();
         }
 
         protected void addAvatar(UUID id, string name)
         {
-            if (avatarsKey2Name.ContainsKey(id) == true)
+            if (avatarsName2Key.ContainsValue(id) == true)
             {
                 return;
             }
-            avatarsKey2Name.Add(id, name);
             avatarsName2Key.Add(name, id);
         }
 
@@ -428,39 +594,20 @@ namespace SecondBotEvents.Services
             }
         }
 
+        protected void AvatarUUIDNamePicker(object o, AvatarPickerReplyEventArgs e)
+        {
+            foreach(KeyValuePair<UUID,string> Av in e.Avatars)
+            {
+                addAvatar(Av.Key, Av.Value);
+            }
+        }
+
         protected void AvatarFriendNames(object o, FriendNamesEventArgs e)
         {
             foreach (KeyValuePair<UUID, string> pair in e.Names)
             {
                 addAvatar(pair.Key, pair.Value);
             }
-        }
-
-        protected void cleanGroupChat(UUID groupID)
-        {
-            if(groupsKey2Name.ContainsKey(groupID) == false)
-            {
-                return;
-            }
-            // @todo clean group chat here
-        }
-
-        protected void cleanAvatarChat(UUID avatarID)
-        {
-            if (avatarsKey2Name.ContainsKey(avatarID) == false)
-            {
-                return;
-            }
-            // @todo clean avatar chat here
-        }
-
-        protected void cleanLocalChat()
-        {
-            if (localChatHistory.Count <= myConfig.GetLocalChatHistoryLimit())
-            {
-                return;
-            }
-            localChatHistory.RemoveAt(0);
         }
 
         protected void ImEvent(object o, InstantMessageEventArgs e)
@@ -512,15 +659,18 @@ namespace SecondBotEvents.Services
             master.BotClientNoticeEvent -= BotClientRestart;
             if (master.botClient != null)
             {
-                if (master.botClient.client != null)
+                if (getClient() != null)
                 {
-                    master.botClient.client.Groups.CurrentGroups -= GroupCurrent;
-                    master.botClient.client.Groups.GroupJoinedReply -= GroupJoin;
-                    master.botClient.client.Groups.GroupLeaveReply -= GroupLeave;
-                    master.botClient.client.Avatars.UUIDNameReply -= AvatarUUIDName;
-                    master.botClient.client.Friends.FriendNames -= AvatarFriendNames;
-                    master.botClient.client.Self.IM -= ImEvent;
-                    master.botClient.client.Self.ChatFromSimulator -= ChatFromSim;
+                    getClient().Groups.CurrentGroups -= GroupCurrent;
+                    getClient().Groups.GroupJoinedReply -= GroupJoin;
+                    getClient().Groups.GroupLeaveReply -= GroupLeave;
+                    getClient().Avatars.UUIDNameReply -= AvatarUUIDName;
+                    getClient().Friends.FriendNames -= AvatarFriendNames;
+                    getClient().Self.IM -= ImEvent;
+                    getClient().Self.ChatFromSimulator -= ChatFromSim;
+                    getClient().Avatars.AvatarPickerReply -= AvatarUUIDNamePicker;
+                    getClient().Groups.GroupMembersReply -= GroupMembers;
+                    getClient().Groups.GroupRoleDataReply -= GroupRoles;
                 }
             }
             Console.WriteLine("DataStore Service [Stopping]");

@@ -35,8 +35,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Invaild group UUID", "IsGroupMember", new [] { group, avatar });
             }
             ProcessAvatar(avatar);
-            return Failure("@todo group membership storage");
-            // IsGroupMemberReply object
+            return BasicReply(master.DataStoreService.IsGroupMember(groupuuid, avataruuid).ToString());
         }
 
         [About("Gets membership of a group")]
@@ -57,7 +56,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild group UUID", "GetGroupMembers", new [] { group });
             }
-            return Failure("@todo group membership storage");
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroupMembers(groupuuid)));
         }
 
         [About("Attempts to ban/unban a given avatar from a group")]
@@ -124,6 +123,10 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild group UUID", "GroupEject", new [] { group, avatar });
             }
+            if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
+            {
+                return Failure("Unknown group", "GroupEject", new[] { group, avatar });
+            }
             ProcessAvatar(avatar);
             if (avataruuid == null)
             {
@@ -134,13 +137,12 @@ namespace SecondBotEvents.Commands
         }
 
         [About("Adds the avatar to the Group with the role \n if they are not in the group then it invites them at that role")]
-        [ReturnHints("Roles updated")]
         [ReturnHints("Invite sent")]
+        [ReturnHints("Adding role")]
         [ReturnHintsFailure("Updating")]
         [ReturnHintsFailure("Unknown group")]
         [ReturnHintsFailure("Invaild group UUID")]
         [ReturnHintsFailure("Invaild role UUID")]
-        [ReturnHintsFailure("Not in group")]
         [ReturnHintsFailure("avatar lookup")]
         [ArgHints("group", "URLARG", "the UUID of the group")]
         [ArgHints("avatar", "URLARG", "the UUID of the avatar you wish to check with")]
@@ -159,7 +161,18 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild role UUID", "GroupAddRole", new [] { group, avatar });
             }
-            return Failure("@todo group membership storage");
+            if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
+            {
+                return Failure("Unknown group", "GroupAddRole", new[] { group, avatar, role });
+            }
+            ProcessAvatar(avatar);
+            if(master.DataStoreService.IsGroupMember(groupuuid, avataruuid) == false)
+            {
+                getClient().Groups.Invite(groupuuid, new List<UUID>() { UUID.Zero, roleuuid }, avataruuid);
+                return BasicReply("Invite sent");
+            }
+            getClient().Groups.AddToRole(groupuuid, roleuuid, avataruuid);
+            return BasicReply("Adding role");
         }
 
         [About("Invites selected avatar to the group with the selected role")]
@@ -184,20 +197,27 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild group UUID", "GroupInvite", new [] { group, avatar, role });
             }
+            if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
+            {
+                return Failure("Unknown group", "GroupInvite", new[] { group, avatar, role });
+            }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
                 return Failure("avatar lookup", "GroupInvite", new [] { group, avatar, role });
             }
-            if(role == "everyone")
+            List<UUID> roles = new List<UUID>();
+            roles.Add(UUID.Zero);
+            if(role != "everyone")
             {
-                role = UUID.Zero.ToString();
+                UUID roleuuid = UUID.Zero;
+                if (UUID.TryParse(role, out roleuuid) == false)
+                {
+                    return Failure("Unable to process role UUID", "GroupInvite", new[] { group, avatar, role });
+                }
+                roles.Add(roleuuid);
             }
-            if(UUID.TryParse(role,out UUID roleuuid) == false)
-            {
-                return Failure("Unable to process role UUID", "GroupInvite", new [] { group, avatar, role });
-            }
-            getClient().Groups.Invite(groupuuid, new List<UUID>() { roleuuid }, avataruuid);
+            getClient().Groups.Invite(groupuuid, roles, avataruuid);
             return BasicReply("Invite sent", "GroupInvite", new [] { group, avatar, role });
         }
 
@@ -234,15 +254,12 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Message empty", "Groupnotice", new [] { group, title, message });
             }
-            return Failure("@todo groups stoage");
-            /*
             GroupNotice NewNotice = new GroupNotice();
             NewNotice.Subject = title;
             NewNotice.Message = message;
             NewNotice.OwnerID = getClient().Self.AgentID;
             getClient().Groups.SendGroupNotice(groupuuid, NewNotice);
             return BasicReply("Sending notice", "Groupnotice", new [] { group, title, message });
-            */
         }
 
         [About("Activates the selected title")]
@@ -338,13 +355,6 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Message empty", "GroupnoticeWithAttachment", new [] { group, title, message, attachment });
             }
-            return Failure("@togo groups storage");
-            /*
-            Group G = bot.MyGroups[groupuuid];
-            if (G.Powers.HasFlag(GroupPowers.SendNotices) == false)
-            {
-                return Failure("Missing group notice power", "GroupnoticeWithAttachment", new [] { group, title, message, attachment });
-            }
             GroupNotice NewNotice = new GroupNotice();
             NewNotice.Subject = title;
             NewNotice.Message = message;
@@ -352,7 +362,6 @@ namespace SecondBotEvents.Commands
             NewNotice.AttachmentID = inventoryuuid;
             getClient().Groups.SendGroupNotice(groupuuid, NewNotice);
             return BasicReply("Sending notice with attachment", "GroupnoticeWithAttachment", new [] { group, title, message, attachment });
-            */
         }
 
 
@@ -365,18 +374,10 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            return Failure("@togo groups storage");
-            /*
-            Dictionary<string, string> grouppackage = new Dictionary<string, string>();
-            foreach (KeyValuePair<UUID, Group> entry in bot.MyGroups)
-            {
-                grouppackage.Add(entry.Value.ID.ToString(), entry.Value.Name);
-            }
-            return BasicReply(JsonConvert.SerializeObject(grouppackage), "GetGroupList");
-            */
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroups()));
         }
 
-        [About("Requests the roles for the selected group<br/>Replys with GroupRoleDetails object formated as follows <ul><li>UpdateUnderway (Bool)</li><li>RoleDataAge (Int) [default -1]</li><li>Roles (KeyPair array of UUID=Name)</li></ul><br/>")]
+        [About("Requests the roles for the selected group")]
         [ReturnHints("GroupRoleDetails object")]
         [ReturnHintsFailure("Group is not currently known")]
         [ReturnHintsFailure("Invaild group UUID")]
@@ -536,70 +537,5 @@ namespace SecondBotEvents.Commands
             }
             return Failure("@todo groupchat");
         }
-
-        protected KeyValuePair<bool, string> waitForReady(bool avatar, bool group, UUID groupuuid)
-        {
-            /* this function is poorly named
-             * and is ugly :(
-             */ 
-            bool exit = false;
-            int sleeps = 0;
-            string failed_on = "";
-            bool allok = true;
-            while (exit == false)
-            {
-                allok = true;
-                failed_on = "";
-                if (avatar == true)
-                {
-                    if (avataruuid == UUID.Zero)
-                    {
-                        allok = false;
-                        failed_on = "avatar lookup";
-                    }
-                }
-                if ((group == true) && (allok == true))
-                {
-                    // @todo wait for group loading
-                    allok = true; 
-                    failed_on = "Updating";
-                }
-                if (allok == false)
-                {
-                    if (sleeps > 3)
-                    {
-                        exit = true;
-                    }
-                }
-                if (allok == true)
-                {
-                    exit = true;
-                }
-                else
-                {
-                    if (exit == false)
-                    {
-                        Thread.Sleep(1000);
-                        sleeps++;
-                    }
-                }
-            }
-            return new KeyValuePair<bool, string>(allok, failed_on);
-        }
-    }
-
-    public class GroupRoleDetails
-    {
-        public bool UpdateUnderway { get; set; }
-        public Dictionary<string,string> Roles { get; set; }
-        public long RoleDataAge = 0;
-    }
-
-    public class IsGroupMemberReply
-    {
-        public bool membershipStatus { get; set; }
-        public string AvatarUUID { get; set; }
-        public string GroupUUID { get; set; }
-        public string AvatarnameIfKnown { get; set; }
     }
 }

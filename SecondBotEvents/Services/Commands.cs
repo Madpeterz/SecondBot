@@ -127,7 +127,7 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            if (e.IM.FromAgentName == master.botClient.client.Self.Name)
+            if (e.IM.FromAgentName == getClient().Self.Name)
             {
                 return;   
             }
@@ -209,11 +209,11 @@ namespace SecondBotEvents.Services
                     LogFormater.Crit("[SmartReply] output Channel must be zero or higher - using 99");
                     target_channel = 999;
                 }
-                master.botClient.client.Self.Chat(output, target_channel, ChatType.Normal);
+                getClient().Self.Chat(output, target_channel, ChatType.Normal);
             }
             else if (mode == "IM")
             {
-                master.botClient.client.Self.InstantMessage(target_avatar, output);
+                getClient().Self.InstantMessage(target_avatar, output);
             }
             else if (mode == "HTTP")
             {
@@ -305,20 +305,20 @@ namespace SecondBotEvents.Services
         {
             acceptNewCommands = false;
             Console.WriteLine("Commands service [Attached to new client]");
-            master.botClient.client.Network.LoggedOut += BotLoggedOut;
-            master.botClient.client.Network.SimConnected += BotLoggedIn;
+            getClient().Network.LoggedOut += BotLoggedOut;
+            getClient().Network.SimConnected += BotLoggedIn;
         }
 
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
-            master.botClient.client.Network.SimConnected += BotLoggedIn;
+            getClient().Network.SimConnected += BotLoggedIn;
             Console.WriteLine("Commands service [Waiting for connect]");
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
-            master.botClient.client.Network.SimConnected -= BotLoggedIn;
-            master.botClient.client.Self.IM += BotImMessage;
+            getClient().Network.SimConnected -= BotLoggedIn;
+            getClient().Self.IM += BotImMessage;
             if (myConfig.GetOnlyMasterAvs() == true)
             {
                 foreach(string A in myConfig.GetMastersCSV())

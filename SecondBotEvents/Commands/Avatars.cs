@@ -103,7 +103,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            if(name != null)
+            if(name == null)
             {
                 return Failure("Not a vaild name");
             }

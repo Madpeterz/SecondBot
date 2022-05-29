@@ -97,13 +97,13 @@ namespace SecondBotEvents.Services
         {
             Console.WriteLine("Discord service [Avi link - Restarting]");
             acceptChat = false;
-            master.botClient.client.Network.LoggedOut += BotLoggedOut;
-            master.botClient.client.Network.SimConnected += BotLoggedIn;
+            getClient().Network.LoggedOut += BotLoggedOut;
+            getClient().Network.SimConnected += BotLoggedIn;
         }
 
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
-            master.botClient.client.Network.SimConnected += BotLoggedIn;
+            getClient().Network.SimConnected += BotLoggedIn;
             acceptChat = false;
             Console.WriteLine("Discord service [Avi link - standby]");
         }
@@ -164,8 +164,8 @@ namespace SecondBotEvents.Services
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
             acceptChat = true;
-            master.botClient.client.Network.SimConnected -= BotLoggedIn;
-            master.botClient.client.Self.IM += BotImMessage;
+            getClient().Network.SimConnected -= BotLoggedIn;
+            getClient().Self.IM += BotImMessage;
             Console.WriteLine("Discord service [Avi link - Active]");
         }
 

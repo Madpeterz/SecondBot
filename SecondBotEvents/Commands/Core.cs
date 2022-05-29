@@ -21,24 +21,6 @@ namespace SecondBotEvents.Commands
             return BasicReply("world", "Hello");
         }
 
-        [About("Delays a thead by X ms<br/>Mostly pointless but good if your doing custom commands")]
-        [ReturnHintsFailure("Invaild amount")]
-        [ReturnHints("ok")]
-        [Route(HttpVerbs.Get, "/Delay/{amount}/{token}")]
-        public object Delay(string amount,string token)
-        {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
-            if (int.TryParse(amount,out int amountvalue) == false)
-            {
-                return Failure("Invaild amount", "Delay", new [] { amount });
-            }
-            Thread.Sleep(amountvalue);
-            return BasicReply("Ok", "Delay", new [] { amount });
-        }
-
         [About("Removes the given token from the accepted token pool")]
         [ReturnHints("ok")]
         [Route(HttpVerbs.Get, "/LogoutUI/{token}")]

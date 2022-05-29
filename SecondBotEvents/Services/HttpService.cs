@@ -53,20 +53,20 @@ namespace SecondBotEvents.Services
         {
             acceptBotCommands = false;
             Console.WriteLine("HTTP service [Attached to new client]");
-            master.botClient.client.Network.LoggedOut += BotLoggedOut;
-            master.botClient.client.Network.SimConnected += BotLoggedIn;
+            getClient().Network.LoggedOut += BotLoggedOut;
+            getClient().Network.SimConnected += BotLoggedIn;
         }
 
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
             acceptBotCommands = false;
-            master.botClient.client.Network.SimConnected += BotLoggedIn;
+            getClient().Network.SimConnected += BotLoggedIn;
             Console.WriteLine("HTTP service [Bot commands disabled]");
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
-            master.botClient.client.Network.SimConnected -= BotLoggedIn;
+            getClient().Network.SimConnected -= BotLoggedIn;
             acceptBotCommands = true;
             Console.WriteLine("HTTP service [Bot commands enabled]");
         }

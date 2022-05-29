@@ -65,8 +65,8 @@ namespace SecondBotEvents.Services
         {
             botConnected = false;
             Console.WriteLine("Interaction Service [Attached to new client]");
-            master.botClient.client.Network.LoggedOut += BotLoggedOut;
-            master.botClient.client.Network.SimConnected += BotLoggedIn;
+            getClient().Network.LoggedOut += BotLoggedOut;
+            getClient().Network.SimConnected += BotLoggedIn;
         }
 
         protected void jsonOuput(bool status, string eventype, string from, string why="", Dictionary<string, string> setMisc = null)
@@ -100,16 +100,16 @@ namespace SecondBotEvents.Services
                 {
                     return;
                 }
-                master.botClient.client.Self.TeleportLureRespond(e.IM.FromAgentID, e.IM.IMSessionID, false);
+                getClient().Self.TeleportLureRespond(e.IM.FromAgentID, e.IM.IMSessionID, false);
                 return;
             }
             jsonOuput(true, mode, e.IM.FromAgentName);
             if (e.IM.Dialog == InstantMessageDialog.RequestLure)
             {
-                master.botClient.client.Self.SendTeleportLure(e.IM.FromAgentID);
+                getClient().Self.SendTeleportLure(e.IM.FromAgentID);
                 return;
             }
-            master.botClient.client.Self.TeleportLureRespond(e.IM.FromAgentID, e.IM.IMSessionID, true);
+            getClient().Self.TeleportLureRespond(e.IM.FromAgentID, e.IM.IMSessionID, true);
             
         }
 
@@ -133,7 +133,7 @@ namespace SecondBotEvents.Services
             Dictionary<string, string> details = new Dictionary<string, string>();
             details.Add("itemuuid", e.ObjectID.ToString());
             details.Add("itemtype", e.AssetType.ToString());
-            InventoryItem itm = master.botClient.client.Inventory.FetchItem(e.ObjectID, master.botClient.client.Self.AgentID, 2000);
+            InventoryItem itm = getClient().Inventory.FetchItem(e.ObjectID, getClient().Self.AgentID, 2000);
             if(itm != null)
             {
                 details.Add("itemname", itm.Name);
@@ -147,7 +147,7 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            master.botClient.client.Friends.AcceptFriendship(e.AgentID, e.SessionID);
+            getClient().Friends.AcceptFriendship(e.AgentID, e.SessionID);
             jsonOuput(true, "FriendRequest", e.AgentName);
             
         }
@@ -155,17 +155,17 @@ namespace SecondBotEvents.Services
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
             botConnected = false;
-            master.botClient.client.Network.SimConnected += BotLoggedIn;
+            getClient().Network.SimConnected += BotLoggedIn;
             Console.WriteLine("Interaction Service [Standby]");
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
-            master.botClient.client.Network.SimConnected -= BotLoggedIn;
-            master.botClient.client.Friends.FriendshipOffered += BotFriendRequested;
-            master.botClient.client.Inventory.InventoryObjectOffered += BotInventoryOffer;
-            master.botClient.client.Groups.GroupInvitation += BotGroupInviteOffer;
-            master.botClient.client.Self.IM += BotTeleportOffer;
+            getClient().Network.SimConnected -= BotLoggedIn;
+            getClient().Friends.FriendshipOffered += BotFriendRequested;
+            getClient().Inventory.InventoryObjectOffered += BotInventoryOffer;
+            getClient().Groups.GroupInvitation += BotGroupInviteOffer;
+            getClient().Self.IM += BotTeleportOffer;
             botConnected = true;
             Console.WriteLine("Interaction Service [Active]");
         }
@@ -191,11 +191,11 @@ namespace SecondBotEvents.Services
             master.BotClientNoticeEvent -= BotClientRestart;
             if (master.botClient != null)
             {
-                if (master.botClient.client != null)
+                if (getClient() != null)
                 {
-                    master.botClient.client.Friends.FriendshipOffered -= BotFriendRequested;
-                    master.botClient.client.Inventory.InventoryObjectOffered -= BotInventoryOffer;
-                    master.botClient.client.Groups.GroupInvitation -= BotGroupInviteOffer;
+                    getClient().Friends.FriendshipOffered -= BotFriendRequested;
+                    getClient().Inventory.InventoryObjectOffered -= BotInventoryOffer;
+                    getClient().Groups.GroupInvitation -= BotGroupInviteOffer;
                 }
             }
             Console.WriteLine("Interaction Service [Stopping]");
