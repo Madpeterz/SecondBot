@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenMetaverse;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,6 +13,10 @@ namespace SecondBotEvents.Services
             master = setMaster;
         }
 
+        protected GridClient getClient()
+        {
+            return master.botClient.client;
+        }
         public virtual string Status()
         {
             return "";
