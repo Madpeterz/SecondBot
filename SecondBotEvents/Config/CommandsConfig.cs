@@ -11,48 +11,55 @@ namespace SecondBotEvents.Config
         protected override void MakeSettings()
         {
             filename = "commands";
-            settings.Add("allowFundsCommands");
-            settings.Add("allowIMcontrol");
-            settings.Add("sharedSecret");
-            settings.Add("onlySelectedAvs");
-            settings.Add("avsCSV");
-            settings.Add("enforceTimeWindow");
-            settings.Add("timeWindowSecs");
+            settings.Add("AllowFundsCommands");
+            settings.Add("AllowIMcontrol");
+            settings.Add("SharedSecret");
+            settings.Add("OnlyMasterAvs");
+            settings.Add("MastersCSV");
+            settings.Add("EnforceTimeWindow");
+            settings.Add("TimeWindowSecs");
+            settings.Add("Enabled");
+        }
+
+        public bool GetEnabled()
+        {
+            return ReadSettingAsBool("Enabled", true);
+        }
+
+        public string[] GetMastersCSV()
+        {
+            return ReadSettingAsString("MastersCSV", "Madpeter Zond").Split(",");
         }
 
         public bool GetEnforceTimeWindow()
         {
-            return ReadSettingAsBool("enforceTimeWindow", false);
+            return ReadSettingAsBool("EnforceTimeWindow", false);
         }
 
         public int GetTimeWindowSecs()
         {
-            return ReadSettingAsInt("timeWindowSecs", 35);
+            return ReadSettingAsInt("TimeWindowSecs", 35);
         }
 
-        public bool GetOnlySelectedAvs()
+        public bool GetOnlyMasterAvs()
         {
-            return ReadSettingAsBool("onlySelectedAvs", false);
+            return ReadSettingAsBool("OnlyMasterAvs", false);
         }
 
-        public List<string> GetAvsCSV()
-        {
-            return ReadSettingAsString("avsCSV", "Madpeter Zond,Madpeter Zond,Madpeter Zond").Split(",").ToList();
-        }
 
         public bool GetAllowFundsCommands()
         {
-            return ReadSettingAsBool("allowFundsCommands", false);
+            return ReadSettingAsBool("AllowFundsCommands", false);
         }
 
         public bool GetAllowIMcontrol()
         {
-            return ReadSettingAsBool("allowIMcontrol", false);
+            return ReadSettingAsBool("AllowIMcontrol", false);
         }
 
         public string GetSharedSecret()
         {
-            return ReadSettingAsString("sharedSecret", "ThisIsMySecret");
+            return ReadSettingAsString("SharedSecret", "ThisIsMySecret");
         }
     }
 }

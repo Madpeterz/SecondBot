@@ -5,9 +5,9 @@ using SecondBotEvents.Services;
 
 namespace SecondBotEvents.Commands
 {
-    internal class Animation : CommandsAPI
+    internal class AnimationCommands : CommandsAPI
     {
-        public Animation(EventsSecondBot setmaster) : base(setmaster)
+        public AnimationCommands(EventsSecondBot setmaster) : base(setmaster)
         {
         }
 

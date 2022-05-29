@@ -10,31 +10,31 @@ namespace SecondBotEvents.Config
         protected override void MakeSettings()
         {
             filename = "basic";
-            settings.Add("username");
-            settings.Add("password");
-            settings.Add("loginURI");
+            settings.Add("Username");
+            settings.Add("Password");
+            settings.Add("LoginURI");
         }
 
         public string GetUsername()
         {
-            return ReadSettingAsString("username","Firstname Lastname");
+            return ReadSettingAsString("Username","Firstname Lastname");
         }
 
         public string GetPassword()
         {
-            return ReadSettingAsString("password", "passwordHere");
+            return ReadSettingAsString("Password", "passwordHere");
         }
 
         public string GetFirstName()
         {
 
-            string[] bits = ReadSettingAsString("username", "Firstname Lastname").Split(" ");
+            string[] bits = GetUsername().Split(" ");
             return bits[0];
         }
 
         public string GetLastName()
         {
-            string[] bits = ReadSettingAsString("username", "Firstname Lastname").Split(" ");
+            string[] bits = GetUsername().Split(" ");
             if(bits.Length == 2)
             {
                 return bits[1];
@@ -44,7 +44,7 @@ namespace SecondBotEvents.Config
 
         public string GetLoginURI()
         {
-            return ReadSettingAsString("loginURI", "secondlife");
+            return ReadSettingAsString("LoginURI", "secondlife");
         }
     }
 }

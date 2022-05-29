@@ -10,18 +10,18 @@ namespace SecondBotEvents.Config
         protected override void MakeSettings()
         {
             filename = "http";
-            settings.Add("enabled");
-            settings.Add("host");
+            settings.Add("Enabled");
+            settings.Add("Host");
         }
 
         public string GetHost()
         {
-            return ReadSettingAsString("host", "http://*:80");
+            return ReadSettingAsString("Host", "http://*:80");
         }
 
         public bool GetEnabled()
         {
-            return ReadSettingAsBool("enabled", false);
+            return ReadSettingAsBool("Enabled", false);
         }
     }
 

@@ -26,7 +26,7 @@ namespace SecondBotEvents.Commands
             }
             if (getClient().Network.CurrentSim == null)
             {
-                return BasicReply("Error not in a sim", "nearmewithdetails");
+                return BasicReply("Error not in a sim");
             }
             List<NearMeDetails> BetterNearMe = new List<NearMeDetails>();
             Dictionary<uint, Avatar> avcopy = getClient().Network.CurrentSim.ObjectsAvatars.Copy();
@@ -44,7 +44,7 @@ namespace SecondBotEvents.Commands
                     BetterNearMe.Add(details);
                 }
             }
-            return BasicReply(JsonConvert.SerializeObject(BetterNearMe), "nearmewithdetails");
+            return BasicReply(JsonConvert.SerializeObject(BetterNearMe));
         }
 
         [About("returns a list of all known avatars nearby")]
@@ -59,7 +59,7 @@ namespace SecondBotEvents.Commands
             }
             if (getClient().Network.CurrentSim == null)
             {
-                return BasicReply("Error not in a sim", "nearme");
+                return BasicReply("Error not in a sim");
             }
             Dictionary<UUID, string> NearMe = new Dictionary<UUID, string>();
             Dictionary<uint, Avatar> avcopy = getClient().Network.CurrentSim.ObjectsAvatars.Copy();
@@ -70,7 +70,44 @@ namespace SecondBotEvents.Commands
                     NearMe.Add(av.ID, av.Name);
                 }
             }
-            return BasicReply(JsonConvert.SerializeObject(NearMe), "nearme");
+            return BasicReply(JsonConvert.SerializeObject(NearMe));
+        }
+
+        [About("searchs the AV database for the given UUID to find the name, if not found triggers a lookup")]
+        [ReturnHints("the name of the avatar")]
+        [ReturnHints("lookup")]
+        [ReturnHintsFailure("Not a vaild UUID")]
+        [Route(HttpVerbs.Get, "/Key2Name/{uuid}/{token}")]
+        public object Key2Name(string uuid, string token)
+        {
+            if (AllowToken(token) == false)
+            {
+                return Failure("Token not accepted");
+            }
+            UUID avUUID = UUID.Zero;
+            if (UUID.TryParse(uuid, out avUUID) == false)
+            {
+                return Failure("Not a vaild UUID");
+            }
+            return BasicReply(master.DataStoreService.getAvatarName(avUUID));
+        }
+
+        [About("searchs the AV database for the given name to find the UUID, if not found triggers a lookup")]
+        [ReturnHints("the uuid of the avatar")]
+        [ReturnHints("lookup")]
+        [ReturnHintsFailure("Not a vaild name")]
+        [Route(HttpVerbs.Get, "/Name2Key/{name}/{token}")]
+        public object Name2Key(string name, string token)
+        {
+            if (AllowToken(token) == false)
+            {
+                return Failure("Token not accepted");
+            }
+            if(name != null)
+            {
+                return Failure("Not a vaild name");
+            }
+            return BasicReply(master.DataStoreService.getAvatarUUID(name));
         }
     }
 }

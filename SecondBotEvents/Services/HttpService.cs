@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using SecondBotEvents.Commands;
 
 namespace SecondBotEvents.Services
 {
@@ -105,6 +106,23 @@ namespace SecondBotEvents.Services
                  .WithUrlPrefix(myConfig.GetHost())
                  .WithMode(HttpListenerMode.EmbedIO))
                 .WithCors()
+                .WithWebApi("/animation", m => m.WithController(() => new AnimationCommands(master)))
+                .WithWebApi("/avatars", m => m.WithController(() => new Avatars(master)))
+                .WithWebApi("/chat", m => m.WithController(() => new Chat(master)))
+                .WithWebApi("/core", m => m.WithController(() => new Core(master)))
+                .WithWebApi("/dialogs", m => m.WithController(() => new Dialogs(master)))
+                .WithWebApi("/discord", m => m.WithController(() => new DiscordCommands(master)))
+                .WithWebApi("/estate", m => m.WithController(() => new Estate(master)))
+                .WithWebApi("/friends", m => m.WithController(() => new Friends(master)))
+                .WithWebApi("/funds", m => m.WithController(() => new Funds(master)))
+                .WithWebApi("/group", m => m.WithController(() => new GroupCommands(master)))
+                .WithWebApi("/info", m => m.WithController(() => new Info(master)))
+                .WithWebApi("/inventory", m => m.WithController(() => new InventoryCommands(master)))
+                .WithWebApi("/movement", m => m.WithController(() => new Movement(master)))
+                .WithWebApi("/notecard", m => m.WithController(() => new Notecard(master)))
+                .WithWebApi("/parcel", m => m.WithController(() => new ParcelCommands(master)))
+                .WithWebApi("/self", m => m.WithController(() => new Self(master)))
+                .WithWebApi("/streamadmin", m => m.WithController(() => new StreamAdmin(master)))
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" }))
             );
             HTTPendpoint.RunAsync();
@@ -180,11 +198,12 @@ namespace SecondBotEvents.Services
 
         protected void ProcessAvatar(string avatar)
         {
-            string[] bits = avatar.Split(' ');
             avataruuid = UUID.Zero;
-            // @todo Avatar storage system
-            UUID.TryParse(avatar, out avataruuid);
-
+            string UUIDfetch = master.DataStoreService.getAvatarUUID(avatar);
+            if(UUIDfetch != "lookup")
+            {
+                UUID.TryParse(UUIDfetch, out avataruuid);
+            }
         }
 
         protected void SuccessNoReturn(string command)

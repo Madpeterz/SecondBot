@@ -18,6 +18,10 @@ namespace SecondBotEvents.Services
         public CommandsService(EventsSecondBot setMaster) : base(setMaster)
         {
             myConfig = new CommandsConfig(master.fromEnv, master.fromFolder);
+            if (myConfig.GetEnabled() == false)
+            {
+                return;
+            }
             loadCommands();
         }
 
@@ -147,12 +151,12 @@ namespace SecondBotEvents.Services
                         {
                             break;
                         }
-                        if (myConfig.GetOnlySelectedAvs() == false)
+                        if (myConfig.GetOnlyMasterAvs() == false)
                         {
                             break;
                         }
                         requireSigning = false;
-                        acceptMessage = myConfig.GetAvsCSV().Contains(e.IM.FromAgentName);
+                        acceptMessage = myConfig.GetMastersCSV().Contains(e.IM.FromAgentName);
                         break;
                     }
                 default:
@@ -181,7 +185,7 @@ namespace SecondBotEvents.Services
             }
         }
 
-        protected void SmartCommandReply(bool run_status, string target, string output, string command)
+        public void SmartCommandReply(bool run_status, string target, string output, string command)
         {
             string mode = "CHAT";
             UUID target_avatar = UUID.Zero;
@@ -194,12 +198,9 @@ namespace SecondBotEvents.Services
             {
                 mode = "IM";
             }
-            else
+            else if (int.TryParse(target, out target_channel) == false)
             {
-                if (int.TryParse(target, out target_channel) == false)
-                {
-                    mode = "None";
-                }
+                return;
             }
             if (mode == "CHAT")
             {
@@ -318,6 +319,13 @@ namespace SecondBotEvents.Services
         {
             master.botClient.client.Network.SimConnected -= BotLoggedIn;
             master.botClient.client.Self.IM += BotImMessage;
+            if (myConfig.GetOnlyMasterAvs() == true)
+            {
+                foreach(string A in myConfig.GetMastersCSV())
+                {
+                    master.DataStoreService.knownAvatar(A);
+                }
+            }
             acceptNewCommands = true;
             Console.WriteLine("Commands service [accepting IM commands]");
         }

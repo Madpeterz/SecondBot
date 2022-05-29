@@ -12,9 +12,9 @@ using System.Linq;
 
 namespace SecondBotEvents.Commands
 {
-    public class Inventory : CommandsAPI
+    public class InventoryCommands : CommandsAPI
     {
-        public Inventory(EventsSecondBot setmaster) : base(setmaster)
+        public InventoryCommands(EventsSecondBot setmaster) : base(setmaster)
         {
         }
 

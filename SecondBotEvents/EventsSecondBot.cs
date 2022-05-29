@@ -26,6 +26,8 @@ namespace SecondBotEvents
         public CommandsService CommandsService = null;
         public BotClientService botClient = null;
         public DiscordService DiscordService = null;
+        public InteractionService InteractionService = null;
+        public DataStoreService DataStoreService = null;
 
 
         private EventHandler<BotClientNotice> botclient_eventNotices;
@@ -72,10 +74,13 @@ namespace SecondBotEvents
         }
         protected void StartServices()
         {
+            DataStoreService = new DataStoreService(this);
+            DataStoreService.Start();
             botClient = new BotClientService(this);
             HttpService = new HttpService(this);
             CommandsService = new CommandsService(this);
             DiscordService = new DiscordService(this);
+            InteractionService = new InteractionService(this);
             if (botClient.IsLoaded() == false)
             {
                 Console.WriteLine("Config is not loaded :(");
@@ -85,10 +90,15 @@ namespace SecondBotEvents
             HttpService.Start();
             CommandsService.Start();
             DiscordService.Start();
+            InteractionService.Start();
             botClient.Start();
         }
         protected void StopServices()
         {
+            if(DataStoreService != null)
+            {
+                DataStoreService.Stop();
+            }
             if (HttpService != null)
             {
                 HttpService.Stop();
@@ -100,6 +110,10 @@ namespace SecondBotEvents
             if (DiscordService != null)
             {
                 DiscordService.Stop();
+            }
+            if(InteractionService != null)
+            {
+                InteractionService.Stop();
             }
             if(botClient != null)
             {

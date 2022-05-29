@@ -13,8 +13,9 @@ namespace SecondBotEvents.Commands
         public Chat(EventsSecondBot setmaster) : base(setmaster)
         {
         }
-        [About("fetchs the last 20 localchat messages")]
-        [ReturnHints("array string")]
+
+        [About("fetchs the last localchat messages")]
+        [ReturnHints("json encoded array")]
         [Route(HttpVerbs.Get, "/LocalChatHistory/{token}")]
         public object LocalChatHistory(string token)
         {
@@ -22,7 +23,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            return Failure("@todo add local chat history");
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.getLocalChat()));
         }
 
         [About("sends a message to localchat")]
@@ -51,11 +52,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Invaild channel", "Say", new [] { channel, message });
             }
             getClient().Self.Chat(message, channelnum, ChatType.Normal);
-            if (channelnum == 0)
-            {
-                // @todo add message to localchat
-            }
-            return Failure("@todo get localchat history");
+            return BasicReply("ok");
             
         }
 
@@ -85,7 +82,7 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok", "IM", new [] { avatar, message });
         }
 
-        [About("gets a full list of all chat windows")]
+        [About("gets a full list of all avatar chat windows")]
         [ReturnHints("array UUID = Name")]
         [Route(HttpVerbs.Get, "/chatwindows/{token}")]
         public object chatwindows(string token)
@@ -94,10 +91,10 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            return Failure("@todo chat windows list");
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.getAvatarImWindows()));
         }
 
-        [About("gets a list of chat windows with unread messages")]
+        [About("gets a list of chat windows from avatars with unread messages")]
         [ReturnHints("array of UUID")]
         [Route(HttpVerbs.Get, "/listwithunread/{token}")]
         public object listwithunread(string token)
@@ -106,11 +103,10 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            List<UUID> unreadimwindows = new List<UUID>();
-            return Failure("@todo chat windows list unread");
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.getAvatarImWindowsUnread()));
         }
 
-        [About("gets if there are any unread im messages at all")]
+        [About("gets if there are any unread im messages from avatars at all")]
         [ReturnHints("True|False")]
         [Route(HttpVerbs.Get, "/haveunreadims/{token}")]
         public object haveunreadims(string token)
@@ -119,28 +115,27 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Token not accepted");
             }
-            return Failure("@todo have any unread ims");
+            return BasicReply(master.DataStoreService.getAvatarImWindowsUnreadAny().ToString());
         }
 
-        [About("gets the chat from the selected window")]
-        [ArgHints("window", "URLARG", "the UUID of the chat window")]
-        [ReturnHintsFailure("Window UUID invaild")]
+        [About("gets the chat from the selected window for avatar")]
+        [ArgHints("window", "URLARG", "the UUID of the avatar you wish to view the chat from")]
+        [ReturnHintsFailure("avatar UUID invaild")]
         [ReturnHints("Array of text")]
-        [Route(HttpVerbs.Get, "/getimchat/{window}/{token}")]
-        public object getimchat(string window, string token)
+        [Route(HttpVerbs.Get, "/getimchat/{avatarid}/{token}")]
+        public object getimchat(string avatarid, string token)
         {
             if (AllowToken(token) == false)
             {
                 return Failure("Token not accepted");
             }
-            if (UUID.TryParse(window, out UUID windowUUID) == false)
+            UUID avatarUUID = UUID.Zero;
+            if (UUID.TryParse(avatarid, out avatarUUID) == false)
             {
-                return Failure("Window UUID invaild", "getimchat", new[] { window });
+                return Failure("avatar UUID invaild");
             }
-            return Failure("@todo chat window fetch");
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.getAvatarImWindow(avatarUUID)));
         }
 
     }
-
-
 }

@@ -10,30 +10,30 @@ namespace SecondBotEvents.Config
         protected override void MakeSettings()
         {
             filename = "discord";
-            settings.Add("enabled");
-            settings.Add("serverID");
-            settings.Add("clientToken");
-            settings.Add("allowDiscordCommands");
+            settings.Add("Enabled");
+            settings.Add("ServerID");
+            settings.Add("ClientToken");
+            settings.Add("AllowDiscordCommands");
         }
 
         public bool GetEnabled()
         {
-            return ReadSettingAsBool("enabled");
+            return ReadSettingAsBool("Enabled");
         }
 
         public ulong GetServerID()
         {
-            return ReadSettingAsUlong("serverID", 0);
+            return ReadSettingAsUlong("ServerID", 0);
         }
 
         public string GetClientToken()
         {
-            return ReadSettingAsString("clientToken","tokenPlzKThanks");
+            return ReadSettingAsString("ClientToken","tokenPlzKThanks");
         }
 
         public bool GetAllowDiscordCommands()
         {
-            return ReadSettingAsBool("allowDiscordCommands");
+            return ReadSettingAsBool("AllowDiscordCommands");
         }
     }
 }

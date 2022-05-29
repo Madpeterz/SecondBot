@@ -9,9 +9,9 @@ using System.Threading;
 
 namespace SecondBotEvents.Commands
 {
-    public class Group : CommandsAPI
+    public class GroupCommands : CommandsAPI
     {
-        public Group(EventsSecondBot setmaster) : base(setmaster)
+        public GroupCommands(EventsSecondBot setmaster) : base(setmaster)
         {
         }
 
