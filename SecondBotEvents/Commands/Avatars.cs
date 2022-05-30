@@ -1,6 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using OpenMetaverse;
 using Newtonsoft.Json;
@@ -17,13 +15,8 @@ namespace SecondBotEvents.Commands
         [About("an improved version of near me with extra details<br/>NearMeDetails is a object formated as follows<br/><ul><li>id</li><li>name</li><li>x</li><li>y</li><li>z</li><li>range</li></ul>")]
         [ReturnHints("array NearMeDetails")]
         [ReturnHintsFailure("Error not in a sim")]
-        [Route(HttpVerbs.Get, "/NearmeWithDetails/{token}")]
-        public object NearmeWithDetails(string token)
+        public object NearmeWithDetails()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (getClient().Network.CurrentSim == null)
             {
                 return BasicReply("Error not in a sim");
@@ -50,13 +43,8 @@ namespace SecondBotEvents.Commands
         [About("returns a list of all known avatars nearby")]
         [ReturnHints("array UUID = Name")]
         [ReturnHintsFailure("Error not in a sim")]
-        [Route(HttpVerbs.Get, "/Nearme/{token}")]
-        public object Nearme(string token)
+        public object Nearme()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (getClient().Network.CurrentSim == null)
             {
                 return BasicReply("Error not in a sim");
@@ -73,17 +61,13 @@ namespace SecondBotEvents.Commands
             return BasicReply(JsonConvert.SerializeObject(NearMe));
         }
 
-        [About("searchs the AV database for the given UUID to find the name, if not found triggers a lookup")]
+        [About("searchs the AV database if not found triggers a lookup")]
+        [ArgHints("uuid", "the UUID to find the name for")]
         [ReturnHints("the name of the avatar")]
         [ReturnHints("lookup")]
         [ReturnHintsFailure("Not a vaild UUID")]
-        [Route(HttpVerbs.Get, "/Key2Name/{uuid}/{token}")]
-        public object Key2Name(string uuid, string token)
+        public object Key2Name(string uuid)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             UUID avUUID = UUID.Zero;
             if (UUID.TryParse(uuid, out avUUID) == false)
             {
@@ -92,17 +76,13 @@ namespace SecondBotEvents.Commands
             return BasicReply(master.DataStoreService.getAvatarName(avUUID));
         }
 
-        [About("searchs the AV database for the given name to find the UUID, if not found triggers a lookup")]
+        [About("searchs the AV database if not found triggers a lookup")]
         [ReturnHints("the uuid of the avatar")]
         [ReturnHints("lookup")]
         [ReturnHintsFailure("Not a vaild name")]
-        [Route(HttpVerbs.Get, "/Name2Key/{name}/{token}")]
-        public object Name2Key(string name, string token)
+        [ArgHints("name", "the name to find the uuid for")]
+        public object Name2Key(string name)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if(name == null)
             {
                 return Failure("Not a vaild name");

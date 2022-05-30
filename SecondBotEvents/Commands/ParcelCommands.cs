@@ -1,7 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using EmbedIO.WebApi;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OpenMetaverse;
 using SecondBotEvents.Services;
 using System;
@@ -22,15 +19,10 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild amount")]
-        [ArgHints("amount", "URLARG", "The amount to sell the parcel for from 1 to 9999999")]
-        [ArgHints("avatar", "URLARG", "Avatar uuid or Firstname Lastname or \"none\" who we are locking the sale to")]
-        [Route(HttpVerbs.Get, "/SetParcelSale/{amount}/{avatar}/{token}")]
-        public object SetParcelSale(string amount,string avatar,string token)
+        [ArgHints("amount", "The amount to sell the parcel for from 1 to 9999999, can be zero if avatar is assigned.")]
+        [ArgHints("avatar", "Avatar uuid or Firstname Lastname or \"none\" who we are locking the sale to")]
+        public object SetParcelSale(string amount,string avatar)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if(tests.Key == false)
             {
@@ -67,13 +59,8 @@ namespace SecondBotEvents.Commands
         [ReturnHints("traffic value")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
-        [Route(HttpVerbs.Get, "/GetParcelTraffic/{token}")]
-        public object GetParcelTraffic(string token)
+        public object GetParcelTraffic()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -87,16 +74,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild amount")]
-        [ArgHints("x", "URLARG", "X point for landing")]
-        [ArgHints("y", "URLARG", "Y point for landing")]
-        [ArgHints("z", "URLARG", "Z point for landing")]
-        [Route(HttpVerbs.Get, "/SetParcelLandingZone/{x}/{y}/{z}/{token}")]
-        public object SetParcelLandingZone(string x, string y, string z, string token)
+        [ArgHints("x", "X point for landing")]
+        [ArgHints("y", "Y point for landing")]
+        [ArgHints("z", "Z point for landing")]
+        public object SetParcelLandingZone(string x, string y, string z)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -126,14 +108,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Parcel name is empty")]
-        [ArgHints("name", "URLARG", "The new name of the parcel")]
-        [Route(HttpVerbs.Get, "/SetParcelName/{name}/{token}")]
-        public object SetParcelName(string name, string token)
+        [ArgHints("name", "The new name of the parcel")]
+        public object SetParcelName(string name)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -152,14 +129,9 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
-        [ArgHints("desc", "Text", "The new desc of the parcel")]
-        [Route(HttpVerbs.Post, "/SetParcelDesc/{token}")]
-        public object SetParcelDesc([FormField] string desc, string token)
+        [ArgHints("desc", "The new desc of the parcel")]
+        public object SetParcelDesc(string desc)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -174,13 +146,8 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
-        [Route(HttpVerbs.Get, "/GetParcelDesc/{token}")]
-        public object GetParcelDesc(string token)
+        public object GetParcelDesc()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -193,13 +160,8 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
-        [Route(HttpVerbs.Get, "/GetParcelFlags/{token}")]
-        public object GetParcelFlags(string token)
+        public object GetParcelFlags()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -218,14 +180,9 @@ namespace SecondBotEvents.Commands
         [About("Ejects an avatar")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar")]
-        [ArgHints("avatar", "URLARG", "uuid of the avatar or Firstname Lastname")]
-        [Route(HttpVerbs.Get, "/ParcelEject/{avatar}/{token}")]
-        public object ParcelEject(string avatar,string token)
+        [ArgHints("avatar", "uuid of the avatar or Firstname Lastname")]
+        public object ParcelEject(string avatar)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
@@ -237,13 +194,8 @@ namespace SecondBotEvents.Commands
 
         [About("Abandons the parcel the bot is currently on, returning it to Linden's or Estate owner")]
         [ReturnHints("ok")]
-        [Route(HttpVerbs.Get, "/AbandonLand/{token}")]
-        public object AbandonLand(string token)
+        public object AbandonLand()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -260,14 +212,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild avatar")]
         [ReturnHintsFailure("Avatar is in the blacklist")]
-        [ArgHints("avatar", "URLARG", "uuid of the avatar or Firstname Lastname")]
-        [Route(HttpVerbs.Get, "/ParcelBan/{avatar}/{token}")]
-        public object ParcelBan(string avatar, string token)
+        [ArgHints("avatar", "uuid of the avatar or Firstname Lastname")]
+        public object ParcelBan(string avatar)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -306,14 +253,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild avatar")]
         [ReturnHintsFailure("Avatar is already unbanned")]
-        [ArgHints("avatar", "URLARG", "uuid of the avatar or Firstname Lastname")]
-        [Route(HttpVerbs.Get, "/ParcelUnBan/{avatar}/{token}")]
-        public object ParcelUnBan(string avatar, string token)
+        [ArgHints("avatar", "uuid of the avatar or Firstname Lastname")]
+        public object ParcelUnBan(string avatar)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -349,14 +291,9 @@ namespace SecondBotEvents.Commands
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
-        [ArgHints("musicurl", "URLARG", "The new name of the parcel")]
-        [Route(HttpVerbs.Get, "/SetParcelMusic/{musicurl}/{token}")]
-        public object SetParcelMusic(string musicurl, string token)
+        [ArgHints("musicurl", "The new name of the parcel")]
+        public object SetParcelMusic(string musicurl)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -375,14 +312,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to set flag ...")]
         [ReturnHintsFailure("Flag: ? is unknown")]
         [ReturnHintsFailure("Flag: ? missing \"=\"")]
-        [ArgHints("escapedflagdata", "Text", "repeatable flag data split by ::: formated Flag=True|False")]
-        [Route(HttpVerbs.Post, "/SetParcelFlag/{escapedflagdata}/{token}")]
-        public object SetParcelFlag([FormField] string escapedflagdata, string token)
+        [ArgHints("escapedflagdata", "repeatable flag data split by ::: formated Flag=True|False")]
+        public object SetParcelFlag(string escapedflagdata)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -437,14 +369,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild avatar UUID")]
-        [ArgHints("avatar", "URLARG", "avatar uuid or Firstname Lastname")]
-        [Route(HttpVerbs.Get, "/ParcelReturnTargeted/{avatar}/{token}")]
-        public object ParcelReturnTargeted(string avatar, string token)
+        [ArgHints("avatar", "avatar uuid or Firstname Lastname")]
+        public object ParcelReturnTargeted(string avatar)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -462,17 +389,13 @@ namespace SecondBotEvents.Commands
 
         [About("transfers the current parcel ownership to the assigned group")]
         [ReturnHints("ok")]
+        [ArgHints("group", "The group uuid to assign")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild group uuid")]
         [ReturnHintsFailure("Not in group")]
-        [Route(HttpVerbs.Get, "/ParcelDeedToGroup/{group}/{token}")]
-        public object ParcelDeedToGroup(string group, string token)
+        public object ParcelDeedToGroup(string group)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -502,14 +425,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Parcel sale locked to other avatars")]
         [ReturnHintsFailure("Parcel sale price and amount do not match")]
         [ReturnHintsFailure("Invaild amount")]
-        [ArgHints("amount", "URLARG", "amount to pay for the parcel (min 1)")]
-        [Route(HttpVerbs.Get, "/ParcelBuy/{amount}/{token}")]
-        public object ParcelBuy(string amount, string token)
+        [ArgHints("amount", "amount to pay for the parcel (min 1)")]
+        public object ParcelBuy(string amount)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -548,15 +466,10 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar UUID")]
         [ReturnHintsFailure("Invaild state")]
-        [ArgHints("avatar", "URLARG", "avatar uuid or Firstname Lastname")]
-        [ArgHints("state", "URLARG", "setting state to false will unfreeze or true to freeze")]
-        [Route(HttpVerbs.Get, "/ParcelFreeze/{avatar}/{state}/{token}")]
-        public object ParcelFreeze(string avatar, string state, string token)
+        [ArgHints("avatar", "avatar uuid or Firstname Lastname")]
+        [ArgHints("state", "setting state to false will unfreeze or true to freeze")]
+        public object ParcelFreeze(string avatar, string state)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (bool.TryParse(state, out bool freezestate) == false)
             {
                 return Failure("Invaild state", "ParcelFreeze", new [] { avatar, state });
@@ -575,13 +488,8 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("json object: GetParcelBanlistObject")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
-        [Route(HttpVerbs.Get, "/GetParcelBanlist/{token}")]
-        public object GetParcelBanlist(string token)
+        public object GetParcelBanlist()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
@@ -623,14 +531,9 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild object uuid")]
         [ReturnHintsFailure("Unable to find object")]
-        [ArgHints("objectuuid", "URLARG", "object UUID to unrez")]
-        [Route(HttpVerbs.Get, "/UnRezObject/{objectuuid}/{token}")]
-        public object UnRezObject(string objectuuid,string token)
+        [ArgHints("objectuuid", "object UUID to unrez")]
+        public object UnRezObject(string objectuuid)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(objectuuid, out UUID targetobject) == false)
             {
                 return Failure("Invaild object uuid", "UnRezObject", new [] { objectuuid });
@@ -666,14 +569,9 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
-        [ArgHints("escapedflagdata", "Text", "repeatable flag data split by ::: formated Flag=True|False")]
-        [Route(HttpVerbs.Get, "/ParcelSetMedia/{token}")]
-        public object ParcelSetMedia([FormField] string escapedflagdata, string token)
+        [ArgHints("escapedflagdata", "repeatable flag data split by ::: formated Flag=True|False")]
+        public object ParcelSetMedia(string escapedflagdata)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {

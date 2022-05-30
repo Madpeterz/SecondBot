@@ -1,6 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using OpenMetaverse;
+﻿using OpenMetaverse;
 using SecondBotEvents.Services;
 using Newtonsoft.Json;
 
@@ -12,33 +10,24 @@ namespace SecondBotEvents.Commands
         public Friends(EventsSecondBot setmaster) : base(setmaster)
         {
         }
+
         [About("Gets the friendslist")]
         [ReturnHints("array UUID = friendreplyobject")]
-        [Route(HttpVerbs.Get, "/Friendslist/{token}")]
-        public object Friendslist(string token)
+        public object Friendslist()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             return BasicReply(JsonConvert.SerializeObject(getClient().Friends.FriendList));
         }
 
         [About("Updates the friend perms for avatar avatar to State \n if true grants (Online/Map/Modify) perms")]
-        [ArgHints("avatar", "URLARG", "A avatar uuid or Firstname Lastname")]
-        [ArgHints("state", "URLARG", "true: Grant perms, false: Remove perms")]
+        [ArgHints("avatar", "A avatar uuid or Firstname Lastname")]
+        [ArgHints("state", "true: Grant perms, false: Remove perms")]
         [ReturnHints("granted")]
         [ReturnHints("removed")]
         [ReturnHintsFailure("Not A friend")]
         [ReturnHintsFailure("state invaild")]
         [ReturnHintsFailure("avatar lookup")]
-        [Route(HttpVerbs.Get, "/FriendFullPerms/{avatar}/{state}/{token}")]
-        public object FriendFullPerms(string avatar, string state, string token)
+        public object FriendFullPerms(string avatar, string state)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
@@ -69,15 +58,10 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Not in friendslist")]
         [ReturnHintsFailure("state invaild")]
         [ReturnHintsFailure("avatar lookup")]
-        [ArgHints("avatar", "URLARG", "A avatar uuid or Firstname Lastname")]
-        [ArgHints("state", "URLARG", "true: Send invite, false: Remove from friendslist")]
-        [Route(HttpVerbs.Get, "/FriendRequest/{avatar}/{state}/{token}")]
-        public object FriendRequest(string avatar, string state, string token)
+        [ArgHints("avatar", "A avatar uuid or Firstname Lastname")]
+        [ArgHints("state", "true: Send invite, false: Remove from friendslist")]
+        public object FriendRequest(string avatar, string state)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
@@ -105,6 +89,4 @@ namespace SecondBotEvents.Commands
             
         }
     }
-
-
 }

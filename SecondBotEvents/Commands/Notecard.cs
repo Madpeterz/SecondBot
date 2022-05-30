@@ -1,7 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using EmbedIO.WebApi;
-using OpenMetaverse;
+﻿using OpenMetaverse;
 using SecondBotEvents.Services;
 
 
@@ -17,15 +14,10 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Collection value is empty")]
         [ReturnHintsFailure("Content value is empty")]
         [ReturnHints("ok")]
-        [ArgHints("collection", "URLARG", "The name of the collection")]
-        [ArgHints("content", "String", "The text to add to the collection")]
-        [Route(HttpVerbs.Post, "/NotecardAdd/{collection}/{token}")]
-        public object NotecardAdd(string collection, [FormField] string content, string token)
+        [ArgHints("collection", "The name of the collection")]
+        [ArgHints("content", "The text to add to the collection")]
+        public object NotecardAdd(string collection, string content)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (SecondbotHelpers.notempty(collection) == false)
             {
                 return Failure("Collection value is empty", "NotecardAdd", new [] { collection, content });
@@ -41,14 +33,9 @@ namespace SecondBotEvents.Commands
         [About("Clears the contents of a collection")]
         [ReturnHintsFailure("Collection value is empty")]
         [ReturnHints("ok")]
-        [ArgHints("collection", "URLARG", "The name of the collection")]
-        [Route(HttpVerbs.Get, "/NotecardClear/{collection}/{token}")]
-        public object NotecardClear(string collection, string token)
+        [ArgHints("collection", "The name of the collection")]
+        public object NotecardClear(string collection)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (SecondbotHelpers.notempty(collection) == false)
             {
                 return Failure("Collection value is empty", "NotecardClear", new [] { collection });
@@ -62,16 +49,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild avatar uuid")]
         [ReturnHintsFailure("No content in notecard storage ?")]
         [ReturnHints("ok")]
-        [ArgHints("avatar", "URLARG", "The UUID or Name of an avatar")]
-        [ArgHints("collection", "URLARG", "The name of the collection")]
-        [ArgHints("notecardname", "URLARG", "What to call the created notecard")]
-        [Route(HttpVerbs.Get, "/NotecardSend/{avatar}/{collection}/{notecardname}/{token}")]
-        public object NotecardSend(string avatar, string collection, string notecardname, string token)
+        [ArgHints("avatar", "The UUID or Name of an avatar")]
+        [ArgHints("collection", "The name of the collection")]
+        [ArgHints("notecardname", "What to call the created notecard")]
+        public object NotecardSend(string avatar, string collection, string notecardname)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (SecondbotHelpers.notempty(collection) == false)
             {
                 return Failure("Collection value is empty", "NotecardSend", new [] { avatar, collection, notecardname });
@@ -93,16 +75,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Content value is empty")]
         [ReturnHintsFailure("Invaild avatar uuid")]
         [ReturnHints("ok")]
-        [ArgHints("avatar", "URLARG", "The UUID or Name of an avatar")]
-        [ArgHints("content", "String", "The text to add to the collection")]
-        [ArgHints("notecardname", "URLARG", "What to call the created notecard")]
-        [Route(HttpVerbs.Post, "/NotecardDirectSend/{avatar}/{notecardname}/{token}")]
-        public object NotecardDirectSend(string avatar, [FormField] string content, string notecardname, string token)
+        [ArgHints("avatar", "The UUID or Name of an avatar")]
+        [ArgHints("content", "The text to add to the collection")]
+        [ArgHints("notecardname", "What to call the created notecard")]
+        public object NotecardDirectSend(string avatar, string content, string notecardname)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (SecondbotHelpers.notempty(notecardname) == false)
             {
                 return Failure("notecardname value is empty", "NotecardDirectSend", new[] { avatar, content, notecardname });

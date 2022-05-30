@@ -1,7 +1,4 @@
 ﻿using BetterSecondBot.Static;
-using EmbedIO;
-using EmbedIO.Routing;
-using EmbedIO.WebApi;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using SecondBotEvents.Services;
@@ -22,29 +19,19 @@ namespace SecondBotEvents.Commands
         [ReturnHints("cleared")]
         [ReturnHints("No action")]
         [ReturnHints("Event added")]
-        [ArgHints("inventoryType", "URLARG", "Types: texture,sound,callcard,landmark,clothing,object,notecard,lsltext,lslbyte,animatn,gesture,mesh")]
-        [ArgHints("outputTarget", "text", "HTTP url, channel, avatar UUID or clear to remove all events for the selected type")]
-        [Route(HttpVerbs.Post, "/SetInventoryUpdate/{inventoryType}/{token}")]
-        public object SetInventoryUpdate(string inventoryType, [FormField] string outputTarget, string token)
+        [ArgHints("inventoryType", "Types: texture,sound,callcard,landmark,clothing,object,notecard,lsltext,lslbyte,animatn,gesture,mesh")]
+        [ArgHints("outputTarget", "HTTP url, channel, avatar UUID or clear to remove all events for the selected type")]
+        public object SetInventoryUpdate(string inventoryType, string outputTarget)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             return Failure("@todo inventory update events");
         }
 
         [About("Uploads a new sound file to inventory")]
         [ReturnHints("ok")]
-        [ArgHints("sourcePath", "Text", "accepts a file path to a wave PCM file @ 44100")]
-        [ArgHints("inventoryName", "URLARG", "the name in secondlife")]
-        [Route(HttpVerbs.Post, "/UploadMediaWave/{inventoryName}/{token}")]
-        public object UploadMediaWave([FormField] string sourcePath, string inventoryName, string token)
+        [ArgHints("sourcePath", "accepts a file path to a wave PCM file @ 44100")]
+        [ArgHints("inventoryName", "the name in secondlife")]
+        public object UploadMediaWave(string sourcePath, string inventoryName)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             byte[] audioData = File.ReadAllBytes(sourcePath);
             InventoryFolder AA = getClient().Inventory.Store.RootFolder;
             List<InventoryBase> T = getClient().Inventory.Store.GetContents(AA);
@@ -70,14 +57,9 @@ namespace SecondBotEvents.Commands
         [ReturnHints("UUID of rezzed item")]
         [ReturnHints("Invaild item UUID")]
         [ReturnHints("Unable to find item")]
-        [ArgHints("item", "URLARG", "UUID of item to rez")]
-        [Route(HttpVerbs.Get, "/RezObject/{item}/{token}")]
-        public object RezObject(string item, string token)
+        [ArgHints("item", "UUID of item to rez")]
+        public object RezObject(string item)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(item, out UUID targetitem) == false)
             {
                 return Failure("Invaild item UUID: "+ item, "RezObject", new [] { item });
@@ -97,15 +79,10 @@ namespace SecondBotEvents.Commands
         [ReturnHints("invaild item uuid")]
         [ReturnHints("Item name is to short")]
         [ReturnHints("Unable to find inventory item")]
-        [ArgHints("item", "URLARG", "UUID of item/folder to name")]
-        [ArgHints("newname", "Text", "What we are changing it to")]
-        [Route(HttpVerbs.Post, "/RenameInventory/{item}/{token}")]
-        public object RenameInventory(string item, [FormField] string newname, string token)
+        [ArgHints("item", "UUID of item/folder to name")]
+        [ArgHints("newname", "What we are changing it to")]
+        public object RenameInventory(string item, string newname)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(item, out UUID target) == false)
             {
                 return Failure("invaild item uuid", "RenameInventory", new [] { item, newname });
@@ -127,14 +104,9 @@ namespace SecondBotEvents.Commands
         [About("Attempts to Remove the given inventory item")]
         [ReturnHints("ok")]
         [ReturnHints("invaild item uuid")]
-        [ArgHints("item", "URLARG", "UUID of item")]
-        [Route(HttpVerbs.Get, "/DeleteInventoryItem/{item}/{token}")]
-        public object DeleteInventoryItem(string item, string token)
+        [ArgHints("item", "UUID of item")]
+        public object DeleteInventoryItem(string item)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(item, out UUID target) == false)
             {
                 return Failure("invaild item uuid", "DeleteInventoryItem", new [] { item });
@@ -146,14 +118,9 @@ namespace SecondBotEvents.Commands
         [About("Attempts to Remove the given inventory folder")]
         [ReturnHints("ok")]
         [ReturnHints("invaild folder uuid")]
-        [ArgHints("folder", "URLARG", "UUID of folder")]
-        [Route(HttpVerbs.Get, "/DeleteInventoryFolder/{folder}/{token}")]
-        public object DeleteInventoryFolder(string folder, string token)
+        [ArgHints("folder", "UUID of folder")]
+        public object DeleteInventoryFolder(string folder)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(folder, out UUID target) == false)
             {
                 return Failure("invaild folder uuid", "DeleteInventoryFolder", new [] { folder });
@@ -165,14 +132,9 @@ namespace SecondBotEvents.Commands
         [About("Attempts to attach the given inventory item")]
         [ReturnHints("ok")]
         [ReturnHints("invaild item uuid")] 
-        [ArgHints("item", "URLARG", "UUID of item")]
-        [Route(HttpVerbs.Get, "/Attach/{item}/{token}")]
-        public object Attach(string item, string token)
+        [ArgHints("item", "UUID of item")]
+        public object Attach(string item)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(item,out UUID itemuuid) == false)
             {
                 return Failure("invaild item uuid", "Attach", new [] { item });
@@ -185,14 +147,9 @@ namespace SecondBotEvents.Commands
         [About("Attempts to Remove the given inventory folder")]
         [ReturnHints("ok")]
         [ReturnHints("invaild item uuid")]
-        [ArgHints("item", "URLARG", "UUID of item")]
-        [Route(HttpVerbs.Get, "/Detach/{item}/{token}")]
-        public object Detach(string item, string token)
+        [ArgHints("item", "UUID of item")]
+        public object Detach(string item)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(item, out UUID itemuuid) == false)
             {
                 return Failure("invaild item uuid", "Detach", new [] { item });
@@ -208,14 +165,9 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Cant find Clothing folder")]
         [ReturnHints("Cant find target folder")]
         [ReturnHints("target folder is empty or so full I cant get it in 5 secs...")]
-        [ArgHints("name", "URLARG", "Name of the folder")]
-        [Route(HttpVerbs.Get, "/Outfit/{name}/{token}")]
-        public object Outfit(string name, string token)
+        [ArgHints("name", "Name of the folder")]
+        public object Outfit(string name)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (SecondbotHelpers.notempty(name) == false)
             {
                 return Failure("Named folder value is empty", "Outfit", new [] { name });
@@ -273,14 +225,8 @@ namespace SecondBotEvents.Commands
         [About("Searchs the notecards folder for notecards, any older than 31 days are deleted.<br/>Depending on the number of notecards this might require multiple calls!")]
         [ReturnHints("ok")]
         [ReturnHints("Unable to find notecard folder")]
-        [Route(HttpVerbs.Get, "/InventoryPurgeNotecards/{token}")]
-        [Obsolete]
-        public object InventoryPurgeNotecards(string token)
+        public object InventoryPurgeNotecards()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             List<InventoryBase> T = getClient().Inventory.Store.GetContents(getClient().Inventory.Store.RootFolder);
             InventoryBase NotecardFolder = null;
             foreach (InventoryBase R in T)
@@ -319,14 +265,9 @@ namespace SecondBotEvents.Commands
         [About("converts a inventory uuid to a realworld uuid<br/>Needed for texture preview")]
         [ReturnHints("Asset UUID or UUID zero")]
         [ReturnHints("Invaild item uuid")]
-        [ArgHints("item", "URLARG", "inventory level UUID of item")]
-        [Route(HttpVerbs.Get, "/getRealUUID/{item}/{token}")]
-        public object getRealUUID(string item, string token)
+        [ArgHints("item", "inventory level UUID of item")]
+        public object getRealUUID(string item)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(item, out UUID itemUUID) == false)
             {
                 return Failure("Invaild item uuid", "getRealUUID", new [] { item });
@@ -341,15 +282,10 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Invaild avatar uuid")]
         [ReturnHints("Invaild item uuid")]
         [ReturnHints("Unable to find item")]
-        [ArgHints("item", "URLARG", "UUID of item")]
-        [ArgHints("avatar", "URLARG", "a UUID or Firstname Lastname")]
-        [Route(HttpVerbs.Get, "/SendItem/{item}/{avatar}/{token}")]
-        public object SendItem(string item, string avatar, string token)
+        [ArgHints("item", "UUID of item")]
+        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        public object SendItem(string item, string avatar)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
@@ -374,15 +310,10 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Invaild avatar uuid")]
         [ReturnHints("Invaild folter uuid")]
         [ReturnHints("Unable to find folder")]
-        [ArgHints("item", "URLARG", "UUID of item")]
-        [ArgHints("avatar", "URLARG", "a UUID or Firstname Lastname")]
-        [Route(HttpVerbs.Get, "/SendFolder/{folder}/{avatar}/{token}")]
-        public object SendFolder(string folder, string avatar, string token)
+        [ArgHints("item", "UUID of item")]
+        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        public object SendFolder(string folder, string avatar)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
@@ -401,8 +332,6 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok", "SendFolder", new [] { folder, avatar });
         }
 
-
-
         [About("Transfers a item [ARG 2] to a objects inventory [ARG 1] (And if set with the script running state [ARG 3])")]
         [ReturnHints("Transfering running script")]
         [ReturnHints("Transfering inventory")]
@@ -411,17 +340,11 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Unable to find inventory")]
         [ReturnHints("Unable to find object")]
         [ReturnHints("Invaild running")]
-        [ArgHints("item", "URLARG", "UUID of item")]
-        [ArgHints("object", "URLARG", "the uuid of the object")]
-        [ArgHints("running", "URLARG", "true if you wish the transfered script to be running otherwise false")]
-
-        [Route(HttpVerbs.Get, "/TransferInventoryToObject/{item}/{objectuuid}/{running}/{token}")]
-        public object TransferInventoryToObject(string item, string objectuuid, string running, string token)
+        [ArgHints("item",  "UUID of item")]
+        [ArgHints("object", "the uuid of the object")]
+        [ArgHints("running", "true if you wish the transfered script to be running otherwise false")]
+        public object TransferInventoryToObject(string item, string objectuuid, string running)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(item, out UUID itemuuid) == false)
             {
                 return Failure("Invaild item uuid", "TransferInventoryToObject", new [] { item, objectuuid, running });
@@ -471,29 +394,19 @@ namespace SecondBotEvents.Commands
         [About("Requests the inventory folder layout as a json object InventoryMapFolder<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>subfolders: InventoryMapFolder[]</li></ul>")]
         [ReturnHints("array of InventoryMapFolder")]
         [ReturnHints("Error")]
-        [Route(HttpVerbs.Get, "/InventoryFolders/{token}")]
-        public object InventoryFolders(string token)
+        public object InventoryFolders()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             string reply = HelperInventory.MapFolderJson(getClient());
             if (reply != null) return BasicReply(reply, "InventoryFolders");
             return Failure("Error", "InventoryFolders");
         }
 
         [About("Requests folders limited to selected folder")]
-        [ArgHints("targetfolder", "URLARG", "the UUID of the folder or root")]
+        [ArgHints("targetfolder", "the UUID of the folder or root")]
         [ReturnHints("single InventoryMapFolder")]
         [ReturnHints("Error")]
-        [Route(HttpVerbs.Get, "/InventoryFoldersLimited/{targetfolder}/{token}")]
-        public object InventoryFoldersLimited(string targetfolder,string token)
+        public object InventoryFoldersLimited(string targetfolder)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             string reply = HelperInventory.MapFolderJson(getClient(), targetfolder,false);
             if (reply != null) return BasicReply(reply, "InventoryFoldersLimited");
             return Failure("Error", "InventoryFoldersLimited");
@@ -502,14 +415,9 @@ namespace SecondBotEvents.Commands
         [About("Requests the contents of a folder as an array of InventoryMapItem<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>typename: String</li></ul>")]
         [ReturnHints("array of InventoryMapItem")]
         [ReturnHints("Invaild folder UUID")]
-        [ArgHints("folderUUID", "URLARG", "the folder to fetch (Found via: inventory/folders)")]
-        [Route(HttpVerbs.Get, "/InventoryContents/{folderUUID}/{token}")]
-        public object InventoryContents(string folderUUID, string token)
+        [ArgHints("folderUUID", "the folder to fetch (Found via: inventory/folders)")]
+        public object InventoryContents(string folderUUID)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(folderUUID, out UUID folder) == false)
             {
                 return Failure("Invaild folder UUID", "InventoryContents", new [] { folderUUID });

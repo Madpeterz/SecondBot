@@ -1,10 +1,6 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using EmbedIO.WebApi;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OpenMetaverse;
 using SecondBotEvents.Services;
-using System.Collections.Generic;
 
 namespace SecondBotEvents.Commands
 {
@@ -16,29 +12,19 @@ namespace SecondBotEvents.Commands
 
         [About("fetchs the last localchat messages")]
         [ReturnHints("json encoded array")]
-        [Route(HttpVerbs.Get, "/LocalChatHistory/{token}")]
-        public object LocalChatHistory(string token)
+        public object LocalChatHistory()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.getLocalChat()));
         }
 
         [About("sends a message to localchat")]
-        [ArgHints("channel", "URLARG", "the channel to output on (>=0)")]
-        [ArgHints("message", "Text", "the message to send")]
+        [ArgHints("channel", "the channel to output on (>=0)")]
+        [ArgHints("message", "the message to send")]
         [ReturnHints("array string")]
         [ReturnHintsFailure("Message empty")]
         [ReturnHintsFailure("Invaild channel")]
-        [Route(HttpVerbs.Post, "/Say/{channel}/{token}")]
-        public object Say(string channel,[FormField] string message,string token)
+        public object Say(string channel, string message)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (SecondbotHelpers.isempty(message) == true)
             {
                 return Failure("Message empty", "Say", new [] { channel, message });
@@ -57,18 +43,13 @@ namespace SecondBotEvents.Commands
         }
 
         [About("sends a im to the selected avatar")]
-        [ArgHints("avatar", "URLARG", "a UUID or Firstname Lastname")]
-        [ArgHints("message", "Text", "the message to send")]
+        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        [ArgHints("message", "the message to send")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Message empty")]
         [ReturnHintsFailure("avatar lookup")]
-        [Route(HttpVerbs.Post, "/IM/{avatar}/{token}")]
-        public object IM(string avatar, [FormField] string message, string token)
+        public object IM(string avatar, string message)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
@@ -84,51 +65,31 @@ namespace SecondBotEvents.Commands
 
         [About("gets a full list of all avatar chat windows")]
         [ReturnHints("array UUID = Name")]
-        [Route(HttpVerbs.Get, "/chatwindows/{token}")]
-        public object chatwindows(string token)
+        public object chatwindows()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.getAvatarImWindows()));
         }
 
         [About("gets a list of chat windows from avatars with unread messages")]
         [ReturnHints("array of UUID")]
-        [Route(HttpVerbs.Get, "/listwithunread/{token}")]
-        public object listwithunread(string token)
+        public object listwithunread()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.getAvatarImWindowsUnread()));
         }
 
         [About("gets if there are any unread im messages from avatars at all")]
         [ReturnHints("True|False")]
-        [Route(HttpVerbs.Get, "/haveunreadims/{token}")]
-        public object haveunreadims(string token)
+        public object haveunreadims()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             return BasicReply(master.DataStoreService.getAvatarImWindowsUnreadAny().ToString());
         }
 
         [About("gets the chat from the selected window for avatar")]
-        [ArgHints("window", "URLARG", "the UUID of the avatar you wish to view the chat from")]
+        [ArgHints("window", "the UUID of the avatar you wish to view the chat from")]
         [ReturnHintsFailure("avatar UUID invaild")]
         [ReturnHints("Array of text")]
-        [Route(HttpVerbs.Get, "/getimchat/{avatarid}/{token}")]
-        public object getimchat(string avatarid, string token)
+        public object getimchat(string avatarid)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             UUID avatarUUID = UUID.Zero;
             if (UUID.TryParse(avatarid, out avatarUUID) == false)
             {

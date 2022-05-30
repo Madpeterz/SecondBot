@@ -2,24 +2,24 @@
 using EmbedIO.Actions;
 using EmbedIO.WebApi;
 using OpenMetaverse;
+using SecondBotEvents.Commands;
 using SecondBotEvents.Config;
 using Swan.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
-using SecondBotEvents.Commands;
 
 namespace SecondBotEvents.Services
 {
-    public class HttpService: Services
+    public class HttpService : Services
     {
         protected WebServer HTTPendpoint = null;
         protected HttpConfig myConfig;
         protected bool acceptBotCommands = false;
         public HttpService(EventsSecondBot setMaster) : base(setMaster)
         {
-            myConfig = new HttpConfig(master.fromEnv,master.fromFolder);
+            myConfig = new HttpConfig(master.fromEnv, master.fromFolder);
             if (myConfig.GetEnabled() == false)
             {
                 Console.WriteLine(Status());
@@ -29,7 +29,7 @@ namespace SecondBotEvents.Services
 
         public override string Status()
         {
-            if(myConfig == null)
+            if (myConfig == null)
             {
                 return "HTTP service [Config status broken]";
             }
@@ -38,7 +38,7 @@ namespace SecondBotEvents.Services
                 return "HTTP service [- Not requested -]";
             }
             // @todo HTTP server check here
-            if(HTTPendpoint == null)
+            if (HTTPendpoint == null)
             {
                 return "HTTP endpoint not online";
             }
@@ -96,7 +96,7 @@ namespace SecondBotEvents.Services
                 HTTPendpoint.Dispose();
                 HTTPendpoint = null;
                 Console.WriteLine("HTTP service [Stopping]");
-            } 
+            }
         }
 
         private void CreateWebServer()
@@ -106,30 +106,13 @@ namespace SecondBotEvents.Services
                  .WithUrlPrefix(myConfig.GetHost())
                  .WithMode(HttpListenerMode.EmbedIO))
                 .WithCors()
-                .WithWebApi("/animation", m => m.WithController(() => new AnimationCommands(master)))
-                .WithWebApi("/avatars", m => m.WithController(() => new Avatars(master)))
-                .WithWebApi("/chat", m => m.WithController(() => new Chat(master)))
-                .WithWebApi("/core", m => m.WithController(() => new Core(master)))
-                .WithWebApi("/dialogs", m => m.WithController(() => new Dialogs(master)))
-                .WithWebApi("/discord", m => m.WithController(() => new DiscordCommands(master)))
-                .WithWebApi("/estate", m => m.WithController(() => new Estate(master)))
-                .WithWebApi("/friends", m => m.WithController(() => new Friends(master)))
-                .WithWebApi("/funds", m => m.WithController(() => new Funds(master)))
-                .WithWebApi("/group", m => m.WithController(() => new GroupCommands(master)))
-                .WithWebApi("/info", m => m.WithController(() => new Info(master)))
-                .WithWebApi("/inventory", m => m.WithController(() => new InventoryCommands(master)))
-                .WithWebApi("/movement", m => m.WithController(() => new Movement(master)))
-                .WithWebApi("/notecard", m => m.WithController(() => new Notecard(master)))
-                .WithWebApi("/parcel", m => m.WithController(() => new ParcelCommands(master)))
-                .WithWebApi("/self", m => m.WithController(() => new Self(master)))
-                .WithWebApi("/streamadmin", m => m.WithController(() => new StreamAdmin(master)))
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" }))
             );
             HTTPendpoint.RunAsync();
         }
     }
 
-    public abstract class CommandsAPI : WebApiController
+    public abstract class CommandsAPI
     {
         protected EventsSecondBot master;
         public CommandsAPI(EventsSecondBot setmaster)
@@ -137,39 +120,8 @@ namespace SecondBotEvents.Services
             master = setmaster;
         }
 
-        protected bool AllowToken(string token)
-        {
-            return master.CommandsService.AllowToken(token);
-        }
-
         protected UUID avataruuid = UUID.Zero;
         protected Parcel targetparcel = null;
-
-        protected bool disableIPchecks = false;
-        public void disableIPlockout()
-        {
-            disableIPchecks = true;
-        }
-
-        public IPAddress handleGetClientIP()
-        {
-            try
-            {
-                if (disableIPchecks == true)
-                {
-                    return IPAddress.Parse("127.0.0.1");
-                }
-                else
-                {
-                    return HttpContext.Request.RemoteEndPoint.Address;
-                }
-            }
-            catch
-            {
-                Console.WriteLine("Error getting client ip");
-                return IPAddress.Parse("0.0.0.0");
-            }
-        }
 
         protected GridClient getClient()
         {
@@ -200,7 +152,7 @@ namespace SecondBotEvents.Services
         {
             avataruuid = UUID.Zero;
             string UUIDfetch = master.DataStoreService.getAvatarUUID(avatar);
-            if(UUIDfetch != "lookup")
+            if (UUIDfetch != "lookup")
             {
                 UUID.TryParse(UUIDfetch, out avataruuid);
             }
@@ -240,7 +192,7 @@ namespace SecondBotEvents.Services
         protected object Failure(string input)
         {
             // @todo Command history storage system
-            return new { reply = input, command= getCallingCommand(), status = false };
+            return new { reply = input, command = getCallingCommand(), status = false };
         }
 
         protected string getCallingCommand()
@@ -261,7 +213,7 @@ namespace SecondBotEvents.Services
 
     }
 
-    
+
     [AttributeUsage(AttributeTargets.Method)]
     public class About : Attribute
     {
@@ -269,16 +221,6 @@ namespace SecondBotEvents.Services
         public About(string about)
         {
             this.about = about;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public class NeedsToken : Attribute
-    {
-        public bool needsToken = true;
-        public NeedsToken(bool needsToken)
-        {
-            this.needsToken = needsToken;
         }
     }
 
@@ -296,7 +238,7 @@ namespace SecondBotEvents.Services
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class ReturnHintsFailure : ReturnHints
     {
-        public ReturnHintsFailure(string hint): base(hint)
+        public ReturnHintsFailure(string hint) : base(hint)
         {
             this.good = false;
         }
@@ -306,13 +248,11 @@ namespace SecondBotEvents.Services
     public class ArgHints : Attribute
     {
         public string name = "";
-        public string typename = "";
         public string about = "";
 
-        public ArgHints(string name,string typename, string about)
+        public ArgHints(string name, string about)
         {
             this.name = name;
-            this.typename = typename;
             this.about = about;
         }
     }

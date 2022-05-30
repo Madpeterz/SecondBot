@@ -1,6 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using OpenMetaverse;
+﻿using OpenMetaverse;
 using SecondBotEvents.Services;
 
 namespace SecondBotEvents.Commands
@@ -15,14 +13,9 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Granted perm animation")]
         [ReturnHints("Removed perm animation")]
         [ReturnHintsFailure("avatar lookup")]
-        [ArgHints("avatar", "URLARG", "UUID (or Firstname Lastname)")]
-        [Route(HttpVerbs.Get, "/AddToAllowAnimations/{avatar}/{token}")]
-        public object AddToAllowAnimations(string avatar, string token)
+        [ArgHints("avatar", "UUID (or Firstname Lastname)")]
+        public object AddToAllowAnimations(string avatar)
         {
-            if(AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
@@ -35,14 +28,9 @@ namespace SecondBotEvents.Commands
         [About("Attempts to play a gesture")]
         [ReturnHintsFailure("Error with gesture")]
         [ReturnHints("Accepted")]
-        [ArgHints("gesture", "URLARG", "Inventory UUID of the gesture")]
-        [Route(HttpVerbs.Get, "/PlayGesture/{gesture}/{token}")]
-        public object PlayGesture(string gesture, string token)
+        [ArgHints("gesture", "Inventory UUID of the gesture")]
+        public object PlayGesture(string gesture)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(gesture, out UUID gestureUUID) == false)
             {
                 return BasicReply("Error with gesture", "PlayGesture", new [] { gesture });
@@ -54,13 +42,8 @@ namespace SecondBotEvents.Commands
 
         [About("Resets the animation stack for the bot")]
         [ReturnHints("Accepted")]
-        [Route(HttpVerbs.Get, "/ResetAnimations/{token}")]
-        public object ResetAnimations(string token)
+        public object ResetAnimations()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             // @todo Reset animations function from old version
             return Failure("@todo", "ResetAnimations");
         }

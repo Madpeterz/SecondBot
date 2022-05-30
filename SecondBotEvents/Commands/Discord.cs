@@ -1,10 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using EmbedIO.WebApi;
-using OpenMetaverse;
-using SecondBotEvents.Services;
-using System;
-using System.Collections.Generic;
+﻿using SecondBotEvents.Services;
 
 namespace SecondBotEvents.Commands
 {
@@ -16,16 +10,11 @@ namespace SecondBotEvents.Commands
         [About("Adds a discord server role to the selected member")]
         [ReturnHintsFailure("Discord client not ready")]
         [ReturnHints("true|false")]
-        [ArgHints("serverid","URLARG","the server id to apply this action to")]
-        [ArgHints("roleid", "URLARG", "the role id we are giving")]
-        [ArgHints("memberid", "URLARG", "who we are giving it to")]
-        [Route(HttpVerbs.Get, "/Discord_AddRole/{serverid}/{roleid}/{memberid}/{token}")]
-        public object Discord_AddRole(string serverid,string roleid,string memberid,string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("roleid", "the role id we are giving")]
+        [ArgHints("memberid", "who we are giving it to")]
+        public object Discord_AddRole(string serverid,string roleid,string memberid)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");
@@ -37,16 +26,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Discord client not ready")]
         [ReturnHintsFailure("Why empty")]
         [ReturnHints("true|false")]
-        [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
-        [ArgHints("memberid", "URLARG", "who we are giving it to")]
-        [ArgHints("why", "string", "why they are being banned")]
-        [Route(HttpVerbs.Post, "/Discord_BanMember/{serverid}/{memberid}/{token}")]
-        public object Discord_BanMember(string serverid, string memberid, [FormField] string why, string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("memberid", "who we are giving it to")]
+        [ArgHints("why", "why they are being banned")]
+        public object Discord_BanMember(string serverid, string memberid, string why)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");
@@ -61,15 +45,10 @@ namespace SecondBotEvents.Commands
         [About("Clears messages on the server sent by the member in the last 13 days, 22hours 59mins")]
         [ReturnHintsFailure("Discord client not ready")]
         [ReturnHints("true|false")]
-        [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
-        [ArgHints("memberid", "URLARG", "who we are giving it to")]
-        [Route(HttpVerbs.Get, "/Discord_BulkClear_Messages/{serverid}/{memberid}/{token}")]
-        public object Discord_BulkClear_Messages(string serverid, string memberid, string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("memberid", "who we are giving it to")]
+        public object Discord_BulkClear_Messages(string serverid, string memberid)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");
@@ -81,16 +60,11 @@ namespace SecondBotEvents.Commands
         [About("Sends a message directly to the user [They must be in the server]\n This command requires the SERVER MEMBERS INTENT found in discord app dev")]
         [ReturnHintsFailure("Discord client not ready")]
         [ReturnHints("true|false")]
-        [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
-        [ArgHints("memberid", "URLARG", "who we are giving it to")]
-        [ArgHints("message", "Text", "what we are sending")]
-        [Route(HttpVerbs.Post, "/Discord_Dm_Member/{serverid}/{memberid}/{token}")]
-        public object Discord_Dm_Member(string serverid, string memberid, [FormField] string message, string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("memberid", "who we are giving it to")]
+        [ArgHints("message", "what we are sending")]
+        public object Discord_Dm_Member(string serverid, string memberid, string message)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");
@@ -103,14 +77,9 @@ namespace SecondBotEvents.Commands
             "SERVER MEMBERS INTENT set to true on the discord bot api area !!!")]
         [ReturnHintsFailure("Discord client not ready")]
         [ReturnHints("mixed array of userid: nickname|username  or   userid:username")]
-        [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
-        [Route(HttpVerbs.Get, "/Discord_MembersList/{serverid}/{token}")]
-        public object Discord_MembersList(string serverid, string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        public object Discord_MembersList(string serverid)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");
@@ -123,17 +92,12 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Discord client not ready")]
         [ReturnHintsFailure("message empty")]
         [ReturnHints("true|false")]
-        [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
-        [ArgHints("channelid", "URLARG", "the channel id to apply this action to")]
-        [ArgHints("tts", "URLARG", "shoud tts be enabled true or false")]
-        [ArgHints("message", "Text", "what we are sending")]
-        [Route(HttpVerbs.Post, "/Discord_MembersList/{serverid}/{tts}/{token}")]
-        public object Discord_MessageChannel(string serverid, string channelid, string tts, [FormField] string message,  string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("channelid", "the channel id to apply this action to")]
+        [ArgHints("tts", "shoud tts be enabled true or false")]
+        [ArgHints("message", "what we are sending")]
+        public object Discord_MessageChannel(string serverid, string channelid, string tts, string message)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");
@@ -148,16 +112,11 @@ namespace SecondBotEvents.Commands
         [About("Sends a message to the selected channel - Optional TTS usage")]
         [ReturnHints("mixed array of userid: nickname|username  or   userid:username")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
-        [ArgHints("memberid", "URLARG", "who we are giving it to")]
-        [ArgHints("mode", "URLARG", "should we mute them \"true\" or unmute \"false\"")]
-        [Route(HttpVerbs.Get, "/Discord_MuteMember/{serverid}/{memberid}/{mode}/{token}")]
-        public object Discord_MuteMember(string serverid, string memberid, string mode, string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("memberid", "who we are giving it to")]
+        [ArgHints("mode", "should we mute them \"true\" or unmute \"false\"")]
+        public object Discord_MuteMember(string serverid, string memberid, string mode)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");
@@ -168,16 +127,11 @@ namespace SecondBotEvents.Commands
         [About("returns a collection of settings for the given role \n This command requires Discord full client mode enabled and connected")]
         [ReturnHints("KeyPair of status: KeyPair[] item = value")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
-        [ArgHints("memberid", "URLARG", "who we are giving it to")]
-        [ArgHints("mode", "URLARG", "should we mute them \"true\" or unmute \"false\"")]
-        [Route(HttpVerbs.Get, "/Discord_Role_GetSettings/{serverid}/{roleid}/{token}")]
-        public object Discord_Role_GetSettings(string serverid, string roleid, string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("memberid", "who we are giving it to")]
+        [ArgHints("mode", "should we mute them \"true\" or unmute \"false\"")]
+        public object Discord_Role_GetSettings(string serverid, string roleid)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");
@@ -190,16 +144,11 @@ namespace SecondBotEvents.Commands
             " This command requires Discord full client mode enabled and connected")]
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
-        [ArgHints("roleid", "URLARG", "who we are giving it to")]
-        [ArgHints("flagscsv", "Text", "what we are setting")]
-        [Route(HttpVerbs.Post, "/Discord_Role_UpdatePerms/{serverid}/{roleid}/{token}")]
-        public object Discord_Role_UpdatePerms(string serverid, string roleid, [FormField] string flagscsv, string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("roleid", "who we are giving it to")]
+        [ArgHints("flagscsv", "what we are setting")]
+        public object Discord_Role_UpdatePerms(string serverid, string roleid, string flagscsv)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");
@@ -211,15 +160,10 @@ namespace SecondBotEvents.Commands
     " This command requires Discord full client mode enabled and connected")]
         [ReturnHints("KeyPair of statusmessage=roleid or 0")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
-        [ArgHints("role", "URLARG", "the name of the role we are creating")]
-        [Route(HttpVerbs.Get, "/Discord_RoleCreate/{serverid}/{role}/{token}")]
-        public object Discord_RoleCreate(string serverid, string role, string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("role", "the name of the role we are creating")]
+        public object Discord_RoleCreate(string serverid, string role)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");
@@ -231,14 +175,9 @@ namespace SecondBotEvents.Commands
         [About("Returns a list of roles and their ids in collection \n This command requires Discord full client mode enabled and connected")]
         [ReturnHints("KeyPair of status: KeyPair of roleid: rolename")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
-        [Route(HttpVerbs.Get, "/Discord_RoleList/{serverid}/{token}")]
-        public object Discord_RoleList(string serverid, string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        public object Discord_RoleList(string serverid)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");
@@ -249,14 +188,9 @@ namespace SecondBotEvents.Commands
         [About("Remove a role from a server \n This command requires Discord full client mode enabled and connected")]
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
-        [Route(HttpVerbs.Get, "/Discord_RoleRemove/{serverid}/{roleid}/{token}")]
-        public object Discord_RoleRemove(string serverid, string roleid, string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        public object Discord_RoleRemove(string serverid, string roleid)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");
@@ -267,14 +201,9 @@ namespace SecondBotEvents.Commands
         [About("Returns a list of text channels in a server")]
         [ReturnHints("array of channelid: name")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "URLARG", "the server id to apply this action to")]
-        [Route(HttpVerbs.Get, "/Discord_TextChannels_List/{serverid}/{roleid}/{token}")]
-        public object Discord_TextChannels_List(string serverid, string token)
+        [ArgHints("serverid", "the server id to apply this action to")]
+        public object Discord_TextChannels_List(string serverid)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.DiscordService.DiscordReady() == false)
             {
                 return Failure("Discord client not ready");

@@ -1,7 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using EmbedIO.WebApi;
-using OpenMetaverse;
+﻿using OpenMetaverse;
 using SecondBotEvents.Services;
 using System;
 using System.Collections.Generic;
@@ -21,16 +18,11 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Convert to vector has failed")]
         [ReturnHintsFailure("?  value out of range 0-?")]
-        [ArgHints("x", "URLARG", "X location to AutoPilot to")]
-        [ArgHints("y", "URLARG", "y location to AutoPilot to")]
-        [ArgHints("z", "URLARG", "z location to AutoPilot to")]
-        [Route(HttpVerbs.Get, "/AutoPilot/{x}/{y}/{z}/{token}")]
-        public object AutoPilot(string x, string y, string z, string token)
+        [ArgHints("x", "X location to AutoPilot to")]
+        [ArgHints("y", "Y location to AutoPilot to")]
+        [ArgHints("z", "Z location to AutoPilot to")]
+        public object AutoPilot(string x, string y, string z)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (Vector3.TryParse("<" + x + "," + y + "," + z + ">", out Vector3 pos) == false)
             {
                 return Failure("Convert to vector has failed", "AutoPilot", new [] { x, y, z });
@@ -58,13 +50,8 @@ namespace SecondBotEvents.Commands
 
         [About("Attempt to teleport to a new region")]
         [ReturnHints("ok")]
-        [Route(HttpVerbs.Get, "/AutoPilotStop/{token}")]
-        public object AutoPilotStop(string token)
+        public object AutoPilotStop()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             getClient().Self.AutoPilotCancel();
             return BasicReply("ok", "AutoPilotStop");
         }
@@ -72,14 +59,9 @@ namespace SecondBotEvents.Commands
         [About("Make the bot request the target avatar teleport to the bot")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar UUID")]
-        [ArgHints("avatar", "URLARG", "Avatar UUID or Firstname Lastname")]
-        [Route(HttpVerbs.Get, "/SendTeleportLure/{avatar}/{token}")]
-        public object SendTeleportLure(string avatar,string token)
+        [ArgHints("avatar", "Avatar UUID or Firstname Lastname")]
+        public object SendTeleportLure(string avatar)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
@@ -92,14 +74,9 @@ namespace SecondBotEvents.Commands
         [About("Sends a teleport request (Move the bot to the avatar)")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar UUID")]
-        [ArgHints("avatar", "URLARG", "Avatar UUID or Firstname Lastname")]
-        [Route(HttpVerbs.Get, "/RequestTeleport/{avatar}/{token}")]
-        public object RequestTeleport(string avatar, string token)
+        [ArgHints("avatar", "Avatar UUID or Firstname Lastname")]
+        public object RequestTeleport(string avatar)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
@@ -113,14 +90,9 @@ namespace SecondBotEvents.Commands
         [About("Makes the bot fly (or not)")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild mode")]
-        [ArgHints("mode", "URLARG", "true: Start flying, false: stop flying (super fun at height)")]
-        [Route(HttpVerbs.Get, "/Fly/{mode}/{token}")]
-        public object Fly(string mode, string token)
+        [ArgHints("mode", "true: Start flying, false: stop flying (super fun at height)")]
+        public object Fly(string mode)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (bool.TryParse(mode, out bool flymode) == false)
             {
                 return Failure("Invaild mode", "Fly", new [] { mode });
@@ -130,20 +102,13 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok", "Fly", new [] { mode });
         }
 
-
-
         [About("Rotates the bot to face a vector from its current location")]
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Invaild vector")]
         [ReturnHintsFailure("Vector ? value is out of range 0-?")]
-        [ArgHints("vector", "Text", "a vector to face eg <123,45,44>")]
-        [Route(HttpVerbs.Post, "/RotateToFaceVector/{token}")]
-        public object RotateToFaceVector([FormField] string vector, string token)
+        [ArgHints("vector", "a vector to face eg <123,45,44>")]
+        public object RotateToFaceVector(string vector)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (Vector3.TryParse(vector, out Vector3 pos) == false)
             {
                 return Failure("Invaild vector", "RotateToFaceVector", new [] { vector });
@@ -167,14 +132,9 @@ namespace SecondBotEvents.Commands
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Invaild avatar UUID")]
         [ReturnHintsFailure("Unable to see avatar")]
-        [ArgHints("avatar", "URLARG", "An avatar UUID or Firstname Lastname")]
-        [Route(HttpVerbs.Post, "/RotateToFace/{avatar}/{token}")]
-        public object RotateToFace(string avatar, string token)
+        [ArgHints("avatar", "An avatar UUID or Firstname Lastname")]
+        public object RotateToFace(string avatar)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
@@ -187,18 +147,12 @@ namespace SecondBotEvents.Commands
             return BasicReply(getClient().Self.Movement.TurnToward(getClient().Network.CurrentSim.AvatarPositions[avataruuid], true).ToString(), "RotateToFace", new [] { avatar });
         }
 
-
         [About("Rotates the avatar to face a rotation from north in Degrees")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Unable to process rotation")]
-        [ArgHints("deg", "URLARG", "0 to 360")]
-        [Route(HttpVerbs.Post, "/RotateTo/{deg}/{token}")]
-        public object RotateTo(string deg, string token)
+        [ArgHints("deg", "0 to 360")]
+        public object RotateTo(string deg)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (float.TryParse(deg, out float target_yaw) == true)
             {
                 return Failure("Unable to process rotation", "RotateTo", new [] { deg });
@@ -232,17 +186,12 @@ namespace SecondBotEvents.Commands
         [About("Attempt to teleport to a new region")]
         [ReturnHintsFailure("Error Unable to Teleport to location")]
         [ReturnHints("Accepted")]
-        [ArgHints("region", "URLARG", "the name of the region we are going to")]
-        [ArgHints("x", "URLARG", "X location to teleport to")]
-        [ArgHints("y", "URLARG", "y location to teleport to")]
-        [ArgHints("z", "URLARG", "z location to teleport to")]
-        [Route(HttpVerbs.Get, "/Teleport/{region}/{x}/{y}/{z}/{token}")]
-        public object Teleport(string region, string x, string y, string z, string token)
+        [ArgHints("region", "the name of the region we are going to")]
+        [ArgHints("x", "X location to teleport to")]
+        [ArgHints("y", "y location to teleport to")]
+        [ArgHints("z", "z location to teleport to")]
+        public object Teleport(string region, string x, string y, string z)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             bool status = TeleportRequest(new [] { region, x, y, z });
             if (status == false)
             {
@@ -255,14 +204,9 @@ namespace SecondBotEvents.Commands
         [About("Attempt to teleport to a new region via a SL url")]
         [ReturnHintsFailure("slurl is empty")]
         [ReturnHints("True|False")]
-        [ArgHints("slurl", "Text", "a full SLurl")]
-        [Route(HttpVerbs.Post, "/TeleportSLURL/{token}")]
-        public object TeleportSLURL([FormField] string slurl, string token)
+        [ArgHints("slurl", "a full SLurl")]
+        public object TeleportSLURL(string slurl)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (SecondbotHelpers.notempty(slurl) == false)
             {
                 return Failure("slurl is empty", "TeleportSLURL", new [] { slurl });

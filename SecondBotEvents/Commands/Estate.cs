@@ -1,7 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using EmbedIO.WebApi;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OpenMetaverse;
 using SecondBotEvents.Services;
 using System.Collections.Generic;
@@ -17,16 +14,11 @@ namespace SecondBotEvents.Commands
         [ReturnHints("restarting")]
         [ReturnHintsFailure("Not an estate manager here")]
         [ReturnHintsFailure("canceled")]
-        [ArgHints("delay", "URLARG", "How long to delay the restart for (30 to 240 secs) - defaults to 240 if out of bounds \n" +
+        [ArgHints("delay", "How long to delay the restart for (30 to 240 secs) - defaults to 240 if out of bounds \n" +
             "set to 0 if your canceling!")]
-        [ArgHints("mode", "URLARG", "true to start a restart, false to cancel")]
-        [Route(HttpVerbs.Get, "/SimRestart/{delay}/{mode}/{token}")]
-        public object SimRestart(string delay, string mode, string token)
+        [ArgHints("mode", "true to start a restart, false to cancel")]
+        public object SimRestart(string delay, string mode)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (getClient().Network.CurrentSim.IsEstateManager == false)
             {
                 return Failure("Not an estate manager here", "SimRestart", new [] { delay, mode });
@@ -51,14 +43,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Not an estate manager here")]
         [ReturnHintsFailure("Message empty")]
         [ReturnHints("ok")]
-        [ArgHints("message", "Text", "What the message is")]
-        [Route(HttpVerbs.Post, "/SimMessage/{token}")]
-        public object SimMessage([FormField] string message, string token)
+        [ArgHints("message", "What the message is")]
+        public object SimMessage(string message, string token)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (SecondbotHelpers.notempty(message) == false)
             {
                 return Failure("Message empty", "SimMessage", new [] { message });
@@ -74,14 +61,9 @@ namespace SecondBotEvents.Commands
         [About("Fetchs the regions map tile")]
         [ReturnHintsFailure("Unable to find region")]
         [ReturnHints("Texture UUID")]
-        [ArgHints("regionname", "URLARG", "the name of the region we are fetching")]
-        [Route(HttpVerbs.Get, "/GetSimTexture/{regionname}/{token}")]
-        public object GetSimTexture(string regionname, string token)
+        [ArgHints("regionname", "the name of the region we are fetching")]
+        public object GetSimTexture(string regionname)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (getClient().Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region) == false)
             {
                 return Failure("Unable to find region", "GetSimTexture", new [] { regionname });
@@ -92,32 +74,23 @@ namespace SecondBotEvents.Commands
         [About("Reclaims ownership of the current parcel")]
         [ReturnHintsFailure("Not an estate manager here")]
         [ReturnHints("ok")]
-        [Route(HttpVerbs.Get, "/EstateParcelReclaim/{token}")]
-        public object EstateParcelReclaim(string token)
+        public object EstateParcelReclaim()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (getClient().Network.CurrentSim.IsEstateManager == false)
             {
-                return Failure("Not an estate manager here", "EstateParcelReclaim");
+                return Failure("Not an estate manager here");
             }
             int localid = getClient().Parcels.GetParcelLocalID(getClient().Network.CurrentSim, getClient().Self.SimPosition);
             getClient().Parcels.Reclaim(getClient().Network.CurrentSim, localid);
-            return BasicReply("ok", "EstateParcelReclaim");
+            return BasicReply("ok");
         }
 
-        [About("Reclaims ownership of the current parcel")]
-        [ReturnHintsFailure("Not an estate manager here")]
-        [ReturnHints("ok")]
-        [Route(HttpVerbs.Get, "/GetSimGlobalPos/{regionname}/{token}")]
-        public object GetSimGlobalPos(string regionname, string token)
+        [About("Gets the global location of a sim [region]")]
+        [ArgHints("regionname", "the region we want")]
+        [ReturnHintsFailure("Unable to find region")]
+        [ReturnHints("a json object with the x,y and region name")]
+        public object GetSimGlobalPos(string regionname)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (getClient().Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region) == false)
             {
                 return Failure("Unable to find region", "GetSimGlobalPos", new [] { regionname });
@@ -126,20 +99,14 @@ namespace SecondBotEvents.Commands
             reply.Add("region", regionname);
             reply.Add("X", region.X.ToString());
             reply.Add("Y", region.Y.ToString());
-            SuccessNoReturn("GetSimGlobalPos", new [] { regionname });
-            return reply;
+            return BasicReply(JsonConvert.SerializeObject(reply));
         }
 
         [About("Requests the estate banlist")]
         [ReturnHints("ban list json")]
-        [Route(HttpVerbs.Get, "/GetEstateBanList/{token}")]
-        public object GetEstateBanList(string token)
+        public object GetEstateBanList()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
-            return Failure("@todo estate blacklist");
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetEstateBans()));
         }
 
         [About("Attempts to add/remove the avatar to/from the Estate banlist")]
@@ -148,17 +115,12 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to find avatar UUID")]
         [ReturnHintsFailure("Unable to process global value please use true or false")]
         [ReturnHintsFailure("Not an estate manager on region {REGIONNAME}")]
-        [ArgHints("avatar", "URLARG", "the uuid avatar you wish to ban")]
-        [ArgHints("mode", "URLARG", "What action would you like to take<br/>Defaults to remove if not given \"add\"")]
-        [ArgHints("global", "URLARG", "if true this the ban/unban will be applyed to all estates the bot has access to")]
-        [Route(HttpVerbs.Get, "/UpdateEstateBanlist/{avatar}/{mode}/{global}/{token}")]
+        [ArgHints("avatar", "the uuid avatar you wish to ban")]
+        [ArgHints("mode", "What action would you like to take<br/>Defaults to remove if not given \"add\"")]
+        [ArgHints("global", "if true this the ban/unban will be applyed to all estates the bot has access to")]
 
-        public object UpdateEstateBanlist(string avatar, string mode, string global, string token)
+        public object UpdateEstateBanlist(string avatar, string mode, string global)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (getClient().Network.CurrentSim.IsEstateManager == false)
             {
                 return Failure("Not an estate manager on region " + getClient().Network.CurrentSim.Name, "UpdateEstateBanlist", new [] { avatar, mode, global });

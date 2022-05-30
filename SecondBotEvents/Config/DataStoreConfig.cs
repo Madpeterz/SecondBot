@@ -17,6 +17,31 @@ namespace SecondBotEvents.Config
             settings.Add("NotecardStoragePurgeAfterMins");
             settings.Add("PrefetchGroupMembers");
             settings.Add("PrefetchGroupRoles");
+            settings.Add("PrefetchEstateBanlist");
+            settings.Add("AutoCleanKeyValueStore");
+            settings.Add("CleanKeyValueStoreAfterMins");
+            settings.Add("CommandHistoryLimit");
+        }
+
+        public int GetCommandHistoryLimit()
+        {
+            return ReadSettingAsInt("CommandHistoryLimit", 30);
+        }
+
+
+        public bool GetAutoCleanKeyValueStore()
+        {
+            return ReadSettingAsBool("AutoCleanKeyValueStore", true);
+        }
+
+        public int GetCleanKeyValueStoreAfterMins()
+        {
+            return ReadSettingAsInt("CleanKeyValueStoreAfterMins", 10);
+        }
+
+        public bool GetPrefetchEstateBanlist()
+        {
+            return ReadSettingAsBool("PrefetchEstateBanlist", true);
         }
 
         public bool GetPrefetchGroupRoles()

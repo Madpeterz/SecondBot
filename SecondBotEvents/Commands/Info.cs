@@ -1,6 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OpenMetaverse;
 using SecondBotEvents.Services;
 using System;
@@ -16,13 +14,8 @@ namespace SecondBotEvents.Commands
 
         [About("Lists objects that are sculpty type in the current sim that the bot can see")]
         [ReturnHints("A json object")]
-        [Route(HttpVerbs.Get, "/ListSculptys/{token}")]
-        public object ListSculptys(string token)
+        public object ListSculptys()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             Dictionary<uint, Primitive> objects_copy = getClient().Network.CurrentSim.ObjectsPrimitives.Copy();
 
             Dictionary<uint, uint> mapLocalID = new Dictionary<uint, uint>();
@@ -72,107 +65,77 @@ namespace SecondBotEvents.Commands
             }
             if (reply.Count == 0)
             {
-                return Failure("No objects found", "ListSculptys");
+                return Failure("No objects found");
             }
-            return BasicReply(JsonConvert.SerializeObject(reply), "ListSculptys",new string[] { });
+            return BasicReply(JsonConvert.SerializeObject(reply));
         }
 
         [About("Fetchs the current bot")]
         [ReturnHints("The build ID of the bot")]
-        [Route(HttpVerbs.Get, "/Version/{token}")]
-        public object Version(string token)
+        public object Version()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
-            return BasicReply(master.GetVersion(), "Version");
+            return BasicReply(master.GetVersion());
 
         }
 
         [About("Fetchs the name of the bot")]
         [ReturnHints("Firstname Lastname")]
-        [Route(HttpVerbs.Get, "/Name/{token}")]
-        public object Name(string token)
+        public object Name()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
-            return BasicReply(getClient().Self.FirstName + " " + getClient().Self.LastName, "Name");
+            return BasicReply(getClient().Self.FirstName + " " + getClient().Self.LastName);
         }
 
         [About("Fetchs the current parcels name")]
         [ReturnHints("Parcelname")]
         [ReturnHintsFailure("Error parcel not found")]
         [ReturnHintsFailure("Error not in a sim")]
-        [Route(HttpVerbs.Get, "/ParcelName/{token}")]
-        public object ParcelName(string token)
+        public object ParcelName()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (getClient().Network.CurrentSim == null)
             {
-                return Failure("Error not in a sim", "ParcelName");
+                return Failure("Error not in a sim");
             }
             int localid = getClient().Parcels.GetParcelLocalID(getClient().Network.CurrentSim, getClient().Self.SimPosition);
             if (getClient().Network.CurrentSim.Parcels.ContainsKey(localid) == false)
             {
-                return Failure("Error parcel not found", "ParcelName");
+                return Failure("Error parcel not found");
             }
-            return BasicReply(getClient().Network.CurrentSim.Parcels[localid].Name, "ParcelName");
+            return BasicReply(getClient().Network.CurrentSim.Parcels[localid].Name);
         }
 
         [About("Requests the current unixtime at the bot")]
         [ReturnHints("Unixtime")]
-        [Route(HttpVerbs.Get, "/UnixTimeNow/{token}")]
-        public object UnixTimeNow(string token)
+        public object UnixTimeNow()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
-            return BasicReply(SecondbotHelpers.UnixTimeNow().ToString(), "UnixTimeNow");
+            return BasicReply(SecondbotHelpers.UnixTimeNow().ToString());
         }
 
         [About("Fetchs the current region name")]
         [ReturnHints("Regionname")]
         [ReturnHintsFailure("Error not in a sim")]
-        [Route(HttpVerbs.Get, "/SimName/{token}")]
-        public object SimName(string token)
+        public object SimName()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (getClient().Network.CurrentSim == null)
             {
-                return Failure("Error not in a sim", "SimName");
+                return Failure("Error not in a sim");
             }
-            return BasicReply(getClient().Network.CurrentSim.Name, "SimName");
+            return BasicReply(getClient().Network.CurrentSim.Name);
         }
 
         [About("Fetchs the current location of the bot")]
         [ReturnHints("array of X,Y,Z values")]
         [ReturnHintsFailure("Error not in a sim")]
-        [Route(HttpVerbs.Get, "/GetPosition/{token}")]
-        public object GetPosition(string token)
+        public object GetPosition()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (getClient().Network.CurrentSim == null)
             {
-                return Failure("Error not in a sim", "GetPosition");
+                return Failure("Error not in a sim");
             }
             Dictionary<string, int> pos = new Dictionary<string, int>();
             pos.Add("x", (int)Math.Round(getClient().Self.SimPosition.X));
             pos.Add("y", (int)Math.Round(getClient().Self.SimPosition.Y));
             pos.Add("z", (int)Math.Round(getClient().Self.SimPosition.Z));
-            return BasicReply(JsonConvert.SerializeObject(pos), "GetPosition");
+            return BasicReply(JsonConvert.SerializeObject(pos));
         }
     }
 

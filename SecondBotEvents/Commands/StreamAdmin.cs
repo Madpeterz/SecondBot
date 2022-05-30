@@ -1,7 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using EmbedIO.WebApi;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OpenMetaverse;
 using RestSharp;
 using SecondBotEvents.Services;
@@ -24,15 +21,10 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("HTTP status code: ...")]
         [ReturnHintsFailure("Error: ...")]
         [ReturnHintsFailure("Notecard title is to short")]
-        [ArgHints("endpoint","Text","The end point")]
-        [ArgHints("endpointcode", "Text", "The end point code")]
-        [Route(HttpVerbs.Post, "/FetchNextNotecard/{token}")]
-        public object FetchNextNotecard([FormField] string endpoint, [FormField] string endpointcode, string token)
+        [ArgHints("endpoint", "The end point")]
+        [ArgHints("endpointcode", "The end point code")]
+        public object FetchNextNotecard(string endpoint, string endpointcode)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (SecondbotHelpers.notempty(endpoint) == false)
             {
                 return Failure("Endpoint is empty", "FetchNextNotecard", new [] { endpoint, endpointcode });
@@ -43,7 +35,7 @@ namespace SecondBotEvents.Commands
             }
 
             string attempt_endpoint = endpoint + "sys.php";
-            token = SecondbotHelpers.GetSHA1(SecondbotHelpers.UnixTimeNow().ToString() + "NotecardNext" + endpointcode);
+            string token = SecondbotHelpers.GetSHA1(SecondbotHelpers.UnixTimeNow().ToString() + "NotecardNext" + endpointcode);
             var client = new RestClient(attempt_endpoint);
             var request = new RestRequest("Notecard/Next", Method.Post);
             string unixtime = SecondbotHelpers.UnixTimeNow().ToString();

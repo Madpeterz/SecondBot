@@ -1,7 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using EmbedIO.WebApi;
-using OpenMetaverse;
+﻿using OpenMetaverse;
 using SecondBotEvents.Services;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,67 +13,48 @@ namespace SecondBotEvents.Commands
 
         [About("Makes the bot teleport to its home region")]
         [ReturnHints("ok")]
-        [Route(HttpVerbs.Get, "/GoHome/{token}")]
-        public object GoHome(string token)
+        public object GoHome()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             return Failure("@todo home system");
         }
 
-        [About("Makes the bot turn to face avatar and point at them (if found)")]
+        [About("Makes the bot turn to face a avatar and point at it (if found)")]
         [ReturnHints("ok")]
+        [ArgHints("targetUUID", "UUID of a avatar to point at")]
         [ReturnHintsFailure("Cant find UUID in sim")]
-        [Route(HttpVerbs.Get, "/PointAt/{avatar}/{token}")]
-        public object PointAt(string avatar, string token)
+        public object PointAt(string targetUUID)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
-            ProcessAvatar(avatar);
             if (getClient().Network.CurrentSim.AvatarPositions.ContainsKey(avataruuid) == false)
             {
-                return Failure("Cant find UUID in sim", "PointAt", new [] { avatar });
+                return Failure("Cant find UUID in sim", "PointAt", new [] { targetUUID });
             }
+            ProcessAvatar(targetUUID);
             getClient().Self.Stand();
             getClient().Self.Movement.TurnToward(getClient().Network.CurrentSim.AvatarPositions[avataruuid]);
             getClient().Self.Movement.SendUpdate();
             getClient().Self.AnimationStart(Animations.POINT_YOU, true);
             getClient().Self.PointAtEffect(getClient().Self.AgentID, avataruuid, new Vector3d(0, 0, 0), PointAtType.Select, UUID.Random());
             getClient().Self.BeamEffect(getClient().Self.AgentID, avataruuid, new Vector3d(0, 0, 2), new Color4(255, 255, 255, 1), (float)3.0, UUID.Random());
-            return BasicReply("ok", "PointAt", new [] { avatar });
+            return BasicReply("ok", "PointAt", new [] { targetUUID });
         }
 
         [About("Reads a value from the KeyValue storage (temp unless SQL is enabled)")]
         [ReturnHints("value")]
         [ReturnHintsFailure("Unknown Key: KeyName")]
-        [ArgHints("Key", "URLARG", "the key we are trying to read from")]
-        [Route(HttpVerbs.Get, "/ReadKeyValue/{Key}/{token}")]
-        public object ReadKeyValue(string Key, string token)
+        [ArgHints("Key", "the key we are trying to read from")]
+        public object ReadKeyValue(string Key)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
-            return Failure("@todo key value storage");
+            return BasicReply(master.DataStoreService.GetKeyValue(Key));
         }
 
         [About("sets a value for KeyValue storage (temp unless SQL is enabled)")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Key is empty")]
         [ReturnHintsFailure("Value is empty")]
-        [ArgHints("Key", "URLARG", "the key we are trying to set")]
-        [ArgHints("Value", "string", "the value we are tring to put on the key")]
-        [Route(HttpVerbs.Post, "/SetKeyValue/{Key}/{token}")]
-        public object SetKeyValue(string Key, [FormField] string Value, string token)
+        [ArgHints("Key", "the key we are trying to set")]
+        [ArgHints("Value", "the value we are tring to put on the key")]
+        public object SetKeyValue(string Key, string Value)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (SecondbotHelpers.isempty(Key) == false)
             {
                 return Failure("Key is empty", "SetKeyValue", new[] { Key, Value });
@@ -85,38 +63,30 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Value is empty", "SetKeyValue", new[] { Key, Value });
             }
-            return Failure("@todo key value storage");
+            master.DataStoreService.SetKeyValue(Key, Value);
+            return BasicReply("ok");
         }
 
         [About("Reads a value from the KeyValue storage (temp unless SQL is enabled)")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Key is empty")]
-        [ArgHints("Key", "URLARG", "the key we are trying to clear")]
-        [Route(HttpVerbs.Get, "/ClearKeyValue/{Key}/{token}")]
-        public object ClearKeyValue(string Key, string token)
+        [ArgHints("Key", "the key we are trying to clear")]
+        public object ClearKeyValue(string Key)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (SecondbotHelpers.isempty(Key) == false)
             {
                 return Failure("Key is empty", "SetKeyValue", new[] { Key });
             }
-            return Failure("@todo key value storage");
+            master.DataStoreService.ClearKeyValue(Key);
+            return BasicReply("ok");
         }
 
         [About("Makes the bot sit on the ground or on a object if it can see it")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild object UUID")]
-        [ArgHints("target", "URLARG", "ground or a object UUID")]
-        [Route(HttpVerbs.Get, "/Sit/{target}/{token}")]
-        public object Sit(string target, string token)
+        [ArgHints("target", "ground or a object UUID")]
+        public object Sit(string target)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (target == "ground")
             {
                 getClient().Self.SitOnGround();
@@ -132,29 +102,19 @@ namespace SecondBotEvents.Commands
 
         [About("Makes the bot stand up if sitting (also resets animations)")]
         [ReturnHints("ok")]
-        [Route(HttpVerbs.Get, "/Stand/{token}")]
-        public object Stand(string token)
+        public object Stand()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             getClient().Self.Stand();
-            return BasicReply("ok", "Stand");
+            return BasicReply("ok");
         }
 
         [About("Makes the bot sit on the ground or on a object if it can see it")]
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Invaild object UUID")]
         [ReturnHintsFailure("Unable to see object")]
-        [ArgHints("target", "URLARG", "object UUID")]
-        [Route(HttpVerbs.Get, "/ClickObject/{object}/{token}")]
-        public object ClickObject(string target, string token)
+        [ArgHints("target", "object UUID")]
+        public object ClickObject(string target)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(target, out UUID objectuuid) == false)
             {
                 return Failure("Invaild object UUID", "ClickObject", new [] { target });
@@ -179,26 +139,16 @@ namespace SecondBotEvents.Commands
 
         [About("Makes the bot kill itself you monster")]
         [ReturnHints("ok")]
-        [Route(HttpVerbs.Get, "/Logoff/{token}")]
-        public object Logoff(string token)
+        public object Logoff()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             getClient().Network.BeginLogout();
-            return BasicReply("ok", "Logoff");
+            return BasicReply("ok");
         }
 
-        [About("Gets the last 5 commands issued to the bot")]
+        [About("Gets the last commands issued to the bot")]
         [ReturnHints("list of commands")]
-        [Route(HttpVerbs.Get, "/GetLastCommands/{token}")]
         public object GetLastCommands(string token)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             SuccessNoReturn("GetLastCommands");
             return Failure("@todo command storage");
         }
@@ -214,17 +164,12 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild state")]
         [ReturnHintsFailure("Invaild sticky")]
         [ReturnHintsFailure("Invaild flag")]
-        [ArgHints("avatar", "URLARG", "avatar uuid or Firstname Lastname")]
-        [ArgHints("flag", "URLARG", "friend, group, animation, teleport, inventory or command")]
-        [ArgHints("state", "URLARG", "State to set the flag to true or false")]
-        [ArgHints("sticky", "URLARG", "if true the permissing will not expire after the first use otherwise false")]
-        [Route(HttpVerbs.Get, "/SetPermFlag/{avatar}/{flag}/{state}/{sticky}/{token}")]
-        public object SetPermFlag(string avatar, string flag, string state, string sticky, string token)
+        [ArgHints("avatar", "avatar uuid or Firstname Lastname")]
+        [ArgHints("flag", "friend, group, animation, teleport, inventory or command")]
+        [ArgHints("state", "State to set the flag to true or false")]
+        [ArgHints("sticky", "if true the permissing will not expire after the first use otherwise false")]
+        public object SetPermFlag(string avatar, string flag, string state, string sticky)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {

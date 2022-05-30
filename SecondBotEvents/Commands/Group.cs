@@ -1,11 +1,7 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using EmbedIO.WebApi;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OpenMetaverse;
 using SecondBotEvents.Services;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace SecondBotEvents.Commands
 {
@@ -21,15 +17,10 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unknown group")]
         [ReturnHintsFailure("Invaild group UUID")]
         [ReturnHintsFailure("avatar lookup")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [ArgHints("avatar", "URLARG", "the UUID of the avatar you wish to check with")]
-        [Route(HttpVerbs.Get, "/IsGroupMember/{group}/{avatar}/{token}")]
-        public object IsGroupMember(string group, string avatar, string token)
+        [ArgHints("group", "the UUID of the group")]
+        [ArgHints("avatar", "the UUID of the avatar you wish to check with")]
+        public object IsGroupMember(string group, string avatar)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
                 return Failure("Invaild group UUID", "IsGroupMember", new [] { group, avatar });
@@ -44,14 +35,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unknown group")]
         [ReturnHintsFailure("Invaild group UUID")]
         [ReturnHintsFailure("avatar lookup")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [Route(HttpVerbs.Get, "/GetGroupMembers/{group}/{token}")]
-        public object GetGroupMembers(string group, string token)
+        [ArgHints("group", "the UUID of the group")]
+        public object GetGroupMembers(string group)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
                 return Failure("Invaild group UUID", "GetGroupMembers", new [] { group });
@@ -66,16 +52,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild group UUID")]
         [ReturnHintsFailure("avatar lookup")]
         [ReturnHintsFailure("Missing group GroupBanAccess power")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [ArgHints("avatar", "URLARG", "the UUID of the avatar or Firstname Lastname")]
-        [ArgHints("state", "URLARG", "true to ban false to unban")]
-        [Route(HttpVerbs.Get, "/GroupBan/{group}/{avatar}/{state}/{token}")]
-        public object GroupBan(string group, string avatar, string state, string token)
+        [ArgHints("group", "the UUID of the group")]
+        [ArgHints("avatar", "the UUID of the avatar or Firstname Lastname")]
+        [ArgHints("state", "true to ban false to unban")]
+        public object GroupBan(string group, string avatar, string state)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
                 return Failure("Invaild group UUID", "GroupBan", new[] { group, avatar, state });
@@ -110,15 +91,10 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Not in group")]
         [ReturnHintsFailure("avatar lookup")]
         [ReturnHintsFailure("Missing group Eject power")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [ArgHints("avatar", "URLARG", "the UUID of the avatar you wish to check with")]
-        [Route(HttpVerbs.Get, "/GroupEject/{group}/{avatar}/{token}")]
-        public object GroupEject(string group, string avatar, string token)
+        [ArgHints("group", "the UUID of the group")]
+        [ArgHints("avatar", "the UUID of the avatar you wish to check with")]
+        public object GroupEject(string group, string avatar)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
                 return Failure("Invaild group UUID", "GroupEject", new [] { group, avatar });
@@ -144,15 +120,10 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild group UUID")]
         [ReturnHintsFailure("Invaild role UUID")]
         [ReturnHintsFailure("avatar lookup")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [ArgHints("avatar", "URLARG", "the UUID of the avatar you wish to check with")]
-        [Route(HttpVerbs.Get, "/GroupAddRole/{group}/{avatar}/{role}/{token}")]
-        public object GroupAddRole(string group, string avatar, string role, string token)
+        [ArgHints("group", "the UUID of the group")]
+        [ArgHints("avatar", "the UUID of the avatar you wish to check with")]
+        public object GroupAddRole(string group, string avatar, string role)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
                 return Failure("Invaild group UUID", "GroupAddRole", new [] { group, avatar });
@@ -183,16 +154,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild group UUID")]
         [ReturnHintsFailure("avatar lookup")]
         [ReturnHintsFailure("Missing group Invite power")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [ArgHints("avatar", "URLARG", "the UUID of the avatar you wish to check with")]
-        [ArgHints("role", "URLARG", "the UUID of the role to invite them at the word \"everyone\"")]
-        [Route(HttpVerbs.Get, "/GroupInvite/{group}/{avatar}/{role}/{token}")]
-        public object GroupInvite(string group, string avatar, string role, string token)
+        [ArgHints("group", "the UUID of the group")]
+        [ArgHints("avatar", "the UUID of the avatar you wish to check with")]
+        [ArgHints("role", "the UUID of the role to invite them at the word \"everyone\"")]
+        public object GroupInvite(string group, string avatar, string role)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
                 return Failure("Invaild group UUID", "GroupInvite", new [] { group, avatar, role });
@@ -228,16 +194,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Title empty")]
         [ReturnHintsFailure("Message empty")]
         [ReturnHintsFailure("Missing group Notice power")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [ArgHints("title", "Text", "The title of the group notice")]
-        [ArgHints("message", "Text", "The body of the group notice")]
-        [Route(HttpVerbs.Post, "/Groupnotice/{group}/{token}")]
-        public object Groupnotice(string group, [FormField] string title, [FormField] string message, string token)
+        [ArgHints("group", "the UUID of the group")]
+        [ArgHints("title", "The title of the group notice")]
+        [ArgHints("message", "The body of the group notice")]
+        public object Groupnotice(string group, string title, string message)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
                 return Failure("Invaild group UUID", "Groupnotice", new [] { group, title, message });
@@ -267,15 +228,10 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unknown group")]
         [ReturnHintsFailure("Invaild group UUID")]
         [ReturnHintsFailure("Invaild role UUID")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [ArgHints("role", "URLARG", "tje UUID of the role")]
-        [Route(HttpVerbs.Get, "/GroupActiveTitle/{group}/{token}")]
-        public object GroupActiveTitle(string group, string role, string token)
+        [ArgHints("group", "the UUID of the group")]
+        [ArgHints("role", "the UUID of the role")]
+        public object GroupActiveTitle(string group, string role)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
                 return Failure("Invaild group UUID", "GroupActiveTitle", new [] { group, role });
@@ -296,14 +252,9 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Switching active group")]
         [ReturnHintsFailure("Unknown group")]
         [ReturnHintsFailure("Invaild group UUID")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [Route(HttpVerbs.Get, "/GroupActiveGroup/{group}/{token}")]
-        public object GroupActiveGroup(string group, string token)
+        [ArgHints("group", "the UUID of the group")]
+        public object GroupActiveGroup(string group)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
                 return Failure("Invaild group UUID", "GroupActiveGroup", new [] { group });
@@ -324,17 +275,12 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Title empty")]
         [ReturnHintsFailure("Message empty")]
         [ReturnHintsFailure("Missing group Notice power")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [ArgHints("title", "Text", "The title of the group notice")]
-        [ArgHints("message", "Text", "The body of the group notice")]
-        [ArgHints("attachment", "URLARG", "the UUID of inventory you wish to attach")]
-        [Route(HttpVerbs.Post, "/Groupnotice/{group}/{attachment}/{token}")]
-        public object GroupnoticeWithAttachment(string group, [FormField] string title, [FormField] string message, string attachment, string token)
+        [ArgHints("group", "the UUID of the group")]
+        [ArgHints("title", "The title of the group notice")]
+        [ArgHints("message", "The body of the group notice")]
+        [ArgHints("attachment", "the UUID of inventory you wish to attach")]
+        public object GroupnoticeWithAttachment(string group, string title, string message, string attachment)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
                 return Failure("Invaild group UUID", "GroupnoticeWithAttachment", new [] { group, title, message, attachment });
@@ -367,13 +313,8 @@ namespace SecondBotEvents.Commands
 
         [About("fetchs a list of all groups known to the bot")]
         [ReturnHints("array UUID=name")]
-        [Route(HttpVerbs.Get, "/GetGroupList/{token}")]
-        public object GetGroupList(string token)
+        public object GetGroupList()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroups()));
         }
 
@@ -382,14 +323,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Group is not currently known")]
         [ReturnHintsFailure("Invaild group UUID")]
         [ReturnHintsFailure("Updating")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [Route(HttpVerbs.Get, "/GetGroupRoles/{group}/{token}")]
-        public object GetGroupRoles(string group, string token)
+        [ArgHints("group", "the UUID of the group")]
+        public object GetGroupRoles(string group)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
                 return Failure("Invaild group UUID", "GetGroupRoles", new [] { group });
@@ -398,65 +334,23 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unknown group", "GetGroupRoles", new [] { group });
             }
-            return Failure("@todo group role storage");
-            /*
-            GroupRoleDetails reply = new GroupRoleDetails();
-            reply.UpdateUnderway = false;
-            reply.RoleDataAge = -1;
-            reply.Roles = new Dictionary<string, string>();
-            if (bot.MyGroupRolesStorage.ContainsKey(groupuuid) == false)
-            {
-                reply.UpdateUnderway = true;
-            }
-            else
-            {
-                long dif = SecondbotHelpers.UnixTimeNow() - bot.MyGroupRolesStorage[groupuuid].Key;
-                reply.RoleDataAge = dif;
-                if (dif >= 120)
-                {
-                    reply.UpdateUnderway = true;
-                }
-                foreach (GroupRole gr in bot.MyGroupRolesStorage[groupuuid].Value)
-                {
-                    reply.Roles.Add(gr.ID.ToString(), gr.Name);
-                }
-            }
-            if (reply.UpdateUnderway == true)
-            {
-                getClient().Groups.RequestGroupRoles(groupuuid);
-                if (reply.Roles.Count == 0)
-                {
-                    return Failure("Updating", "GetGroupRoles", new [] { group });
-                }
-            }
-            return BasicReply(JsonConvert.SerializeObject(reply), "GetGroupRoles", new [] { group });
-            */
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroupRoles(groupuuid)));
         }
 
         [About("fetchs a list of all groups with unread messages")]
         [ReturnHints("array UUID")]
-        [Route(HttpVerbs.Get, "/GroupchatListAllUnreadGroups/{token}")]
-        public object GroupchatListAllUnreadGroups(string token)
+        public object GroupchatListAllUnreadGroups()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
-            return Failure("@todo group message storage");
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetAllGroupsChatWithUnread()));
         }
 
         [About("fetchs a list of all groups with unread messages")]
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Unknown group")]
         [ReturnHintsFailure("group value is invaild")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [Route(HttpVerbs.Get, "/GroupchatGroupHasUnread/{group}/{token}")]
-        public object GroupchatGroupHasUnread(string group,string token)
+        [ArgHints("group", "the UUID of the group")]
+        public object GroupchatGroupHasUnread(string group)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             UUID groupUUID = UUID.Zero;
             if(UUID.TryParse(group,out groupUUID) == false)
             {
@@ -466,66 +360,46 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unknown group", "GroupchatGroupHasUnread", new [] { group });
             }
-            return Failure("@todo group message storage");
+            return BasicReply(master.DataStoreService.GetGroupChatHasUnread(groupUUID).ToString());
         }
 
 
         [About("checks if there are any groups with unread messages")]
         [ReturnHints("True|False")]
-        [Route(HttpVerbs.Get, "/GroupchatAnyUnread/{token}")]
-        public object GroupchatAnyUnread(string token)
+        public object GroupchatAnyUnread()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
-            return Failure("@todo group message storage");
+            return BasicReply(master.DataStoreService.GetGroupChatHasAnyUnread().ToString());
         }
 
         [About("Clears all group chat buffers at once")]
         [ReturnHints("ok")]
-        [Route(HttpVerbs.Get, "/GroupchatClearAll/{token}")]
-        public object GroupchatClearAll(string token)
+        public object GroupchatClearAll()
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
-            return Failure("@todo group message storage");
+            master.DataStoreService.clearGroupChat();
+            return BasicReply("ok");
         }
 
         [About("fetchs the groupchat history")]
         [ReturnHintsFailure("Group UUID invaild")]
         [ReturnHints("Group Chat")]
-        [ArgHints("group", "URLARG", "the UUID of the group")]
-        [Route(HttpVerbs.Get, "/GroupchatHistory/{group}/{token}")]
-        public object GroupchatHistory(string group, string token)
+        [ArgHints("group", "the UUID of the group")]
+        public object GroupchatHistory(string group)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (UUID.TryParse(group, out UUID groupUUID) == false)
             {
                 return Failure("Group UUID invaild", "GroupchatHistory", new [] { group });
             }
-            return Failure("@todo group message storage");
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroupChatHistory(groupUUID)));
         }
 
         [About("sends a message to the groupchat")]
-        [ArgHints("group", "URLARG", "UUID of the group")]
-        [ArgHints("message", "Text", "the message to send")]
+        [ArgHints("group", "UUID of the group")]
+        [ArgHints("message", "the message to send")]
         [ReturnHints("Sending")]
         [ReturnHintsFailure("Group UUID invaild")]
-        [ReturnHintsFailure("Opening groupchat - Please retry later")]
-        [ReturnHintsFailure("Missing group JoinChat power")]
-        [Route(HttpVerbs.Post, "/Groupchat/{group}/{token}")]
-        public object Groupchat(string group, [FormField] string message, string token)
+        [ReturnHintsFailure("Unknown group")]
+        public object Groupchat(string group, string message)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             UUID groupUUID = UUID.Zero;
             if (UUID.TryParse(group, out groupUUID) == false)
             {
@@ -535,7 +409,12 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unknown group", "Groupchat", new [] { group, message });
             }
-            return Failure("@todo groupchat");
+            if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupUUID) == false)
+            {
+                return Failure("Unknown group", "Groupchat", new[] { group });
+            }
+            getClient().Self.InstantMessageGroup(groupUUID, message);
+            return BasicReply("Sending");
         }
     }
 }

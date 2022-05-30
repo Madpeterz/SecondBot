@@ -37,7 +37,6 @@ namespace SecondBotEvents.Services
         protected virtual void LoadCommandEndpoint(Type endpointtype)
         {
             CommandsAPI controler = (CommandsAPI)Activator.CreateInstance(endpointtype, args: new object[] { master });
-            controler.disableIPlockout();
             commandEndpoints.Add(endpointtype.Name, controler);
             foreach (MethodInfo M in endpointtype.GetMethods())
             {
@@ -241,13 +240,11 @@ namespace SecondBotEvents.Services
             C.command = commandnameLowerToReal[C.command.ToLowerInvariant()];
             try
             {
-                string ott = SingleUseToken();
                 CommandsAPI Endpoint = commandEndpoints[endpointcommandmap[C.command]];
                 MethodInfo theMethod = Endpoint.GetType().GetMethod(C.command);
                 if (theMethod != null)
                 {
                     List<string> argsList = C.args.ToList();
-                    argsList.Add(ott);
                     string reply = "Inconnect number of args expected: " + theMethod.GetParameters().Count().ToString() + " but got: " + argsList.Count.ToString();
                     bool status = false;
                     if (argsList.Count == theMethod.GetParameters().Count())

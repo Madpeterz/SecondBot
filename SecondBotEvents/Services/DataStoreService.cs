@@ -41,37 +41,203 @@ namespace SecondBotEvents.Services
         protected Dictionary<UUID, bool> chatWindowsIsGroup = new Dictionary<UUID, bool>(); // sess, bool
         protected Dictionary<UUID, UUID> chatWindowsOwner = new Dictionary<UUID, UUID>(); // sess, owner id
 
+        protected Dictionary<string, string> KeyValueStore = new Dictionary<string, string>();
+        protected Dictionary<string, long> KeyValueStoreLastUsed = new Dictionary<string, long>();
+
+
+        protected List<CommandHistory> commandHistories = new List<CommandHistory>();
+
+        public void addCommandToHistory(UUID Source, string command, string[] args)
+        {
+            CommandHistory A = new CommandHistory(Source, command, args, SecondbotHelpers.UnixTimeNow());
+            commandHistories.Add(A);
+            int c = commandHistories.Count;
+            while (c > myConfig.GetCommandHistoryLimit())
+            {
+                commandHistories.RemoveAt(0);
+                c--;
+            }
+        }
+
+        public string GetKeyValue(string key)
+        {
+            if(KeyValueStore.ContainsKey(key) == false)
+            {
+                return "";
+            }
+            KeyValueStoreLastUsed[key] = SecondbotHelpers.UnixTimeNow();
+            return KeyValueStore[key];
+        }
+
+        public void SetKeyValue(string key, string value)
+        {
+            if(KeyValueStore.ContainsKey(key) == false)
+            {
+                KeyValueStore.Add(key, "");
+                KeyValueStoreLastUsed.Add(key, 0);
+            }
+            KeyValueStore[key] = value;
+            KeyValueStoreLastUsed[key] = SecondbotHelpers.UnixTimeNow();
+        }
+
+        public void ClearKeyValue(string key)
+        {
+            if (KeyValueStore.ContainsKey(key) == false)
+            {
+                return;
+            }
+            KeyValueStore.Remove(key);
+            KeyValueStoreLastUsed.Remove(key);
+        }
+
+        public void AppendKeyValue(string key, string value)
+        {
+            if (KeyValueStore.ContainsKey(key) == false)
+            {
+                SetKeyValue(key, value);
+                return;
+            }
+            KeyValueStoreLastUsed[key] = SecondbotHelpers.UnixTimeNow();
+            KeyValueStore[key] = KeyValueStore[key] + value;
+        }
+
         public Dictionary<UUID, string> GetGroups()
         {
             return groupsKey2Name;
         }
-        public bool IsGroupMember(UUID Group, UUID avatar)
+
+        public List<UUID> GetAllGroupsChatWithUnread()
         {
-            if(groupMembers.ContainsKey(Group) == false)
+            List<UUID> reply = new List<UUID>();
+            foreach(KeyValuePair<UUID, bool> windowState in chatWindowsUnread)
             {
-                groupMembers.Add(Group, new List<UUID>());
+                if(windowState.Value == false)
+                {
+                    continue;
+                }    
+                if(chatWindowsIsGroup[windowState.Key] == false)
+                {
+                    continue;
+                }
+                reply.Add(windowState.Key);
             }
-            if(groupMembers[Group].Contains(avatar) == false)
+            return reply;
+        }
+
+        public bool GetGroupChatHasUnread(UUID group)
+        {
+            if(chatWindowsUnread.ContainsKey(group) == false)
+            {
+                return false;
+            }
+            return chatWindowsUnread[group];
+        }
+
+        public bool GetGroupChatHasAnyUnread()
+        {
+            bool reply = false;
+            foreach(KeyValuePair<UUID,bool> check in chatWindowsIsGroup)
+            {
+                if(check.Value == false)
+                {
+                    continue;
+                }
+                if(chatWindowsUnread[check.Key] == true)
+                {
+                    reply = true;
+                    break;
+                }
+            }
+
+            return reply;
+        }
+
+        public List<string> GetGroupChatHistory(UUID group)
+        {
+            if(chatWindows.ContainsKey(group) == false)
+            {
+                return new List<string>();
+            }
+            return chatWindows[group];
+        }
+
+        public void clearGroupChat()
+        {
+            foreach(UUID group in groupsKey2Name.Keys)
+            {
+                if (chatWindowsUnread.ContainsKey(group) == false)
+                {
+                    continue;
+                }
+                chatWindowsUnread.Remove(group);
+                chatWindows.Remove(group);
+                chatWindowsIsGroup.Remove(group);
+                chatWindowsOwner.Remove(group);
+            }
+        }
+
+        public Dictionary<UUID, string> GetGroupRoles(UUID group)
+        {
+            Dictionary<UUID, string> reply = new Dictionary<UUID, string>();
+            if (groupRoles.ContainsKey(group) == false)
+            {
+                
+                AutoResetEvent fetchEvent = new AutoResetEvent(false);
+                EventHandler<GroupRolesDataReplyEventArgs> callback =
+                    delegate (object sender, GroupRolesDataReplyEventArgs e)
+                    {
+                        if (e.GroupID == group)
+                        {
+                            foreach(KeyValuePair<UUID,GroupRole> role in e.Roles)
+                            {
+                                reply[role.Value.ID] = role.Value.Name;
+                            }
+                            fetchEvent.Set();
+                        }
+                    };
+                getClient().Groups.GroupRoleDataReply += callback;
+                getClient().Groups.RequestGroupRoles(group);
+
+                fetchEvent.WaitOne(1000, false);
+                getClient().Groups.GroupRoleDataReply -= callback;
+                return reply;
+            }
+            foreach (KeyValuePair<UUID, GroupRole> role in groupRoles[group])
+            {
+                reply[role.Value.ID] = role.Value.Name;
+            }
+            return reply;
+        }
+
+        public bool IsGroupMember(UUID group, UUID avatar)
+        {
+            if(groupMembers.ContainsKey(group) == false)
+            {
+                groupMembers.Add(group, new List<UUID>());
+            }
+            if(groupMembers[group].Contains(avatar) == false)
             {
                 bool found = false;
                 AutoResetEvent fetchEvent = new AutoResetEvent(false);
                 EventHandler<GroupMembersReplyEventArgs> callback =
                     delegate (object sender, GroupMembersReplyEventArgs e)
                     {
-                        if (e.GroupID == Group)
+                        if (e.GroupID == group)
                         {
                             foreach (KeyValuePair<UUID, GroupMember> a in e.Members)
                             {
                                 if (a.Value.ID == avatar)
                                 {
                                     found = true;
+                                    fetchEvent.Set();
                                     break;
                                 }
                             }
+                            
                         }
                     };
                 getClient().Groups.GroupMembersReply += callback;
-                getClient().Groups.RequestGroupMembers(Group);
+                getClient().Groups.RequestGroupMembers(group);
 
                 fetchEvent.WaitOne(1000, false);
                 getClient().Groups.GroupMembersReply -= callback;
@@ -434,7 +600,7 @@ namespace SecondBotEvents.Services
             groupsKey2Name = new Dictionary<UUID, string>();
 
             groupMembers = new Dictionary<UUID, List<UUID>>();
-            groupRoles = new Dictionary<UUID, Dictionary<UUID, string>>();
+            groupRoles = new Dictionary<UUID, Dictionary<UUID, GroupRole>>();
 
             localChatHistory = new List<string>();
 
@@ -444,7 +610,9 @@ namespace SecondBotEvents.Services
             chatWindowsUnread = new Dictionary<UUID, bool>(); // sess, bool
             chatWindowsIsGroup = new Dictionary<UUID, bool>(); // sess, bool
             chatWindowsOwner = new Dictionary<UUID, UUID>(); // sess, owner id
-    }
+
+            estateBanlist = new List<UUID>();
+        }
 
 
         protected void BotClientRestart(object o, BotClientNotice e)
@@ -466,7 +634,7 @@ namespace SecondBotEvents.Services
         {
             if(groupRoles.ContainsKey(e.GroupID) == false)
             {
-                groupRoles.Add(e.GroupID, new Dictionary<UUID, string>());
+                groupRoles.Add(e.GroupID, new Dictionary<UUID, GroupRole>());
             }
             groupRoles[e.GroupID] = e.Roles;
         }
@@ -484,6 +652,35 @@ namespace SecondBotEvents.Services
             }
         }
 
+        public List<UUID> GetEstateBans()
+        {
+            if (estateBanlist == null)
+            {
+                List<UUID> reply = new List<UUID>();
+                AutoResetEvent fetchEvent = new AutoResetEvent(false);
+                EventHandler<EstateBansReplyEventArgs> callback =
+                    delegate (object sender, EstateBansReplyEventArgs e)
+                    {
+                        reply = e.Banned;
+                        fetchEvent.Set();
+                    };
+                getClient().Estate.EstateBansReply += callback;
+                getClient().Estate.RequestInfo();
+
+                fetchEvent.WaitOne(1000, false);
+                getClient().Estate.EstateBansReply -= callback;
+                return reply;
+            }
+            return estateBanlist;
+        }
+
+        List<UUID> estateBanlist = null;
+
+        protected void EstateBans(object o, EstateBansReplyEventArgs e)
+        {
+            estateBanlist = e.Banned;
+        }
+
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
             getClient().Network.SimConnected -= BotLoggedIn;
@@ -497,6 +694,7 @@ namespace SecondBotEvents.Services
             getClient().Avatars.AvatarPickerReply += AvatarUUIDNamePicker;
             getClient().Groups.GroupMembersReply += GroupMembers;
             getClient().Groups.GroupRoleDataReply += GroupRoles;
+            getClient().Estate.EstateBansReply += EstateBans;
             getClient().Groups.RequestCurrentGroups();
             botConnected = true;
             Console.WriteLine("DataStore Service [Active]");
@@ -671,9 +869,26 @@ namespace SecondBotEvents.Services
                     getClient().Avatars.AvatarPickerReply -= AvatarUUIDNamePicker;
                     getClient().Groups.GroupMembersReply -= GroupMembers;
                     getClient().Groups.GroupRoleDataReply -= GroupRoles;
+                    getClient().Estate.EstateBansReply -= EstateBans;
                 }
             }
             Console.WriteLine("DataStore Service [Stopping]");
+        }
+    }
+
+    public class CommandHistory
+    {
+        public UUID Source = UUID.Zero;
+        public string Command = "";
+        public string[] Args = new string[] { };
+        public long Unixtime = 0;
+
+        public CommandHistory(UUID setSource, string setCommand, string[] setArgs, long setUnixtime)
+        {
+            Source = setSource;
+            Command = setCommand;
+            Args = setArgs;
+            Unixtime = setUnixtime;
         }
     }
 }

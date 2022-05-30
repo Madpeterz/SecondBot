@@ -1,9 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using EmbedIO.WebApi;
-using OpenMetaverse;
-using SecondBotEvents.Services;
-using System.Threading;
+﻿using SecondBotEvents.Services;
 
 namespace SecondBotEvents.Commands
 {
@@ -12,27 +7,11 @@ namespace SecondBotEvents.Commands
         public Core(EventsSecondBot setmaster) : base(setmaster)
         {
         }
-        [About("Used to check HTTP connections")]
+        [About("Used to check connections")]
         [ReturnHints("world")]
-        [NeedsToken(false)]
-        [Route(HttpVerbs.Get, "/Hello")]
         public object Hello()
         {
             return BasicReply("world", "Hello");
-        }
-
-        [About("Removes the given token from the accepted token pool")]
-        [ReturnHints("ok")]
-        [Route(HttpVerbs.Get, "/LogoutUI/{token}")]
-        public object LogoutUI(string token)
-        {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
-            SuccessNoReturn("LogoutUI");
-            // @todo remove token from stoage
-            return BasicReply("ok");
         }
     }
 

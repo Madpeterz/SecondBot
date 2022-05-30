@@ -1,6 +1,4 @@
-﻿using EmbedIO;
-using EmbedIO.Routing;
-using OpenMetaverse;
+﻿using OpenMetaverse;
 using SecondBotEvents.Services;
 
 
@@ -14,13 +12,8 @@ namespace SecondBotEvents.Commands
         [About("Requests the current balance and requests the balance to update.")]
         [ReturnHints("Current fund level")]
         [ReturnHintsFailure("Funds commands are disabled")]
-        [Route(HttpVerbs.Get, "/Balance/{token}")]
         public object Balance(string token)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
             {
                 return Failure("Funds commands are disabled", "Balance");
@@ -35,15 +28,10 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Amount out of range")]
         [ReturnHintsFailure("Invaild amount")]
         [ReturnHintsFailure("Transfer funds to avatars disabled")]
-        [ArgHints("avatar", "URLARG", "the avatars UUID or Firstname Lastname")]
-        [ArgHints("amount", "URLARG", "the amount to pay (from 1 to current balance)")]
-        [Route(HttpVerbs.Get, "/PayAvatar/{avatar}/{amount}/{token}")]
-        public object PayAvatar(string avatar, string amount, string token)
+        [ArgHints("avatar", "the avatars UUID or Firstname Lastname")]
+        [ArgHints("amount", "the amount to pay (from 1 to current balance)")]
+        public object PayAvatar(string avatar, string amount)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
             {
                 return Failure("Transfer funds to avatars disabled", "PayAvatar", new [] { avatar, amount });
@@ -72,16 +60,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild amount")]
         [ReturnHintsFailure("Amount out of range")]
         [ReturnHintsFailure("Funds commands are disabled")]
-        [ArgHints("object", "URLARG", "UUID of the object to pay")]
-        [ArgHints("primname", "URLARG", "The name of the prim on the object to pay")]
-        [ArgHints("amount", "URLARG", "the amount to pay (from 1 to current balance)")]
-        [Route(HttpVerbs.Get, "/PayObject/{object}/{primname}/{amount}/{token}")]
-        public object PayObject(string objectuuid,string primname,string amount,string token)
+        [ArgHints("object", "UUID of the object to pay")]
+        [ArgHints("primname", "The name of the prim on the object to pay")]
+        [ArgHints("amount", "the amount to pay (from 1 to current balance)")]
+        public object PayObject(string objectuuid,string primname,string amount)
         {
-            if (AllowToken(token) == false)
-            {
-                return Failure("Token not accepted");
-            }
             if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
             {
                 return Failure("Funds commands are disabled", "PayObject", new [] { objectuuid, primname, amount });
