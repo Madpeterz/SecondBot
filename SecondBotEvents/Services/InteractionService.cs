@@ -47,7 +47,7 @@ namespace SecondBotEvents.Services
                 jsonOuput(false, sourceName, avatarName, "disabled by config");
                 return false;
             }
-            if (master.CommandsService.myConfig.GetOnlyMasterAvs() == false)
+            if (master.CommandsService.myConfig.GetEnableMasterControls() == false)
             {
                 // master avatars list is not enabled. unable to continue
                 jsonOuput(false, sourceName, avatarName, "masters AV list is disabled");

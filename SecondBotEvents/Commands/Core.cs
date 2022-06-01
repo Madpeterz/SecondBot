@@ -11,7 +11,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("world")]
         public object Hello()
         {
-            return BasicReply("world", "Hello");
+            return BasicReply("world");
         }
     }
 

@@ -27,11 +27,11 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(endpoint) == false)
             {
-                return Failure("Endpoint is empty", "FetchNextNotecard", new [] { endpoint, endpointcode });
+                return Failure("Endpoint is empty", new [] { endpoint, endpointcode });
             }
             if (SecondbotHelpers.notempty(endpointcode) == false)
             {
-                return Failure("Endpointcode is empty", "FetchNextNotecard", new [] { endpoint, endpointcode });
+                return Failure("Endpointcode is empty", new [] { endpoint, endpointcode });
             }
 
             string attempt_endpoint = endpoint + "sys.php";
@@ -47,24 +47,24 @@ namespace SecondBotEvents.Commands
             RestResponse endpoint_checks = client.ExecutePostAsync(request).Result;
             if (endpoint_checks.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                return Failure("HTTP status code: " + endpoint_checks.StatusCode.ToString(), "FetchNextNotecard", new [] { endpoint, endpointcode });
+                return Failure("HTTP status code: " + endpoint_checks.StatusCode.ToString(), new [] { endpoint, endpointcode });
             }
             try
             {
                 NotecardEndpoint server_reply = JsonConvert.DeserializeObject<NotecardEndpoint>(endpoint_checks.Content);
                 if (server_reply.status == false)
                 {
-                    return Failure("Bad reply: " + server_reply.message, "FetchNextNotecard", new [] { endpoint, endpointcode });
+                    return Failure("Bad reply: " + server_reply.message, new [] { endpoint, endpointcode });
                 }
                 if (server_reply.NotecardTitle.Length < 3)
                 {
-                    return Failure("Notecard title is to short", "FetchNextNotecard", new [] { endpoint, endpointcode });
+                    return Failure("Notecard title is to short", new [] { endpoint, endpointcode });
                 }
                 return Failure("@todo notecard sending");
             }
             catch (Exception e)
             {
-                return Failure("Error: " + e.Message + "", "FetchNextNotecard", new [] { endpoint, endpointcode });
+                return Failure("Error: " + e.Message + "", new [] { endpoint, endpointcode });
             }
         }
 

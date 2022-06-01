@@ -16,10 +16,10 @@ namespace SecondBotEvents.Commands
         {
             if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
             {
-                return Failure("Funds commands are disabled", "Balance");
+                return Failure("Funds commands are disabled");
             }
             getClient().Self.RequestBalance();
-            return BasicReply(getClient().Self.Balance.ToString(), "Balance");
+            return BasicReply(getClient().Self.Balance.ToString());
         }
 
         [About("Makes the bot pay a avatar")]
@@ -34,23 +34,23 @@ namespace SecondBotEvents.Commands
         {
             if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
             {
-                return Failure("Transfer funds to avatars disabled", "PayAvatar", new [] { avatar, amount });
+                return Failure("Transfer funds to avatars disabled", new [] { avatar, amount });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return BasicReply("avatar lookup", "PayAvatar", new [] { avatar, amount });
+                return BasicReply("avatar lookup", new [] { avatar, amount });
             }
             if (int.TryParse(amount, out int amountvalue) == false)
             {
-                return Failure("Invaild amount", "PayAvatar", new [] { avatar, amount });
+                return Failure("Invaild amount", new [] { avatar, amount });
             }
             if ((amountvalue < 0) || (amountvalue > getClient().Self.Balance))
             {
-                return Failure("Amount out of range", "PayAvatar", new [] { avatar, amount });
+                return Failure("Amount out of range", new [] { avatar, amount });
             }
             getClient().Self.GiveAvatarMoney(avataruuid, amountvalue);
-            return BasicReply("Accepted", "PayAvatar", new [] { avatar, amount });
+            return BasicReply("Accepted", new [] { avatar, amount });
         }
 
         [About("Makes the bot pay a object")]
@@ -67,26 +67,26 @@ namespace SecondBotEvents.Commands
         {
             if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
             {
-                return Failure("Funds commands are disabled", "PayObject", new [] { objectuuid, primname, amount });
+                return Failure("Funds commands are disabled", new [] { objectuuid, primname, amount });
             }
             if (UUID.TryParse(objectuuid, out UUID objectUUID) == false)
             {
-                return Failure("Invaild object UUID", "PayObject", new [] { objectuuid, primname, amount });
+                return Failure("Invaild object UUID", new [] { objectuuid, primname, amount });
             }
             if (int.TryParse(amount, out int amountvalue) == false)
             {
-                return Failure("Invaild amount", "PayObject", new [] { objectuuid, primname, amount });
+                return Failure("Invaild amount", new [] { objectuuid, primname, amount });
             }
             if((amountvalue < 0) || (amountvalue > getClient().Self.Balance))
             {
-                return Failure("Amount out of range", "PayObject", new [] { objectuuid, primname, amount });
+                return Failure("Amount out of range", new [] { objectuuid, primname, amount });
             }
             if(SecondbotHelpers.notempty(primname) == false)
             {
-                return Failure("Primname is empty", "PayObject", new [] { objectuuid, primname, amount });
+                return Failure("Primname is empty", new [] { objectuuid, primname, amount });
             }
             getClient().Self.GiveObjectMoney(objectUUID, amountvalue, primname);
-            return BasicReply("ok", "PayObject", new [] { objectuuid, primname, amount });
+            return BasicReply("ok", new [] { objectuuid, primname, amount });
         }
     }
 }

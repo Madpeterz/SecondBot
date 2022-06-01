@@ -14,7 +14,7 @@ namespace SecondBotEvents.Config
             settings.Add("AllowFundsCommands");
             settings.Add("AllowIMcontrol");
             settings.Add("SharedSecret");
-            settings.Add("OnlyMasterAvs");
+            settings.Add("EnableMasterControls");
             settings.Add("MastersCSV");
             settings.Add("EnforceTimeWindow");
             settings.Add("TimeWindowSecs");
@@ -41,9 +41,9 @@ namespace SecondBotEvents.Config
             return ReadSettingAsInt("TimeWindowSecs", 35);
         }
 
-        public bool GetOnlyMasterAvs()
+        public bool GetEnableMasterControls()
         {
-            return ReadSettingAsBool("OnlyMasterAvs", false);
+            return ReadSettingAsBool("EnableMasterControls", false);
         }
 
 

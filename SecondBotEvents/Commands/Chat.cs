@@ -27,15 +27,15 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.isempty(message) == true)
             {
-                return Failure("Message empty", "Say", new [] { channel, message });
+                return Failure("Message empty", new [] { channel, message });
             }
             if(int.TryParse(channel,out int channelnum) == false)
             {
-                return Failure("Invaild channel", "Say", new [] { channel, message });
+                return Failure("Invaild channel", new [] { channel, message });
             }
             if(channelnum < 0)
             {
-                return Failure("Invaild channel", "Say", new [] { channel, message });
+                return Failure("Invaild channel", new [] { channel, message });
             }
             getClient().Self.Chat(message, channelnum, ChatType.Normal);
             return BasicReply("ok");
@@ -53,14 +53,14 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup", "IM", new [] { avatar, message });
+                return Failure("avatar lookup", new [] { avatar, message });
             }
             if (SecondbotHelpers.isempty(message) == true)
             {
-                return Failure("Message empty", "IM", new [] { avatar, message });
+                return Failure("Message empty", new [] { avatar, message });
             }
             master.botClient.SendIM(avataruuid, message);
-            return BasicReply("ok", "IM", new [] { avatar, message });
+            return BasicReply("ok",  new [] { avatar, message });
         }
 
         [About("gets a full list of all avatar chat windows")]

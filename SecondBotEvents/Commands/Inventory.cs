@@ -49,7 +49,7 @@ namespace SecondBotEvents.Commands
             S.Encode();
 
             getClient().Inventory.RequestCreateItemFromAsset(S.AssetData, inventoryName, "", AssetType.Sound, InventoryType.Sound, AA.UUID, null);
-            return BasicReply("ok", "UploadMediaWave");
+            return BasicReply("ok");
         }
 
 
@@ -62,15 +62,15 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(item, out UUID targetitem) == false)
             {
-                return Failure("Invaild item UUID: "+ item, "RezObject", new [] { item });
+                return Failure("Invaild item UUID: "+ item, new [] { item });
             }
             InventoryItem itm = getClient().Inventory.FetchItem(targetitem, getClient().Self.AgentID, (5 * 1000));
             if (itm == null)
             {
-                return Failure("Unable to find item: " + item, "RezObject", new [] { item });
+                return Failure("Unable to find item: " + item, new [] { item });
             }
             UUID rezedobject = getClient().Inventory.RequestRezFromInventory(getClient().Network.CurrentSim, getClient().Self.SimRotation, getClient().Self.RelativePosition, itm);
-            return BasicReply(rezedobject.ToString(), "RezObject", new [] { item });
+            return BasicReply(rezedobject.ToString(), new [] { item });
         }
 
 
@@ -85,20 +85,20 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(item, out UUID target) == false)
             {
-                return Failure("invaild item uuid", "RenameInventory", new [] { item, newname });
+                return Failure("invaild item uuid", new [] { item, newname });
             }
             if (newname.Length < 3)
             {
-                return Failure("Item name is to short", "RenameInventory", new [] { item, newname });
+                return Failure("Item name is to short", new [] { item, newname });
             }
             InventoryItem realitem = HelperInventory.getItemByInventoryUUID(getClient(), target);
             if (realitem == null)
             {
-                return Failure("Unable to find inventory item", "RenameInventory", new [] { item, newname });
+                return Failure("Unable to find inventory item", new [] { item, newname });
             }
             realitem.Name = newname;
             getClient().Inventory.RequestUpdateItem(realitem);
-            return BasicReply("Ok", "RenameInventory", new [] { item, newname });
+            return BasicReply("Ok", new [] { item, newname });
         }
 
         [About("Attempts to Remove the given inventory item")]
@@ -109,10 +109,10 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(item, out UUID target) == false)
             {
-                return Failure("invaild item uuid", "DeleteInventoryItem", new [] { item });
+                return Failure("invaild item uuid", new [] { item });
             }
             getClient().Inventory.Remove(new List<UUID>() { target }, new List<UUID>());
-            return BasicReply("Ok", "DeleteInventoryItem", new [] { item });
+            return BasicReply("Ok", new [] { item });
         }
 
         [About("Attempts to Remove the given inventory folder")]
@@ -123,10 +123,10 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(folder, out UUID target) == false)
             {
-                return Failure("invaild folder uuid", "DeleteInventoryFolder", new [] { folder });
+                return Failure("invaild folder uuid", new [] { folder });
             }
             getClient().Inventory.Remove(new List<UUID>(), new List<UUID>() { target });
-            return BasicReply("Ok", "DeleteInventoryFolder", new [] { folder });
+            return BasicReply("Ok", new [] { folder });
         }
 
         [About("Attempts to attach the given inventory item")]
@@ -137,11 +137,11 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(item,out UUID itemuuid) == false)
             {
-                return Failure("invaild item uuid", "Attach", new [] { item });
+                return Failure("invaild item uuid", new [] { item });
             }
             InventoryItem realitem = HelperInventory.getItemByInventoryUUID(getClient(), itemuuid);
             getClient().Appearance.AddAttachments(new List<InventoryItem>() { realitem }, false, false);
-            return BasicReply("Ok", "Attach", new [] { item });
+            return BasicReply("Ok", new [] { item });
         }
 
         [About("Attempts to Remove the given inventory folder")]
@@ -152,11 +152,11 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(item, out UUID itemuuid) == false)
             {
-                return Failure("invaild item uuid", "Detach", new [] { item });
+                return Failure("invaild item uuid", new [] { item });
             }
             InventoryItem realitem = HelperInventory.getItemByInventoryUUID(getClient(), itemuuid);
             getClient().Appearance.RemoveFromOutfit(realitem);
-            return BasicReply("Ok", "Detach", new [] { item });
+            return BasicReply("Ok", new [] { item });
         }
 
         [About("Replaces the current avatar outfit with the Clothing/[NAME] folder<br/>Please note: This does not use the outfits folder!<br/>Please do not use links in the folder!")]
@@ -170,7 +170,7 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(name) == false)
             {
-                return Failure("Named folder value is empty", "Outfit", new [] { name });
+                return Failure("Named folder value is empty", new [] { name });
             }
             // uses the Clothing folder
             // must be a full outfit (shapes/eyes ect)
@@ -187,7 +187,7 @@ namespace SecondBotEvents.Commands
             }
             if (AA == null)
             {
-                return Failure("Cant find Clothing folder", "Outfit", new [] { name });
+                return Failure("Cant find Clothing folder", new [] { name });
             }
             T = getClient().Inventory.Store.GetContents(AA);
             AA = null;
@@ -201,13 +201,13 @@ namespace SecondBotEvents.Commands
             }
             if (AA == null)
             {
-                return Failure("Cant find target folder", "Outfit", new [] { name });
+                return Failure("Cant find target folder", new [] { name });
             }
             List<InventoryBase> contents = getClient().Inventory.FolderContents(AA.UUID, getClient().Self.AgentID, true, true, InventorySortOrder.ByName, 5 * 1000);
             List<InventoryItem> wareables = new List<InventoryItem>();
             if (contents == null)
             {
-                return Failure("target folder is empty or so full I cant get it in 5 secs...", "Outfit", new [] { name });
+                return Failure("target folder is empty or so full I cant get it in 5 secs...", new [] { name });
             }
             foreach (InventoryBase item in contents)
             {
@@ -217,7 +217,7 @@ namespace SecondBotEvents.Commands
                 }
             }
             getClient().Appearance.ReplaceOutfit(wareables, false);
-            return BasicReply("ok", "Outfit", new [] { name });
+            return BasicReply("ok", new [] { name });
         }
 
 
@@ -239,7 +239,7 @@ namespace SecondBotEvents.Commands
             }
             if (NotecardFolder != null)
             {
-                return Failure("Unable to find notecard folder", "InventoryPurgeNotecards");
+                return Failure("Unable to find notecard folder");
             }
             List<UUID> purge_notecards = new List<UUID>();
             List<InventoryBase> contents = getClient().Inventory.FolderContents(NotecardFolder.UUID, getClient().Self.AgentID, true, true, InventorySortOrder.ByDate, 40 * 1000);
@@ -259,7 +259,7 @@ namespace SecondBotEvents.Commands
             {
                 getClient().Inventory.Remove(purge_notecards, new List<UUID>());
             }
-            return BasicReply("Ok", "InventoryPurgeNotecards");
+            return BasicReply("Ok");
         }
 
         [About("converts a inventory uuid to a realworld uuid<br/>Needed for texture preview")]
@@ -270,10 +270,10 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(item, out UUID itemUUID) == false)
             {
-                return Failure("Invaild item uuid", "getRealUUID", new [] { item });
+                return Failure("Invaild item uuid", new [] { item });
             }
             UUID reply = HelperInventory.GetAssetUUID(getClient(), itemUUID);
-            return BasicReply(reply.ToString(), "getRealUUID", new [] { item });
+            return BasicReply(reply.ToString(), new [] { item });
         }
 
         [About("sends a item to an avatar")]
@@ -289,19 +289,19 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar uuid", "SendItem", new [] { item, avatar });
+                return Failure("Invaild avatar uuid", new [] { item, avatar });
             }
             if (UUID.TryParse(item, out UUID targetitem) == false)
             {
-                return Failure("Invaild item uuid", "SendItem", new [] { item, avatar });
+                return Failure("Invaild item uuid", new [] { item, avatar });
             }
             InventoryItem itm = getClient().Inventory.FetchItem(targetitem, getClient().Self.AgentID, (3 * 1000));
             if (itm == null)
             {
-                return Failure("Unable to find item", "SendItem", new [] { item, avatar });
+                return Failure("Unable to find item", new [] { item, avatar });
             }
             getClient().Inventory.GiveItem(itm.UUID, itm.Name, itm.AssetType, avataruuid, false);
-            return BasicReply("ok", "SendItem", new [] { item, avatar });
+            return BasicReply("ok", new [] { item, avatar });
         }
 
         [About("Sends a folder to an avatar")]
@@ -317,19 +317,19 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar uuid", "SendFolder", new [] { folder, avatar });
+                return Failure("Invaild avatar uuid", new [] { folder, avatar });
             }
             if (UUID.TryParse(folder, out UUID targetfolder) == true)
             {
-                return Failure("Invaild folder uuid", "SendFolder", new [] { folder, avatar });
+                return Failure("Invaild folder uuid", new [] { folder, avatar });
             }
             InventoryBase FindFolderHelper = HelperInventory.FindFolder(getClient(), getClient().Inventory.Store.RootFolder, targetfolder);
             if (FindFolderHelper == null)
             {
-                return Failure("Unable to find folder", "SendFolder", new [] { folder, avatar });
+                return Failure("Unable to find folder", new [] { folder, avatar });
             }
             getClient().Inventory.GiveFolder(FindFolderHelper.UUID, FindFolderHelper.Name, avataruuid, false);
-            return BasicReply("ok", "SendFolder", new [] { folder, avatar });
+            return BasicReply("ok", new [] { folder, avatar });
         }
 
         [About("Transfers a item [ARG 2] to a objects inventory [ARG 1] (And if set with the script running state [ARG 3])")]
@@ -347,21 +347,21 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(item, out UUID itemuuid) == false)
             {
-                return Failure("Invaild item uuid", "TransferInventoryToObject", new [] { item, objectuuid, running });
+                return Failure("Invaild item uuid", new [] { item, objectuuid, running });
             }
             if (UUID.TryParse(objectuuid, out UUID objectUUID) == false)
             {
-                return Failure("Invaild object uuid", "TransferInventoryToObject", new [] { item, objectuuid, running });
+                return Failure("Invaild object uuid", new [] { item, objectuuid, running });
             }
             if (bool.TryParse(running, out bool runscript) == false)
             {
-                return Failure("Invaild running", "TransferInventoryToObject", new [] { item, objectuuid, running });
+                return Failure("Invaild running", new [] { item, objectuuid, running });
             }
 
             InventoryItem itm = getClient().Inventory.FetchItem(itemuuid, getClient().Self.AgentID, (3 * 1000));
             if (itm == null)
             {
-                return Failure("Unable to find inventory", "TransferInventoryToObject", new [] { item, objectuuid, running });
+                return Failure("Unable to find inventory", new [] { item, objectuuid, running });
             }
             Dictionary<uint, Primitive> objects_copy = getClient().Network.CurrentSim.ObjectsPrimitives.Copy();
             KeyValuePair<uint, Primitive> RealObject = new KeyValuePair<uint, Primitive>(0,null);
@@ -375,7 +375,7 @@ namespace SecondBotEvents.Commands
             }
             if (RealObject.Value == null)
             {
-                return Failure("Unable to find object", "TransferInventoryToObject", new [] { item, objectuuid, running });
+                return Failure("Unable to find object", new [] { item, objectuuid, running });
             }
             bool scriptState = runscript;
             if (itm.AssetType != AssetType.LSLText)
@@ -385,10 +385,10 @@ namespace SecondBotEvents.Commands
             if (itm.AssetType == AssetType.LSLText)
             {
                 getClient().Inventory.CopyScriptToTask(RealObject.Key, itm, scriptState);
-                return BasicReply("Transfering script [state: "+scriptState.ToString()+"]", "TransferInventoryToObject", new [] { item, objectuuid, running });
+                return BasicReply("Transfering script [state: "+scriptState.ToString()+"]", new [] { item, objectuuid, running });
             }
             getClient().Inventory.UpdateTaskInventory(RealObject.Key, itm);
-            return BasicReply("Transfering inventory", "TransferInventoryToObject", new [] { item, objectuuid, running });
+            return BasicReply("Transfering inventory", new [] { item, objectuuid, running });
         }
 
         [About("Requests the inventory folder layout as a json object InventoryMapFolder<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>subfolders: InventoryMapFolder[]</li></ul>")]
@@ -397,8 +397,8 @@ namespace SecondBotEvents.Commands
         public object InventoryFolders()
         {
             string reply = HelperInventory.MapFolderJson(getClient());
-            if (reply != null) return BasicReply(reply, "InventoryFolders");
-            return Failure("Error", "InventoryFolders");
+            if (reply != null) return BasicReply(reply);
+            return Failure("Error");
         }
 
         [About("Requests folders limited to selected folder")]
@@ -408,8 +408,8 @@ namespace SecondBotEvents.Commands
         public object InventoryFoldersLimited(string targetfolder)
         {
             string reply = HelperInventory.MapFolderJson(getClient(), targetfolder,false);
-            if (reply != null) return BasicReply(reply, "InventoryFoldersLimited");
-            return Failure("Error", "InventoryFoldersLimited");
+            if (reply != null) return BasicReply(reply);
+            return Failure("Error");
         }
 
         [About("Requests the contents of a folder as an array of InventoryMapItem<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>typename: String</li></ul>")]
@@ -420,9 +420,9 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(folderUUID, out UUID folder) == false)
             {
-                return Failure("Invaild folder UUID", "InventoryContents", new [] { folderUUID });
+                return Failure("Invaild folder UUID", new [] { folderUUID });
             }
-            return BasicReply(HelperInventory.MapFolderInventoryJson(getClient(), folder), "InventoryContents", new [] { folderUUID });
+            return BasicReply(HelperInventory.MapFolderInventoryJson(getClient(), folder), new [] { folderUUID });
         }
 
         [About("creates a folder in a folder")]
@@ -435,15 +435,15 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(parentFolder, out UUID parentFolderUUID) == false)
             {
-                return Failure("invaild parent folder UUID", "CreateInventoryFolder", new[] { parentFolder });
+                return Failure("invaild parent folder UUID", new[] { parentFolder });
             }
             if (folderName.Length < 3)
             {
-                return Failure("new folder name is too short, must be longer than 3 characters.", "CreateInventoryFolder", new[] { folderName });
+                return Failure("new folder name is too short, must be longer than 3 characters.", new[] { folderName });
             }
             UUID folder = getClient().Inventory.CreateFolder(parentFolderUUID, folderName);
             string uuid = folder.ToString();
-            return BasicReply("Ok", "CreateInventoryFolder", new string[] { uuid });
+            return BasicReply("Ok", new string[] { uuid });
         }
 
 
@@ -457,14 +457,14 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(item, out UUID itemUUID) == false)
             {
-                return Failure("invaild item uuid", "MoveInventoryItem", new[] { item, folder });
+                return Failure("invaild item uuid", new[] { item, folder });
             }
             if (UUID.TryParse(folder, out UUID folderUUID) == false)
             {
-                return Failure("invaild folder uuid", "MoveInventoryItem", new[] { item, folder });
+                return Failure("invaild folder uuid", new[] { item, folder });
             }
             getClient().Inventory.MoveItem(itemUUID, folderUUID);
-            return BasicReply("Ok", "MoveInventoryItem", new string[] { item });
+            return BasicReply("Ok", new string[] { item });
         }
 
         [About("moves a folder to another folder")]
@@ -477,14 +477,14 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(sourceFolder, out UUID sourceFolderUUID) == false)
             {
-                return Failure("invaild source folder uuid", "MoveInventoryFolder", new[] { sourceFolder, destFolder });
+                return Failure("invaild source folder uuid", new[] { sourceFolder, destFolder });
             }
             if (UUID.TryParse(destFolder, out UUID destFolderUUID) == false)
             {
-                return Failure("invaild dest folder uuid", "MoveInventoryFolder", new[] { sourceFolder, destFolder });
+                return Failure("invaild dest folder uuid", new[] { sourceFolder, destFolder });
             }
             getClient().Inventory.MoveFolder(sourceFolderUUID, destFolderUUID);
-            return BasicReply("Ok", "MoveInventoryFolder", new string[] { sourceFolder, destFolder });
+            return BasicReply("Ok", new string[] { sourceFolder, destFolder });
         }
     }
 }

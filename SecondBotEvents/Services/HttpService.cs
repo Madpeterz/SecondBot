@@ -158,29 +158,20 @@ namespace SecondBotEvents.Services
             }
         }
 
-        protected void SuccessNoReturn(string command)
-        {
-            SuccessNoReturn(command, new string[] { });
-        }
-        protected void SuccessNoReturn(string command, string[] args)
-        {
-            // @todo Command history storage system
-        }
-
-        protected object BasicReply(string input, string command)
-        {
-            return BasicReply(input, command, new string[] { });
-        }
-
         protected object BasicReply(string input)
         {
-            return BasicReply(input, getCallingCommand(), new string[] { });
+            return BasicReply(input, new string[] { }, getCallingCommand());
         }
 
-        protected object BasicReply(string input, string command, string[] args)
+        protected object BasicReply(string input, string[] args)
+        {
+            return BasicReply(input, args, getCallingCommand());
+        }
+
+        protected object BasicReply(string input, string[] args, string command)
         {
             // @todo Command history storage system
-            return new { reply = input, status = true };
+            return new { reply = input, status = false };
         }
 
         protected object Failure(string input, string command, string[] args, string whyfailed)
@@ -188,12 +179,6 @@ namespace SecondBotEvents.Services
             // @todo Command history storage system
             return new { reply = input, status = false };
         }
-
-        protected object Failure(string input, string command, string[] args)
-        {
-            return Failure(input, command, args, null);
-        }
-
 
         protected object Failure(string input, string[] args)
         {
@@ -208,11 +193,6 @@ namespace SecondBotEvents.Services
         protected string getCallingCommand()
         {
             return (new System.Diagnostics.StackTrace()).GetFrame(2).GetMethod().Name;
-        }
-
-        protected object Failure(string input, string command)
-        {
-            return Failure(input, command, new string[] { });
         }
 
     }

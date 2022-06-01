@@ -21,13 +21,13 @@ namespace SecondBotEvents.Commands
         {
             if (getClient().Network.CurrentSim.IsEstateManager == false)
             {
-                return Failure("Not an estate manager here", "SimRestart", new [] { delay, mode });
+                return Failure("Not an estate manager here", new [] { delay, mode });
             }
             bool.TryParse(mode, out bool modeflag);
             if (modeflag == false)
             {
                 getClient().Estate.CancelRestart();
-                return BasicReply("canceled", "SimRestart", new [] { delay, mode });
+                return BasicReply("canceled", new [] { delay, mode });
             }
             int delay_restart = 60;
             int.TryParse(delay, out delay_restart);
@@ -36,7 +36,7 @@ namespace SecondBotEvents.Commands
                 delay_restart = 240;
             }
             getClient().Estate.RestartRegion(delay_restart);
-            return BasicReply("restarting", "SimRestart", new [] { delay, mode });
+            return BasicReply("restarting", new [] { delay, mode });
         }
 
         [About("Sends the message to the current sim")]
@@ -48,14 +48,14 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(message) == false)
             {
-                return Failure("Message empty", "SimMessage", new [] { message });
+                return Failure("Message empty", new [] { message });
             }
             if (getClient().Network.CurrentSim.IsEstateManager == false)
             {
-                return Failure("Not an estate manager here", "SimMessage", new [] { message });
+                return Failure("Not an estate manager here", new [] { message });
             }
             getClient().Estate.SimulatorMessage(message);
-            return BasicReply("ok", "SimMessage", new [] { message });
+            return BasicReply("ok", new [] { message });
         }
 
         [About("Fetchs the regions map tile")]
@@ -66,9 +66,9 @@ namespace SecondBotEvents.Commands
         {
             if (getClient().Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region) == false)
             {
-                return Failure("Unable to find region", "GetSimTexture", new [] { regionname });
+                return Failure("Unable to find region", new [] { regionname });
             }
-            return BasicReply(region.MapImageID.ToString(), "GetSimTexture", new [] { regionname });
+            return BasicReply(region.MapImageID.ToString(), new [] { regionname });
         }
 
         [About("Reclaims ownership of the current parcel")]
@@ -93,7 +93,7 @@ namespace SecondBotEvents.Commands
         {
             if (getClient().Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region) == false)
             {
-                return Failure("Unable to find region", "GetSimGlobalPos", new [] { regionname });
+                return Failure("Unable to find region", new [] { regionname });
             }
             Dictionary<string, string> reply = new Dictionary<string, string>();
             reply.Add("region", regionname);
@@ -123,25 +123,25 @@ namespace SecondBotEvents.Commands
         {
             if (getClient().Network.CurrentSim.IsEstateManager == false)
             {
-                return Failure("Not an estate manager on region " + getClient().Network.CurrentSim.Name, "UpdateEstateBanlist", new [] { avatar, mode, global });
+                return Failure("Not an estate manager on region " + getClient().Network.CurrentSim.Name, new [] { avatar, mode, global });
             }
             UUID avataruuid = UUID.Zero;
             if (UUID.TryParse(avatar, out avataruuid) == false)
             {
-                return Failure("Unable to find avatar UUID", "UpdateEstateBanlist", new [] { avatar, mode, global });
+                return Failure("Unable to find avatar UUID", new [] { avatar, mode, global });
             }
             bool globalban = false;
             if (bool.TryParse(global, out globalban) == false)
             {
-                return Failure("Unable to process global value please use true or false", "UpdateEstateBanlist", new [] { avatar, mode, global });
+                return Failure("Unable to process global value please use true or false", new [] { avatar, mode, global });
             }
             if (mode != "add")
             {
                 getClient().Estate.UnbanUser(avataruuid, globalban);
-                return BasicReply("Unban request accepted", "UpdateEstateBanlist", new [] { avatar, mode, global });
+                return BasicReply("Unban request accepted", new [] { avatar, mode, global });
             }
             getClient().Estate.BanUser(avataruuid, globalban);
-            return BasicReply("Ban request accepted", "UpdateEstateBanlist", new [] { avatar, mode, global });
+            return BasicReply("Ban request accepted", new [] { avatar, mode, global });
         }
     }
 }

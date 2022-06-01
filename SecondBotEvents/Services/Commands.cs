@@ -43,7 +43,7 @@ namespace SecondBotEvents.Services
                 bool isCallable = false;
                 foreach (CustomAttributeData At in M.CustomAttributes)
                 {
-                    if (At.AttributeType.Name == "RouteAttribute")
+                    if (At.AttributeType.Name == "About")
                     {
                         isCallable = true;
                         break;
@@ -150,7 +150,7 @@ namespace SecondBotEvents.Services
                         {
                             break;
                         }
-                        if (myConfig.GetOnlyMasterAvs() == false)
+                        if (myConfig.GetEnableMasterControls() == false)
                         {
                             break;
                         }
@@ -197,6 +197,16 @@ namespace SecondBotEvents.Services
             {
                 mode = "IM";
             }
+            else if (target.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length == 2)
+            {
+                string UUIDfetch = master.DataStoreService.getAvatarUUID(target);
+                if (UUIDfetch == "lookup")
+                {
+                    return;
+                }
+                mode = "IM";
+                UUID.TryParse(UUIDfetch, out target_avatar);
+            }
             else if (int.TryParse(target, out target_channel) == false)
             {
                 return;
@@ -237,9 +247,16 @@ namespace SecondBotEvents.Services
 
         public KeyValuePair<bool, string> runCommand(SignedCommand C)
         {
-            C.command = commandnameLowerToReal[C.command.ToLowerInvariant()];
+
             try
             {
+                string lowerName = C.command.ToLower();
+                if(commandnameLowerToReal.ContainsKey(lowerName) == false)
+                {
+                    return new KeyValuePair<bool, string>(false, "Unknown command");
+                }
+                C.command = commandnameLowerToReal[lowerName];
+
                 CommandsAPI Endpoint = commandEndpoints[endpointcommandmap[C.command]];
                 MethodInfo theMethod = Endpoint.GetType().GetMethod(C.command);
                 if (theMethod != null)
@@ -255,10 +272,6 @@ namespace SecondBotEvents.Services
                             if (Endpoint == null)
                             {
                                 return new KeyValuePair<bool, string>(false, "Endpoint is null");
-                            }
-                            if (argsList.Count == 0)
-                            {
-                                return new KeyValuePair<bool, string>(false, "Zero args at final check require at min 1");
                             }
                             object[] argsWorker = argsList.ToArray<object>();
                             object processed = theMethod.Invoke(Endpoint, argsWorker);
@@ -316,7 +329,7 @@ namespace SecondBotEvents.Services
         {
             getClient().Network.SimConnected -= BotLoggedIn;
             getClient().Self.IM += BotImMessage;
-            if (myConfig.GetOnlyMasterAvs() == true)
+            if (myConfig.GetEnableMasterControls() == true)
             {
                 foreach(string A in myConfig.GetMastersCSV())
                 {

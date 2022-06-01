@@ -19,7 +19,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            return BasicReply(master.DiscordService.addRoleToMember(serverid, roleid, memberid).Result.ToString(), "Discord_AddRole", new [] { serverid, roleid, memberid });
+            return BasicReply(master.DiscordService.addRoleToMember(serverid, roleid, memberid).Result.ToString(), new [] { serverid, roleid, memberid });
         }
 
         [About("Adds the selected user to the ban list - Disallows rejoining untill they are removed from the list")]
@@ -37,9 +37,9 @@ namespace SecondBotEvents.Commands
             }
             if (SecondbotHelpers.notempty(why) == false)
             {
-                return Failure("Why empty", "Discord_BanMember", new [] { serverid, memberid, why });
+                return Failure("Why empty", new [] { serverid, memberid, why });
             }
-            return BasicReply(master.DiscordService.BanMember(serverid, memberid, why).Result.ToString(), "Discord_BanMember", new [] { serverid, memberid, why });
+            return BasicReply(master.DiscordService.BanMember(serverid, memberid, why).Result.ToString(), new [] { serverid, memberid, why });
         }
 
         [About("Clears messages on the server sent by the member in the last 13 days, 22hours 59mins")]
@@ -53,8 +53,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            SuccessNoReturn("Discord_BulkClear_Messages", new [] { serverid, memberid });
-            return master.DiscordService.ClearMessages(serverid, memberid).Result;
+            return BasicReply(master.DiscordService.ClearMessages(serverid, memberid).Result.ToString(), new[] { serverid, memberid });
         }
 
         [About("Sends a message directly to the user [They must be in the server]\n This command requires the SERVER MEMBERS INTENT found in discord app dev")]
@@ -69,7 +68,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            return BasicReply(master.DiscordService.MessageMember(serverid, memberid, message).Result.ToString(), "Discord_Dm_Member", new [] { serverid, memberid, message });
+            return BasicReply(master.DiscordService.MessageMember(serverid, memberid, message).Result.ToString(), new [] { serverid, memberid, message });
         }
 
         [About("Returns a list of members in a server \n collection is userid: username \n if the user has set a nickname: userid: nickname|username \n" +
@@ -84,8 +83,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            SuccessNoReturn("Discord_MembersList", new [] { serverid });
-            return master.DiscordService.ListMembers(serverid).Result;
+            return BasicReply(master.DiscordService.ListMembers(serverid).Result.ToString(), new[] { serverid });
         }
 
         [About("Sends a message to the selected channel - Optional TTS usage")]
@@ -104,9 +102,9 @@ namespace SecondBotEvents.Commands
             }
             if (SecondbotHelpers.notempty(message) == false)
             {
-                return Failure("message empty", "Discord_MessageChannel", new [] { serverid, channelid, tts, message });
+                return Failure("message empty", new [] { serverid, channelid, tts, message });
             }
-            return BasicReply(master.DiscordService.MessageChannel(serverid, channelid, message, tts).Result.ToString(), "Discord_MessageChannel", new [] { serverid, channelid, tts, message });
+            return BasicReply(master.DiscordService.MessageChannel(serverid, channelid, message, tts).Result.ToString(), new [] { serverid, channelid, tts, message });
         }
 
         [About("Sends a message to the selected channel - Optional TTS usage")]
@@ -121,7 +119,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            return BasicReply(master.DiscordService.MuteMember(serverid, memberid, mode).Result.ToString(), "Discord_MuteMember", new [] { serverid, memberid, mode });
+            return BasicReply(master.DiscordService.MuteMember(serverid, memberid, mode).Result.ToString(), new [] { serverid, memberid, mode });
         }
 
         [About("returns a collection of settings for the given role \n This command requires Discord full client mode enabled and connected")]
@@ -136,8 +134,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            SuccessNoReturn("Discord_Role_GetSettings", new [] { serverid, roleid });
-            return master.DiscordService.RoleSettings(serverid,roleid);
+            return BasicReply(master.DiscordService.RoleSettings(serverid, roleid).ToString(), new [] { serverid, roleid });
         }
 
         [About("Updates perm flags for the selected role \n example CSV format: Speak=True,SendMessages=False \n for a full list of perms see output of Discord_Role_GetSettings \n" +
@@ -153,7 +150,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            return BasicReply(master.DiscordService.UpdateRolePerms(serverid, roleid, flagscsv).Result.ToString(), "Discord_Role_UpdatePerms", new [] { serverid, roleid, flagscsv });
+            return BasicReply(master.DiscordService.UpdateRolePerms(serverid, roleid, flagscsv).Result.ToString(), new [] { serverid, roleid, flagscsv });
         }
 
         [About("Updates perm flags for the selected role \n example CSV format: Speak=True,SendMessages=False \n for a full list of perms see output of Discord_Role_GetSettings \n" +
@@ -168,8 +165,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            SuccessNoReturn("Discord_RoleCreate", new [] { serverid, role });
-            return master.DiscordService.CreateRole(serverid,role).Result;
+            return BasicReply(master.DiscordService.CreateRole(serverid, role).Result.ToString(), new[] { serverid, role });
         }
 
         [About("Returns a list of roles and their ids in collection \n This command requires Discord full client mode enabled and connected")]
@@ -182,7 +178,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            return BasicReply(master.DiscordService.ListRoles(serverid).ToString(), "Discord_RoleList", new [] { serverid });
+            return BasicReply(master.DiscordService.ListRoles(serverid).ToString(), new [] { serverid });
         }
 
         [About("Remove a role from a server \n This command requires Discord full client mode enabled and connected")]
@@ -195,7 +191,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            return BasicReply(master.DiscordService.RemoveRole(serverid, roleid).Result.ToString(), "Discord_RoleRemove", new [] { serverid, roleid });
+            return BasicReply(master.DiscordService.RemoveRole(serverid, roleid).Result.ToString(), new [] { serverid, roleid });
         }
 
         [About("Returns a list of text channels in a server")]
@@ -208,7 +204,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            return master.DiscordService.ListTextChannels(serverid);
+            return BasicReply(master.DiscordService.ListTextChannels(serverid).ToString());
         }
     }
 }

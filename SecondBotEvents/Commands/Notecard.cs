@@ -20,11 +20,11 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(collection) == false)
             {
-                return Failure("Collection value is empty", "NotecardAdd", new [] { collection, content });
+                return Failure("Collection value is empty", new [] { collection, content });
             }
             if (SecondbotHelpers.notempty(content) == false)
             {
-                return Failure("Content value is empty", "NotecardAdd", new [] { collection, content });
+                return Failure("Content value is empty", new [] { collection, content });
             }
             return Failure("@todo notecard temp stroage");
             //return BasicReply("ok", "NotecardAdd", new [] { collection, content });
@@ -38,7 +38,7 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(collection) == false)
             {
-                return Failure("Collection value is empty", "NotecardClear", new [] { collection });
+                return Failure("Collection value is empty", new [] { collection });
             }
             return Failure("@todo notecard storage");
         }
@@ -56,16 +56,16 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(collection) == false)
             {
-                return Failure("Collection value is empty", "NotecardSend", new [] { avatar, collection, notecardname });
+                return Failure("Collection value is empty", new [] { avatar, collection, notecardname });
             }
             if (SecondbotHelpers.notempty(notecardname) == false)
             {
-                return Failure("Notecardname value is empty", "NotecardSend", new [] { avatar, collection, notecardname });
+                return Failure("Notecardname value is empty", new [] { avatar, collection, notecardname });
             }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar uuid", "NotecardSend", new [] { avatar, collection, notecardname });
+                return Failure("Invaild avatar uuid", new [] { avatar, collection, notecardname });
             }
             return Failure("@todo notecard storage");
         }
@@ -82,16 +82,16 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(notecardname) == false)
             {
-                return Failure("notecardname value is empty", "NotecardDirectSend", new[] { avatar, content, notecardname });
+                return Failure("notecardname value is empty", new[] { avatar, content, notecardname });
             }
             if (SecondbotHelpers.notempty(content) == false)
             {
-                return Failure("content value is empty", "NotecardDirectSend", new[] { avatar, content, notecardname });
+                return Failure("content value is empty", new[] { avatar, content, notecardname });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar uuid", "NotecardDirectSend", new[] { avatar, content, notecardname });
+                return Failure("Invaild avatar uuid", new[] { avatar, content, notecardname });
             }
             return Failure("@todo notecard sending");
         }

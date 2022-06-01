@@ -30,7 +30,7 @@ namespace SecondBotEvents.Commands
         {
             if (int.TryParse(dialogid, out int dialogidnum) == false)
             {
-                return Failure("bad dialog id", "DialogResponce", new [] { dialogid, buttontext });
+                return Failure("bad dialog id", new [] { dialogid, buttontext });
             }
             return Failure("@todo dialog relay");
         }
@@ -43,7 +43,7 @@ namespace SecondBotEvents.Commands
         {
             if (bool.TryParse(status, out bool statuscode) == false)
             {
-                return Failure("bad status", "DialogTrack", new [] { status });
+                return Failure("bad status", new [] { status });
             }
             return Failure("@todo dialog relay");
         }

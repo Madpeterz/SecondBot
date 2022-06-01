@@ -31,24 +31,24 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup", "FriendFullPerms", new [] { avatar, state });
+                return Failure("avatar lookup", new [] { avatar, state });
             }
             bool status = false;
             if (bool.TryParse(state, out status) == false)
             {
-                return Failure("state invaild", "FriendFullPerms", new [] { avatar, state });
+                return Failure("state invaild", new [] { avatar, state });
             }
             if (getClient().Friends.FriendList.ContainsKey(avataruuid) == false)
             {
-                return Failure("Not A friend", "FriendFullPerms", new [] { avatar, state });
+                return Failure("Not A friend", new [] { avatar, state });
             }
             if (status == true)
             {
                 getClient().Friends.GrantRights(avataruuid, FriendRights.CanSeeOnline | FriendRights.CanSeeOnMap | FriendRights.CanModifyObjects);
-                return BasicReply("granted", "FriendFullPerms", new [] { avatar, state });
+                return BasicReply("granted", new [] { avatar, state });
             }
             getClient().Friends.GrantRights(avataruuid, FriendRights.None);
-            return BasicReply("removed", "FriendFullPerms", new [] { avatar, state });
+            return BasicReply("removed", new [] { avatar, state });
         }
 
         [About("Updates the friend perms for avatar avatar to State \n if true grants (Online/Map/Modify) perms")]
@@ -65,27 +65,27 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup", "FriendRequest", new [] { avatar, state });
+                return Failure("avatar lookup", new [] { avatar, state });
             }
             bool status = false;
             if (bool.TryParse(state, out status) == false)
             {
-                return Failure("state invaild", "FriendRequest", new [] { avatar, state });
+                return Failure("state invaild", new [] { avatar, state });
             }
             if (getClient().Friends.FriendList.ContainsKey(avataruuid) == true)
             {
                 if (status == false)
                 {
                     getClient().Friends.TerminateFriendship(avataruuid);
-                    return BasicReply("Removed", "FriendRequest", new [] { avatar, state });
+                    return BasicReply("Removed", new [] { avatar, state });
                 }
             }
             if (status == false)
             {
-                return Failure("Not in friendslist", "FriendRequest", new [] { avatar, state });
+                return Failure("Not in friendslist", new [] { avatar, state });
             }
             getClient().Friends.OfferFriendship(avataruuid);
-            return BasicReply("Request sent", "FriendRequest", new [] { avatar, state });
+            return BasicReply("Request sent", new [] { avatar, state });
             
         }
     }

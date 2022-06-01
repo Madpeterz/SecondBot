@@ -23,7 +23,7 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID", "IsGroupMember", new [] { group, avatar });
+                return Failure("Invaild group UUID", new [] { group, avatar });
             }
             ProcessAvatar(avatar);
             return BasicReply(master.DataStoreService.IsGroupMember(groupuuid, avataruuid).ToString());
@@ -40,7 +40,7 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID", "GetGroupMembers", new [] { group });
+                return Failure("Invaild group UUID", new [] { group });
             }
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroupMembers(groupuuid)));
         }
@@ -59,16 +59,16 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID", "GroupBan", new[] { group, avatar, state });
+                return Failure("Invaild group UUID", new[] { group, avatar, state });
             }
             if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group", "GroupBan", new[] { group, avatar, state });
+                return Failure("Unknown group", new[] { group, avatar, state });
             }
             ProcessAvatar(avatar);
             if(avataruuid == null)
             {
-                return Failure("Unknown avatar", "GroupBan", new[] { group, avatar, state });
+                return Failure("Unknown avatar", new[] { group, avatar, state });
             }
             GroupBanAction Action = GroupBanAction.Ban;
             if (state == "false")
@@ -97,16 +97,16 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID", "GroupEject", new [] { group, avatar });
+                return Failure("Invaild group UUID", new [] { group, avatar });
             }
             if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group", "GroupEject", new[] { group, avatar });
+                return Failure("Unknown group", new[] { group, avatar });
             }
             ProcessAvatar(avatar);
             if (avataruuid == null)
             {
-                return Failure("Unknown avatar", "GroupEject", new[] { group, avatar});
+                return Failure("Unknown avatar", new[] { group, avatar});
             }
             getClient().Groups.EjectUser(groupuuid, avataruuid);
             return BasicReply("Accepted");
@@ -126,15 +126,15 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID", "GroupAddRole", new [] { group, avatar });
+                return Failure("Invaild group UUID", new [] { group, avatar });
             }
             if (UUID.TryParse(role, out UUID roleuuid) == false)
             {
-                return Failure("Invaild role UUID", "GroupAddRole", new [] { group, avatar });
+                return Failure("Invaild role UUID", new [] { group, avatar });
             }
             if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group", "GroupAddRole", new[] { group, avatar, role });
+                return Failure("Unknown group", new[] { group, avatar, role });
             }
             ProcessAvatar(avatar);
             if(master.DataStoreService.IsGroupMember(groupuuid, avataruuid) == false)
@@ -161,16 +161,16 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID", "GroupInvite", new [] { group, avatar, role });
+                return Failure("Invaild group UUID", new [] { group, avatar, role });
             }
             if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group", "GroupInvite", new[] { group, avatar, role });
+                return Failure("Unknown group", new[] { group, avatar, role });
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup", "GroupInvite", new [] { group, avatar, role });
+                return Failure("avatar lookup", new [] { group, avatar, role });
             }
             List<UUID> roles = new List<UUID>();
             roles.Add(UUID.Zero);
@@ -179,12 +179,12 @@ namespace SecondBotEvents.Commands
                 UUID roleuuid = UUID.Zero;
                 if (UUID.TryParse(role, out roleuuid) == false)
                 {
-                    return Failure("Unable to process role UUID", "GroupInvite", new[] { group, avatar, role });
+                    return Failure("Unable to process role UUID", new[] { group, avatar, role });
                 }
                 roles.Add(roleuuid);
             }
             getClient().Groups.Invite(groupuuid, roles, avataruuid);
-            return BasicReply("Invite sent", "GroupInvite", new [] { group, avatar, role });
+            return BasicReply("Invite sent", new [] { group, avatar, role });
         }
 
         [About("Sends a group notice (No attachments please use GroupnoticeWithAttachment to attach items!)")]
@@ -201,26 +201,26 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID", "Groupnotice", new [] { group, title, message });
+                return Failure("Invaild group UUID", new [] { group, title, message });
             }
             if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group", "Groupnotice", new [] { group, title, message });
+                return Failure("Unknown group", new [] { group, title, message });
             }
             if (SecondbotHelpers.notempty(title) == false)
             {
-                return Failure("Title empty", "Groupnotice", new [] { group, title, message });
+                return Failure("Title empty", new [] { group, title, message });
             }
             if (SecondbotHelpers.notempty(message) == false)
             {
-                return Failure("Message empty", "Groupnotice", new [] { group, title, message });
+                return Failure("Message empty", new [] { group, title, message });
             }
             GroupNotice NewNotice = new GroupNotice();
             NewNotice.Subject = title;
             NewNotice.Message = message;
             NewNotice.OwnerID = getClient().Self.AgentID;
             getClient().Groups.SendGroupNotice(groupuuid, NewNotice);
-            return BasicReply("Sending notice", "Groupnotice", new [] { group, title, message });
+            return BasicReply("Sending notice", new [] { group, title, message });
         }
 
         [About("Activates the selected title")]
@@ -234,18 +234,18 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID", "GroupActiveTitle", new [] { group, role });
+                return Failure("Invaild group UUID", new [] { group, role });
             }
             if (UUID.TryParse(role, out UUID roleuuid) == false)
             {
-                return Failure("Invaild role UUID", "GroupActiveTitle", new [] { group, role });
+                return Failure("Invaild role UUID", new [] { group, role });
             }
             if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group", "GroupActiveTitle", new [] { group, role });
+                return Failure("Unknown group", new [] { group, role });
             }
             getClient().Groups.ActivateTitle(groupuuid, roleuuid);
-            return BasicReply("Switching title", "GroupActiveTitle", new [] { group, role });
+            return BasicReply("Switching title", new [] { group, role });
         }
 
         [About("Sets the selected group to the active group")]
@@ -257,14 +257,14 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID", "GroupActiveGroup", new [] { group });
+                return Failure("Invaild group UUID", new [] { group });
             }
             if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group", "GroupActiveGroup", new[] { group });
+                return Failure("Unknown group", new[] { group });
             }
             getClient().Groups.ActivateGroup(groupuuid);
-            return BasicReply("Switching active group", "GroupActiveGroup", new [] { group });
+            return BasicReply("Switching active group", new [] { group });
         }
 
         [About("Sends a group notice with an attachment")]
@@ -283,23 +283,23 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID", "GroupnoticeWithAttachment", new [] { group, title, message, attachment });
+                return Failure("Invaild group UUID", new [] { group, title, message, attachment });
             }
             if (UUID.TryParse(attachment, out UUID inventoryuuid) == false)
             {
-                return Failure("Invaild inventory UUID", "GroupnoticeWithAttachment", new [] { group, title, message, attachment });
+                return Failure("Invaild inventory UUID", new [] { group, title, message, attachment });
             }
             if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group", "GroupnoticeWithAttachment", new [] { group, title, message, attachment });
+                return Failure("Unknown group", new [] { group, title, message, attachment });
             }
             if (SecondbotHelpers.notempty(title) == false)
             {
-                return Failure("Title empty", "GroupnoticeWithAttachment", new [] { group, title, message, attachment });
+                return Failure("Title empty", new [] { group, title, message, attachment });
             }
             if (SecondbotHelpers.notempty(message) == false)
             {
-                return Failure("Message empty", "GroupnoticeWithAttachment", new [] { group, title, message, attachment });
+                return Failure("Message empty", new [] { group, title, message, attachment });
             }
             GroupNotice NewNotice = new GroupNotice();
             NewNotice.Subject = title;
@@ -307,7 +307,7 @@ namespace SecondBotEvents.Commands
             NewNotice.OwnerID = getClient().Self.AgentID;
             NewNotice.AttachmentID = inventoryuuid;
             getClient().Groups.SendGroupNotice(groupuuid, NewNotice);
-            return BasicReply("Sending notice with attachment", "GroupnoticeWithAttachment", new [] { group, title, message, attachment });
+            return BasicReply("Sending notice with attachment", new [] { group, title, message, attachment });
         }
 
 
@@ -328,11 +328,11 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group UUID", "GetGroupRoles", new [] { group });
+                return Failure("Invaild group UUID", new [] { group });
             }
             if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
             {
-                return Failure("Unknown group", "GetGroupRoles", new [] { group });
+                return Failure("Unknown group", new [] { group });
             }
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroupRoles(groupuuid)));
         }
@@ -354,11 +354,11 @@ namespace SecondBotEvents.Commands
             UUID groupUUID = UUID.Zero;
             if(UUID.TryParse(group,out groupUUID) == false)
             {
-                return Failure("group value is invaild", "GroupchatGroupHasUnread", new [] { group });
+                return Failure("group value is invaild", new [] { group });
             }
             if(getClient().Groups.GroupName2KeyCache.ContainsKey(groupUUID) == false)
             {
-                return Failure("Unknown group", "GroupchatGroupHasUnread", new [] { group });
+                return Failure("Unknown group", new [] { group });
             }
             return BasicReply(master.DataStoreService.GetGroupChatHasUnread(groupUUID).ToString());
         }
@@ -387,7 +387,7 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(group, out UUID groupUUID) == false)
             {
-                return Failure("Group UUID invaild", "GroupchatHistory", new [] { group });
+                return Failure("Group UUID invaild", new [] { group });
             }
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroupChatHistory(groupUUID)));
         }
@@ -403,15 +403,15 @@ namespace SecondBotEvents.Commands
             UUID groupUUID = UUID.Zero;
             if (UUID.TryParse(group, out groupUUID) == false)
             {
-                return Failure("group value is invaild", "Groupchat", new [] { group, message });
+                return Failure("group value is invaild", new [] { group, message });
             }
             if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupUUID) == false)
             {
-                return Failure("Unknown group", "Groupchat", new [] { group, message });
+                return Failure("Unknown group", new [] { group, message });
             }
             if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupUUID) == false)
             {
-                return Failure("Unknown group", "Groupchat", new[] { group });
+                return Failure("Unknown group", new[] { group });
             }
             getClient().Self.InstantMessageGroup(groupUUID, message);
             return BasicReply("Sending");

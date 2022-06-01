@@ -19,10 +19,10 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return BasicReply("avatar lookup", "AddToAllowAnimations", new [] { avatar });
+                return BasicReply("avatar lookup", new [] { avatar });
             }
             // @todo accept storage
-            return Failure("@todo", "AddToAllowAnimations");
+            return Failure("@todo");
         }
 
         [About("Attempts to play a gesture")]
@@ -33,11 +33,11 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(gesture, out UUID gestureUUID) == false)
             {
-                return BasicReply("Error with gesture", "PlayGesture", new [] { gesture });
+                return BasicReply("Error with gesture", new [] { gesture });
             }
             InventoryItem itm = getClient().Inventory.FetchItem(gestureUUID, getClient().Self.AgentID, (3 * 1000));
             getClient().Self.PlayGesture(itm.AssetUUID);
-            return BasicReply("Accepted", "PlayGesture", new [] { gesture });
+            return BasicReply("Accepted", new [] { gesture });
         }
 
         [About("Resets the animation stack for the bot")]
@@ -45,7 +45,7 @@ namespace SecondBotEvents.Commands
         public object ResetAnimations()
         {
             // @todo Reset animations function from old version
-            return Failure("@todo", "ResetAnimations");
+            return Failure("@todo");
         }
 
     }
