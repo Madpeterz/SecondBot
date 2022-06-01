@@ -520,7 +520,7 @@ namespace BetterSecondBot.HttpService
             return BasicReply(HelperInventory.MapFolderInventoryJson(bot, folder), "InventoryContents", new [] { folderUUID });
         }
         
-		[About("creates a folder in a folder")]
+        [About("creates a folder in a folder")]
         [ReturnHints("Ok")]
         [ReturnHintsFailure("invaild parent folder UUID")]
         [ReturnHintsFailure("new folder name is too short, must be longer than 3 characters.")]
