@@ -424,5 +424,67 @@ namespace SecondBotEvents.Commands
             }
             return BasicReply(HelperInventory.MapFolderInventoryJson(getClient(), folder), "InventoryContents", new [] { folderUUID });
         }
+
+        [About("creates a folder in a folder")]
+        [ReturnHints("Ok")]
+        [ReturnHintsFailure("invaild parent folder UUID")]
+        [ReturnHintsFailure("new folder name is too short, must be longer than 3 characters.")]
+        [ArgHints("parentFolder", "UUID of folder to create a subfolder in")]
+        [ArgHints("folderName", "name of the new folder")]
+        public object CreateInventoryFolder(string parentFolder, string folderName, string token)
+        {
+            if (UUID.TryParse(parentFolder, out UUID parentFolderUUID) == false)
+            {
+                return Failure("invaild parent folder UUID", "CreateInventoryFolder", new[] { parentFolder });
+            }
+            if (folderName.Length < 3)
+            {
+                return Failure("new folder name is too short, must be longer than 3 characters.", "CreateInventoryFolder", new[] { folderName });
+            }
+            UUID folder = getClient().Inventory.CreateFolder(parentFolderUUID, folderName);
+            string uuid = folder.ToString();
+            return BasicReply("Ok", "CreateInventoryFolder", new string[] { uuid });
+        }
+
+
+        [About("moves an item to another folder")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("invaild item uuid")]
+        [ReturnHintsFailure("invaild folder uuid")]
+        [ArgHints("item", "UUID of item to move")]
+        [ArgHints("folder", "UUID of destination folder")]
+        public object MoveInventoryItem(string item, string folder)
+        {
+            if (UUID.TryParse(item, out UUID itemUUID) == false)
+            {
+                return Failure("invaild item uuid", "MoveInventoryItem", new[] { item, folder });
+            }
+            if (UUID.TryParse(folder, out UUID folderUUID) == false)
+            {
+                return Failure("invaild folder uuid", "MoveInventoryItem", new[] { item, folder });
+            }
+            getClient().Inventory.MoveItem(itemUUID, folderUUID);
+            return BasicReply("Ok", "MoveInventoryItem", new string[] { item });
+        }
+
+        [About("moves a folder to another folder")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("invaild source folder uuid")]
+        [ReturnHintsFailure("invaild dest folder uuid")]
+        [ArgHints("sourceFolder", "UUID of folder to move")]
+        [ArgHints("destFolder", "UUID of destination folder")]
+        public object MoveInventoryFolder(string sourceFolder, string destFolder)
+        {
+            if (UUID.TryParse(sourceFolder, out UUID sourceFolderUUID) == false)
+            {
+                return Failure("invaild source folder uuid", "MoveInventoryFolder", new[] { sourceFolder, destFolder });
+            }
+            if (UUID.TryParse(destFolder, out UUID destFolderUUID) == false)
+            {
+                return Failure("invaild dest folder uuid", "MoveInventoryFolder", new[] { sourceFolder, destFolder });
+            }
+            getClient().Inventory.MoveFolder(sourceFolderUUID, destFolderUUID);
+            return BasicReply("Ok", "MoveInventoryFolder", new string[] { sourceFolder, destFolder });
+        }
     }
 }
