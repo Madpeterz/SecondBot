@@ -520,32 +520,28 @@ namespace BetterSecondBot.HttpService
             return BasicReply(HelperInventory.MapFolderInventoryJson(bot, folder), "InventoryContents", new [] { folderUUID });
         }
         
-        
-        //NEW COMMANDS
-		
-		[About("creates a folder")]
-        [ReturnHints("ok")]
-        [ReturnHints("invaild item uuid")]
-        [ArgHints("parent", "URLARG", "UUID of folder to create a subfolder in")]
-        [ArgHints("itemName", "URLARG", "name of the new folder")]
-        [Route(HttpVerbs.Get, "/CreateInventoryFolder/{parent}/{itemName}/{token}")]
-        public object CreateInventoryFolder(string parent, string itemName, string token)
+		[About("creates a folder in a folder")]
+        [ReturnHints("Ok")]
+        [ReturnHintsFailure("invaild parent folder UUID")]
+        [ReturnHintsFailure("new folder name is too short, must be longer than 3 characters.")]
+        [ArgHints("parentFolder", "URLARG", "UUID of folder to create a subfolder in")]
+        [ArgHints("folderName", "URLARG", "name of the new folder")]
+        [Route(HttpVerbs.Get, "/CreateInventoryFolder/{parentFolder}/{folderName}/{token}")]
+        public object CreateInventoryFolder(string parentFolder, string folderName, string token)
         {
-			string name=HttpUtility.HtmlDecode(itemName);
-			Console.WriteLine("creating: {}",name);
             if (tokens.Allow(token, "inventory", "CreateInventoryFolder", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "CreateInventoryFolder", new [] { name });
+                return Failure("Token not accepted", "CreateInventoryFolder", new [] { folderName });
             }
-            if (UUID.TryParse(parent, out UUID target) == false)
+            if (UUID.TryParse(parentFolder, out UUID parentFolderUUID) == false)
             {
-                return Failure("invaild item uuid", "CreateInventoryFolder", new [] { parent });
+                return Failure("invaild parent folder UUID", "CreateInventoryFolder", new [] { parentFolder });
             }
-            if (name.Length<3)
+            if (folderName.Length<3)
             {
-				return Failure("name is too short, must be longer than 3 characters.","CreateInventoryFolder",new [] {name});
+				return Failure("new folder name is too short, must be longer than 3 characters.", "CreateInventoryFolder",new [] { folderName });
 			}
-            UUID folder=bot.GetClient.Inventory.CreateFolder(target, name);
+            UUID folder=bot.GetClient.Inventory.CreateFolder(parentFolderUUID, folderName);
             string uuid=folder.ToString();
             return BasicReply("Ok", "CreateInventoryFolder", new string[] {uuid});
         }
@@ -553,53 +549,52 @@ namespace BetterSecondBot.HttpService
 		
 		[About("moves an item to another folder")]
         [ReturnHints("ok")]
-        [ReturnHints("invaild item uuid")]
+        [ReturnHintsFailure("invaild item uuid")]
+        [ReturnHintsFailure("invaild folder uuid")]
         [ArgHints("item", "URLARG", "UUID of item to move")]
-        [ArgHints("dest", "URLARG", "UUID of destination folder")]
-        [Route(HttpVerbs.Get, "/MoveInventoryItem/{item}/{dest}/{token}")]
-        public object MoveInventoryItem(string item,string dest, string token)
+        [ArgHints("folder", "URLARG", "UUID of destination folder")]
+        [Route(HttpVerbs.Get, "/MoveInventoryItem/{item}/{folder}/{token}")]
+        public object MoveInventoryItem(string item,string folder, string token)
         {
             if (tokens.Allow(token, "inventory", "MoveInventoryItem", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "MoveInventoryItem", new [] { item,dest });
+                return Failure("Token not accepted", "MoveInventoryItem", new [] { item, folder });
             }
-            if (UUID.TryParse(item, out UUID itemId) == false)
+            if (UUID.TryParse(item, out UUID itemUUID) == false)
             {
-                return Failure("invaild item uuid", "MoveInventoryItem", new [] { item,dest });
+                return Failure("invaild item uuid", "MoveInventoryItem", new [] { item, folder });
             }
-            if (UUID.TryParse(dest, out UUID destId) == false)
+            if (UUID.TryParse(folder, out UUID folderUUID) == false)
             {
-                return Failure("invaild item uuid", "MoveInventoryItem", new [] { item,dest });
+                return Failure("invaild folder uuid", "MoveInventoryItem", new [] { item, folder });
             }
-            bot.GetClient.Inventory.MoveItem(itemId, destId);
+            bot.GetClient.Inventory.MoveItem(itemUUID, folderUUID);
             return BasicReply("Ok", "MoveInventoryItem", new string[] {item});
         }
         
         [About("moves a folder to another folder")]
         [ReturnHints("ok")]
-        [ReturnHints("invaild item uuid")]
-        [ArgHints("item", "URLARG", "UUID of folder to move")]
-        [ArgHints("dest", "URLARG", "UUID of destination folder")]
+        [ReturnHintsFailure("invaild source folder uuid")]
+        [ReturnHintsFailure("invaild dest folder uuid")]
+        [ArgHints("sourceFolder", "URLARG", "UUID of folder to move")]
+        [ArgHints("destFolder", "URLARG", "UUID of destination folder")]
         [Route(HttpVerbs.Get, "/MoveInventoryFolder/{item}/{dest}/{token}")]
-        public object MoveInventoryFolder(string item,string dest, string token)
+        public object MoveInventoryFolder(string sourceFolder,string destFolder, string token)
         {
             if (tokens.Allow(token, "inventory", "MoveInventoryFolder", handleGetClientIP()) == false)
             {
-                return Failure("Token not accepted", "MoveInventoryFolder", new [] { item,dest });
+                return Failure("Token not accepted", "MoveInventoryFolder", new [] { sourceFolder, destFolder });
             }
-            if (UUID.TryParse(item, out UUID itemId) == false)
+            if (UUID.TryParse(sourceFolder, out UUID sourceFolderUUID) == false)
             {
-                return Failure("invaild item uuid", "MoveInventoryFolder", new [] { item,dest });
+                return Failure("invaild source folder uuid", "MoveInventoryFolder", new [] { sourceFolder, destFolder });
             }
-            if (UUID.TryParse(dest, out UUID destId) == false)
+            if (UUID.TryParse(destFolder, out UUID destFolderUUID) == false)
             {
-                return Failure("invaild item uuid", "MoveInventoryFolder", new [] { item,dest });
+                return Failure("invaild dest folder uuid", "MoveInventoryFolder", new [] { sourceFolder, destFolder });
             }
-            bot.GetClient.Inventory.MoveFolder(itemId, destId);
-            return BasicReply("Ok", "MoveInventoryFolder", new string[] {item});
+            bot.GetClient.Inventory.MoveFolder(sourceFolderUUID, destFolderUUID);
+            return BasicReply("Ok", "MoveInventoryFolder", new string[] { sourceFolder , destFolder });
         }
-		
-		
-		//END NEW COMMANDS
     }
 }
