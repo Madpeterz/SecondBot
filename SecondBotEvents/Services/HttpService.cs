@@ -183,27 +183,31 @@ namespace SecondBotEvents.Services
             return new { reply = input, status = true };
         }
 
-        protected object Failure(string input, string command, string[] args)
+        protected object Failure(string input, string command, string[] args, string whyfailed)
         {
             // @todo Command history storage system
             return new { reply = input, status = false };
         }
 
+        protected object Failure(string input, string command, string[] args)
+        {
+            return Failure(input, command, args, null);
+        }
+
+
+        protected object Failure(string input, string[] args)
+        {
+            return Failure(input, getCallingCommand(), args, null);
+        }
+
         protected object Failure(string input)
         {
-            // @todo Command history storage system
-            return new { reply = input, command = getCallingCommand(), status = false };
+            return Failure(input, getCallingCommand(), new string[] { }, null);
         }
 
         protected string getCallingCommand()
         {
             return (new System.Diagnostics.StackTrace()).GetFrame(2).GetMethod().Name;
-        }
-
-        protected object Failure(string input, string command, string[] args, string whyfailed)
-        {
-            // @todo Command history storage system
-            return new { reply = input, status = false };
         }
 
         protected object Failure(string input, string command)
