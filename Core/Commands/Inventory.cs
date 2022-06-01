@@ -1,4 +1,4 @@
-﻿using BetterSecondBot.bottypes;
+using BetterSecondBot.bottypes;
 using BetterSecondBot.Static;
 using EmbedIO;
 using EmbedIO.Routing;
@@ -11,6 +11,8 @@ using System.Linq;
 using BetterSecondBotShared.Static;
 using System.IO;
 using OpenMetaverse.Assets;
+using System.Web;
+
 
 namespace BetterSecondBot.HttpService
 {
@@ -144,7 +146,7 @@ namespace BetterSecondBot.HttpService
             bot.GetClient.Inventory.Remove(new List<UUID>() { target }, new List<UUID>());
             return BasicReply("Ok", "DeleteInventoryItem", new [] { item });
         }
-
+		
         [About("Attempts to Remove the given inventory folder")]
         [ReturnHints("ok")]
         [ReturnHints("invaild folder uuid")]
@@ -517,5 +519,87 @@ namespace BetterSecondBot.HttpService
             }
             return BasicReply(HelperInventory.MapFolderInventoryJson(bot, folder), "InventoryContents", new [] { folderUUID });
         }
+        
+        
+        //NEW COMMANDS
+		
+		[About("creates a folder")]
+        [ReturnHints("ok")]
+        [ReturnHints("invaild item uuid")]
+        [ArgHints("parent", "URLARG", "UUID of folder to create a subfolder in")]
+        [ArgHints("itemName", "URLARG", "name of the new folder")]
+        [Route(HttpVerbs.Get, "/CreateInventoryFolder/{parent}/{itemName}/{token}")]
+        public object CreateInventoryFolder(string parent, string itemName, string token)
+        {
+			string name=HttpUtility.HtmlDecode(itemName);
+			Console.WriteLine("creating: {}",name);
+            if (tokens.Allow(token, "inventory", "CreateInventoryFolder", handleGetClientIP()) == false)
+            {
+                return Failure("Token not accepted", "CreateInventoryFolder", new [] { name });
+            }
+            if (UUID.TryParse(parent, out UUID target) == false)
+            {
+                return Failure("invaild item uuid", "CreateInventoryFolder", new [] { parent });
+            }
+            if (name.Length<3)
+            {
+				return Failure("name is too short, must be longer than 3 characters.","CreateInventoryFolder",new [] {name});
+			}
+            UUID folder=bot.GetClient.Inventory.CreateFolder(target, name);
+            string uuid=folder.ToString();
+            return BasicReply("Ok", "CreateInventoryFolder", new string[] {uuid});
+        }
+        
+		
+		[About("moves an item to another folder")]
+        [ReturnHints("ok")]
+        [ReturnHints("invaild item uuid")]
+        [ArgHints("item", "URLARG", "UUID of item to move")]
+        [ArgHints("dest", "URLARG", "UUID of destination folder")]
+        [Route(HttpVerbs.Get, "/MoveInventoryItem/{item}/{dest}/{token}")]
+        public object MoveInventoryItem(string item,string dest, string token)
+        {
+            if (tokens.Allow(token, "inventory", "MoveInventoryItem", handleGetClientIP()) == false)
+            {
+                return Failure("Token not accepted", "MoveInventoryItem", new [] { item,dest });
+            }
+            if (UUID.TryParse(item, out UUID itemId) == false)
+            {
+                return Failure("invaild item uuid", "MoveInventoryItem", new [] { item,dest });
+            }
+            if (UUID.TryParse(dest, out UUID destId) == false)
+            {
+                return Failure("invaild item uuid", "MoveInventoryItem", new [] { item,dest });
+            }
+            bot.GetClient.Inventory.MoveItem(itemId, destId);
+            return BasicReply("Ok", "MoveInventoryItem", new string[] {item});
+        }
+        
+        [About("moves a folder to another folder")]
+        [ReturnHints("ok")]
+        [ReturnHints("invaild item uuid")]
+        [ArgHints("item", "URLARG", "UUID of folder to move")]
+        [ArgHints("dest", "URLARG", "UUID of destination folder")]
+        [Route(HttpVerbs.Get, "/MoveInventoryFolder/{item}/{dest}/{token}")]
+        public object MoveInventoryFolder(string item,string dest, string token)
+        {
+            if (tokens.Allow(token, "inventory", "MoveInventoryFolder", handleGetClientIP()) == false)
+            {
+                return Failure("Token not accepted", "MoveInventoryFolder", new [] { item,dest });
+            }
+            if (UUID.TryParse(item, out UUID itemId) == false)
+            {
+                return Failure("invaild item uuid", "MoveInventoryFolder", new [] { item,dest });
+            }
+            if (UUID.TryParse(dest, out UUID destId) == false)
+            {
+                return Failure("invaild item uuid", "MoveInventoryFolder", new [] { item,dest });
+            }
+            bot.GetClient.Inventory.MoveFolder(itemId, destId);
+            return BasicReply("Ok", "MoveInventoryFolder", new string[] {item});
+        }
+		
+		
+		//END NEW COMMANDS
     }
 }
