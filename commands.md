@@ -2396,6 +2396,90 @@ Requests the contents of a folder as an array of InventoryMapItem<br/>Formated a
 - [:x:] Token not accepted
 
  
+### CreateInventoryFolder
+ 
+http://localhost:8080/inventory/CreateInventoryFolder/{parentFolder}/{folderName}/{token}
+ 
+Method: Get
+ 
+OR
+ 
+CreateInventoryFolder|||{parentFolder}~#~{folderName}
+ 
+creates a folder in a folder
+ 
+***Args helper***
+ 
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| parentFolder | URL arg | UUID of folder to create a subfolder in |
+| folderName | URL arg | name of the new folder |
+| token | URL arg | the api access token |
+
+***Replys***
+ 
+- [:heavy_check_mark:] Ok
+- [:x:] invaild parent folder UUID
+- [:x:] new folder name is too short, must be longer than 3 characters.
+- [:x:] Token not accepted
+
+ 
+### MoveInventoryItem
+ 
+http://localhost:8080/inventory/MoveInventoryItem/{item}/{folder}/{token}
+ 
+Method: Get
+ 
+OR
+ 
+MoveInventoryItem|||{item}~#~{folder}
+ 
+moves an item to another folder
+ 
+***Args helper***
+ 
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| item | URL arg | UUID of item to move |
+| folder | URL arg | UUID of destination folder |
+| token | URL arg | the api access token |
+
+***Replys***
+ 
+- [:heavy_check_mark:] ok
+- [:x:] invaild item uuid
+- [:x:] invaild folder uuid
+- [:x:] Token not accepted
+
+ 
+### MoveInventoryFolder
+ 
+http://localhost:8080/inventory/MoveInventoryFolder/{sourceFolder}/{destFolder}/{token}
+ 
+Method: Get
+ 
+OR
+ 
+MoveInventoryFolder|||{sourceFolder}~#~{destFolder}
+ 
+moves a folder to another folder
+ 
+***Args helper***
+ 
+|Name|Type|Hint|
+| ------ | ------- | ---------------------------- |
+| sourceFolder | URL arg | UUID of folder to move |
+| destFolder | URL arg | UUID of destination folder |
+| token | URL arg | the api access token |
+
+***Replys***
+ 
+- [:heavy_check_mark:] ok
+- [:x:] invaild source folder uuid
+- [:x:] invaild dest folder uuid
+- [:x:] Token not accepted
+
+ 
 ## movement
  
 ### AutoPilot
@@ -3720,5 +3804,3 @@ A streamadin command
 - [:x:] Error: ...
 - [:x:] Notecard title is to short
 - [:x:] Token not accepted
-
- 
