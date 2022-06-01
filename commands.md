@@ -1,4 +1,4 @@
-View as [HTML](https://wiki.vrlife.live/files/Commands.html)
+View as [HTML](https://wiki.vrlife.life/files/Commands.html)
  
 Host it yourself: [+Docker image](https://hub.docker.com/r/madpeter/secondbot_wiki)
  
