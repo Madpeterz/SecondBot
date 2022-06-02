@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SecondBotEvents.Services
 {
-    public class DiscordService : Services
+    public class DiscordService : BotServices
     {
         public Config.DiscordConfig myConfig = null;
         public bool acceptChat = false;

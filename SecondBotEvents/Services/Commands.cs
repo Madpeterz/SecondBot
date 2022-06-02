@@ -11,7 +11,7 @@ using System.Net.Http;
 
 namespace SecondBotEvents.Services
 {
-    public class CommandsService : Services
+    public class CommandsService : BotServices
     {
         public CommandsConfig myConfig = null;
         public bool acceptNewCommands = false;
@@ -118,6 +118,15 @@ namespace SecondBotEvents.Services
         public override void Stop()
         {
             acceptNewCommands = false;
+        }
+
+        public override string Status()
+        {
+            if (acceptNewCommands == false)
+            {
+                return "Disabled";
+            }
+            return "Enabled";
         }
 
         protected void BotImMessage(object o, InstantMessageEventArgs e)
@@ -346,7 +355,7 @@ namespace SecondBotEvents.Services
         public string command;
         public string signingCode;
         public string[] args;
-        public string replyTarget;
+        public string replyTarget = null;
         public bool accepted = false;
         public long unixtimeOfCommand = 0;
         public SignedCommand(string input, bool requireSigning, bool requireTimewindow, int windowSize, string secret)
@@ -357,12 +366,27 @@ namespace SecondBotEvents.Services
                 accepted = true; // just accept the command
                 return;
             }
+            vaildate(requireTimewindow, windowSize, secret);
+        }
+        public SignedCommand(string setCommand, string setSigningCode, string[] setArgs, int setUnixtime, string setReplyTarget, bool requireTimewindow, int windowSize, string secret)
+        {
+            command = setCommand;
+            signingCode = setSigningCode;
+            args = setArgs;
+            unixtimeOfCommand = setUnixtime;
+            replyTarget = setReplyTarget;
+            vaildate(requireTimewindow, windowSize, secret);
+        }
+
+        protected void vaildate(bool requireTimewindow, int windowSize, string secret)
+        {
+            accepted = false;
             long dif = SecondbotHelpers.UnixTimeNow() - unixtimeOfCommand;
             if ((requireTimewindow == true) && ((unixtimeOfCommand == 0) || (dif > windowSize))) // bad time window
             {
                 return;
             }
-            if ((signingCode == null) ) // no signing code
+            if ((signingCode == null)) // no signing code
             {
                 return;
             }
@@ -379,9 +403,8 @@ namespace SecondBotEvents.Services
                 return; // invaild signing code
             }
             accepted = true;
-
-
         }
+
         protected void unpackInput(string input)
         {
             if (IsValidJson(input) == false)

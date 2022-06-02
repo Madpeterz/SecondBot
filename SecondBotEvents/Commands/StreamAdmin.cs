@@ -60,7 +60,17 @@ namespace SecondBotEvents.Commands
                 {
                     return Failure("Notecard title is to short", new [] { endpoint, endpointcode });
                 }
-                return Failure("@todo notecard sending");
+                ProcessAvatar(server_reply.AvatarUUID);
+                if(avataruuid == UUID.Zero)
+                {
+                    return Failure("Unable to unpack avatar", new[] { endpoint, endpointcode });
+                }
+                bool result = master.botClient.SendNotecard(server_reply.NotecardTitle, server_reply.NotecardContent, avataruuid);
+                if (result == false)
+                {
+                    return Failure("Failed to create/send notecard", new[] { endpoint, endpointcode });
+                }
+                return BasicReply("ok");
             }
             catch (Exception e)
             {

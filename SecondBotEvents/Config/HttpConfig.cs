@@ -11,12 +11,12 @@ namespace SecondBotEvents.Config
         {
             filename = "http";
             settings.Add("Enabled");
-            settings.Add("Host");
+            settings.Add("Port");
         }
 
-        public string GetHost()
+        public int GetPort()
         {
-            return ReadSettingAsString("Host", "http://*:80");
+            return ReadSettingAsInt("Port", 80);
         }
 
         public bool GetEnabled()

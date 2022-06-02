@@ -26,8 +26,8 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Content value is empty", new [] { collection, content });
             }
-            return Failure("@todo notecard temp stroage");
-            //return BasicReply("ok", "NotecardAdd", new [] { collection, content });
+            master.DataStoreService.AppendKeyValue("notecard_"+collection, content);
+            return BasicReply("ok", new [] { collection, master.DataStoreService.GetKeyValue("notecard_"+collection).Length.ToString() });
         }
 
         [About("Clears the contents of a collection")]
@@ -40,7 +40,8 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Collection value is empty", new [] { collection });
             }
-            return Failure("@todo notecard storage");
+            master.DataStoreService.ClearKeyValue("notecard_" + collection);
+            return BasicReply("ok");
         }
 
         [About("Sends a notecard to a avatar using the text in the prebuilt collection [see NotecardAdd] and also clears the collection just before sending [see NotecardClear]")]
@@ -67,7 +68,18 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar uuid", new [] { avatar, collection, notecardname });
             }
-            return Failure("@todo notecard storage");
+            string content = master.DataStoreService.GetKeyValue("notecard_" + collection);
+            if(content.Length <= 3)
+            {
+                return Failure("No content in notecard storage ?", new[] { avatar, collection, notecardname });
+            }
+            bool result = master.botClient.SendNotecard(notecardname, content, avataruuid);
+            if (result == false)
+            {
+                return Failure("Failed to create/send notecard", new[] { avatar, content, notecardname });
+            }
+            master.DataStoreService.ClearKeyValue("notecard_" + collection);
+            return BasicReply("ok");
         }
 
         [About("Creates and sends a notecard in one command good if you are using HTTP otherwise see [NotecardSend]")]
@@ -93,7 +105,12 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar uuid", new[] { avatar, content, notecardname });
             }
-            return Failure("@todo notecard sending");
+            bool result = master.botClient.SendNotecard(notecardname, content, avataruuid);
+            if(result == false)
+            {
+                return Failure("Failed to create/send notecard", new[] { avatar, content, notecardname });
+            }
+            return BasicReply("ok");
         }
     }
 }

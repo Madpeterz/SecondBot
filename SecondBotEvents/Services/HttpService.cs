@@ -1,18 +1,18 @@
 ﻿using EmbedIO;
 using EmbedIO.Actions;
+using EmbedIO.Routing;
 using EmbedIO.WebApi;
+using Newtonsoft.Json;
 using OpenMetaverse;
-using SecondBotEvents.Commands;
 using SecondBotEvents.Config;
 using Swan.Logging;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading;
 
 namespace SecondBotEvents.Services
 {
-    public class HttpService : Services
+    public class HttpService : BotServices
     {
         protected WebServer HTTPendpoint = null;
         protected HttpConfig myConfig;
@@ -27,26 +27,31 @@ namespace SecondBotEvents.Services
             }
         }
 
+        public bool GetAcceptBotCommands()
+        {
+            return acceptBotCommands;
+        }
+
         public override string Status()
         {
             if (myConfig == null)
             {
-                return "HTTP service [Config status broken]";
+                return "Config broken";
             }
             if (myConfig.GetEnabled() == false)
             {
-                return "HTTP service [- Not requested -]";
+                return "- Not requested -";
             }
             // @todo HTTP server check here
             if (HTTPendpoint == null)
             {
-                return "HTTP endpoint not online";
+                return "not online";
             }
             if (acceptBotCommands == false)
             {
-                return "Active [Service]";
+                return "Active ~ Service";
             }
-            return "Active [Commands]";
+            return "Active ~ Commands";
         }
 
         protected void BotClientRestart(object o, BotClientNotice e)
@@ -68,7 +73,7 @@ namespace SecondBotEvents.Services
         {
             getClient().Network.SimConnected -= BotLoggedIn;
             acceptBotCommands = true;
-            Console.WriteLine("HTTP service [Bot commands enabled]");
+            CreateWebServer();
         }
 
         public override void Start()
@@ -80,8 +85,6 @@ namespace SecondBotEvents.Services
             }
             Stop();
             master.BotClientNoticeEvent += BotClientRestart;
-            Console.WriteLine("HTTP service [Enabled]");
-            CreateWebServer();
         }
 
         public override void Stop()
@@ -103,12 +106,14 @@ namespace SecondBotEvents.Services
         {
             Swan.Logging.Logger.UnregisterLogger<ConsoleLogger>();
             HTTPendpoint = new WebServer(o => o
-                 .WithUrlPrefix(myConfig.GetHost())
-                 .WithMode(HttpListenerMode.EmbedIO))
+                .WithUrlPrefix("http://*:" + myConfig.GetPort().ToString())
+                .WithMode(HttpListenerMode.EmbedIO))
                 .WithCors()
+                .WithWebApi("/api", m => m.WithController(() => new HttpWebBot(master)))
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" }))
             );
             HTTPendpoint.RunAsync();
+            Console.WriteLine("HTTP service [Enabled] on port "+ myConfig.GetPort().ToString());
         }
     }
 
@@ -170,13 +175,13 @@ namespace SecondBotEvents.Services
 
         protected object BasicReply(string input, string[] args, string command)
         {
-            // @todo Command history storage system
+            master.DataStoreService.addCommandToHistory(true, command, args);
             return new { reply = input, status = false };
         }
 
         protected object Failure(string input, string command, string[] args, string whyfailed)
         {
-            // @todo Command history storage system
+            master.DataStoreService.addCommandToHistory(false, command, args);
             return new { reply = input, status = false };
         }
 
@@ -238,6 +243,53 @@ namespace SecondBotEvents.Services
         {
             this.name = name;
             this.about = about;
+        }
+    }
+
+    public class SecondbotWebApi : WebApiController
+    {
+        protected EventsSecondBot master;
+        public SecondbotWebApi(EventsSecondBot setmaster)
+        {
+            master = setmaster;
+        }
+    }
+
+    public class HttpWebBot : SecondbotWebApi
+    {
+        public HttpWebBot(EventsSecondBot setmaster) : base(setmaster) {  }
+
+        [About("Runs a command on the bot")]
+        [ReturnHints("command reply")]
+        [ReturnHintsFailure("Bad token signing")]
+        [ArgHints("commandName", "the name of the command to run")]
+        [ArgHints("args", "a list of args formated with ~#~ as the split points")]
+        [ArgHints("signing", "a sha1 hash that meets level 3 API signing spec [see github wiki]")]
+        [ArgHints("unixtime", "the time you signed the command")]
+        [Route(HttpVerbs.Post, "/Run")]
+
+        public string Run([FormField] string commandName, [FormField] string? args, [FormField] string signing, [FormField] string unixtime)
+        {
+            string input = commandName;
+            string[] myArgs = new string[] { };
+            if(args != null)
+            {
+                myArgs = args.Split("~#~", StringSplitOptions.RemoveEmptyEntries);
+            }
+            if(int.TryParse(unixtime, out int cmdUnixtime) == false)
+            {
+                return "Invaild unixtime was sent";
+            }
+            if (master.HttpService.GetAcceptBotCommands() == false)
+            {
+                return "No bot connected yet";
+            }
+            SignedCommand C = new SignedCommand(commandName, signing, myArgs, cmdUnixtime, null, true, 5, master.CommandsService.myConfig.GetSharedSecret());
+            if(C.accepted == false)
+            {
+                return "Command request rejected";
+            }
+            return JsonConvert.SerializeObject(master.CommandsService.runCommand(C));
         }
     }
 }

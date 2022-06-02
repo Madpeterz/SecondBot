@@ -14,7 +14,6 @@ namespace SecondBotEvents.Config
             settings.Add("LocalChatHistoryLimit");
             settings.Add("GroupChatHistoryLimitPerGroup");
             settings.Add("ImChatHistoryLimit");
-            settings.Add("NotecardStoragePurgeAfterMins");
             settings.Add("PrefetchGroupMembers");
             settings.Add("PrefetchGroupRoles");
             settings.Add("PrefetchEstateBanlist");
@@ -72,11 +71,6 @@ namespace SecondBotEvents.Config
         public int GetImChatHistoryLimit()
         {
             return ReadSettingAsInt("ImChatHistoryLimit", 50);
-        }
-
-        public int GetNotecardStoragePurgeAfterMins()
-        {
-            return ReadSettingAsInt("NotecardStoragePurgeAfterMins", 10);
         }
     }
 }

@@ -197,6 +197,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Error Unable to Teleport to location", new [] { region, x, y, z });
             }
+            master.HomeboundService.markTeleport();
             return BasicReply("Accepted", new [] { region, x, y, z });
         }
 

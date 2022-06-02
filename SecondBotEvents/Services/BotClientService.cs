@@ -1,4 +1,5 @@
 ﻿using OpenMetaverse;
+using OpenMetaverse.Assets;
 using SecondBotEvents.Config;
 using System;
 using System.Collections.Generic;
@@ -6,10 +7,19 @@ using System.Text;
 
 namespace SecondBotEvents.Services
 {
-    public class BotClientService : Services
+    public class BotClientService : BotServices
     {
         public GridClient client = null;
         protected BasicConfig basicCfg = null;
+        public bool _ExitBot
+        {
+            get { return ExitBot; }   // get method
+            set {  }  // set method
+        }
+
+        protected bool ExitBot = false;
+
+
         public BotClientService(EventsSecondBot setMaster) : base(setMaster)
         {
             basicCfg = new BasicConfig(master.fromEnv, master.fromFolder);
@@ -52,13 +62,78 @@ namespace SecondBotEvents.Services
         }
 
         protected void BotLoginStatus(object o, LoginProgressEventArgs e)
-        {
+        { 
+            if(e.FailReason != "")
+            {
+                Console.WriteLine("Client service ~ {FAILED} Login status: " + e.FailReason.ToString());
+                client.Network.Logout();
+                ResetClient();
+                return;
+            }
             Console.WriteLine("Client service ~ Login status: " + e.Status.ToString());
         }
         public void SendIM(UUID avatar, string message)
         {
             // @todo add message to IM chat
             client.Self.InstantMessage(avatar, message);
+        }
+
+        public bool SendNotecard(string name, string content, UUID sendToUUID)
+        {
+            bool returnstatus = true;
+            name = name + " " + DateTime.Now;
+            client.Inventory.RequestCreateItem(
+                client.Inventory.FindFolderForType(AssetType.Notecard),
+                name,
+                name + " Created via SecondBot notecard API",
+                AssetType.Notecard,
+                UUID.Random(),
+                InventoryType.Notecard,
+                PermissionMask.All,
+                (bool Success, InventoryItem item) =>
+                {
+                    if (Success)
+                    {
+                        AssetNotecard empty = new AssetNotecard { BodyText = "\n" };
+                        empty.Encode();
+                        client.Inventory.RequestUploadNotecardAsset(empty.AssetData, item.UUID,
+                        (bool emptySuccess, string emptyStatus, UUID emptyItemID, UUID emptyAssetID) =>
+                        {
+                            if (emptySuccess)
+                            {
+                                empty.BodyText = content;
+                                empty.Encode();
+                                client.Inventory.RequestUploadNotecardAsset(empty.AssetData, emptyItemID,
+                                (bool finalSuccess, string finalStatus, UUID finalItemID, UUID finalID) =>
+                                {
+                                    if (finalSuccess)
+                                    {
+                                        LogFormater.Info("Sending notecard now");
+                                        client.Inventory.GiveItem(finalItemID, name, AssetType.Notecard, sendToUUID, false);
+                                    }
+                                    else
+                                    {
+                                        returnstatus = false;
+                                        LogFormater.Warn("Unable to request notecard upload");
+                                    }
+
+                                });
+                            }
+                            else
+                            {
+                                LogFormater.Warn("The fuck empty success notecard create");
+                                returnstatus = false;
+                            }
+                        });
+                    }
+                    else
+                    {
+                        LogFormater.Warn("Unable to find default notecards folder");
+                        returnstatus = false;
+                    }
+                }
+            );
+            return returnstatus;
         }
 
         protected void ResetClient()
@@ -96,6 +171,25 @@ namespace SecondBotEvents.Services
             client.Network.BeginLogin(loginParams);
         }
 
-
+        public override string Status()
+        {
+            if (client == null)
+            {
+                return "No Client [Restart needed]";
+            }
+            else if (client.Network == null)
+            {
+                return "No network - [Starting / Shutting down]";
+            }
+            else if (client.Network.Connected == false)
+            {
+                return "Not connected";
+            }
+            else if (client.Network.CurrentSim == null)
+            {
+                return "No sim";
+            }
+            return client.Network.CurrentSim.Name + " " + client.Self.SimPosition.ToString();
+        }
     }
 }

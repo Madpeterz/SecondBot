@@ -9,22 +9,13 @@ using System.Threading;
 
 namespace SecondBotEvents.Services
 {
-    public class DataStoreService : Services
+    public class DataStoreService : BotServices
     {
         protected DataStoreConfig myConfig;
         protected bool botConnected = false;
         public DataStoreService(EventsSecondBot setMaster) : base(setMaster)
         {
             myConfig = new DataStoreConfig(master.fromEnv,master.fromFolder);
-        }
-
-        public override string Status()
-        {
-            if(myConfig == null)
-            {
-                return "DataStore Service [Config status broken]";
-            }
-            return "DataStore Service [Waiting for bot]";
         }
 
         protected Dictionary<string, UUID> avatarsName2Key = new Dictionary<string, UUID>();
@@ -44,12 +35,24 @@ namespace SecondBotEvents.Services
         protected Dictionary<string, string> KeyValueStore = new Dictionary<string, string>();
         protected Dictionary<string, long> KeyValueStoreLastUsed = new Dictionary<string, long>();
 
-
         protected List<CommandHistory> commandHistories = new List<CommandHistory>();
 
-        public void addCommandToHistory(UUID Source, string command, string[] args)
+        public override string Status()
         {
-            CommandHistory A = new CommandHistory(Source, command, args, SecondbotHelpers.UnixTimeNow());
+            if (myConfig == null)
+            {
+                return "DataStore Service [Config broken]";
+            }
+            int sum = commandHistories.Count() + KeyValueStoreLastUsed.Count() + KeyValueStore.Count() +
+                chatWindowsOwner.Count() + chatWindowsIsGroup.Count() + chatWindowsUnread.Count() +
+                chatWindows.Count() + localChatHistory.Count() + groupRoles.Count() +
+                groupMembers.Count() + groupsKey2Name.Count() + avatarsName2Key.Count();
+            return sum.ToString();
+        }
+
+        public void addCommandToHistory(bool status, string command, string[] args)
+        {
+            CommandHistory A = new CommandHistory(status, command, args, SecondbotHelpers.UnixTimeNow());
             commandHistories.Add(A);
             int c = commandHistories.Count;
             while (c > myConfig.GetCommandHistoryLimit())
@@ -257,83 +260,92 @@ namespace SecondBotEvents.Services
 
         protected void recordChat(UUID sessionID, string fromname, string message)
         {
-            if(chatWindows.ContainsKey(sessionID) == false)
+            lock (chatWindows)
             {
-                return; // chat window not open unable to record message
-            }
-            chatWindows[sessionID].Add(fromname + ": " + message);
-            chatWindowsUnread[sessionID] = true;
-            int purgeLen = myConfig.GetImChatHistoryLimit();
-            if(chatWindowsIsGroup[sessionID] == true)
-            {
-                purgeLen = myConfig.GetGroupChatHistoryLimitPerGroup();
-            }
-            int counter = chatWindows[sessionID].Count();
-            while (counter > purgeLen)
-            {
-                chatWindows[sessionID].RemoveAt(0);
-                counter--;
+                if (chatWindows.ContainsKey(sessionID) == false)
+                {
+                    return; // chat window not open unable to record message
+                }
+                chatWindows[sessionID].Add(fromname + ": " + message);
+                chatWindowsUnread[sessionID] = true;
+                int purgeLen = myConfig.GetImChatHistoryLimit();
+                if (chatWindowsIsGroup[sessionID] == true)
+                {
+                    purgeLen = myConfig.GetGroupChatHistoryLimitPerGroup();
+                }
+                int counter = chatWindows[sessionID].Count();
+                while (counter > purgeLen)
+                {
+                    chatWindows[sessionID].RemoveAt(0);
+                    counter--;
+                }
             }
         }
 
         protected void closeChat(UUID owner)
         {
-            UUID sessionID = UUID.Zero;
-            if(chatWindowsOwner.ContainsValue(owner) == false)
+            lock (chatWindows)
             {
-                return;
-            }
-            foreach(KeyValuePair<UUID,UUID> ownermap in chatWindowsOwner)
-            {
-                if(ownermap.Value != owner)
+                UUID sessionID = UUID.Zero;
+                if (chatWindowsOwner.ContainsValue(owner) == false)
                 {
-                    continue;
+                    return;
                 }
-                sessionID = ownermap.Key;
+                foreach (KeyValuePair<UUID, UUID> ownermap in chatWindowsOwner)
+                {
+                    if (ownermap.Value != owner)
+                    {
+                        continue;
+                    }
+                    sessionID = ownermap.Key;
+                }
+                if (sessionID == UUID.Zero)
+                {
+                    return;
+                }
+                chatWindowsOwner.Remove(sessionID);
+                chatWindowsIsGroup.Remove(sessionID);
+                chatWindowsUnread.Remove(sessionID);
+                chatWindows.Remove(sessionID);
             }
-            if(sessionID == UUID.Zero)
-            {
-                return;
-            }
-            chatWindowsOwner.Remove(sessionID);
-            chatWindowsIsGroup.Remove(sessionID);
-            chatWindowsUnread.Remove(sessionID);
-            chatWindows.Remove(sessionID);
 
         }
 
         protected void openChatWindow(bool group, UUID sessionID, UUID ownerID)
         {
-            if (chatWindows.ContainsKey(sessionID) == true)
+            lock (chatWindows)
             {
-                return; // window already open
-            }
-            if (chatWindowsOwner.ContainsValue(ownerID) == true)
-            {
-                // new session find the old one and update to this session
-                Dictionary<UUID, UUID> oldOwners = chatWindowsOwner;
-                foreach (KeyValuePair<UUID,UUID> kvp in oldOwners)
+                if (chatWindows.ContainsKey(sessionID) == true)
                 {
-                    if(kvp.Value == ownerID)
-                    {
-                        chatWindows.Add(sessionID, chatWindows[kvp.Key]);
-                        chatWindowsUnread.Add(sessionID, chatWindowsUnread[kvp.Key]);
-                        chatWindowsIsGroup.Add(sessionID, chatWindowsIsGroup[kvp.Key]);
-                        chatWindowsOwner.Add(sessionID, ownerID);
-                        chatWindows.Remove(kvp.Key);
-                        chatWindowsUnread.Remove(kvp.Key);
-                        chatWindowsIsGroup.Remove(kvp.Key);
-                        chatWindowsOwner.Remove(kvp.Key);
-                        break;
-                    }
+                    return; // window already open
                 }
-                return; // chat recovered
+                if (chatWindowsOwner.ContainsValue(ownerID) == true)
+                {
+                    // new session find the old one and update to this session
+                    Dictionary<UUID, UUID> oldOwners = chatWindowsOwner;
+                    foreach (KeyValuePair<UUID, UUID> kvp in oldOwners)
+                    {
+                        if (kvp.Value == ownerID)
+                        {
+                            chatWindows.Add(sessionID, chatWindows[kvp.Key]);
+                            chatWindowsUnread.Add(sessionID, chatWindowsUnread[kvp.Key]);
+                            chatWindowsIsGroup.Add(sessionID, chatWindowsIsGroup[kvp.Key]);
+                            chatWindowsOwner.Add(sessionID, ownerID);
+                            chatWindows.Remove(kvp.Key);
+                            chatWindowsUnread.Remove(kvp.Key);
+                            chatWindowsIsGroup.Remove(kvp.Key);
+                            chatWindowsOwner.Remove(kvp.Key);
+                            break;
+                        }
+                    }
+                    return; // chat recovered
+                }
+                chatWindows.Add(sessionID, new List<string>());
+                chatWindowsUnread.Add(sessionID, false);
+                chatWindowsIsGroup.Add(sessionID, group);
+                chatWindowsOwner.Add(sessionID, ownerID);
+                // new window now open
             }
-            chatWindows.Add(sessionID, new List<string>());
-            chatWindowsUnread.Add(sessionID, false);
-            chatWindowsIsGroup.Add(sessionID, group);
-            chatWindowsOwner.Add(sessionID, ownerID);
-            // new window now open
         }
 
 
@@ -632,23 +644,29 @@ namespace SecondBotEvents.Services
 
         protected void GroupRoles(object o, GroupRolesDataReplyEventArgs e)
         {
-            if(groupRoles.ContainsKey(e.GroupID) == false)
+            lock (groupRoles)
             {
-                groupRoles.Add(e.GroupID, new Dictionary<UUID, GroupRole>());
+                if (groupRoles.ContainsKey(e.GroupID) == false)
+                {
+                    groupRoles.Add(e.GroupID, new Dictionary<UUID, GroupRole>());
+                }
+                groupRoles[e.GroupID] = e.Roles;
             }
-            groupRoles[e.GroupID] = e.Roles;
         }
 
         protected void GroupMembers(object o, GroupMembersReplyEventArgs e)
         {
-            if(groupMembers.ContainsKey(e.GroupID) == true)
+            lock (groupMembers)
             {
-                groupMembers.Remove(e.GroupID);
-            }
-            groupMembers.Add(e.GroupID, new List<UUID>());
-            foreach (KeyValuePair<UUID,GroupMember> a in e.Members)
-            {
-                groupMembers[e.GroupID].Add(a.Value.ID);
+                if (groupMembers.ContainsKey(e.GroupID) == true)
+                {
+                    groupMembers.Remove(e.GroupID);
+                }
+                groupMembers.Add(e.GroupID, new List<UUID>());
+                foreach (KeyValuePair<UUID, GroupMember> a in e.Members)
+                {
+                    groupMembers[e.GroupID].Add(a.Value.ID);
+                }
             }
         }
 
@@ -678,7 +696,10 @@ namespace SecondBotEvents.Services
 
         protected void EstateBans(object o, EstateBansReplyEventArgs e)
         {
-            estateBanlist = e.Banned;
+            lock (estateBanlist)
+            {
+                estateBanlist = e.Banned;
+            }
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
@@ -733,35 +754,38 @@ namespace SecondBotEvents.Services
 
         protected void GroupCurrent(object o, CurrentGroupsEventArgs e)
         {
-            List<UUID> missingGroups = groupsKey2Name.Keys.ToList();
-            foreach(Group G in e.Groups.Values)
+            lock (groupsKey2Name)
             {
-                missingGroups.Remove(G.ID);
-                if (groupsKey2Name.ContainsKey(G.ID) == true)
+                List<UUID> missingGroups = groupsKey2Name.Keys.ToList();
+                foreach (Group G in e.Groups.Values)
                 {
-                    continue;
+                    missingGroups.Remove(G.ID);
+                    if (groupsKey2Name.ContainsKey(G.ID) == true)
+                    {
+                        continue;
+                    }
+                    groupsKey2Name.Add(G.ID, G.Name);
+                    getClient().Self.RequestJoinGroupChat(G.ID);
+                    if (myConfig.GetPrefetchGroupMembers() == true)
+                    {
+                        getClient().Groups.RequestGroupMembers(G.ID);
+                    }
+                    if (myConfig.GetPrefetchGroupRoles() == true)
+                    {
+                        getClient().Groups.RequestGroupRoles(G.ID);
+                    }
                 }
-                groupsKey2Name.Add(G.ID, G.Name);
-                getClient().Self.RequestJoinGroupChat(G.ID);
-                if (myConfig.GetPrefetchGroupMembers() == true)
-                {
-                    getClient().Groups.RequestGroupMembers(G.ID);
-                }
-                if(myConfig.GetPrefetchGroupRoles() == true)
-                {
-                    getClient().Groups.RequestGroupRoles(G.ID);
-                }
-            }
 
-            foreach(UUID G in missingGroups)
-            {
-                if (groupsKey2Name.ContainsKey(G) == false)
+                foreach (UUID G in missingGroups)
                 {
-                    continue;
+                    if (groupsKey2Name.ContainsKey(G) == false)
+                    {
+                        continue;
+                    }
+                    string name = groupsKey2Name[G];
+                    groupsKey2Name.Remove(G);
+                    closeChat(G);
                 }
-                string name = groupsKey2Name[G];
-                groupsKey2Name.Remove(G);
-                closeChat(G);
             }
         }
 
@@ -777,11 +801,14 @@ namespace SecondBotEvents.Services
 
         protected void addAvatar(UUID id, string name)
         {
-            if (avatarsName2Key.ContainsValue(id) == true)
+            lock (avatarsName2Key)
             {
-                return;
+                if (avatarsName2Key.ContainsValue(id) == true)
+                {
+                    return;
+                }
+                avatarsName2Key.Add(name, id);
             }
-            avatarsName2Key.Add(name, id);
         }
 
         protected void AvatarUUIDName(object o, UUIDNameReplyEventArgs e)
@@ -878,14 +905,14 @@ namespace SecondBotEvents.Services
 
     public class CommandHistory
     {
-        public UUID Source = UUID.Zero;
         public string Command = "";
         public string[] Args = new string[] { };
         public long Unixtime = 0;
+        public bool status = false;
 
-        public CommandHistory(UUID setSource, string setCommand, string[] setArgs, long setUnixtime)
+        public CommandHistory(bool setStatus, string setCommand, string[] setArgs, long setUnixtime)
         {
-            Source = setSource;
+            status = setStatus;
             Command = setCommand;
             Args = setArgs;
             Unixtime = setUnixtime;

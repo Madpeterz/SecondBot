@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace SecondBotEvents.Services
 {
-    public class InteractionService : Services
+    public class InteractionService : BotServices
     {
         protected InteractionConfig myConfig;
         protected bool botConnected = false;
@@ -26,13 +26,17 @@ namespace SecondBotEvents.Services
         {
             if(myConfig == null)
             {
-                return "Interaction Service [Config status broken]";
+                return "Config broken";
             }
             if (myConfig.GetEnabled() == false)
             {
-                return "Interaction Service [- Not requested -]";
+                return "- Not requested -";
             }
-            return "Interaction Service [Waiting for bot]";
+            if (botConnected == false)
+            {
+                return "Waiting for bot";
+            }
+            return "Active";
         }
 
         protected bool processRequest(bool enabledByConfig, string avatarName, string sourceName)
@@ -90,12 +94,18 @@ namespace SecondBotEvents.Services
                 return;
             }
             string mode = "Teleport Bot to Av";
+            bool markTeleport = true;
             if (e.IM.Dialog == InstantMessageDialog.RequestLure)
             {
                 mode = "Teleport Av to Bot";
+                markTeleport = false;
             }
             if (processRequest(myConfig.GetAcceptTeleports(), e.IM.FromAgentName, mode) == false)
             {
+                if(markTeleport == true)
+                {
+                    master.HomeboundService.markTeleport();
+                }
                 if (e.IM.Dialog != InstantMessageDialog.RequestLure)
                 {
                     return;

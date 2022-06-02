@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace SecondBotEvents
 {
@@ -10,24 +11,31 @@ namespace SecondBotEvents
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to Secondbot [Events build] version: " + AssemblyInfo.GetGitHash());
+            LogFormater.Info("Welcome to Secondbot [Events build] version: " + AssemblyInfo.GetGitHash());
             EventsSecondBot worker = new EventsSecondBot(args);
 
             while(worker.Exit() == false)
             {
+                if(worker.Ready == true)
+                {
+                    worker.Status();
+                }
                 Thread.Sleep(1000);
             }
+            LogFormater.Warn("Shutdown in 5 secs");
+            Thread.Sleep(5000);
         }
     }
 
     public class EventsSecondBot
     {
-        public HttpService HttpService = null;
-        public CommandsService CommandsService = null;
-        public BotClientService botClient = null;
-        public DiscordService DiscordService = null;
-        public InteractionService InteractionService = null;
-        public DataStoreService DataStoreService = null;
+        public HttpService HttpService { get { return (HttpService) getService("HttpService"); } }
+        public CommandsService CommandsService { get { return (CommandsService)getService("CommandsService"); } }
+        public BotClientService botClient { get { return (BotClientService)getService("BotClientService"); } }
+        public DiscordService DiscordService { get { return (DiscordService)getService("DiscordService"); } }
+        public InteractionService InteractionService { get { return (InteractionService)getService("InteractionService"); } }
+        public DataStoreService DataStoreService { get { return (DataStoreService)getService("DataStoreService"); } }
+        public HomeboundService HomeboundService { get { return (HomeboundService)getService("HomeboundService"); } }
 
 
         private EventHandler<BotClientNotice> botclient_eventNotices;
@@ -44,6 +52,8 @@ namespace SecondBotEvents
             EventHandler<BotClientNotice> handler = botclient_eventNotices;
             handler?.Invoke(this, new BotClientNotice(asRestart));
         }
+
+
 
         public string GetVersion()
         {
@@ -67,61 +77,120 @@ namespace SecondBotEvents
             StartServices();
         }
 
+        public bool Ready = false;
+
         public void RestartServices()
         {
             StopServices();
             StartServices();
         }
+
+        protected Dictionary<string, BotServices> services = new Dictionary<string, BotServices>();
+
+        public BotServices getService(string classname)
+        {
+            if(services.ContainsKey(classname) == false)
+            {
+                return null;
+            }
+            return services[classname];
+        }
+        protected BotServices RegisterService(string classname, bool autoStart = true)
+        {
+            BotServices instance = (BotServices)GetInstance("SecondBotEvents.Services." + classname);
+            services.Add(classname, instance);
+            lastStatus.Add(classname, "?");
+            if (autoStart == true)
+            {
+                instance.Start();
+            }
+            return instance;
+        }
+
+        protected object GetInstance(string strFullyQualifiedName)
+        {
+            Type type = Type.GetType(strFullyQualifiedName);
+            if (type != null)
+                return Activator.CreateInstance(type, this);
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                type = asm.GetType(strFullyQualifiedName);
+                if (type != null)
+                    return Activator.CreateInstance(type, this);
+            }
+            return null;
+        }
+
         protected void StartServices()
         {
-            DataStoreService = new DataStoreService(this);
-            DataStoreService.Start();
-            botClient = new BotClientService(this);
-            HttpService = new HttpService(this);
-            CommandsService = new CommandsService(this);
-            DiscordService = new DiscordService(this);
-            InteractionService = new InteractionService(this);
+            services = new Dictionary<string, BotServices>();
+            lastStatus = new Dictionary<string, string>();
+            RegisterService("BotClientService", false);
+            RegisterService("DataStoreService");
+            RegisterService("HttpService");
+            RegisterService("CommandsService");
+            RegisterService("DiscordService");
+            RegisterService("InteractionService");
+            RegisterService("HomeboundService");
             if (botClient.IsLoaded() == false)
             {
                 Console.WriteLine("Config is not loaded :(");
                 exitNow = true;
                 return;
             }
-            HttpService.Start();
-            CommandsService.Start();
-            DiscordService.Start();
-            InteractionService.Start();
             botClient.Start();
+            Ready = true;
+
         }
+
+        Dictionary<string, string> lastStatus = new Dictionary<string, string>();
+        long lastChange = 0;
+        public void Status()
+        {
+            string Output = "";
+            string addon = "";
+            foreach(KeyValuePair<string, BotServices> A in services)
+            {
+                string StatusMessage = A.Value.Status();
+                if(StatusMessage != lastStatus[A.Key])
+                {
+                    Output = Output + addon + " [" + A.Key + "] ~ " + StatusMessage;
+                    lastStatus[A.Key] = StatusMessage;
+                    addon = " | ";
+                }
+            }
+            if(Output != "")
+            {
+                LogFormater.Info(Output);
+                lastChange = SecondbotHelpers.UnixTimeNow();
+                return;
+            }
+            long dif = SecondbotHelpers.UnixTimeNow() - lastChange;
+            if(dif > 60)
+            {
+                string[] bits = lastStatus.Keys.ToArray();
+                foreach (string A in bits)
+                {
+                    lastStatus[A] = "";
+                }
+            }
+        }
+
         protected void StopServices()
         {
-            if(DataStoreService != null)
+            Ready = false;
+            Dictionary<string, BotServices> copy = services;
+            foreach (KeyValuePair<string, BotServices> A in copy)
             {
-                DataStoreService.Stop();
+                if(A.Key == "BotClientService")
+                {
+                    continue;
+                }
+                A.Value.Stop();
+                services.Remove(A.Key);
             }
-            if (HttpService != null)
-            {
-                HttpService.Stop();
-            }
-            if (CommandsService != null)
-            {
-                CommandsService.Stop();
-            }
-            if (DiscordService != null)
-            {
-                DiscordService.Stop();
-            }
-            if(InteractionService != null)
-            {
-                InteractionService.Stop();
-            }
-            if(botClient != null)
-            {
-                botClient.Stop();
-            }
-            HttpService = null;
-            botClient = null;
-
+            services["BotClientService"].Stop();
+            services.Remove("BotClientService");
         }
 
         public bool Exit()

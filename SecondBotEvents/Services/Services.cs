@@ -5,10 +5,10 @@ using System.Text;
 
 namespace SecondBotEvents.Services
 {
-    public abstract class Services
+    public abstract class BotServices
     {
         public EventsSecondBot master;
-        public Services(EventsSecondBot setMaster)
+        public BotServices(EventsSecondBot setMaster)
         {
             master = setMaster;
         }
