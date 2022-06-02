@@ -159,7 +159,8 @@ namespace SecondBotEvents.Services
             }
             lastGotoAction = SecondbotHelpers.UnixTimeNow();
             float dist = Vector3.Distance(new Vector3(location.x, location.y, location.z), getClient().Self.SimPosition);
-            if(dist < 1)
+            closeToHome = false;
+            if (dist < 1)
             {
                 closeToHome = true;
                 if (gotoPosAttemptedWalk == true)
@@ -170,16 +171,16 @@ namespace SecondBotEvents.Services
                 gotoPosAttemptedTp = false;
                 return;
             }
+            if ((gotoPosAttemptedWalk == false) && (dist < 16))
+            {
+                gotoPosAttemptedWalk = true;
+                getClient().Self.AutoPilotLocal(location.x, location.y, getClient().Self.SimPosition.Z);
+                return;
+            }
             if (gotoPosAttemptedTp == false)
             {
                 gotoPosAttemptedTp = true;
                 getClient().Self.Teleport(location.name, new Vector3(location.x, location.y, location.z), new Vector3(0, 0, 0));
-                return;
-            }
-            if(gotoPosAttemptedWalk == false)
-            {
-                gotoPosAttemptedWalk = true;
-                getClient().Self.AutoPilotLocal(location.x, location.y, location.z);
                 return;
             }
             getClient().Self.AutoPilotCancel();

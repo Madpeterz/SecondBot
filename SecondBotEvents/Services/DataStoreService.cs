@@ -607,6 +607,19 @@ namespace SecondBotEvents.Services
 
         protected void reset()
         {
+            if (estateBanlist != null)
+            {
+                lock (avatarsName2Key) lock (groupMembers) lock (localChatHistory) lock (chatWindows) lock (estateBanlist)
+                {
+                    clearMem();
+                }
+                return;
+            }
+            clearMem();
+        }
+
+        protected void clearMem()
+        {
             avatarsName2Key = new Dictionary<string, UUID>();
 
             groupsKey2Name = new Dictionary<UUID, string>();
@@ -737,12 +750,24 @@ namespace SecondBotEvents.Services
                         {
                             break;
                         }
-                        localChatHistory.Add(e.FromName + ": " + e.Message);
-                        if (localChatHistory.Count <= myConfig.GetLocalChatHistoryLimit())
+                        string source = "{Av}";
+                        if (e.SourceType == ChatSourceType.Object)
                         {
-                            break;
+                            source = "{Obj}";
                         }
-                        localChatHistory.RemoveAt(0);
+                        else if (e.SourceType == ChatSourceType.System)
+                        {
+                            source = "{Sys}";
+                        }
+                        lock (localChatHistory)
+                        {
+                            localChatHistory.Add(source+ " "+e.FromName + ": " + e.Message);
+                            if (localChatHistory.Count <= myConfig.GetLocalChatHistoryLimit())
+                            {
+                                break;
+                            }
+                            localChatHistory.RemoveAt(0);
+                        }
                         break;
                     }
                 default:

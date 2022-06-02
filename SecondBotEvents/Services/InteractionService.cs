@@ -102,16 +102,17 @@ namespace SecondBotEvents.Services
             }
             if (processRequest(myConfig.GetAcceptTeleports(), e.IM.FromAgentName, mode) == false)
             {
-                if(markTeleport == true)
-                {
-                    master.HomeboundService.markTeleport();
-                }
+                // rejected requests
                 if (e.IM.Dialog != InstantMessageDialog.RequestLure)
                 {
                     return;
                 }
                 getClient().Self.TeleportLureRespond(e.IM.FromAgentID, e.IM.IMSessionID, false);
                 return;
+            }
+            if (markTeleport == true)
+            {
+                master.HomeboundService.markTeleport();
             }
             jsonOuput(true, mode, e.IM.FromAgentName);
             if (e.IM.Dialog == InstantMessageDialog.RequestLure)
