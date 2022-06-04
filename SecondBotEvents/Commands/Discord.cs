@@ -19,7 +19,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            return BasicReply(master.DiscordService.addRoleToMember(serverid, roleid, memberid).Result.ToString(), new [] { serverid, roleid, memberid });
+            return BasicReply(master.DiscordService.AddRoleToMember(serverid, roleid, memberid).Result.ToString(), new [] { serverid, roleid, memberid });
         }
 
         [About("Adds the selected user to the ban list - Disallows rejoining untill they are removed from the list")]

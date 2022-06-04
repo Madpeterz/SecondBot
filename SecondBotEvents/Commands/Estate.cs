@@ -19,14 +19,14 @@ namespace SecondBotEvents.Commands
         [ArgHints("mode", "true to start a restart, false to cancel")]
         public object SimRestart(string delay, string mode)
         {
-            if (getClient().Network.CurrentSim.IsEstateManager == false)
+            if (GetClient().Network.CurrentSim.IsEstateManager == false)
             {
                 return Failure("Not an estate manager here", new [] { delay, mode });
             }
             bool.TryParse(mode, out bool modeflag);
             if (modeflag == false)
             {
-                getClient().Estate.CancelRestart();
+                GetClient().Estate.CancelRestart();
                 return BasicReply("canceled", new [] { delay, mode });
             }
             int delay_restart = 60;
@@ -35,7 +35,7 @@ namespace SecondBotEvents.Commands
             {
                 delay_restart = 240;
             }
-            getClient().Estate.RestartRegion(delay_restart);
+            GetClient().Estate.RestartRegion(delay_restart);
             return BasicReply("restarting", new [] { delay, mode });
         }
 
@@ -50,11 +50,11 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Message empty", new [] { message });
             }
-            if (getClient().Network.CurrentSim.IsEstateManager == false)
+            if (GetClient().Network.CurrentSim.IsEstateManager == false)
             {
                 return Failure("Not an estate manager here", new [] { message });
             }
-            getClient().Estate.SimulatorMessage(message);
+            GetClient().Estate.SimulatorMessage(message);
             return BasicReply("ok", new [] { message });
         }
 
@@ -64,7 +64,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("regionname", "the name of the region we are fetching")]
         public object GetSimTexture(string regionname)
         {
-            if (getClient().Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region) == false)
+            if (GetClient().Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region) == false)
             {
                 return Failure("Unable to find region", new [] { regionname });
             }
@@ -76,12 +76,12 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         public object EstateParcelReclaim()
         {
-            if (getClient().Network.CurrentSim.IsEstateManager == false)
+            if (GetClient().Network.CurrentSim.IsEstateManager == false)
             {
                 return Failure("Not an estate manager here");
             }
-            int localid = getClient().Parcels.GetParcelLocalID(getClient().Network.CurrentSim, getClient().Self.SimPosition);
-            getClient().Parcels.Reclaim(getClient().Network.CurrentSim, localid);
+            int localid = GetClient().Parcels.GetParcelLocalID(GetClient().Network.CurrentSim, GetClient().Self.SimPosition);
+            GetClient().Parcels.Reclaim(GetClient().Network.CurrentSim, localid);
             return BasicReply("ok");
         }
 
@@ -91,7 +91,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("a json object with the x,y and region name")]
         public object GetSimGlobalPos(string regionname)
         {
-            if (getClient().Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region) == false)
+            if (GetClient().Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region) == false)
             {
                 return Failure("Unable to find region", new [] { regionname });
             }
@@ -121,9 +121,9 @@ namespace SecondBotEvents.Commands
 
         public object UpdateEstateBanlist(string avatar, string mode, string global)
         {
-            if (getClient().Network.CurrentSim.IsEstateManager == false)
+            if (GetClient().Network.CurrentSim.IsEstateManager == false)
             {
-                return Failure("Not an estate manager on region " + getClient().Network.CurrentSim.Name, new [] { avatar, mode, global });
+                return Failure("Not an estate manager on region " + GetClient().Network.CurrentSim.Name, new [] { avatar, mode, global });
             }
             UUID avataruuid = UUID.Zero;
             if (UUID.TryParse(avatar, out avataruuid) == false)
@@ -137,10 +137,10 @@ namespace SecondBotEvents.Commands
             }
             if (mode != "add")
             {
-                getClient().Estate.UnbanUser(avataruuid, globalban);
+                GetClient().Estate.UnbanUser(avataruuid, globalban);
                 return BasicReply("Unban request accepted", new [] { avatar, mode, global });
             }
-            getClient().Estate.BanUser(avataruuid, globalban);
+            GetClient().Estate.BanUser(avataruuid, globalban);
             return BasicReply("Ban request accepted", new [] { avatar, mode, global });
         }
     }

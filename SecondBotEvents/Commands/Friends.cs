@@ -15,7 +15,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("array UUID = friendreplyobject")]
         public object Friendslist()
         {
-            return BasicReply(JsonConvert.SerializeObject(getClient().Friends.FriendList));
+            return BasicReply(JsonConvert.SerializeObject(GetClient().Friends.FriendList));
         }
 
         [About("Updates the friend perms for avatar avatar to State \n if true grants (Online/Map/Modify) perms")]
@@ -38,16 +38,16 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("state invaild", new [] { avatar, state });
             }
-            if (getClient().Friends.FriendList.ContainsKey(avataruuid) == false)
+            if (GetClient().Friends.FriendList.ContainsKey(avataruuid) == false)
             {
                 return Failure("Not A friend", new [] { avatar, state });
             }
             if (status == true)
             {
-                getClient().Friends.GrantRights(avataruuid, FriendRights.CanSeeOnline | FriendRights.CanSeeOnMap | FriendRights.CanModifyObjects);
+                GetClient().Friends.GrantRights(avataruuid, FriendRights.CanSeeOnline | FriendRights.CanSeeOnMap | FriendRights.CanModifyObjects);
                 return BasicReply("granted", new [] { avatar, state });
             }
-            getClient().Friends.GrantRights(avataruuid, FriendRights.None);
+            GetClient().Friends.GrantRights(avataruuid, FriendRights.None);
             return BasicReply("removed", new [] { avatar, state });
         }
 
@@ -72,11 +72,11 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("state invaild", new [] { avatar, state });
             }
-            if (getClient().Friends.FriendList.ContainsKey(avataruuid) == true)
+            if (GetClient().Friends.FriendList.ContainsKey(avataruuid) == true)
             {
                 if (status == false)
                 {
-                    getClient().Friends.TerminateFriendship(avataruuid);
+                    GetClient().Friends.TerminateFriendship(avataruuid);
                     return BasicReply("Removed", new [] { avatar, state });
                 }
             }
@@ -84,7 +84,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Not in friendslist", new [] { avatar, state });
             }
-            getClient().Friends.OfferFriendship(avataruuid);
+            GetClient().Friends.OfferFriendship(avataruuid);
             return BasicReply("Request sent", new [] { avatar, state });
             
         }

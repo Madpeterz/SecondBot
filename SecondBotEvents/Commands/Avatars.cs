@@ -17,15 +17,15 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         public object NearmeWithDetails()
         {
-            if (getClient().Network.CurrentSim == null)
+            if (GetClient().Network.CurrentSim == null)
             {
                 return BasicReply("Error not in a sim");
             }
             List<NearMeDetails> BetterNearMe = new List<NearMeDetails>();
-            Dictionary<uint, Avatar> avcopy = getClient().Network.CurrentSim.ObjectsAvatars.Copy();
+            Dictionary<uint, Avatar> avcopy = GetClient().Network.CurrentSim.ObjectsAvatars.Copy();
             foreach (Avatar av in avcopy.Values)
             {
-                if (av.ID != getClient().Self.AgentID)
+                if (av.ID != GetClient().Self.AgentID)
                 {
                     NearMeDetails details = new NearMeDetails();
                     details.id = av.ID.ToString();
@@ -33,7 +33,7 @@ namespace SecondBotEvents.Commands
                     details.x = (int)Math.Round(av.Position.X);
                     details.y = (int)Math.Round(av.Position.Y);
                     details.z = (int)Math.Round(av.Position.Z);
-                    details.range = (int)Math.Round(Vector3.Distance(av.Position, getClient().Self.SimPosition));
+                    details.range = (int)Math.Round(Vector3.Distance(av.Position, GetClient().Self.SimPosition));
                     BetterNearMe.Add(details);
                 }
             }
@@ -45,15 +45,15 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         public object Nearme()
         {
-            if (getClient().Network.CurrentSim == null)
+            if (GetClient().Network.CurrentSim == null)
             {
                 return BasicReply("Error not in a sim");
             }
             Dictionary<UUID, string> NearMe = new Dictionary<UUID, string>();
-            Dictionary<uint, Avatar> avcopy = getClient().Network.CurrentSim.ObjectsAvatars.Copy();
+            Dictionary<uint, Avatar> avcopy = GetClient().Network.CurrentSim.ObjectsAvatars.Copy();
             foreach (Avatar av in avcopy.Values)
             {
-                if (av.ID != getClient().Self.AgentID)
+                if (av.ID != GetClient().Self.AgentID)
                 {
                     NearMe.Add(av.ID, av.Name);
                 }
@@ -73,7 +73,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Not a vaild UUID");
             }
-            return BasicReply(master.DataStoreService.getAvatarName(avUUID));
+            return BasicReply(master.DataStoreService.GetAvatarName(avUUID));
         }
 
         [About("searchs the AV database if not found triggers a lookup")]
@@ -87,7 +87,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Not a vaild name");
             }
-            return BasicReply(master.DataStoreService.getAvatarUUID(name));
+            return BasicReply(master.DataStoreService.GetAvatarUUID(name));
         }
     }
 }

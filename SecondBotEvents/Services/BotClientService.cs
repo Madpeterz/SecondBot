@@ -11,11 +11,6 @@ namespace SecondBotEvents.Services
     {
         public GridClient client = null;
         protected BasicConfig basicCfg = null;
-        public bool _ExitBot
-        {
-            get { return ExitBot; }   // get method
-            set {  }  // set method
-        }
 
         protected bool ExitBot = false;
 

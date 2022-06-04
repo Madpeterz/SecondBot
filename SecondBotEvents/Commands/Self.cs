@@ -24,17 +24,17 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Cant find UUID in sim")]
         public object PointAt(string targetUUID)
         {
-            if (getClient().Network.CurrentSim.AvatarPositions.ContainsKey(avataruuid) == false)
+            if (GetClient().Network.CurrentSim.AvatarPositions.ContainsKey(avataruuid) == false)
             {
                 return Failure("Cant find UUID in sim", new [] { targetUUID });
             }
             ProcessAvatar(targetUUID);
-            getClient().Self.Stand();
-            getClient().Self.Movement.TurnToward(getClient().Network.CurrentSim.AvatarPositions[avataruuid]);
-            getClient().Self.Movement.SendUpdate();
-            getClient().Self.AnimationStart(Animations.POINT_YOU, true);
-            getClient().Self.PointAtEffect(getClient().Self.AgentID, avataruuid, new Vector3d(0, 0, 0), PointAtType.Select, UUID.Random());
-            getClient().Self.BeamEffect(getClient().Self.AgentID, avataruuid, new Vector3d(0, 0, 2), new Color4(255, 255, 255, 1), (float)3.0, UUID.Random());
+            GetClient().Self.Stand();
+            GetClient().Self.Movement.TurnToward(GetClient().Network.CurrentSim.AvatarPositions[avataruuid]);
+            GetClient().Self.Movement.SendUpdate();
+            GetClient().Self.AnimationStart(Animations.POINT_YOU, true);
+            GetClient().Self.PointAtEffect(GetClient().Self.AgentID, avataruuid, new Vector3d(0, 0, 0), PointAtType.Select, UUID.Random());
+            GetClient().Self.BeamEffect(GetClient().Self.AgentID, avataruuid, new Vector3d(0, 0, 2), new Color4(255, 255, 255, 1), (float)3.0, UUID.Random());
             return BasicReply("ok", new [] { targetUUID });
         }
 
@@ -89,14 +89,14 @@ namespace SecondBotEvents.Commands
         {
             if (target == "ground")
             {
-                getClient().Self.SitOnGround();
+                GetClient().Self.SitOnGround();
                 return BasicReply("ok", new [] { target });
             }
             if(UUID.TryParse(target,out UUID objectuuid) == false)
             {
                 return Failure("Invaild object UUID", new [] { target });
             }
-            getClient().Self.RequestSit(objectuuid, Vector3.Zero);
+            GetClient().Self.RequestSit(objectuuid, Vector3.Zero);
             return BasicReply("ok", new [] { target });
         }
 
@@ -104,7 +104,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         public object Stand()
         {
-            getClient().Self.Stand();
+            GetClient().Self.Stand();
             return BasicReply("ok");
         }
 
@@ -120,16 +120,16 @@ namespace SecondBotEvents.Commands
                 return Failure("Invaild object UUID", new [] { target });
             }
 
-            getClient().Self.PointAtEffect(getClient().Self.AgentID, objectuuid, new Vector3d(0, 0, 0), PointAtType.Select, new UUID("1df9eb92-62fa-15e5-4bfb-5931f1525274"));
+            GetClient().Self.PointAtEffect(GetClient().Self.AgentID, objectuuid, new Vector3d(0, 0, 0), PointAtType.Select, new UUID("1df9eb92-62fa-15e5-4bfb-5931f1525274"));
 
-            Dictionary<uint, Primitive> objectsentrys = getClient().Network.CurrentSim.ObjectsPrimitives.Copy();
+            Dictionary<uint, Primitive> objectsentrys = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
 
             bool found_object = false;
             foreach (KeyValuePair<uint, Primitive> entry in objectsentrys)
             {
                 if (entry.Value.ID == objectuuid)
                 {
-                    getClient().Objects.ClickObject(getClient().Network.CurrentSim, entry.Key);
+                    GetClient().Objects.ClickObject(GetClient().Network.CurrentSim, entry.Key);
                     found_object = true;
                     break;
                 }
@@ -141,7 +141,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         public object Logoff()
         {
-            getClient().Network.BeginLogout();
+            GetClient().Network.BeginLogout();
             return BasicReply("ok");
         }
 

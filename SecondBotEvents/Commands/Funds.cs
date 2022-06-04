@@ -18,8 +18,8 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Funds commands are disabled");
             }
-            getClient().Self.RequestBalance();
-            return BasicReply(getClient().Self.Balance.ToString());
+            GetClient().Self.RequestBalance();
+            return BasicReply(GetClient().Self.Balance.ToString());
         }
 
         [About("Makes the bot pay a avatar")]
@@ -45,11 +45,11 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild amount", new [] { avatar, amount });
             }
-            if ((amountvalue < 0) || (amountvalue > getClient().Self.Balance))
+            if ((amountvalue < 0) || (amountvalue > GetClient().Self.Balance))
             {
                 return Failure("Amount out of range", new [] { avatar, amount });
             }
-            getClient().Self.GiveAvatarMoney(avataruuid, amountvalue);
+            GetClient().Self.GiveAvatarMoney(avataruuid, amountvalue);
             return BasicReply("Accepted", new [] { avatar, amount });
         }
 
@@ -77,7 +77,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild amount", new [] { objectuuid, primname, amount });
             }
-            if((amountvalue < 0) || (amountvalue > getClient().Self.Balance))
+            if((amountvalue < 0) || (amountvalue > GetClient().Self.Balance))
             {
                 return Failure("Amount out of range", new [] { objectuuid, primname, amount });
             }
@@ -85,7 +85,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Primname is empty", new [] { objectuuid, primname, amount });
             }
-            getClient().Self.GiveObjectMoney(objectUUID, amountvalue, primname);
+            GetClient().Self.GiveObjectMoney(objectUUID, amountvalue, primname);
             return BasicReply("ok", new [] { objectuuid, primname, amount });
         }
     }

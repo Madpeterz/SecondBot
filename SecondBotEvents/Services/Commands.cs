@@ -22,10 +22,10 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            loadCommands();
+            LoadCommands();
         }
 
-        protected void loadCommands()
+        protected void LoadCommands()
         {
             Dictionary<string, Type> commandmodules = http_commands_helper.getCommandModules();
             foreach (Type entry in commandmodules.Values)
@@ -66,50 +66,6 @@ namespace SecondBotEvents.Services
                 }
             }
         }
-
-        Dictionary<string,int> acceptTokens = new Dictionary<string,int>();
-        public bool AllowToken(string token)
-        {
-            if(acceptTokens.ContainsKey(token) == false)
-            {
-                return false;
-            }
-            if (acceptTokens[token] != -1)
-            {
-                acceptTokens[token] = acceptTokens[token] - 1;
-                if(acceptTokens[token] == 0)
-                {
-                    acceptTokens.Remove(token);
-                }
-            }
-            return true;
-        }
-
-        protected string SingleUseToken()
-        {
-            bool found = false;
-            string token = "";
-            while(found == false)
-            {
-                token = SecondbotHelpers.GetSHA1(token + SecondbotHelpers.UnixTimeNow().ToString());
-                if(acceptTokens.ContainsKey(token) == false)
-                {
-                    addNewToken(token, 1);
-                    found = true;
-                }
-            }
-            return token;
-        }
-
-        protected void addNewToken(string token,int uses)
-        {
-            if (acceptTokens.ContainsKey(token) == false)
-            {
-                acceptTokens[token] = 0;
-            }
-            acceptTokens[token] = uses;
-        }
-
         public override void Start()
         {
             master.BotClientNoticeEvent += BotClientRestart;
@@ -135,7 +91,7 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            if (e.IM.FromAgentName == getClient().Self.Name)
+            if (e.IM.FromAgentName == GetClient().Self.Name)
             {
                 return;   
             }
@@ -186,14 +142,14 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            KeyValuePair<bool, string> reply = runCommand(C);
+            KeyValuePair<bool, string> reply = RunCommand(C);
             if(C.replyTarget != null)
             {
-                SmartCommandReply(reply.Key, C.replyTarget, reply.Value, C.command);
+                SmartCommandReply(C.replyTarget, reply.Value, C.command);
             }
         }
 
-        public void SmartCommandReply(bool run_status, string target, string output, string command)
+        public void SmartCommandReply(string target, string output, string command)
         {
             string mode = "CHAT";
             UUID target_avatar = UUID.Zero;
@@ -208,7 +164,7 @@ namespace SecondBotEvents.Services
             }
             else if (target.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length == 2)
             {
-                string UUIDfetch = master.DataStoreService.getAvatarUUID(target);
+                string UUIDfetch = master.DataStoreService.GetAvatarUUID(target);
                 if (UUIDfetch == "lookup")
                 {
                     return;
@@ -227,11 +183,11 @@ namespace SecondBotEvents.Services
                     LogFormater.Crit("[SmartReply] output Channel must be zero or higher - using 99");
                     target_channel = 999;
                 }
-                getClient().Self.Chat(output, target_channel, ChatType.Normal);
+                GetClient().Self.Chat(output, target_channel, ChatType.Normal);
             }
             else if (mode == "IM")
             {
-                getClient().Self.InstantMessage(target_avatar, output);
+                GetClient().Self.InstantMessage(target_avatar, output);
             }
             else if (mode == "HTTP")
             {
@@ -254,7 +210,7 @@ namespace SecondBotEvents.Services
         }
         protected HttpClient HTTPclient = new HttpClient();
 
-        public KeyValuePair<bool, string> runCommand(SignedCommand C)
+        public KeyValuePair<bool, string> RunCommand(SignedCommand C)
         {
 
             try
@@ -306,7 +262,7 @@ namespace SecondBotEvents.Services
             }
         }
 
-        public string[] getFullListOfCommands()
+        public string[] GetFullListOfCommands()
         {
             List<string> output = new List<string>();
             foreach (string A in endpointcommandmap.Keys)
@@ -324,25 +280,25 @@ namespace SecondBotEvents.Services
         {
             acceptNewCommands = false;
             Console.WriteLine("Commands service [Attached to new client]");
-            getClient().Network.LoggedOut += BotLoggedOut;
-            getClient().Network.SimConnected += BotLoggedIn;
+            GetClient().Network.LoggedOut += BotLoggedOut;
+            GetClient().Network.SimConnected += BotLoggedIn;
         }
 
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
-            getClient().Network.SimConnected += BotLoggedIn;
+            GetClient().Network.SimConnected += BotLoggedIn;
             Console.WriteLine("Commands service [Waiting for connect]");
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
-            getClient().Network.SimConnected -= BotLoggedIn;
-            getClient().Self.IM += BotImMessage;
+            GetClient().Network.SimConnected -= BotLoggedIn;
+            GetClient().Self.IM += BotImMessage;
             if (myConfig.GetEnableMasterControls() == true)
             {
                 foreach(string A in myConfig.GetMastersCSV())
                 {
-                    master.DataStoreService.knownAvatar(A);
+                    master.DataStoreService.KnownAvatar(A);
                 }
             }
             acceptNewCommands = true;
@@ -360,13 +316,13 @@ namespace SecondBotEvents.Services
         public long unixtimeOfCommand = 0;
         public SignedCommand(string input, bool requireSigning, bool requireTimewindow, int windowSize, string secret)
         {
-            unpackInput(input);
+            UnpackInput(input);
             if (requireSigning == false)
             {
                 accepted = true; // just accept the command
                 return;
             }
-            vaildate(requireTimewindow, windowSize, secret);
+            Vaildate(requireTimewindow, windowSize, secret);
         }
         public SignedCommand(string setCommand, string setSigningCode, string[] setArgs, int setUnixtime, string setReplyTarget, bool requireTimewindow, int windowSize, string secret)
         {
@@ -375,10 +331,10 @@ namespace SecondBotEvents.Services
             args = setArgs;
             unixtimeOfCommand = setUnixtime;
             replyTarget = setReplyTarget;
-            vaildate(requireTimewindow, windowSize, secret);
+            Vaildate(requireTimewindow, windowSize, secret);
         }
 
-        protected void vaildate(bool requireTimewindow, int windowSize, string secret)
+        protected void Vaildate(bool requireTimewindow, int windowSize, string secret)
         {
             accepted = false;
             long dif = SecondbotHelpers.UnixTimeNow() - unixtimeOfCommand;
@@ -391,12 +347,12 @@ namespace SecondBotEvents.Services
                 return;
             }
             string raw = command;
-            raw = raw + string.Join("~#~", args);
+            raw += string.Join("~#~", args);
             if (requireTimewindow == true)
             {
-                raw = raw + unixtimeOfCommand.ToString();
+                raw += unixtimeOfCommand.ToString();
             }
-            raw = raw + secret;
+            raw += secret;
             string cooked = SecondbotHelpers.GetSHA1(raw);
             if (cooked != signingCode)
             {
@@ -405,17 +361,17 @@ namespace SecondBotEvents.Services
             accepted = true;
         }
 
-        protected void unpackInput(string input)
+        protected void UnpackInput(string input)
         {
             if (IsValidJson(input) == false)
             {
-                unpackStringToClass(input);
+                UnpackStringToClass(input);
                 return;
             }
-            unpackJsonToClass();
+            UnpackJsonToClass();
         }
         protected JToken obj = null;
-        protected void unpackStringToClass(string input)
+        protected void UnpackStringToClass(string input)
         {
             // command|||args~#~args~#~args#|#reply_target@@@sha1 [inc time if required];|;unixtime of command
 
@@ -437,13 +393,13 @@ namespace SecondBotEvents.Services
                 args = bits[1].Split("~#~");
             }
         }
-        protected void unpackJsonToClass()
+        protected void UnpackJsonToClass()
         {
-            command = jsonHelper.GetValue<string>(obj, "cmd", null);
-            args = jsonHelper.GetValue<string[]>(obj, "args", null);
-            signingCode = jsonHelper.GetValue<string>(obj, "signing", null);
-            replyTarget = jsonHelper.GetValue<string>(obj, "reply", null);
-            unixtimeOfCommand = jsonHelper.GetValue<long>(obj, "unixtime", 0);
+            command = JsonHelper.GetValue<string>(obj, "cmd", null);
+            args = JsonHelper.GetValue<string[]>(obj, "args", null);
+            signingCode = JsonHelper.GetValue<string>(obj, "signing", null);
+            replyTarget = JsonHelper.GetValue<string>(obj, "reply", null);
+            unixtimeOfCommand = JsonHelper.GetValue<long>(obj, "unixtime", 0);
         }
 
         private bool IsValidJson(string strInput)
@@ -467,9 +423,9 @@ namespace SecondBotEvents.Services
         }
     }
 
-    public static class jsonHelper
+    public static class JsonHelper
     {
-        public static T GetValue<T>(this JToken jToken, string key, T defaultValue = default(T))
+        public static T GetValue<T>(this JToken jToken, string key, T defaultValue = default)
         {
             dynamic ret = jToken[key];
             if (ret == null) return defaultValue;

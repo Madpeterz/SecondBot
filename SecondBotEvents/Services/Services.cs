@@ -13,9 +13,9 @@ namespace SecondBotEvents.Services
             master = setMaster;
         }
 
-        protected GridClient getClient()
+        protected GridClient GetClient()
         {
-            return master.botClient.client;
+            return master.BotClient.client;
         }
         public virtual string Status()
         {

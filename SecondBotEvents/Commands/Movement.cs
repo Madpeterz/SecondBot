@@ -39,12 +39,12 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("z value out of range 0-5000", new [] { x, y, z });
             }
-            getClient().Self.AutoPilotCancel();
-            getClient().Self.Movement.TurnToward(pos, true);
+            GetClient().Self.AutoPilotCancel();
+            GetClient().Self.Movement.TurnToward(pos, true);
             Thread.Sleep(500);
             uint Globalx, Globaly;
-            Utils.LongToUInts(getClient().Network.CurrentSim.Handle, out Globalx, out Globaly);
-            getClient().Self.AutoPilot((ulong)(Globalx + pos.X), (ulong)(Globaly + pos.Y), pos.Z);
+            Utils.LongToUInts(GetClient().Network.CurrentSim.Handle, out Globalx, out Globaly);
+            GetClient().Self.AutoPilot((ulong)(Globalx + pos.X), (ulong)(Globaly + pos.Y), pos.Z);
             return BasicReply("ok", new [] { x, y, z });
         }
 
@@ -52,7 +52,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         public object AutoPilotStop()
         {
-            getClient().Self.AutoPilotCancel();
+            GetClient().Self.AutoPilotCancel();
             return BasicReply("ok");
         }
 
@@ -67,7 +67,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar UUID", new [] { avatar });
             }
-            getClient().Self.SendTeleportLure(avataruuid);
+            GetClient().Self.SendTeleportLure(avataruuid);
             return BasicReply("ok", new [] { avatar });
         }
 
@@ -83,7 +83,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Invaild avatar UUID", new [] { avatar });
             }
             // @todo action from event log with accept
-            getClient().Self.SendTeleportLureRequest(avataruuid, "I would like to teleport to you");
+            GetClient().Self.SendTeleportLureRequest(avataruuid, "I would like to teleport to you");
             return BasicReply("ok", new [] { avatar });
         }
 
@@ -97,8 +97,8 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild mode", new [] { mode });
             }
-            getClient().Self.Movement.Fly = flymode;
-            getClient().Self.Movement.SendUpdate();
+            GetClient().Self.Movement.Fly = flymode;
+            GetClient().Self.Movement.SendUpdate();
             return BasicReply("ok", new [] { mode });
         }
 
@@ -125,7 +125,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Vector z value is out of range 0-5000", new [] { vector });
             }
-            return BasicReply(getClient().Self.Movement.TurnToward(pos, true).ToString(), new [] { vector });
+            return BasicReply(GetClient().Self.Movement.TurnToward(pos, true).ToString(), new [] { vector });
         }
 
         [About("Rotates the bot to face a avatar")]
@@ -140,11 +140,11 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar UUID", new [] { avatar });
             }
-            if (getClient().Network.CurrentSim.AvatarPositions.ContainsKey(avataruuid) == false)
+            if (GetClient().Network.CurrentSim.AvatarPositions.ContainsKey(avataruuid) == false)
             {
                 return Failure("Unable to see avatar", new [] { avatar });
             }
-            return BasicReply(getClient().Self.Movement.TurnToward(getClient().Network.CurrentSim.AvatarPositions[avataruuid], true).ToString(), new [] { avatar });
+            return BasicReply(GetClient().Self.Movement.TurnToward(GetClient().Network.CurrentSim.AvatarPositions[avataruuid], true).ToString(), new [] { avatar });
         }
 
         [About("Rotates the avatar to face a rotation from north in Degrees")]
@@ -158,7 +158,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Unable to process rotation", new [] { deg });
             }
             float yaw = target_yaw;
-            getClient().Self.Movement.BodyRotation.GetEulerAngles(out float roll, out float pitch, out _);
+            GetClient().Self.Movement.BodyRotation.GetEulerAngles(out float roll, out float pitch, out _);
             roll *= 57.2958f;
             pitch *= 57.2958f;
             yaw *= 57.2958f;
@@ -176,8 +176,8 @@ namespace SecondBotEvents.Commands
             result.X = cosYawOver2 * sinPitchOver2 * cosRollOver2 + sinYawOver2 * cosPitchOver2 * sinRollOver2;
             result.Y = sinYawOver2 * cosPitchOver2 * cosRollOver2 - cosYawOver2 * sinPitchOver2 * sinRollOver2;
             result.Z = cosYawOver2 * cosPitchOver2 * sinRollOver2 - sinYawOver2 * sinPitchOver2 * cosRollOver2;
-            getClient().Self.Movement.BodyRotation = result;
-            getClient().Self.Movement.SendUpdate();
+            GetClient().Self.Movement.BodyRotation = result;
+            GetClient().Self.Movement.SendUpdate();
             return BasicReply("ok", new [] { deg });
         }
 
@@ -197,7 +197,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Error Unable to Teleport to location", new [] { region, x, y, z });
             }
-            master.HomeboundService.markTeleport();
+            master.HomeboundService.MarkTeleport();
             return BasicReply("Accepted", new [] { region, x, y, z });
         }
 
@@ -217,7 +217,7 @@ namespace SecondBotEvents.Commands
 
         protected bool TeleportRequest(string[] args)
         {
-            getClient().Self.AutoPilotCancel();
+            GetClient().Self.AutoPilotCancel();
             if (args[0].Contains("http://maps.secondlife.com/secondlife/") == true)
             {
                 return false; // @todo SL url teleport
@@ -227,7 +227,7 @@ namespace SecondBotEvents.Commands
                 List<string> argvalues = new List<string>(args);
                 if(argvalues.Count == 3)
                 {
-                    string regionName = getClient().Network.CurrentSim.Name;
+                    string regionName = GetClient().Network.CurrentSim.Name;
                     argvalues = new List<string>() { regionName };
                     argvalues.AddRange(args);
                 }
@@ -237,7 +237,7 @@ namespace SecondBotEvents.Commands
                     float.TryParse(argvalues[1], out float posX);
                     float.TryParse(argvalues[2], out float posY);
                     float.TryParse(argvalues[3], out float posZ);
-                    bool status = getClient().Self.Teleport(regionName, new Vector3(posX, posY, posZ));
+                    bool status = GetClient().Self.Teleport(regionName, new Vector3(posX, posY, posZ));
                     return true;
                 }
                 else

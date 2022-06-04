@@ -29,27 +29,40 @@ namespace SecondBotEvents
 
     public class EventsSecondBot
     {
-        public HttpService HttpService { get { return (HttpService) getService("HttpService"); } }
-        public CommandsService CommandsService { get { return (CommandsService)getService("CommandsService"); } }
-        public BotClientService botClient { get { return (BotClientService)getService("BotClientService"); } }
-        public DiscordService DiscordService { get { return (DiscordService)getService("DiscordService"); } }
-        public InteractionService InteractionService { get { return (InteractionService)getService("InteractionService"); } }
-        public DataStoreService DataStoreService { get { return (DataStoreService)getService("DataStoreService"); } }
-        public HomeboundService HomeboundService { get { return (HomeboundService)getService("HomeboundService"); } }
+        public HttpService HttpService { get { return (HttpService) GetService("HttpService"); } }
+        public CommandsService CommandsService { get { return (CommandsService)GetService("CommandsService"); } }
+        public BotClientService BotClient { get { return (BotClientService)GetService("BotClientService"); } }
+        public DiscordService DiscordService { get { return (DiscordService)GetService("DiscordService"); } }
+        public InteractionService InteractionService { get { return (InteractionService)GetService("InteractionService"); } }
+        public DataStoreService DataStoreService { get { return (DataStoreService)GetService("DataStoreService"); } }
+        public HomeboundService HomeboundService { get { return (HomeboundService)GetService("HomeboundService"); } }
 
 
-        private EventHandler<BotClientNotice> botclient_eventNotices;
-        public event EventHandler<BotClientNotice> BotClientNoticeEvent
+        private EventHandler<SystemStatusMessage> SystemStatusMessages;
+        public event EventHandler<SystemStatusMessage> SystemStatusMessagesEvent
         {
-            add { lock (botclient_event_attach) { botclient_eventNotices += value; } }
-            remove { lock (botclient_event_attach) { botclient_eventNotices -= value; } }
+            add { lock (SystemStatusMessagesEventsLockable) { SystemStatusMessages += value; } }
+            remove { lock (SystemStatusMessagesEventsLockable) { SystemStatusMessages -= value; } }
+        }
+        private readonly object SystemStatusMessagesEventsLockable = new object();
+
+        public void TriggerSystemStatusMessageEvent(bool change, string message)
+        {
+            EventHandler<SystemStatusMessage> handler = SystemStatusMessages;
+            handler?.Invoke(this, new SystemStatusMessage(change, message));
         }
 
-        private readonly object botclient_event_attach = new object();
+        private EventHandler<BotClientNotice> BotclientEventNotices;
+        public event EventHandler<BotClientNotice> BotClientNoticeEvent
+        {
+            add { lock (BotclientEventNoticesLockable) { BotclientEventNotices += value; } }
+            remove { lock (BotclientEventNoticesLockable) { BotclientEventNotices -= value; } }
+        }
+        private readonly object BotclientEventNoticesLockable = new object();
 
         public void TriggerBotClientEvent(bool asRestart)
         {
-            EventHandler<BotClientNotice> handler = botclient_eventNotices;
+            EventHandler<BotClientNotice> handler = BotclientEventNotices;
             handler?.Invoke(this, new BotClientNotice(asRestart));
         }
 
@@ -87,7 +100,7 @@ namespace SecondBotEvents
 
         protected Dictionary<string, BotServices> services = new Dictionary<string, BotServices>();
 
-        public BotServices getService(string classname)
+        public BotServices GetService(string classname)
         {
             if(services.ContainsKey(classname) == false)
             {
@@ -132,19 +145,18 @@ namespace SecondBotEvents
             RegisterService("DiscordService");
             RegisterService("InteractionService");
             RegisterService("HomeboundService");
-            if (botClient.IsLoaded() == false)
+            if (BotClient.IsLoaded() == false)
             {
                 Console.WriteLine("Config is not loaded :(");
                 exitNow = true;
                 return;
             }
-            botClient.Start();
+            BotClient.Start();
             Ready = true;
 
         }
 
         Dictionary<string, string> lastStatus = new Dictionary<string, string>();
-        long lastChange = 0;
         public void Status()
         {
             string Output = "";
@@ -152,7 +164,7 @@ namespace SecondBotEvents
             foreach(KeyValuePair<string, BotServices> A in services)
             {
                 string StatusMessage = A.Value.Status();
-                if(StatusMessage != lastStatus[A.Key])
+                if (StatusMessage != lastStatus[A.Key])
                 {
                     Output = Output + addon + " [" + A.Key + "] ~ " + StatusMessage;
                     lastStatus[A.Key] = StatusMessage;
@@ -161,19 +173,11 @@ namespace SecondBotEvents
             }
             if(Output != "")
             {
+                TriggerSystemStatusMessageEvent(true, Output);
                 LogFormater.Info(Output);
-                lastChange = SecondbotHelpers.UnixTimeNow();
                 return;
             }
-            long dif = SecondbotHelpers.UnixTimeNow() - lastChange;
-            if(dif > 60)
-            {
-                string[] bits = lastStatus.Keys.ToArray();
-                foreach (string A in bits)
-                {
-                    lastStatus[A] = "";
-                }
-            }
+            TriggerSystemStatusMessageEvent(false, "");
         }
 
         protected void StopServices()
@@ -218,6 +222,17 @@ namespace SecondBotEvents
         public BotClientNotice(bool asRestart=false)
         {
             isRestart = asRestart;
+        }
+    }
+
+    public class SystemStatusMessage
+    {
+        public bool changed = false;
+        public string message = "";
+        public SystemStatusMessage(bool setChanged, string setMessage)
+        {
+            changed = setChanged;
+            message = setMessage;
         }
     }
 }

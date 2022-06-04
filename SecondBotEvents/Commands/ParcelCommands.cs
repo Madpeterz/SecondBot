@@ -51,7 +51,7 @@ namespace SecondBotEvents.Commands
             targetparcel.AuthBuyerID = avataruuid;
             parcel_static.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
             parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
-            targetparcel.Update(getClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient().Network.CurrentSim, false);
             return Failure("ok", new [] { amount, avatar });
         }
 
@@ -98,7 +98,7 @@ namespace SecondBotEvents.Commands
             }
             targetparcel.Landing = LandingType.LandingPoint;
             targetparcel.UserLocation = new Vector3(X, Y, Z);
-            targetparcel.Update(getClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient().Network.CurrentSim, false);
             return BasicReply("ok", new [] { x, y, z });
         }
 
@@ -121,7 +121,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Parcel name is empty", new [] { name });
             }
             targetparcel.Name = name;
-            targetparcel.Update(getClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient().Network.CurrentSim, false);
             return BasicReply("ok", new [] { name });
         }
 
@@ -138,7 +138,7 @@ namespace SecondBotEvents.Commands
                 return Failure(tests.Value, new [] { desc });
             }
             targetparcel.Desc = desc;
-            targetparcel.Update(getClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient().Network.CurrentSim, false);
             return BasicReply("ok", new [] { desc });
         }
 
@@ -187,7 +187,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar", new [] { avatar });
             }
-            getClient().Parcels.EjectUser(avataruuid, false);
+            GetClient().Parcels.EjectUser(avataruuid, false);
             return BasicReply("ok", new [] { avatar });
         }
 
@@ -200,7 +200,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value);
             }
-            getClient().Parcels.ReleaseParcel(getClient().Network.CurrentSim, targetparcel.LocalID);
+            GetClient().Parcels.ReleaseParcel(GetClient().Network.CurrentSim, targetparcel.LocalID);
             return BasicReply("ok");
         }
 
@@ -242,7 +242,7 @@ namespace SecondBotEvents.Commands
             entry.Flags = AccessList.Ban;
             entry.Time = new System.DateTime(3030, 03, 03);
             targetparcel.AccessBlackList.Add(entry);
-            targetparcel.Update(getClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient().Network.CurrentSim, false);
             return BasicReply("ok", new [] { avatar });
         }
 
@@ -281,7 +281,7 @@ namespace SecondBotEvents.Commands
                 return BasicReply("Avatar is already unbanned", new [] { avatar });
             }
             targetparcel.AccessBlackList.Remove(removeentry);
-            targetparcel.Update(getClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient().Network.CurrentSim, false);
             return BasicReply("ok", new [] { avatar });
         }
 
@@ -298,7 +298,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value, new [] { musicurl });
             }
-            bool status = parcel_static.set_parcel_music(getClient(), targetparcel, musicurl);
+            bool status = parcel_static.set_parcel_music(GetClient(), targetparcel, musicurl);
             return BasicReply(status.ToString(), new [] { musicurl });
         }
 
@@ -348,7 +348,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("No accepted flags", new [] { escapedflagdata });
             }
-            if (parcel_static.has_parcel_perm(targetparcel, getClient()) == false)
+            if (parcel_static.has_parcel_perm(targetparcel, GetClient()) == false)
             {
                 return Failure("Incorrect perms to control parcel", new [] { escapedflagdata });
             }
@@ -359,7 +359,7 @@ namespace SecondBotEvents.Commands
                     parcel_static.ParcelSetFlag(flags[cfg.Key], targetparcel, cfg.Value);
                 }
             }
-            targetparcel.Update(getClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient().Network.CurrentSim, false);
             return BasicReply("Applying perms", new [] { escapedflagdata });
         }
 
@@ -381,7 +381,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar UUID", new [] { avatar });
             }
-            getClient().Parcels.ReturnObjects(getClient().Network.CurrentSim, targetparcel.LocalID, ObjectReturnType.None, new List<UUID>() { avataruuid });
+            GetClient().Parcels.ReturnObjects(GetClient().Network.CurrentSim, targetparcel.LocalID, ObjectReturnType.None, new List<UUID>() { avataruuid });
             return BasicReply("ok", new [] { avatar });
         }
 
@@ -404,14 +404,14 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild group uuid", new [] { group });
             }
-            if (getClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
+            if (GetClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
             {
                 return Failure("Not in group", new [] { group });
             }
             targetparcel.GroupID = groupuuid;
-            targetparcel.Update(getClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient().Network.CurrentSim, false);
             Thread.Sleep(500);
-            getClient().Parcels.DeedToGroup(getClient().Network.CurrentSim, targetparcel.LocalID, groupuuid);
+            GetClient().Parcels.DeedToGroup(GetClient().Network.CurrentSim, targetparcel.LocalID, groupuuid);
             return BasicReply("ok", new [] { group });
         }
 
@@ -432,12 +432,12 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value, new [] { amount });
             }
-            if ((targetparcel.AuthBuyerID != UUID.Zero) && (targetparcel.AuthBuyerID != getClient().Self.AgentID))
+            if ((targetparcel.AuthBuyerID != UUID.Zero) && (targetparcel.AuthBuyerID != GetClient().Self.AgentID))
             {
                 return Failure("Parcel sale locked to other avatars", new[] { amount });
             }
             int minAmount = 1;
-            if (targetparcel.AuthBuyerID == getClient().Self.AgentID)
+            if (targetparcel.AuthBuyerID == GetClient().Self.AgentID)
             {
                 minAmount = 0;
             }
@@ -457,7 +457,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Parcel sale price and amount do not match", new [] { amount });
             }
-            getClient().Parcels.Buy(getClient().Network.CurrentSim, targetparcel.LocalID, false, UUID.Zero, false, targetparcel.Area, amountvalue);
+            GetClient().Parcels.Buy(GetClient().Network.CurrentSim, targetparcel.LocalID, false, UUID.Zero, false, targetparcel.Area, amountvalue);
             return BasicReply("ok", new [] { amount });
         }
 
@@ -478,7 +478,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar UUID", new [] { avatar, state });
             }
-            getClient().Parcels.FreezeUser(avataruuid, freezestate);
+            GetClient().Parcels.FreezeUser(avataruuid, freezestate);
             return BasicReply("ok", new [] { avatar, state });
         }
 
@@ -522,7 +522,7 @@ namespace SecondBotEvents.Commands
             reply.reportedEntrys = targetparcel.AccessBlackList.Count;
             reply.delay = delays * 1000;
             reply.parcelName = targetparcel.Name;
-            reply.regionName = getClient().Network.CurrentSim.Name;
+            reply.regionName = GetClient().Network.CurrentSim.Name;
             return BasicReply(JsonConvert.SerializeObject(reply));
         }
 
@@ -538,12 +538,12 @@ namespace SecondBotEvents.Commands
                 return Failure("Invaild object uuid", new [] { objectuuid });
             }
             bool found = false;
-            Dictionary<uint, Primitive> objects_copy = getClient().Network.CurrentSim.ObjectsPrimitives.Copy();
+            Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
             foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
             {
                 if (Obj.Value.ID == targetobject)
                 {
-                    getClient().Inventory.RequestDeRezToInventory(Obj.Key);
+                    GetClient().Inventory.RequestDeRezToInventory(Obj.Key);
                     found = true;
                     break;
                 }
@@ -634,7 +634,7 @@ namespace SecondBotEvents.Commands
                     }
                 }
             }
-            targetparcel.Update(getClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient().Network.CurrentSim, false);
             return BasicReply("ok", new [] { escapedflagdata });
         }
 

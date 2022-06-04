@@ -54,7 +54,7 @@ namespace SecondBotEvents
             return Debug(message, true);
         }
 
-        private static string Add(string message, ConsoleLogLogLevel Level, bool send_to_console = true)
+        public static string GetClockStamp()
         {
             var date = DateTime.Now;
             StringBuilder n = new StringBuilder();
@@ -71,6 +71,14 @@ namespace SecondBotEvents
             }
             n.Append(date.Minute.ToString());
             n.Append("] ");
+            return n.ToString();
+        }
+
+        private static string Add(string message, ConsoleLogLogLevel Level, bool send_to_console = true)
+        {
+            
+            StringBuilder n = new StringBuilder();
+            n.Append(GetClockStamp());
             switch (Level)
             {
 #if DEBUG

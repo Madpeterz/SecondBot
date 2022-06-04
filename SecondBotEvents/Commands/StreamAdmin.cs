@@ -65,7 +65,7 @@ namespace SecondBotEvents.Commands
                 {
                     return Failure("Unable to unpack avatar", new[] { endpoint, endpointcode });
                 }
-                bool result = master.botClient.SendNotecard(server_reply.NotecardTitle, server_reply.NotecardContent, avataruuid);
+                bool result = master.BotClient.SendNotecard(server_reply.NotecardTitle, server_reply.NotecardContent, avataruuid);
                 if (result == false)
                 {
                     return Failure("Failed to create/send notecard", new[] { endpoint, endpointcode });

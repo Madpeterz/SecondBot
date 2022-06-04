@@ -14,7 +14,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("json encoded array")]
         public object LocalChatHistory()
         {
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.getLocalChat()));
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetLocalChat()));
         }
 
         [About("sends a message to localchat")]
@@ -37,7 +37,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild channel", new [] { channel, message });
             }
-            getClient().Self.Chat(message, channelnum, ChatType.Normal);
+            GetClient().Self.Chat(message, channelnum, ChatType.Normal);
             return BasicReply("ok");
             
         }
@@ -59,7 +59,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Message empty", new [] { avatar, message });
             }
-            master.botClient.SendIM(avataruuid, message);
+            master.BotClient.SendIM(avataruuid, message);
             return BasicReply("ok",  new [] { avatar, message });
         }
 
@@ -67,21 +67,21 @@ namespace SecondBotEvents.Commands
         [ReturnHints("array UUID = Name")]
         public object chatwindows()
         {
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.getAvatarImWindows()));
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetAvatarImWindows()));
         }
 
         [About("gets a list of chat windows from avatars with unread messages")]
         [ReturnHints("array of UUID")]
         public object listwithunread()
         {
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.getAvatarImWindowsUnread()));
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetAvatarImWindowsUnread()));
         }
 
         [About("gets if there are any unread im messages from avatars at all")]
         [ReturnHints("True|False")]
         public object haveunreadims()
         {
-            return BasicReply(master.DataStoreService.getAvatarImWindowsUnreadAny().ToString());
+            return BasicReply(master.DataStoreService.GetAvatarImWindowsUnreadAny().ToString());
         }
 
         [About("gets the chat from the selected window for avatar")]
@@ -95,7 +95,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("avatar UUID invaild");
             }
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.getAvatarImWindow(avatarUUID)));
+            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetAvatarImWindow(avatarUUID)));
         }
 
     }

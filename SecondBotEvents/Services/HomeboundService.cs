@@ -21,7 +21,7 @@ namespace SecondBotEvents.Services
         protected bool softDisable = false;
         protected bool closeToHome = false;
 
-        public void markTeleport()
+        public void MarkTeleport()
         {
             softDisable = true;
         }
@@ -52,14 +52,14 @@ namespace SecondBotEvents.Services
             {
                 BotAlertMessage(null, new AlertMessageEventArgs("restart", "999", new OpenMetaverse.StructuredData.OSDMap()));
             }
-            if (getClient().Network.CurrentSim.Name == home.name)
+            if (GetClient().Network.CurrentSim.Name == home.name)
             {
                 simNickname = "Home # ";
                 if (sitTarget != UUID.Zero)
                 {
-                    if (getClient().Self.SittingOn == 0)
+                    if (GetClient().Self.SittingOn == 0)
                     {
-                        getClient().Self.RequestSit(sitTarget, Vector3.Zero);
+                        GetClient().Self.RequestSit(sitTarget, Vector3.Zero);
                     }
                 }
                 if (myConfig.GetAtHomeSeekLocation() == true)
@@ -68,7 +68,7 @@ namespace SecondBotEvents.Services
                 }
                 return;
             }
-            else if (getClient().Network.CurrentSim.Name == backup.name)
+            else if (GetClient().Network.CurrentSim.Name == backup.name)
             {
                 simNickname = "Backup # ";
                 if (myConfig.GetAtBackupSeekLocation() == true)
@@ -92,7 +92,7 @@ namespace SecondBotEvents.Services
             {
                 attemptedTeleportHome = true;
                 LogFormater.Info("Teleporting to home sim");
-                getClient().Self.Teleport(home.name, new Vector3(home.x, home.y, home.z), new Vector3(0, 0, 0));
+                GetClient().Self.Teleport(home.name, new Vector3(home.x, home.y, home.z), new Vector3(0, 0, 0));
                 return;
             }
             else if(attemptedTeleportBackup == false)
@@ -100,7 +100,7 @@ namespace SecondBotEvents.Services
                 attemptedTeleportBackup = true;
                 LogFormater.Info("Teleporting to backup sim");
                 teleportActionLockout = SecondbotHelpers.UnixTimeNow();
-                getClient().Self.Teleport(backup.name, new Vector3(backup.x, backup.y, backup.z), new Vector3(0, 0, 0));
+                GetClient().Self.Teleport(backup.name, new Vector3(backup.x, backup.y, backup.z), new Vector3(0, 0, 0));
                 return;
             }
             attemptedTeleportHome = false;
@@ -125,7 +125,7 @@ namespace SecondBotEvents.Services
                 {
                     return simNickname + "Waiting to evac";
                 }
-                else if(getClient().Self.SittingOn != 0)
+                else if(GetClient().Self.SittingOn != 0)
                 {
                     return simNickname + "Sitting on a thing";
                 }
@@ -148,7 +148,7 @@ namespace SecondBotEvents.Services
 
         protected void GetToPos(SimSlURL location)
         {
-            if (getClient().Self.SittingOn != 0)
+            if (GetClient().Self.SittingOn != 0)
             {
                 return;
             }
@@ -158,14 +158,14 @@ namespace SecondBotEvents.Services
                 return;
             }
             lastGotoAction = SecondbotHelpers.UnixTimeNow();
-            float dist = Vector3.Distance(new Vector3(location.x, location.y, location.z), getClient().Self.SimPosition);
+            float dist = Vector3.Distance(new Vector3(location.x, location.y, location.z), GetClient().Self.SimPosition);
             closeToHome = false;
             if (dist < 1)
             {
                 closeToHome = true;
                 if (gotoPosAttemptedWalk == true)
                 {
-                    getClient().Self.AutoPilotCancel();
+                    GetClient().Self.AutoPilotCancel();
                 }
                 gotoPosAttemptedWalk = false;
                 gotoPosAttemptedTp = false;
@@ -174,16 +174,16 @@ namespace SecondBotEvents.Services
             if ((gotoPosAttemptedWalk == false) && (dist < 16))
             {
                 gotoPosAttemptedWalk = true;
-                getClient().Self.AutoPilotLocal(location.x, location.y, getClient().Self.SimPosition.Z);
+                GetClient().Self.AutoPilotLocal(location.x, location.y, GetClient().Self.SimPosition.Z);
                 return;
             }
             if (gotoPosAttemptedTp == false)
             {
                 gotoPosAttemptedTp = true;
-                getClient().Self.Teleport(location.name, new Vector3(location.x, location.y, location.z), new Vector3(0, 0, 0));
+                GetClient().Self.Teleport(location.name, new Vector3(location.x, location.y, location.z), new Vector3(0, 0, 0));
                 return;
             }
-            getClient().Self.AutoPilotCancel();
+            GetClient().Self.AutoPilotCancel();
             gotoPosAttemptedWalk = false;
         }
 
@@ -217,24 +217,24 @@ namespace SecondBotEvents.Services
                 return;
             }
             evacWanted = false;
-            if (getClient().Network.CurrentSim.Name == home.name)
+            if (GetClient().Network.CurrentSim.Name == home.name)
             {
                 LogFormater.Info("Teleporting to backup sim to avoid restart");
-                getClient().Self.Teleport(backup.name, new Vector3(backup.x, backup.y, backup.z), new Vector3(0, 0, 0));
+                GetClient().Self.Teleport(backup.name, new Vector3(backup.x, backup.y, backup.z), new Vector3(0, 0, 0));
                 return;
             }
             LogFormater.Info("Teleporting to home sim to avoid restart");
-            getClient().Self.Teleport(home.name, new Vector3(home.x, home.y, home.z), new Vector3(0, 0, 0));
+            GetClient().Self.Teleport(home.name, new Vector3(home.x, home.y, home.z), new Vector3(0, 0, 0));
         }
 
         protected void BotClientRestart(object o, BotClientNotice e)
         {
             botConnected = false;
             Console.WriteLine("Homebound Service [Attached to new client]");
-            getClient().Network.LoggedOut += BotLoggedOut;
-            getClient().Network.SimConnected += BotLoggedIn;
-            getClient().Self.AlertMessage += BotAlertMessage;
-            getClient().Network.SimChanged += BotChangedSim;
+            GetClient().Network.LoggedOut += BotLoggedOut;
+            GetClient().Network.SimConnected += BotLoggedIn;
+            GetClient().Self.AlertMessage += BotAlertMessage;
+            GetClient().Network.SimChanged += BotChangedSim;
         }
 
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
@@ -270,13 +270,13 @@ namespace SecondBotEvents.Services
         public override void Stop()
         {
             master.BotClientNoticeEvent -= BotClientRestart;
-            if (master.botClient != null)
+            if (master.BotClient != null)
             {
-                if (getClient() != null)
+                if (GetClient() != null)
                 {
-                    getClient().Network.SimConnected -= BotLoggedIn;
-                    getClient().Self.AlertMessage -= BotAlertMessage;
-                    getClient().Network.SimChanged -= BotChangedSim;
+                    GetClient().Network.SimConnected -= BotLoggedIn;
+                    GetClient().Self.AlertMessage -= BotAlertMessage;
+                    GetClient().Network.SimChanged -= BotChangedSim;
                 }
             }
             Console.WriteLine("Homebound Service [Stopping]");

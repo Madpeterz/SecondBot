@@ -39,27 +39,27 @@ namespace SecondBotEvents.Services
             return "Active";
         }
 
-        protected bool processRequest(bool enabledByConfig, string avatarName, string sourceName)
+        protected bool ProcessRequest(bool enabledByConfig, string avatarName, string sourceName)
         {
             if(myConfig.GetEnabled() == false)
             {
-                jsonOuput(false, sourceName, avatarName, "Interactions hooks disabled");
+                JsonOuput(false, sourceName, avatarName, "Interactions hooks disabled");
                 return false;
             }
             if (enabledByConfig == false)
             {
-                jsonOuput(false, sourceName, avatarName, "disabled by config");
+                JsonOuput(false, sourceName, avatarName, "disabled by config");
                 return false;
             }
             if (master.CommandsService.myConfig.GetEnableMasterControls() == false)
             {
                 // master avatars list is not enabled. unable to continue
-                jsonOuput(false, sourceName, avatarName, "masters AV list is disabled");
+                JsonOuput(false, sourceName, avatarName, "masters AV list is disabled");
                 return false;
             }
             if (master.CommandsService.myConfig.GetMastersCSV().Contains(avatarName) == false)
             {
-                jsonOuput(false, sourceName, avatarName, "Not from accepted master");
+                JsonOuput(false, sourceName, avatarName, "Not from accepted master");
                 return false;
             }
             return true;
@@ -69,20 +69,19 @@ namespace SecondBotEvents.Services
         {
             botConnected = false;
             Console.WriteLine("Interaction Service [Attached to new client]");
-            getClient().Network.LoggedOut += BotLoggedOut;
-            getClient().Network.SimConnected += BotLoggedIn;
+            GetClient().Network.LoggedOut += BotLoggedOut;
+            GetClient().Network.SimConnected += BotLoggedIn;
         }
 
-        protected void jsonOuput(bool status, string eventype, string from, string why="", Dictionary<string, string> setMisc = null)
+        protected void JsonOuput(bool status, string eventype, string from, string why="", Dictionary<string, string> setMisc = null)
         {
             if (myConfig.GetEnableJsonOutputEvents() == false)
             {
                 return;
             }
             master.CommandsService.SmartCommandReply(
-                status, 
                 myConfig.GetJsonOutputEventsTarget(), 
-                JsonConvert.SerializeObject(new interactionEvent(from, eventype, status, why, setMisc)), 
+                JsonConvert.SerializeObject(new InteractionEvent(from, eventype, status, why, setMisc)), 
                 "interactions"
             );
         }
@@ -100,83 +99,85 @@ namespace SecondBotEvents.Services
                 mode = "Teleport Av to Bot";
                 markTeleport = false;
             }
-            if (processRequest(myConfig.GetAcceptTeleports(), e.IM.FromAgentName, mode) == false)
+            if (ProcessRequest(myConfig.GetAcceptTeleports(), e.IM.FromAgentName, mode) == false)
             {
                 // rejected requests
                 if (e.IM.Dialog != InstantMessageDialog.RequestLure)
                 {
                     return;
                 }
-                getClient().Self.TeleportLureRespond(e.IM.FromAgentID, e.IM.IMSessionID, false);
+                GetClient().Self.TeleportLureRespond(e.IM.FromAgentID, e.IM.IMSessionID, false);
                 return;
             }
             if (markTeleport == true)
             {
-                master.HomeboundService.markTeleport();
+                master.HomeboundService.MarkTeleport();
             }
-            jsonOuput(true, mode, e.IM.FromAgentName);
+            JsonOuput(true, mode, e.IM.FromAgentName);
             if (e.IM.Dialog == InstantMessageDialog.RequestLure)
             {
-                getClient().Self.SendTeleportLure(e.IM.FromAgentID);
+                GetClient().Self.SendTeleportLure(e.IM.FromAgentID);
                 return;
             }
-            getClient().Self.TeleportLureRespond(e.IM.FromAgentID, e.IM.IMSessionID, true);
+            GetClient().Self.TeleportLureRespond(e.IM.FromAgentID, e.IM.IMSessionID, true);
             
         }
 
         protected void BotGroupInviteOffer(object o, GroupInvitationEventArgs e)
         {
-            if (processRequest(myConfig.GetAcceptGroupInvites(), e.FromName, "GroupInvite") == false)
+            if (ProcessRequest(myConfig.GetAcceptGroupInvites(), e.FromName, "GroupInvite") == false)
             {
                 return;
             }
             e.Accept = true;
-            jsonOuput(true, "GroupInvite", e.FromName);
+            JsonOuput(true, "GroupInvite", e.FromName);
         }
 
         protected void BotInventoryOffer(object o, InventoryObjectOfferedEventArgs e)
         {
-            if(processRequest(myConfig.GetAcceptInventory(),e.Offer.FromAgentName, "InventoryUpdate") == false)
+            if(ProcessRequest(myConfig.GetAcceptInventory(),e.Offer.FromAgentName, "InventoryUpdate") == false)
             {
                 return;
             }
             e.Accept = true;
-            Dictionary<string, string> details = new Dictionary<string, string>();
-            details.Add("itemuuid", e.ObjectID.ToString());
-            details.Add("itemtype", e.AssetType.ToString());
-            InventoryItem itm = getClient().Inventory.FetchItem(e.ObjectID, getClient().Self.AgentID, 2000);
+            Dictionary<string, string> details = new Dictionary<string, string>
+            {
+                { "itemuuid", e.ObjectID.ToString() },
+                { "itemtype", e.AssetType.ToString() }
+            };
+            InventoryItem itm = GetClient().Inventory.FetchItem(e.ObjectID, GetClient().Self.AgentID, 2000);
             if(itm != null)
             {
                 details.Add("itemname", itm.Name);
             }
-            jsonOuput(true, "InventoryUpdate", e.Offer.FromAgentName, "see misc", details);
+            JsonOuput(true, "InventoryUpdate", e.Offer.FromAgentName, "see misc", details);
         }
 
         protected void BotFriendRequested(object o, FriendshipOfferedEventArgs e)
         {
-            if (processRequest(myConfig.GetAcceptGroupInvites(), e.AgentName, "FriendRequest") == false)
+            if (ProcessRequest(myConfig.GetAcceptGroupInvites(), e.AgentName, "FriendRequest") == false)
             {
                 return;
             }
-            getClient().Friends.AcceptFriendship(e.AgentID, e.SessionID);
-            jsonOuput(true, "FriendRequest", e.AgentName);
+            GetClient().Friends.AcceptFriendship(e.AgentID, e.SessionID);
+            JsonOuput(true, "FriendRequest", e.AgentName);
             
         }
 
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
             botConnected = false;
-            getClient().Network.SimConnected += BotLoggedIn;
+            GetClient().Network.SimConnected += BotLoggedIn;
             Console.WriteLine("Interaction Service [Standby]");
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
-            getClient().Network.SimConnected -= BotLoggedIn;
-            getClient().Friends.FriendshipOffered += BotFriendRequested;
-            getClient().Inventory.InventoryObjectOffered += BotInventoryOffer;
-            getClient().Groups.GroupInvitation += BotGroupInviteOffer;
-            getClient().Self.IM += BotTeleportOffer;
+            GetClient().Network.SimConnected -= BotLoggedIn;
+            GetClient().Friends.FriendshipOffered += BotFriendRequested;
+            GetClient().Inventory.InventoryObjectOffered += BotInventoryOffer;
+            GetClient().Groups.GroupInvitation += BotGroupInviteOffer;
+            GetClient().Self.IM += BotTeleportOffer;
             botConnected = true;
             Console.WriteLine("Interaction Service [Active]");
         }
@@ -200,27 +201,27 @@ namespace SecondBotEvents.Services
                 return;
             }
             master.BotClientNoticeEvent -= BotClientRestart;
-            if (master.botClient != null)
+            if (master.BotClient != null)
             {
-                if (getClient() != null)
+                if (GetClient() != null)
                 {
-                    getClient().Friends.FriendshipOffered -= BotFriendRequested;
-                    getClient().Inventory.InventoryObjectOffered -= BotInventoryOffer;
-                    getClient().Groups.GroupInvitation -= BotGroupInviteOffer;
+                    GetClient().Friends.FriendshipOffered -= BotFriendRequested;
+                    GetClient().Inventory.InventoryObjectOffered -= BotInventoryOffer;
+                    GetClient().Groups.GroupInvitation -= BotGroupInviteOffer;
                 }
             }
             Console.WriteLine("Interaction Service [Stopping]");
         }
     }
 
-    public class interactionEvent
+    public class InteractionEvent
     {
         public string from = "?";
         public string eventType = "?";
         public bool accepted = false;
         public string info = "";
         public Dictionary<string, string> misc = new Dictionary<string, string>();
-        public interactionEvent(string setFrom, string setType, bool setAccepted, string setInfo, Dictionary<string, string> setMisc = null)
+        public InteractionEvent(string setFrom, string setType, bool setAccepted, string setInfo, Dictionary<string, string> setMisc = null)
         {
             accepted = setAccepted;
             from = setFrom;

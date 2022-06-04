@@ -16,7 +16,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("A json object")]
         public object ListSculptys()
         {
-            Dictionary<uint, Primitive> objects_copy = getClient().Network.CurrentSim.ObjectsPrimitives.Copy();
+            Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
 
             Dictionary<uint, uint> mapLocalID = new Dictionary<uint, uint>();
             Dictionary<uint, Primitive> sculpts = new Dictionary<uint, Primitive>();
@@ -82,7 +82,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Firstname Lastname")]
         public object Name()
         {
-            return BasicReply(getClient().Self.FirstName + " " + getClient().Self.LastName);
+            return BasicReply(GetClient().Self.FirstName + " " + GetClient().Self.LastName);
         }
 
         [About("Fetchs the current parcels name")]
@@ -91,16 +91,16 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         public object ParcelName()
         {
-            if (getClient().Network.CurrentSim == null)
+            if (GetClient().Network.CurrentSim == null)
             {
                 return Failure("Error not in a sim");
             }
-            int localid = getClient().Parcels.GetParcelLocalID(getClient().Network.CurrentSim, getClient().Self.SimPosition);
-            if (getClient().Network.CurrentSim.Parcels.ContainsKey(localid) == false)
+            int localid = GetClient().Parcels.GetParcelLocalID(GetClient().Network.CurrentSim, GetClient().Self.SimPosition);
+            if (GetClient().Network.CurrentSim.Parcels.ContainsKey(localid) == false)
             {
                 return Failure("Error parcel not found");
             }
-            return BasicReply(getClient().Network.CurrentSim.Parcels[localid].Name);
+            return BasicReply(GetClient().Network.CurrentSim.Parcels[localid].Name);
         }
 
         [About("Requests the current unixtime at the bot")]
@@ -115,11 +115,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         public object SimName()
         {
-            if (getClient().Network.CurrentSim == null)
+            if (GetClient().Network.CurrentSim == null)
             {
                 return Failure("Error not in a sim");
             }
-            return BasicReply(getClient().Network.CurrentSim.Name);
+            return BasicReply(GetClient().Network.CurrentSim.Name);
         }
 
         [About("Fetchs the current location of the bot")]
@@ -127,14 +127,14 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         public object GetPosition()
         {
-            if (getClient().Network.CurrentSim == null)
+            if (GetClient().Network.CurrentSim == null)
             {
                 return Failure("Error not in a sim");
             }
             Dictionary<string, int> pos = new Dictionary<string, int>();
-            pos.Add("x", (int)Math.Round(getClient().Self.SimPosition.X));
-            pos.Add("y", (int)Math.Round(getClient().Self.SimPosition.Y));
-            pos.Add("z", (int)Math.Round(getClient().Self.SimPosition.Z));
+            pos.Add("x", (int)Math.Round(GetClient().Self.SimPosition.X));
+            pos.Add("y", (int)Math.Round(GetClient().Self.SimPosition.Y));
+            pos.Add("z", (int)Math.Round(GetClient().Self.SimPosition.Z));
             return BasicReply(JsonConvert.SerializeObject(pos));
         }
     }

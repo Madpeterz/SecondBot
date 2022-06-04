@@ -10,7 +10,8 @@ namespace SecondBotEvents.Config
         protected override void MakeSettings()
         {
             filename = "datastore";
-            settings.Add("AvatarsPurgeAfterMins");
+            settings.Add("AutoCleanAvatars");
+            settings.Add("AvatarsCleanAfterMins");
             settings.Add("LocalChatHistoryLimit");
             settings.Add("GroupChatHistoryLimitPerGroup");
             settings.Add("ImChatHistoryLimit");
@@ -53,9 +54,14 @@ namespace SecondBotEvents.Config
             return ReadSettingAsBool("PrefetchGroupMembers", true);
         }
 
-        public int GetAvatarsPurgeAfterMins()
+        public bool GetAutoCleanAvatars()
         {
-            return ReadSettingAsInt("AvatarsPurgeAfterMins", 25);
+            return ReadSettingAsBool("AutoCleanAvatars", true);
+        }
+
+        public int GetAvatarsCleanAfterMins()
+        {
+            return ReadSettingAsInt("AvatarsCleanAfterMins", 10);
         }
 
         public int GetLocalChatHistoryLimit()

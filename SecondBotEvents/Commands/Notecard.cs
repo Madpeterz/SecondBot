@@ -73,7 +73,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("No content in notecard storage ?", new[] { avatar, collection, notecardname });
             }
-            bool result = master.botClient.SendNotecard(notecardname, content, avataruuid);
+            bool result = master.BotClient.SendNotecard(notecardname, content, avataruuid);
             if (result == false)
             {
                 return Failure("Failed to create/send notecard", new[] { avatar, content, notecardname });
@@ -105,7 +105,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar uuid", new[] { avatar, content, notecardname });
             }
-            bool result = master.botClient.SendNotecard(notecardname, content, avataruuid);
+            bool result = master.BotClient.SendNotecard(notecardname, content, avataruuid);
             if(result == false)
             {
                 return Failure("Failed to create/send notecard", new[] { avatar, content, notecardname });

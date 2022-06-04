@@ -2,19 +2,21 @@
 using Discord.Rest;
 using Discord.WebSocket;
 using OpenMetaverse;
-using SecondBotEvents.Config;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SecondBotEvents.Services
 {
     public class DiscordService : BotServices
     {
-        public Config.DiscordConfig myConfig = null;
-        public bool acceptChat = false;
-        public bool discordIsReady = false;
+        protected Config.DiscordConfig myConfig = null;
+        protected bool AcceptEventsFromSL = false;
+        protected bool DiscordIsReady = false;
+        protected bool DiscordDisconnectExpected = false;
+        protected bool DiscordServerChannelsSetup = false;
+        protected bool DiscordDoingLogin = false;
         protected DiscordSocketClient DiscordClient;
 
         public DiscordService(EventsSecondBot setMaster) : base(setMaster)
@@ -22,32 +24,56 @@ namespace SecondBotEvents.Services
             myConfig = new Config.DiscordConfig(master.fromEnv, master.fromFolder);
         }
 
+        public override string Status()
+        {
+            if (myConfig == null)
+            {
+                return "Config broken";
+            }
+            else if(myConfig.GetEnabled() == false)
+            {
+                return "Disabled";
+            }
+            else if(DiscordServerChannelsSetup == false)
+            {
+                return "Setting up channel";
+            }
+            else if(DiscordDoingLogin == true)
+            {
+                return "Logging in";
+            }
+            else if(DiscordIsReady == false)
+            {
+                return "Disconnected";
+            }
+            return "Active";
+        }
+
         public bool DiscordReady()
         {
-            if(acceptChat == false)
-            {
-                return false;
-            }
-            return discordIsReady;
+            return GetReadyForDiscordActions();
         }
 
         protected Task DiscordClientLoggedOut()
         {
             Console.WriteLine("Discord service [Logged out]");
-            discordIsReady = false;
+            DiscordIsReady = false;
             return Task.CompletedTask;
         }
 
         protected Task DicordClientLoggedin()
         {
             Console.WriteLine("Discord service [Logged in]");
+            DiscordDoingLogin = false;
+            _ = DiscordClient.StartAsync();
             return Task.CompletedTask;   
         }
 
         protected Task DiscordClientReady()
         {
             Console.WriteLine("Discord service [Ready]");
-            discordIsReady = true;
+            DiscordIsReady = true;
+            DoServerChannelSetup();
             return Task.CompletedTask;
         }
 
@@ -59,33 +85,70 @@ namespace SecondBotEvents.Services
         protected Task DiscordDisconnected(Exception e)
         {
             Console.WriteLine("Discord service [Disconnected: "+e.Message+"]");
-            discordIsReady = false;
+            DiscordIsReady = false;
+            if(DiscordDisconnectExpected == false)
+            {
+                Restart();
+            }
             return Task.CompletedTask;
         }
 
-        public async override void Start()
+        protected void StatusMessageUpdate(object o, SystemStatusMessage e)
+        {
+            if(GetReadyForDiscordActions() == false)
+            {
+                return;
+            }
+
+        }
+
+        protected bool GetReadyForDiscordActions()
+        {
+            if (DiscordIsReady == false)
+            {
+                return false;
+            }
+            if (DiscordServerChannelsSetup == false)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public override void Start()
         {
             if(myConfig.GetEnabled() == false)
             {
                 Console.WriteLine("Discord service [Disabled]");
                 return;
             }
+            if(myConfig.GetServerID() == 0)
+            {
+                Console.WriteLine("Discord service [Invaild server id]");
+                return;
+            }
+            DiscordServerChannelsSetup = false;
+            DiscordDisconnectExpected = false;
+            DiscordIsReady = false;
             Console.WriteLine("Discord service [Starting]");
+            master.SystemStatusMessagesEvent += SystemStatusEvent;
             master.BotClientNoticeEvent += BotClientRestart;
+            master.SystemStatusMessagesEvent += StatusMessageUpdate;
             DiscordClient = new DiscordSocketClient();
             DiscordClient.Ready += DiscordClientReady;
             DiscordClient.LoggedOut += DiscordClientLoggedOut;
             DiscordClient.LoggedIn += DicordClientLoggedin;
             DiscordClient.MessageReceived += DiscordClientMessageReceived;
             DiscordClient.Disconnected += DiscordDisconnected;
-            await DiscordClient.LoginAsync(TokenType.Bot, myConfig.GetClientToken());
+            _ = DiscordClient.LoginAsync(TokenType.Bot, myConfig.GetClientToken()).ConfigureAwait(false);
         }
 
         public override void Stop()
         {
             Console.WriteLine("Discord service [Stopping]");
             master.BotClientNoticeEvent -= BotClientRestart;
-            acceptChat = false;
+            master.SystemStatusMessagesEvent -= StatusMessageUpdate;
+            AcceptEventsFromSL = false;
             if(DiscordClient != null)
             {
                 DiscordClient.Dispose();
@@ -95,22 +158,30 @@ namespace SecondBotEvents.Services
 
         protected void BotClientRestart(object o, BotClientNotice e)
         {
-            Console.WriteLine("Discord service [Avi link - Restarting]");
-            acceptChat = false;
-            getClient().Network.LoggedOut += BotLoggedOut;
-            getClient().Network.SimConnected += BotLoggedIn;
+            if (e.isRestart == false)
+            {
+                Console.WriteLine("Discord service [Avi link]");
+                AcceptEventsFromSL = false;
+                GetClient().Network.LoggedOut += BotLoggedOut;
+                GetClient().Self.ChatFromSimulator -= LocalChat;
+                GetClient().Self.IM -= BotImMessage;
+                GetClient().Network.SimConnected += BotLoggedIn;
+            }
+
         }
 
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
-            getClient().Network.SimConnected += BotLoggedIn;
-            acceptChat = false;
+            GetClient().Network.SimConnected += BotLoggedIn;
+            GetClient().Self.ChatFromSimulator -= LocalChat;
+            GetClient().Self.IM -= BotImMessage;
+            AcceptEventsFromSL = false;
             Console.WriteLine("Discord service [Avi link - standby]");
         }
 
         protected void BotImMessage(object o, InstantMessageEventArgs e)
         {
-            if(acceptChat == false)
+            if(AcceptEventsFromSL == false)
             {
                 return;
             }
@@ -118,7 +189,7 @@ namespace SecondBotEvents.Services
             {
                 case InstantMessageDialog.MessageFromObject:
                     {
-                        objectChat(e.IM.FromAgentName, e.IM.Message);
+                        ObjectIMChat(e.IM.FromAgentName, e.IM.Message);
                         break;
                     }
                 case InstantMessageDialog.MessageFromAgent: // shared with SessionSend
@@ -126,10 +197,10 @@ namespace SecondBotEvents.Services
                     {
                         if(e.IM.GroupIM == false)
                         {
-                            avatarChat(e.IM.FromAgentID, e.IM.FromAgentName, e.IM.Message);
+                            AvatarIMChat(e.IM.FromAgentID, e.IM.FromAgentName, e.IM.Message);
                             break;
                         }
-                        groupChat(e.IM.IMSessionID, e.IM.FromAgentName, e.IM.Message);
+                        GroupIMChat(e.IM.IMSessionID, e.IM.FromAgentName, e.IM.Message);
                         break;
                     }
                 default:
@@ -137,35 +208,228 @@ namespace SecondBotEvents.Services
                         break;
                     }
             }
-
         }
 
-        protected void groupChat(UUID group, string name, string message)
+        protected Dictionary<string, ulong> ChannelMap = new Dictionary<string, ulong>();
+        protected Dictionary<string, ulong> CategoryMap = new Dictionary<string, ulong>();
+
+        protected async void DoServerChannelSetup()
+        {
+            LogFormater.Info("Setting up channels");
+            Dictionary<string, string> WantedTextChannels = new Dictionary<string, string>
+            {
+                { "status", StatusPrefill() },
+                { "commands", "Send a command to the bot as if you are a master" },
+                { "localchat", "Talk and view localchat" }
+            };
+
+            SocketGuild server = DiscordClient.GetGuild(myConfig.GetServerID());
+            foreach (ITextChannel channel in server.TextChannels)
+            {
+                if(WantedTextChannels.ContainsKey(channel.Name) == false)
+                {
+                    continue;
+                }
+                if(channel.Name != "commands")
+                {
+                    CleanChannel(channel);
+                }
+                WantedTextChannels.Remove(channel.Name);
+                ChannelMap.Add(channel.Name, channel.Id);
+            }
+
+            List<string> WantedCategoryChannels = new List<string>
+            {
+                "Bot",
+                "IM",
+                "Group"
+            };
+            foreach (ICategoryChannel category in server.CategoryChannels)
+            {
+                if (WantedCategoryChannels.Contains(category.Name) == false)
+                {
+                    continue;
+                }
+                WantedCategoryChannels.Remove(category.Name);
+                CategoryMap.Add(category.Name, category.Id);
+            }
+            foreach(String a in WantedCategoryChannels)
+            {
+                RestCategoryChannel reply = await server.CreateCategoryChannelAsync(a);
+                CategoryMap.Add(a, reply.Id);
+            }
+            foreach(KeyValuePair<string,string> a in WantedTextChannels)
+            {
+                createTextChannel(a.Key, a.Value, "Bot");
+            }
+            DiscordServerChannelsSetup = true;
+        }
+
+        protected async void createTextChannel(string ChannelName, string ChannelInfo,  string Group)
+        {
+            SocketGuild server = DiscordClient.GetGuild(myConfig.GetServerID());
+            IGuildChannel channel = await server.CreateTextChannelAsync(ChannelName, X => DiscordGetNewChannelProperies(X, ChannelName, ChannelInfo, Group));
+            ChannelMap.Add(channel.Name, channel.Id);
+        }
+
+        protected void DiscordGetNewChannelProperies(TextChannelProperties C, string channelname, string channeltopic, string catname)
+        {
+            if (catname != null)
+            {
+                if (CategoryMap.ContainsKey(catname) == true)
+                {
+                    C.CategoryId = CategoryMap[catname];
+                }
+            }
+            C.Name = channelname;
+            C.Topic = channeltopic;
+        }
+
+        protected void GroupIMChat(UUID group, string name, string message)
         {
         }
 
-        protected void avatarChat(UUID avatar, string name, string message)
+        protected void AvatarIMChat(UUID avatar, string name, string message)
+        {
+
+        }
+
+        protected void ObjectIMChat(string objectName, string message)
+        {
+
+        }
+
+        protected void StatusChat(string message)
         {
         }
 
-        protected void objectChat(string objectName, string message)
+        readonly string[] hard_blocked_agents = new[] { "secondlife", "second life" };
+        protected void LocalChat(object o, ChatEventArgs e)
         {
+            switch (e.Type)
+            {
+                case ChatType.OwnerSay:
+                case ChatType.Whisper:
+                case ChatType.Normal:
+                case ChatType.Shout:
+                case ChatType.RegionSayTo:
+                {
+                        if (hard_blocked_agents.Contains(e.FromName.ToLowerInvariant()) == true)
+                        {
+                            break;
+                        }
+                        string source = ":person_bald:";
+                        if (e.SourceType == ChatSourceType.Object)
+                        {
+                            source = ":diamond_shape_with_a_dot_inside:";
+                        }
+                        else if (e.SourceType == ChatSourceType.System)
+                        {
+                            source = ":comet:";
+                        }
+                        if(e.Type == ChatType.OwnerSay)
+                        {
+                            source = ":robot:";
+                        }
+                        else if (e.Type == ChatType.RegionSayTo)
+                        {
+                            source = ":dart:";
+                        }
+                        SendMessageToChannel("localchat", "Talk and view localchat", LogFormater.GetClockStamp()+" "+source + "" + e.FromName + ": " + e.Message);
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
+            }
         }
 
-        protected void statusChat(string message)
-        {
-        }
-
-        protected bool acceptMessageSigned(string message)
+        protected bool AcceptMessageSigned(string message)
         {
             return false;
         }
 
+        public ulong SendMessageToChannel(string ChannelName, string ChannelInfo, string message)
+        {
+            return SendMessageToChannel(GetChannel(ChannelName, ChannelInfo, message), message);
+        }
+
+        public ulong SendMessageToChannel(ITextChannel channel, string message)
+        {
+            IMessage reply = channel.SendMessageAsync(message).GetAwaiter().GetResult();
+            return reply.Id;
+        }
+
+        protected ITextChannel GetChannel(string ChannelName, string ChannelInfo, string Group)
+        {
+            if(ChannelMap.ContainsKey(ChannelName) == true)
+            {
+                return (ITextChannel) DiscordClient.GetChannel(ChannelMap[ChannelName]);
+            }
+            createTextChannel(ChannelName, ChannelInfo, Group);
+            return (ITextChannel)DiscordClient.GetChannel(ChannelMap[ChannelName]);
+        }
+
+        protected ulong LastStatusMessageId = 0;
+        protected string LastMessageContent = "";
+        protected bool messageHasEndDot = false;
+        protected long LastUpdatedSystemStatus = 0;
+
+        protected async void SystemStatusEvent(object o, SystemStatusMessage e)
+        {
+            if(GetReadyForDiscordActions() == false)
+            {
+                return;
+            }
+            ITextChannel statusChannel = GetChannel("status", StatusPrefill(), "bot");
+            if ((e.changed == false) && (LastStatusMessageId != 0))
+            {
+                long dif = SecondbotHelpers.UnixTimeNow() - LastUpdatedSystemStatus;
+                if (dif < 15)
+                {
+                    return;
+                }
+                LastUpdatedSystemStatus = SecondbotHelpers.UnixTimeNow();
+
+                if (messageHasEndDot == false)
+                {
+                    await statusChannel.
+                        ModifyMessageAsync(LastStatusMessageId, m => m.Content = LastMessageContent + ".");
+                    messageHasEndDot = true;
+                    return;
+                }
+                await statusChannel.
+                    ModifyMessageAsync(LastStatusMessageId, m => m.Content = LastMessageContent);
+                messageHasEndDot = false;
+                return;
+            }
+            LastStatusMessageId = SendMessageToChannel(statusChannel, e.message);
+            LastMessageContent = e.message;
+        }
+
+        protected async void CleanChannel(ITextChannel channel)
+        {
+            IEnumerable<IMessage> messages = await channel.GetMessagesAsync(100, CacheMode.AllowDownload).FlattenAsync();
+            IEnumerable<IMessage> filtered = messages.Where(x => (DateTimeOffset.UtcNow - x.Timestamp).TotalDays <= 14);
+            if(filtered.Count() == 0)
+            {
+                return;
+            }
+            await channel.DeleteMessagesAsync(filtered);
+        }
+
+        protected string StatusPrefill()
+        {
+            return "State of the bot service";
+        }
+
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
-            acceptChat = true;
-            getClient().Network.SimConnected -= BotLoggedIn;
-            getClient().Self.IM += BotImMessage;
+            AcceptEventsFromSL = true;
+            GetClient().Network.SimConnected -= BotLoggedIn;
+            GetClient().Self.IM += BotImMessage;
+            GetClient().Self.ChatFromSimulator += LocalChat;
             Console.WriteLine("Discord service [Avi link - Active]");
         }
 
@@ -582,7 +846,7 @@ namespace SecondBotEvents.Services
         }
 
 
-        public async Task<bool> addRoleToMember(string givenserverid, string givenroleid, string givenmemberid)
+        public async Task<bool> AddRoleToMember(string givenserverid, string givenroleid, string givenmemberid)
         {
             if (ulong.TryParse(givenserverid, out ulong serverid) == false)
             {
@@ -602,8 +866,6 @@ namespace SecondBotEvents.Services
             await user.AddRoleAsync(role); // ? Irole seems to accept SocketRole ?
             return true;
         }
-
-
         #endregion
     }
 }

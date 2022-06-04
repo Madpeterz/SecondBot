@@ -58,20 +58,20 @@ namespace SecondBotEvents.Services
         {
             acceptBotCommands = false;
             Console.WriteLine("HTTP service [Attached to new client]");
-            getClient().Network.LoggedOut += BotLoggedOut;
-            getClient().Network.SimConnected += BotLoggedIn;
+            GetClient().Network.LoggedOut += BotLoggedOut;
+            GetClient().Network.SimConnected += BotLoggedIn;
         }
 
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
             acceptBotCommands = false;
-            getClient().Network.SimConnected += BotLoggedIn;
+            GetClient().Network.SimConnected += BotLoggedIn;
             Console.WriteLine("HTTP service [Bot commands disabled]");
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
-            getClient().Network.SimConnected -= BotLoggedIn;
+            GetClient().Network.SimConnected -= BotLoggedIn;
             acceptBotCommands = true;
             CreateWebServer();
         }
@@ -128,35 +128,35 @@ namespace SecondBotEvents.Services
         protected UUID avataruuid = UUID.Zero;
         protected Parcel targetparcel = null;
 
-        protected GridClient getClient()
+        protected GridClient GetClient()
         {
-            return master.botClient.client;
+            return master.BotClient.client;
         }
 
         protected KeyValuePair<bool, string> SetupCurrentParcel()
         {
-            if (getClient().Network.CurrentSim == null)
+            if (GetClient().Network.CurrentSim == null)
             {
                 return new KeyValuePair<bool, string>(false, "Error not in a sim");
             }
-            int localid = getClient().Parcels.GetParcelLocalID(getClient().Network.CurrentSim, getClient().Self.SimPosition);
-            if (getClient().Network.CurrentSim.Parcels.ContainsKey(localid) == false)
+            int localid = GetClient().Parcels.GetParcelLocalID(GetClient().Network.CurrentSim, GetClient().Self.SimPosition);
+            if (GetClient().Network.CurrentSim.Parcels.ContainsKey(localid) == false)
             {
                 Thread.Sleep(2000);
-                localid = getClient().Parcels.GetParcelLocalID(getClient().Network.CurrentSim, getClient().Self.SimPosition);
-                if (getClient().Network.CurrentSim.Parcels.ContainsKey(localid) == false)
+                localid = GetClient().Parcels.GetParcelLocalID(GetClient().Network.CurrentSim, GetClient().Self.SimPosition);
+                if (GetClient().Network.CurrentSim.Parcels.ContainsKey(localid) == false)
                 {
                     return new KeyValuePair<bool, string>(false, "Parcel data not ready");
                 }
             }
-            targetparcel = getClient().Network.CurrentSim.Parcels[localid];
+            targetparcel = GetClient().Network.CurrentSim.Parcels[localid];
             return new KeyValuePair<bool, string>(true, "");
         }
 
         protected void ProcessAvatar(string avatar)
         {
             avataruuid = UUID.Zero;
-            string UUIDfetch = master.DataStoreService.getAvatarUUID(avatar);
+            string UUIDfetch = master.DataStoreService.GetAvatarUUID(avatar);
             if (UUIDfetch != "lookup")
             {
                 UUID.TryParse(UUIDfetch, out avataruuid);
@@ -165,37 +165,37 @@ namespace SecondBotEvents.Services
 
         protected object BasicReply(string input)
         {
-            return BasicReply(input, new string[] { }, getCallingCommand());
+            return BasicReply(input, new string[] { }, GetCallingCommand());
         }
 
         protected object BasicReply(string input, string[] args)
         {
-            return BasicReply(input, args, getCallingCommand());
+            return BasicReply(input, args, GetCallingCommand());
         }
 
         protected object BasicReply(string input, string[] args, string command)
         {
-            master.DataStoreService.addCommandToHistory(true, command, args);
+            master.DataStoreService.AddCommandToHistory(true, command, args);
             return new { reply = input, status = false };
         }
 
         protected object Failure(string input, string command, string[] args, string whyfailed)
         {
-            master.DataStoreService.addCommandToHistory(false, command, args);
+            master.DataStoreService.AddCommandToHistory(false, command, args);
             return new { reply = input, status = false };
         }
 
         protected object Failure(string input, string[] args)
         {
-            return Failure(input, getCallingCommand(), args, null);
+            return Failure(input, GetCallingCommand(), args, null);
         }
 
         protected object Failure(string input)
         {
-            return Failure(input, getCallingCommand(), new string[] { }, null);
+            return Failure(input, GetCallingCommand(), new string[] { }, null);
         }
 
-        protected string getCallingCommand()
+        protected string GetCallingCommand()
         {
             return (new System.Diagnostics.StackTrace()).GetFrame(2).GetMethod().Name;
         }
@@ -268,9 +268,8 @@ namespace SecondBotEvents.Services
         [ArgHints("unixtime", "the time you signed the command")]
         [Route(HttpVerbs.Post, "/Run")]
 
-        public string Run([FormField] string commandName, [FormField] string? args, [FormField] string signing, [FormField] string unixtime)
+        public string Run([FormField] string commandName, [FormField] string args, [FormField] string signing, [FormField] string unixtime)
         {
-            string input = commandName;
             string[] myArgs = new string[] { };
             if(args != null)
             {
@@ -289,7 +288,7 @@ namespace SecondBotEvents.Services
             {
                 return "Command request rejected";
             }
-            return JsonConvert.SerializeObject(master.CommandsService.runCommand(C));
+            return JsonConvert.SerializeObject(master.CommandsService.RunCommand(C));
         }
     }
 }
