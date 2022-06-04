@@ -335,7 +335,7 @@ namespace SecondBotEvents.Services
                         {
                             source = ":dart:";
                         }
-                        SendMessageToChannel("localchat", "Talk and view localchat", LogFormater.GetClockStamp()+" "+source + "" + e.FromName + ": " + e.Message);
+                        SendMessageToChannel("localchat", "Talk and view localchat", source + "" + e.FromName + ": " + e.Message);
                         break;
                     }
                 default:
