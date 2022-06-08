@@ -176,13 +176,13 @@ namespace SecondBotEvents.Services
         protected object BasicReply(string input, string[] args, string command)
         {
             master.DataStoreService.AddCommandToHistory(true, command, args);
-            return new { reply = input, status = false };
+            return new { command = command, args = args, reply = input, status = true };
         }
 
         protected object Failure(string input, string command, string[] args, string whyfailed)
         {
             master.DataStoreService.AddCommandToHistory(false, command, args);
-            return new { reply = input, status = false };
+            return new { command = command, args = args, reply = input, status = false, whyfailed = whyfailed };
         }
 
         protected object Failure(string input, string[] args)
