@@ -4,6 +4,7 @@ using SecondBotEvents.Config;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Timers;
 
 namespace SecondBotEvents.Services
 {
@@ -14,10 +15,16 @@ namespace SecondBotEvents.Services
 
         protected bool ExitBot = false;
 
-
+        protected Timer AutoRestartLoginTimer;
         public BotClientService(EventsSecondBot setMaster) : base(setMaster)
         {
             basicCfg = new BasicConfig(master.fromEnv, master.fromFolder);
+        }
+
+        protected void RestartTimer(object o, ElapsedEventArgs e)
+        {
+            AutoRestartLoginTimer.Stop();
+            Restart();
         }
 
         public bool IsLoaded()
@@ -28,10 +35,15 @@ namespace SecondBotEvents.Services
         public override void Start()
         {
             Console.WriteLine("Client service [Starting]");
+            AutoRestartLoginTimer = new Timer();
+            AutoRestartLoginTimer.Interval = 30 * 1000;
+            AutoRestartLoginTimer.AutoReset = false;
+            AutoRestartLoginTimer.Elapsed += RestartTimer;
             Login();
         }
         public override void Stop()
         {
+            AutoRestartLoginTimer.Stop();
             Console.WriteLine("Client service [Stopping]");
             ResetClient();
         }
@@ -43,6 +55,7 @@ namespace SecondBotEvents.Services
 
         protected void BotSimConnected(object o, SimConnectedEventArgs e)
         {
+            AutoRestartLoginTimer.Stop();
             Console.WriteLine("Client service ~ Connected to sim: "+e.Simulator.Name);
         }
 
@@ -163,6 +176,7 @@ namespace SecondBotEvents.Services
             {
                 loginParams.URI = basicCfg.GetLoginURI();
             }
+            AutoRestartLoginTimer.Start();
             client.Network.BeginLogin(loginParams);
         }
 
