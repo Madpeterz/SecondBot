@@ -694,6 +694,14 @@ namespace SecondBotEvents.Services
             return reply.Id;
         }
 
+        public ulong SendMessageToChannel(ulong serverid, ulong channelid, string message)
+        {
+            SocketGuild server = DiscordClient.GetGuild(serverid);
+            ITextChannel channel = server.GetTextChannel(channelid);
+            IMessage reply = channel.SendMessageAsync(message).GetAwaiter().GetResult();
+            return reply.Id;
+        }
+
         protected string GetChannelName(string input)
         {
             input = input.Replace("-", "");

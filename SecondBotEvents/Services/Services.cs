@@ -13,7 +13,7 @@ namespace SecondBotEvents.Services
             master = setMaster;
         }
 
-        protected GridClient GetClient()
+        public GridClient GetClient()
         {
             return master.BotClient.client;
         }

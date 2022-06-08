@@ -43,6 +43,10 @@ namespace SecondBotEvents.Config
             {
                 string reader = "Get"+ StringExtensions.FirstCharToUpper(setting);
                 MethodInfo theMethod = thisType.GetMethod(reader);
+                if (theMethod == null)
+                {
+                    continue;
+                }
                 string value = theMethod.Invoke(this, null).ToString();
                 saveMe.Add(setting, value);
             }
