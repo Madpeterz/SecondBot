@@ -5,6 +5,8 @@ using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SecondBotEvents.Services
@@ -79,7 +81,301 @@ namespace SecondBotEvents.Services
 
         protected Task DiscordClientMessageReceived(SocketMessage message)
         {
+            if(GetReadyForDiscordActions() == false)
+            {
+                // bot is not ready this message should not have got here yet.
+                return Task.CompletedTask;
+            }
+            SocketChannel socketChannel = DiscordClient.GetChannel(message.Channel.Id);
+            if(socketChannel.GetChannelType() != Discord.ChannelType.Text)
+            {
+                // bot only does stuff on text channels.
+                return Task.CompletedTask;
+            }
+            ITextChannel TextChannel = (ITextChannel)socketChannel;
+            if(TextChannel.CategoryId == null)
+            {
+                // bot only does stuff on text channels that are in a category
+                return Task.CompletedTask;
+            }
+            if(ulong.TryParse(TextChannel.CategoryId.ToString(), out ulong CategoryId) == false)
+            {
+                // a value that is null or ulong, that was not null is some how not a ulong I have no idea
+                // whats going on anymore :/ this should be dead code.
+                return Task.CompletedTask;
+            }
+            if (CategoryMap.ContainsValue(CategoryId) == false)
+            {
+                // message is not on a Category the bot looks after so we ignore it.
+                return Task.CompletedTask;
+            }
+            if (ChannelMap.ContainsKey(message.Channel.Name) == false)
+            {
+                // unknown channel add it to map
+                ChannelMap.Add(message.Channel.Name, message.Channel.Id);
+            }
+            string CatName = MapCatToName(CategoryId);
+            switch (CatName)
+            {
+                case "bot":
+                    {
+                        HandleDiscordBotInput(TextChannel, message);
+                        break;
+                    }
+                case "im":
+                    {
+                        HandleDiscordAvatarImInput(TextChannel, message);
+                        break;
+                    }
+                case "group":
+                    {
+                        HandleDiscordGroupImInput(TextChannel, message);
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
+            }
             return Task.CompletedTask;
+        }
+
+        protected async Task<Task> MarkMessage(IUserMessage message, string emote)
+        {
+            var Tickmark = new Emoji(emote);
+            await message.AddReactionAsync(Tickmark, RequestOptions.Default);
+            return Task.CompletedTask;
+        }
+
+        protected void ReplyToMessage(IMessage message, string reply)
+        {
+            message.Channel.SendMessageAsync(reply, false, null, null, null, new MessageReference(message.Id));
+        }
+
+        protected void HandleDiscordGroupImInput(ITextChannel TextChannel, SocketMessage message)
+        {
+            if (AcceptEventsFromSL == false)
+            {
+                _ = message.DeleteAsync();
+                return;
+            }
+            if (message.Author.Id == DiscordClient.CurrentUser.Id)
+            {
+                return;
+            }
+            // group=UUID||| !clear !notice {Title}@@@{Message}[@@@{Inventory UUID}] !eject {Avatar} !invite {Avatar}
+            string[] bits = TextChannel.Topic.Split("|||", StringSplitOptions.RemoveEmptyEntries);
+            // group=UUID
+            // !clear !notice {Title}@@@{Message}[@@@{Inventory UUID}] !eject {Avatar} !invite {Avatar} !ban {Avatar}
+            if (bits.Length != 2)
+            {
+                _ = TextChannel.DeleteAsync();
+                return;
+            }
+            bits = bits[0].Split("=", StringSplitOptions.RemoveEmptyEntries);
+            // group
+            // UUID
+            if (bits[0] != "group")
+            {
+                _ = TextChannel.DeleteAsync();
+                return;
+            }
+            if (UUID.TryParse(bits[1], out UUID groupuuid) == false)
+            {
+                _ = TextChannel.DeleteAsync();
+                return;
+            }
+            if(GetClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
+            {
+                _ = MarkMessage((IUserMessage)message, "❌");
+                ReplyToMessage(message, "Unknown group [Maybe im still loading]");
+                return;
+            }
+            string cleaned = message.Content.Trim();
+            if(cleaned == "!clear")
+            {
+                CleanChannel(TextChannel);
+                master.DataStoreService.CloseChat(groupuuid);
+                return;
+            }
+            else if(cleaned.StartsWith("!notice") == true)
+            {
+                // handle group notice
+                // !notice {Title}@@@{Message}[@@@{Inventory UUID}]
+                List<string> args = new List<string>();
+                args.Add(groupuuid.ToString());
+                cleaned = cleaned.Replace("!notice ", "");
+                bits = cleaned.Split("@@@", StringSplitOptions.RemoveEmptyEntries);
+                args.AddRange(bits);
+                if (bits.Length < 2)
+                {
+                    _ = MarkMessage((IUserMessage)message, "❌");
+                    ReplyToMessage(message, "Notices require title and a message split with @@@!");
+                    return;
+                }
+                SignedCommand C = new SignedCommand("Groupnotice", null, args.ToArray(), 0, "none", false, 0, "", false);
+                if (bits.Length == 3)
+                {
+                    C.command = "GroupnoticeWithAttachment";
+                }
+                RunCommandFromMessage(C, message);
+                return;
+            }
+            else if(cleaned.StartsWith("!eject") == true)
+            {
+                // handle group eject
+                cleaned = cleaned.Replace("!eject ", "");
+                List<string> args = new List<string>();
+                args.Add(groupuuid.ToString());
+                args.Add(cleaned);
+                RunCommandFromMessage(new SignedCommand("GroupEject", null, args.ToArray(), 0, "none", false, 0, "", false), message);
+                return;
+            }
+            else if(cleaned.StartsWith("!invite") == true)
+            {
+                // hangle group invite
+                cleaned = cleaned.Replace("!invite ", "");
+                List<string> args = new List<string>();
+                args.Add(groupuuid.ToString());
+                args.Add(cleaned);
+                args.Add("everyone");
+                RunCommandFromMessage(new SignedCommand("GroupInvite", null, args.ToArray(), 0, "none", false, 0, "", false), message);
+                return;
+            }
+            else if(cleaned.StartsWith("!ban") == true)
+            {
+                // hangle group ban
+                cleaned = cleaned.Replace("!ban ", "");
+                List<string> args = new List<string>();
+                args.Add(groupuuid.ToString());
+                args.Add(cleaned);
+                args.Add("true");
+                RunCommandFromMessage(new SignedCommand("GroupBan", null, args.ToArray(), 0, "none", false, 0, "", false), message);
+                return;
+            }
+            GetClient().Self.InstantMessageGroup(groupuuid, message.Author.Username + ": " + message.CleanContent);
+            _ = message.DeleteAsync();
+        }
+
+        protected void RunCommandFromMessage(SignedCommand C, SocketMessage message)
+        {
+            KeyValuePair<bool, string> reply = master.CommandsService.RunCommand(C);
+            string replyEmote = "✅";
+            if (reply.Key == false)
+            {
+                replyEmote = "❌";
+            }
+            _ = MarkMessage((IUserMessage)message, replyEmote);
+            ReplyToMessage(message, reply.Value);
+        }
+
+        protected void HandleDiscordAvatarImInput(ITextChannel TextChannel, SocketMessage message)
+        {
+            if (AcceptEventsFromSL == false)
+            {
+                _ = message.DeleteAsync();
+                return;
+            }
+            if (message.Author.Id == DiscordClient.CurrentUser.Id)
+            {
+                return;
+            }
+            // avatar=UUID||| !close !offertp !clear
+            string[] bits = TextChannel.Topic.Split("|||", StringSplitOptions.RemoveEmptyEntries);
+            // avatar=UUID
+            // !close !offertp !clear
+            if (bits.Length != 2)
+            {
+                _ = TextChannel.DeleteAsync();
+                return;
+            }
+            bits = bits[0].Split("=", StringSplitOptions.RemoveEmptyEntries);
+            // avatar
+            // UUID
+            if (bits[0] != "avatar")
+            {
+                _ = TextChannel.DeleteAsync();
+                return;
+            }
+            if(UUID.TryParse(bits[1], out UUID avataruuid) == false)
+            {
+                _ = TextChannel.DeleteAsync();
+                return;
+            }
+            string cleaned = message.Content.Trim();
+            if (cleaned == "!close")
+            {
+                master.DataStoreService.CloseChat(avataruuid);
+                _ = TextChannel.DeleteAsync();
+                return;
+            }
+            else if (cleaned == "!clear")
+            {
+                CleanChannel(TextChannel);
+                return;
+            }
+            else if(cleaned == "!offertp")
+            {
+                _ = MarkMessage((IUserMessage)message, "✅");
+                GetClient().Self.SendTeleportLure(avataruuid);
+                return;
+            }
+            master.DataStoreService.GetAvatarName(avataruuid); // add avatar to lookup service just in case.
+            GetClient().Self.InstantMessage(avataruuid, message.Author.Username + ": " + message.CleanContent);
+            _ = MarkMessage((IUserMessage)message, "✅");
+        }
+
+        protected void HandleDiscordBotInput(ITextChannel TextChannel, SocketMessage message)
+        {
+            if (TextChannel.Name == "status")
+            {
+                if (message.Author.Id != DiscordClient.CurrentUser.Id)
+                {
+                    _ = message.DeleteAsync();
+                }
+                return;
+            }
+            else if (TextChannel.Name == "commands")
+            {
+                if(AcceptEventsFromSL == false)
+                {
+                    _ = message.DeleteAsync();
+                    return;
+                }
+                if (message.Author.Id != DiscordClient.CurrentUser.Id)
+                {
+                    // do command
+                    RunCommandFromMessage(new SignedCommand(message.Content, false, false, 0, ""), message);
+                    return;
+                }
+            }
+            else if (TextChannel.Name == "localchat")
+            {
+                if (AcceptEventsFromSL == false)
+                {
+                    _ = message.DeleteAsync();
+                    return;
+                }
+                if (message.Author.Id != DiscordClient.CurrentUser.Id)
+                {
+                    GetClient().Self.Chat(message.Author.Username + ": " + message.CleanContent, 0, ChatType.Normal);
+                    _ = message.DeleteAsync();
+                }
+            }
+        }
+
+        protected string MapCatToName(ulong CatID)
+        {
+            string reply = "none";
+            foreach(KeyValuePair<string, ulong> entry in CategoryMap)
+            {
+                if(entry.Value == CatID)
+                {
+                    reply = entry.Key;
+                    break;
+                }
+            }
+            return reply;
         }
 
         protected Task DiscordDisconnected(Exception e)
@@ -91,15 +387,6 @@ namespace SecondBotEvents.Services
                 Restart();
             }
             return Task.CompletedTask;
-        }
-
-        protected void StatusMessageUpdate(object o, SystemStatusMessage e)
-        {
-            if(GetReadyForDiscordActions() == false)
-            {
-                return;
-            }
-
         }
 
         protected bool GetReadyForDiscordActions()
@@ -133,7 +420,6 @@ namespace SecondBotEvents.Services
             Console.WriteLine("Discord service [Starting]");
             master.SystemStatusMessagesEvent += SystemStatusEvent;
             master.BotClientNoticeEvent += BotClientRestart;
-            master.SystemStatusMessagesEvent += StatusMessageUpdate;
             DiscordClient = new DiscordSocketClient();
             DiscordClient.Ready += DiscordClientReady;
             DiscordClient.LoggedOut += DiscordClientLoggedOut;
@@ -147,7 +433,7 @@ namespace SecondBotEvents.Services
         {
             Console.WriteLine("Discord service [Stopping]");
             master.BotClientNoticeEvent -= BotClientRestart;
-            master.SystemStatusMessagesEvent -= StatusMessageUpdate;
+            master.SystemStatusMessagesEvent -= SystemStatusEvent;
             AcceptEventsFromSL = false;
             if(DiscordClient != null)
             {
@@ -156,6 +442,27 @@ namespace SecondBotEvents.Services
             }
         }
 
+        protected void GroupCurrent(object o, CurrentGroupsEventArgs e)
+        {
+            if(GetReadyForDiscordActions() == false)
+            {
+                return;
+            }
+            lock (ChannelMap)
+            {
+                foreach (KeyValuePair<UUID, OpenMetaverse.Group> a in e.Groups)
+                {
+                    GetChannel(
+                        a.Value.Name,
+                        GroupPrefill(a.Value.ID),
+                        "group",
+                        true
+                    );
+                }
+            }
+        }
+
+        
         protected void BotClientRestart(object o, BotClientNotice e)
         {
             if (e.isRestart == false)
@@ -165,6 +472,7 @@ namespace SecondBotEvents.Services
                 GetClient().Network.LoggedOut += BotLoggedOut;
                 GetClient().Self.ChatFromSimulator -= LocalChat;
                 GetClient().Self.IM -= BotImMessage;
+                GetClient().Groups.CurrentGroups -= GroupCurrent;
                 GetClient().Network.SimConnected += BotLoggedIn;
             }
 
@@ -175,6 +483,7 @@ namespace SecondBotEvents.Services
             GetClient().Network.SimConnected += BotLoggedIn;
             GetClient().Self.ChatFromSimulator -= LocalChat;
             GetClient().Self.IM -= BotImMessage;
+            GetClient().Groups.CurrentGroups -= GroupCurrent;
             AcceptEventsFromSL = false;
             Console.WriteLine("Discord service [Avi link - standby]");
         }
@@ -195,7 +504,7 @@ namespace SecondBotEvents.Services
                 case InstantMessageDialog.MessageFromAgent: // shared with SessionSend
                 case InstantMessageDialog.SessionSend:
                     {
-                        if(e.IM.GroupIM == false)
+                        if(master.DataStoreService.GetIsGroup(e.IM.IMSessionID) == false)
                         {
                             AvatarIMChat(e.IM.FromAgentID, e.IM.FromAgentName, e.IM.Message);
                             break;
@@ -210,6 +519,11 @@ namespace SecondBotEvents.Services
             }
         }
 
+        protected string GroupPrefill(UUID groupuuid)
+        {
+            return "group=" + groupuuid.ToString() + "||| !clear !notice {Title}@@@{Message}[@@@{Inventory UUID}] !eject {Avatar} !invite {Avatar} !ban {Avatar}";
+        }
+
         protected Dictionary<string, ulong> ChannelMap = new Dictionary<string, ulong>();
         protected Dictionary<string, ulong> CategoryMap = new Dictionary<string, ulong>();
 
@@ -220,7 +534,7 @@ namespace SecondBotEvents.Services
             {
                 { "status", StatusPrefill() },
                 { "commands", "Send a command to the bot as if you are a master" },
-                { "localchat", "Talk and view localchat" }
+                { "localchat", LocalChatPrefill() }
             };
 
             SocketGuild server = DiscordClient.GetGuild(myConfig.GetServerID());
@@ -240,9 +554,9 @@ namespace SecondBotEvents.Services
 
             List<string> WantedCategoryChannels = new List<string>
             {
-                "Bot",
-                "IM",
-                "Group"
+                "bot",
+                "im",
+                "group"
             };
             foreach (ICategoryChannel category in server.CategoryChannels)
             {
@@ -260,16 +574,28 @@ namespace SecondBotEvents.Services
             }
             foreach(KeyValuePair<string,string> a in WantedTextChannels)
             {
-                createTextChannel(a.Key, a.Value, "Bot");
+                createTextChannel(a.Key, a.Value, "bot");
             }
             DiscordServerChannelsSetup = true;
         }
 
-        protected async void createTextChannel(string ChannelName, string ChannelInfo,  string Group)
+        protected void createTextChannel(string ChannelName, string ChannelInfo,  string Group, bool SkipDelay = false)
         {
             SocketGuild server = DiscordClient.GetGuild(myConfig.GetServerID());
-            IGuildChannel channel = await server.CreateTextChannelAsync(ChannelName, X => DiscordGetNewChannelProperies(X, ChannelName, ChannelInfo, Group));
-            ChannelMap.Add(channel.Name, channel.Id);
+            Group = Group.ToLower();
+            IGuildChannel channel = server.CreateTextChannelAsync(ChannelName, X => DiscordGetNewChannelProperies(X, ChannelName, ChannelInfo, Group)).GetAwaiter().GetResult();
+            lock (ChannelMap)
+            {
+                if (ChannelMap.ContainsKey(ChannelName) == true)
+                {
+                    ChannelMap.Remove(ChannelName);
+                }
+                ChannelMap.Add(ChannelName, channel.Id);
+            }
+            if (SkipDelay == false)
+            {
+                Thread.Sleep(500); // wait 300ms for channel to be ready
+            }
         }
 
         protected void DiscordGetNewChannelProperies(TextChannelProperties C, string channelname, string channeltopic, string catname)
@@ -287,20 +613,22 @@ namespace SecondBotEvents.Services
 
         protected void GroupIMChat(UUID group, string name, string message)
         {
+            string groupname = master.DataStoreService.GetGroupName(group);
+            if(groupname == "lookup")
+            {
+                return;
+            }
+            SendMessageToChannel(groupname, GroupPrefill(group), name + ": " + message, "group");
         }
 
         protected void AvatarIMChat(UUID avatar, string name, string message)
         {
-
+            SendMessageToChannel(name.ToLower().Replace(" ",""), "avatar=" + avatar.ToString() + "||| !close !offertp !clear", name+":"+message, "im");
         }
 
         protected void ObjectIMChat(string objectName, string message)
         {
-
-        }
-
-        protected void StatusChat(string message)
-        {
+            SendMessageToChannel("localchat", LocalChatPrefill(), ":white_small_square: "+ objectName + ": " + message, "bot");
         }
 
         readonly string[] hard_blocked_agents = new[] { "secondlife", "second life" };
@@ -335,7 +663,7 @@ namespace SecondBotEvents.Services
                         {
                             source = ":dart:";
                         }
-                        SendMessageToChannel("localchat", "Talk and view localchat", source + "" + e.FromName + ": " + e.Message);
+                        SendMessageToChannel("localchat", LocalChatPrefill(), source + "" + e.FromName + ": " + e.Message, "bot");
                         break;
                     }
                 default:
@@ -345,14 +673,19 @@ namespace SecondBotEvents.Services
             }
         }
 
+        protected string LocalChatPrefill()
+        {
+            return "Talk and view localchat !clear";
+        }
+
         protected bool AcceptMessageSigned(string message)
         {
             return false;
         }
 
-        public ulong SendMessageToChannel(string ChannelName, string ChannelInfo, string message)
+        public ulong SendMessageToChannel(string ChannelName, string ChannelInfo, string message, string group)
         {
-            return SendMessageToChannel(GetChannel(ChannelName, ChannelInfo, message), message);
+            return SendMessageToChannel(GetChannel(ChannelName, ChannelInfo, group), message);
         }
 
         public ulong SendMessageToChannel(ITextChannel channel, string message)
@@ -361,14 +694,69 @@ namespace SecondBotEvents.Services
             return reply.Id;
         }
 
-        protected ITextChannel GetChannel(string ChannelName, string ChannelInfo, string Group)
+        protected string GetChannelName(string input)
         {
-            if(ChannelMap.ContainsKey(ChannelName) == true)
+            input = input.Replace("-", "");
+            string DiscordChannelName = input.ToLower();
+            DiscordChannelName = Regex.Replace(DiscordChannelName, "[^a-z0-9 ]", "");
+            DiscordChannelName = DiscordChannelName.Replace(" ", "-");
+            string old = "";
+            while (old != DiscordChannelName)
             {
-                return (ITextChannel) DiscordClient.GetChannel(ChannelMap[ChannelName]);
+                old = DiscordChannelName;
+                DiscordChannelName = DiscordChannelName.Replace("--", "-");
             }
-            createTextChannel(ChannelName, ChannelInfo, Group);
-            return (ITextChannel)DiscordClient.GetChannel(ChannelMap[ChannelName]);
+            return DiscordChannelName;
+        }
+
+        protected ITextChannel GetChannel(string ChannelName, string ChannelInfo, string Group, bool SkipDelay=false)
+        {
+            // known channel?
+            ChannelName = GetChannelName(ChannelName);
+            if (ChannelMap.ContainsKey(ChannelName) == true)
+            {
+                ITextChannel KwownChannel = (ITextChannel)DiscordClient.GetChannel(ChannelMap[ChannelName]);
+                if(KwownChannel != null)
+                {
+                    return KwownChannel;
+                }
+            }
+            // Channel already on server?
+            SocketGuild server = DiscordClient.GetGuild(myConfig.GetServerID());
+            Group = Group.ToLower();
+            bool found = false;
+            foreach (ITextChannel E in server.TextChannels)
+            {
+                if (ulong.TryParse(E.CategoryId.ToString(), out ulong CategoryId) == false)
+                {
+                    continue;
+                }
+                string CatName = MapCatToName(CategoryId);
+                if (CatName != Group)
+                {
+                    // not in the group we are looking for continue
+                    continue;
+                }
+                if (E.Name == ChannelName)
+                {
+                    lock (ChannelMap)
+                    {
+                        if (ChannelMap.ContainsKey(ChannelName) == true)
+                        {
+                            ChannelMap.Remove(ChannelName);
+                        }
+                        ChannelMap.Add(ChannelName, E.Id);
+                    }
+                    found = true;
+                    break;
+                }
+            }
+            if (found == false)
+            {
+                // create the channel
+                createTextChannel(ChannelName, ChannelInfo, Group, SkipDelay);
+            }
+            return (ITextChannel)DiscordClient.GetChannelAsync(ChannelMap[ChannelName]).GetAwaiter().GetResult();
         }
 
         protected ulong LastStatusMessageId = 0;
@@ -430,6 +818,7 @@ namespace SecondBotEvents.Services
             GetClient().Network.SimConnected -= BotLoggedIn;
             GetClient().Self.IM += BotImMessage;
             GetClient().Self.ChatFromSimulator += LocalChat;
+            GetClient().Groups.CurrentGroups += GroupCurrent;
             Console.WriteLine("Discord service [Avi link - Active]");
         }
 
