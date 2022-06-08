@@ -40,6 +40,40 @@ namespace SecondBotEvents.Services
 
         protected long lastCleanupKeyValueStore = 0;
         protected long lastCleanupAvatarStore = 0;
+
+        public bool GetIsGroup(UUID MaybeGroupUUID)
+        {
+            return groupsKey2Name.ContainsKey(MaybeGroupUUID);
+        }
+
+        public string GetGroupName(UUID group)
+        {
+            if (groupsKey2Name.ContainsKey(group) == true)
+            {
+                return groupsKey2Name[group];
+            }
+            string reply = "lookup";
+            AutoResetEvent fetchEvent = new AutoResetEvent(false);
+            void callback(object sender, CurrentGroupsEventArgs e)
+            {
+                foreach(KeyValuePair<UUID,Group> entry in e.Groups)
+                {
+                    if(entry.Value.ID == group)
+                    {
+                        reply = entry.Value.Name;
+                        fetchEvent.Set();
+                        break;
+                    }
+                }
+            }
+            GetClient().Groups.CurrentGroups += callback;
+            GetClient().Groups.RequestCurrentGroups();
+
+            fetchEvent.WaitOne(1000, false);
+            GetClient().Groups.CurrentGroups -= callback;
+            return reply;
+
+        }
         public override string Status()
         {
             if (myConfig == null)
@@ -365,7 +399,7 @@ namespace SecondBotEvents.Services
             }
         }
 
-        protected void CloseChat(UUID owner)
+        public void CloseChat(UUID owner)
         {
             lock (chatWindows)
             {
