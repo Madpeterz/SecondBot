@@ -212,7 +212,10 @@ namespace SecondBotEvents.Services
 
         public KeyValuePair<bool, string> RunCommand(SignedCommand C)
         {
-
+            if(acceptNewCommands == false)
+            {
+                return new KeyValuePair<bool, string>(false, "Not accepting commands");
+            }
             try
             {
                 string lowerName = C.command.ToLower();
@@ -324,13 +327,18 @@ namespace SecondBotEvents.Services
             }
             Vaildate(requireTimewindow, windowSize, secret);
         }
-        public SignedCommand(string setCommand, string setSigningCode, string[] setArgs, int setUnixtime, string setReplyTarget, bool requireTimewindow, int windowSize, string secret)
+        public SignedCommand(string setCommand, string setSigningCode, string[] setArgs, int setUnixtime, string setReplyTarget, bool requireTimewindow, int windowSize, string secret, bool requireSigning = true)
         {
             command = setCommand;
             signingCode = setSigningCode;
             args = setArgs;
             unixtimeOfCommand = setUnixtime;
             replyTarget = setReplyTarget;
+            if (requireSigning == false)
+            {
+                accepted = true; // just accept the command
+                return;
+            }
             Vaildate(requireTimewindow, windowSize, secret);
         }
 
