@@ -381,6 +381,16 @@ namespace BetterSecondBotShared.bottypes
             Debug("RequestTeleport proc not overridden");
         }
 
+        protected virtual void MoneyEventReplyHandler(object sender, MoneyBalanceReplyEventArgs e)
+        {
+            Debug("MoneyEventReplyHandler proc not overridden");
+        }
+
+        protected virtual void MoneyEventHandler(object sender, BalanceEventArgs e)
+        {
+            Debug("MoneyEventHandler proc not overridden");
+        }
+
         protected virtual void ChatInputHandler(object sender, ChatEventArgs e)
         {
             Debug("ChatInputHandler proc not overridden");

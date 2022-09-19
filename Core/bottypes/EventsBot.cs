@@ -164,6 +164,7 @@ namespace BetterSecondBot.bottypes
 
         private EventHandler<SimChangedEventArgs> _ChangeSim;
         private EventHandler<AlertMessageEventArgs> _AlertMessage;
+        private EventHandler<MoneyBalanceReplyEventArgs> _MoneyUpdate;
         private EventHandler<LoginProgressEventArgs> _LoginProgess;
         private EventHandler<NextHomeRegionArgs> _NextHomeRegion;
         private EventHandler<MessageEventArgs> _MessageEvent;
@@ -174,6 +175,7 @@ namespace BetterSecondBot.bottypes
 
         private readonly object _ChangeSimLock = new object();
         private readonly object _AlertMessageLock = new object();
+        private readonly object _MoneyUpdateLock = new object();
         private readonly object _LoginProgressLock = new object();
         private readonly object _NextHomeRegionLock = new object();
         private readonly object _MessageEventLock = new object();
@@ -193,11 +195,20 @@ namespace BetterSecondBot.bottypes
             remove { lock (_ChangeSimLock) { _ChangeSim -= value; } }
         }
 
+
+        public event EventHandler<MoneyBalanceReplyEventArgs> MoneyUpdateEvent
+        {
+            add { lock (_MoneyUpdateLock) { _MoneyUpdate += value; } }
+            remove { lock (_MoneyUpdateLock) { _MoneyUpdate -= value; } }
+        }
+
         public event EventHandler<AlertMessageEventArgs> AlertMessage
         {
             add { lock (_AlertMessageLock) { _AlertMessage += value; } }
             remove { lock (_AlertMessageLock) { _AlertMessage -= value; } }
         }
+
+
         public event EventHandler<LoginProgressEventArgs> LoginProgess
         {
             add { lock (_LoginProgressLock) { _LoginProgess += value; } }
@@ -235,6 +246,8 @@ namespace BetterSecondBot.bottypes
             add { lock (_TrackerUpdateEventLock) { _TrackerEvent += value; } }
             remove { lock (_TrackerUpdateEventLock) { _TrackerEvent -= value; } }
         }
+
+
 
         protected void On_TrackerUpdateEvent(TrackerEventArgs e)
         {
@@ -298,6 +311,12 @@ namespace BetterSecondBot.bottypes
         protected void AlertEvent(object sender, AlertMessageEventArgs e)
         {
             EventHandler<AlertMessageEventArgs> handler = _AlertMessage;
+            handler?.Invoke(this, e);
+        }
+
+        protected void MoneyEvent(object sender, MoneyBalanceReplyEventArgs e)
+        {
+            EventHandler<MoneyBalanceReplyEventArgs> handler = _MoneyUpdate;
             handler?.Invoke(this, e);
         }
 
@@ -441,6 +460,8 @@ namespace BetterSecondBot.bottypes
         {
             if (reconnect == false)
             {
+                Client.Self.MoneyBalanceReply += MoneyEventReplyHandler;
+                Client.Self.MoneyBalance += MoneyEventHandler;
                 Client.Self.ChatFromSimulator += ChatInputHandler;
                 Client.Self.IM += MessageHandler;
                 Client.Groups.CurrentGroups += GroupsHandler;
@@ -476,6 +497,11 @@ namespace BetterSecondBot.bottypes
                     InventoryUpdateEvent(A);
                 }
             }
+        }
+
+        protected override void MoneyEventReplyHandler(object sender, MoneyBalanceReplyEventArgs e)
+        {
+            MoneyEvent(this, e);
         }
 
         protected virtual void InventoryUpdateEvent(jsonInventoryUpdate A)

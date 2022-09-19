@@ -686,6 +686,7 @@ namespace BetterSecondbot.OnEvents
             controler.getBot().ChangeSimEvent += changeSim;
             controler.getBot().TrackerEvent += trackerEvent;
             controler.getBot().AlertMessage += alertMessage;
+            controler.getBot().MoneyUpdateEvent += moneyEvent;
             
             controler.getBot().GetClient.Groups.GroupMembersReply += groupMembershipUpdate;
             controler.getBot().GetClient.Groups.GroupMemberEjected += groupMembershipUpdateEject;
@@ -961,6 +962,20 @@ namespace BetterSecondbot.OnEvents
             Dictionary<string, string> args = new Dictionary<string, string>();
             args.Add("message ", e.Message);
             TriggerEvent("SimAlertMessage", args);
+        }
+
+        protected void moneyEvent(object o, MoneyBalanceReplyEventArgs e)
+        {
+            Dictionary<string, string> args = new Dictionary<string, string>();
+            args.Add("balance", e.Balance.ToString());
+            args.Add("amount", e.TransactionInfo.Amount.ToString());
+            args.Add("touuid", e.TransactionInfo.DestID.ToString());
+            args.Add("fromuuid", e.TransactionInfo.SourceID.ToString());
+            args.Add("fromname", controler.getBot().FindAvatarKey2Name(e.TransactionInfo.SourceID));
+            args.Add("toname", controler.getBot().FindAvatarKey2Name(e.TransactionInfo.DestID));
+            args.Add("transactionid", e.TransactionID.ToString());
+            args.Add("description", e.Description);
+            TriggerEvent("MoneyEvent", args);
         }
 
         protected void changeSim(object o, SimChangedEventArgs e)
