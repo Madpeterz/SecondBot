@@ -15,6 +15,14 @@ namespace SecondBotEvents.Services
 
         public GridClient GetClient()
         {
+            if(master == null)
+            {
+                return null;
+            } 
+            else if(master.BotClient == null)
+            {
+                return null;
+            }
             return master.BotClient.client;
         }
         public virtual string Status()

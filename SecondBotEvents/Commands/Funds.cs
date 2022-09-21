@@ -47,7 +47,8 @@ namespace SecondBotEvents.Commands
             }
             if ((amountvalue < 0) || (amountvalue > GetClient().Self.Balance))
             {
-                return Failure("Amount out of range", new [] { avatar, amount });
+                GetClient().Self.RequestBalance();
+                return Failure("Amount out of range current max: "+ GetClient().Self.Balance.ToString(), new [] { avatar, amount });
             }
             GetClient().Self.GiveAvatarMoney(avataruuid, amountvalue);
             return BasicReply("Accepted", new [] { avatar, amount });

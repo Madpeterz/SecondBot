@@ -583,6 +583,23 @@ namespace SecondBotEvents.Services
             return true;
         }
 
+        public void GetAvatarNames(List<UUID> avatars)
+        {
+            List<UUID> lookup = new List<UUID>();
+            foreach (UUID id in avatars)
+            {
+                if (avatarsName2Key.ContainsValue(id) == false)
+                {
+                    lookup.Add(id);
+                }
+            }
+            if(lookup.Count == 0)
+            {
+                return;
+            }
+            GetClient().Avatars.RequestAvatarNames(lookup);
+        }
+
         public string GetAvatarName(UUID avatarId)
         {
             string reply = "lookup";
@@ -856,6 +873,7 @@ namespace SecondBotEvents.Services
             GetClient().Groups.RequestCurrentGroups();
             botConnected = true;
             Console.WriteLine("DataStore Service [Active]");
+            GetAvatarName(GetClient().Self.AgentID);
         }
         readonly string[] hard_blocked_agents = new[] { "secondlife", "second life" };
         protected void ChatFromSim(object o, ChatEventArgs e)
