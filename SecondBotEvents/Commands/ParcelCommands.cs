@@ -515,9 +515,7 @@ namespace SecondBotEvents.Commands
             }
             foreach (ParcelAccessEntry e in targetparcel.AccessBlackList)
             {
-                // @todo add avatar key to name
-                string name = "?";
-                reply.entrys.Add(e.AgentID, name);
+                reply.entrys.Add(e.AgentID, master.DataStoreService.GetAvatarName(e.AgentID));
             }
             reply.reportedEntrys = targetparcel.AccessBlackList.Count;
             reply.delay = delays * 1000;
