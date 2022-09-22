@@ -46,6 +46,12 @@ namespace SecondBotEvents.Services
         protected bool attemptedTeleportBackup = false;
         protected long teleportActionLockout = 0;
 
+        public void GoHome()
+        {
+            attemptedTeleportHome = true;
+            LogFormater.Info("Teleporting to home sim");
+            GetClient().Self.Teleport(home.name, new Vector3(home.x, home.y, home.z), new Vector3(0, 0, 0));
+        }
         protected void Tick()
         {
             if (evacWanted == true)
@@ -90,9 +96,7 @@ namespace SecondBotEvents.Services
             teleportActionLockout = SecondbotHelpers.UnixTimeNow();
             if (attemptedTeleportHome == false)
             {
-                attemptedTeleportHome = true;
-                LogFormater.Info("Teleporting to home sim");
-                GetClient().Self.Teleport(home.name, new Vector3(home.x, home.y, home.z), new Vector3(0, 0, 0));
+                GoHome();
                 return;
             }
             else if(attemptedTeleportBackup == false)
