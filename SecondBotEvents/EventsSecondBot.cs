@@ -37,6 +37,7 @@ namespace SecondBotEvents
         public DataStoreService DataStoreService { get { return (DataStoreService)GetService("DataStoreService"); } }
         public HomeboundService HomeboundService { get { return (HomeboundService)GetService("HomeboundService"); } }
         public EventsService EventsService { get { return (EventsService)GetService("EventsService"); } }
+        public DialogService DialogService { get { return (DialogService)GetService("DialogService"); } }
 
 
         private EventHandler<SystemStatusMessage> SystemStatusMessages;
@@ -147,6 +148,7 @@ namespace SecondBotEvents
             RegisterService("InteractionService");
             RegisterService("HomeboundService");
             RegisterService("EventsService");
+            RegisterService("DialogService");
             if (BotClient.IsLoaded() == false)
             {
                 Console.WriteLine("Config is not loaded :(");

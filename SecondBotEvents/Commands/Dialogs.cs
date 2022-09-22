@@ -1,4 +1,5 @@
-﻿using SecondBotEvents.Services;
+﻿using OpenMetaverse;
+using SecondBotEvents.Services;
 
 
 namespace SecondBotEvents.Commands
@@ -8,21 +9,68 @@ namespace SecondBotEvents.Commands
         public Dialogs(EventsSecondBot setmaster) : base(setmaster)
         {
         }
-        [About("Updates the relay target (you can have 1 of each type)<br/>Clear will disable them all")]
-        [ReturnHints("cleared")]
-        [ReturnHints("set/avatar [ok]")]
-        [ReturnHints("set/http [ok]")]
-        [ReturnHints("set/channel [ok]")]
-        [ReturnHintsFailure("Not a vaild option")]
-        [ArgHints("target", "Options: Channel (Any number),Avatar UUID,HTTPurl<br/>Clear")]
-        public object DialogRelay(string target)
+
+        [About("adds a avatar dialog relay target [or removes if it exists]")]
+        [ReturnHints("added")]
+        [ReturnHints("removed")]
+        [ReturnHintsFailure("unable to find avatar")]
+        [ReturnHintsFailure("looking up avatar please try again")]
+        [ArgHints("avatar", "the UUID or avatar name to add")]
+        public object DialogRelayAvatarTarget(string avatar)
         {
-            return Failure("@todo dialog relay");
+            if(UUID.TryParse(avatar, out UUID avUUID) == false)
+            {
+                string avataruuid = master.DataStoreService.GetAvatarUUID(avatar);
+                if (avataruuid == "lookup")
+                {
+                    return Failure("looking up avatar please try again");
+                }
+                if (UUID.TryParse(avataruuid, out avUUID) == false)
+                {
+                    return Failure("unable to find avatar");
+                }
+            }
+            return BasicReply(master.DialogService.AvatarRelayTarget(avUUID));
         }
 
+        [About("adds a chat dialog relay target [or removes if it exists]")]
+        [ReturnHints("added")]
+        [ReturnHints("removed")]
+        [ReturnHintsFailure("channel must be zero or more")]
+        [ReturnHintsFailure("channel is not vaild")]
+        [ArgHints("channel", "a number >= 0")]
+        public object DialogRelayChatTarget(string channel)
+        {
+            if (int.TryParse(channel, out int channelnum) == false)
+            {
+                return Failure("channel is not vaild");
+            }
+            if(channelnum < 0)
+            {
+                return Failure("channel must be zero or more");
+            }
+            return BasicReply(master.DialogService.ChannelRelayTarget(channelnum));
+        }
+
+        [About("adds a http dialog relay target [or removes if it exists]")]
+        [ReturnHints("added")]
+        [ReturnHints("removed")]
+        [ReturnHintsFailure("url must start with http")]
+        [ArgHints("url", "a vaild http url")]
+        public object DialogRelayHttpTarget(string url)
+        {
+            if(url.StartsWith("http") == false)
+            {
+                return Failure("url must start with http");
+            }
+            return BasicReply(master.DialogService.HttpRelayTarget(url));
+        }
+
+
         [About("Makes the bot interact with the dialog [dialogid] with the button [buttontext]")]
-        [ReturnHints("true")]
-        [ReturnHints("false")]
+        [ReturnHints("action")]
+        [ReturnHintsFailure("Invaild dialog window")]
+        [ReturnHintsFailure("Invaild dialog button")]
         [ReturnHintsFailure("bad dialog id")]
         [ArgHints("dialogid", "The ID for the dialog")]
         [ArgHints("buttontext", "The button text to push")]
@@ -32,20 +80,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("bad dialog id", new [] { dialogid, buttontext });
             }
-            return Failure("@todo dialog relay");
-        }
-
-        [About("Should the bot track dialogs and send them to the relays setup?")]
-        [ReturnHints("updated")]
-        [ReturnHintsFailure("bad status")]
-        [ArgHints("status", "true or false")]
-        public object DialogTrack(string status)
-        {
-            if (bool.TryParse(status, out bool statuscode) == false)
-            {
-                return Failure("bad status", new [] { status });
-            }
-            return Failure("@todo dialog relay");
+            return BasicReply(master.DialogService.DialogAction(dialogidnum, buttontext));
         }
 
     }
