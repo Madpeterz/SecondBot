@@ -163,6 +163,11 @@ namespace SecondBotEvents.Services
             }
         }
 
+        public List<CommandHistory> GetCommandHistory()
+        {
+            return commandHistories;
+        }
+
         public string GetKeyValue(string key)
         {
             lock (KeyValueStore)
