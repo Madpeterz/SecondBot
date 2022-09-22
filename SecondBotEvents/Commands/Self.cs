@@ -1,4 +1,5 @@
-﻿using OpenMetaverse;
+﻿using Newtonsoft.Json;
+using OpenMetaverse;
 using SecondBotEvents.Services;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,8 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         public object GoHome()
         {
-            return Failure("@todo home system");
+            master.HomeboundService.GoHome();
+            return BasicReply("ok");
         }
 
         [About("Makes the bot turn to face a avatar and point at it (if found)")]
@@ -145,11 +147,20 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok");
         }
 
-        [About("Gets the last commands issued to the bot")]
+        [About("Gets the last 5 commands issued to the bot")]
         [ReturnHints("list of commands")]
         public object GetLastCommands(string token)
         {
-            return Failure("@todo command storage");
+            List<string> reply = new List<string>();
+            foreach(CommandHistory A in master.DataStoreService.GetCommandHistory())
+            {
+                reply.Add(JsonConvert.SerializeObject(A));
+                if(reply.Count >= 5)
+                {
+                    break;
+                }
+            }
+            return BasicReply("ok", reply.ToArray<string>());
         }
 
         [About("Sets the bot to accept a request type from the avatar (or a object owned by the avatar)\n " +
