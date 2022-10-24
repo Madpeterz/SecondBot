@@ -14,6 +14,8 @@ namespace SecondBotEvents.Config
         protected List<string> settings = new List<string>();
         protected string filename = "config";
         protected bool loaded = false;
+        protected bool tryLoadfromEnv = false;
+
         public Config(bool fromENV, string fromFolder="")
         {
             MakeSettings();
@@ -29,6 +31,7 @@ namespace SecondBotEvents.Config
         {
             if(fromENV == true)
             {
+                tryLoadfromEnv = true;
                 LoadSettingsFromEnv();
                 return;
             }
@@ -88,14 +91,7 @@ namespace SecondBotEvents.Config
         {
             foreach (string setting in settings)
             {
-                string key = filename + "_" + setting;
-                string value = Environment.GetEnvironmentVariable(key);
-                if (SecondbotHelpers.notempty(value) == false)
-                {
-                    mysettings.Add(setting, "");
-                    continue;
-                }
-                mysettings.Add(setting, value);
+                TryLoadSetting(setting);
             }
             loaded = true;
         }
@@ -105,11 +101,31 @@ namespace SecondBotEvents.Config
 
         }
 
+        protected bool TryLoadSetting(string setting)
+        {
+            if(tryLoadfromEnv == false)
+            {
+                return false;
+            }
+            string key = filename + "_" + setting;
+            string value = Environment.GetEnvironmentVariable(key);
+            if(value == null)
+            {
+                return false;
+            }
+            mysettings.Add(setting, value);
+            return true;
+
+        }
+
         protected string ReadSettingAsString(string key, string defaultValue)
         {
             if (mysettings.ContainsKey(key) == false)
             {
-                return defaultValue;
+                if(TryLoadSetting(key) == false)
+                {
+                    return defaultValue;
+                }
             }
             return mysettings[key];
         }

@@ -39,6 +39,8 @@ namespace SecondBotEvents
         public EventsService EventsService { get { return (EventsService)GetService("EventsService"); } }
         public DialogService DialogService { get { return (DialogService)GetService("DialogService"); } }
 
+        public CustomCommandsService CustomCommandsService { get { return (CustomCommandsService)GetService("CustomCommandsService"); } }
+
 
         private EventHandler<SystemStatusMessage> SystemStatusMessages;
         public event EventHandler<SystemStatusMessage> SystemStatusMessagesEvent
@@ -46,6 +48,7 @@ namespace SecondBotEvents
             add { lock (SystemStatusMessagesEventsLockable) { SystemStatusMessages += value; } }
             remove { lock (SystemStatusMessagesEventsLockable) { SystemStatusMessages -= value; } }
         }
+
         private readonly object SystemStatusMessagesEventsLockable = new object();
 
         public void TriggerSystemStatusMessageEvent(bool change, string message)
@@ -149,6 +152,7 @@ namespace SecondBotEvents
             RegisterService("HomeboundService");
             RegisterService("EventsService");
             RegisterService("DialogService");
+            RegisterService("CustomCommandsService");
             if (BotClient.IsLoaded() == false)
             {
                 Console.WriteLine("Config is not loaded :(");

@@ -144,30 +144,7 @@ namespace SecondBotEvents.Services
             }
         }
 
-        protected void BotClientRestart(object o, BotClientNotice e)
-        {
-            Console.WriteLine("Dialog service [Attached to new client]");
-            GetClient().Network.LoggedOut += BotLoggedOut;
-            GetClient().Network.SimConnected += BotLoggedIn;
-        }
 
-        protected void BotLoggedOut(object o, LoggedOutEventArgs e)
-        {
-            GetClient().Network.SimConnected += BotLoggedIn;
-            Console.WriteLine("Dialog service [waiting for new client]");
-            if (GetClient() != null)
-            {
-                GetClient().Self.ScriptDialog -= DialogWindowEvent;
-            }
-        }
-
-        protected void BotLoggedIn(object o, SimConnectedEventArgs e)
-        {
-            GetClient().Network.SimConnected -= BotLoggedIn;
-            botConnected = true;
-            // attach events
-            GetClient().Self.ScriptDialog += DialogWindowEvent;
-        }
 
         protected Dictionary<int, ScriptDialogEventArgs> DialogWindows = new Dictionary<int, ScriptDialogEventArgs>();
         protected Dictionary<int, long> DialogWindowsExpire = new Dictionary<int, long>();
@@ -214,8 +191,31 @@ namespace SecondBotEvents.Services
             }
         }
 
-       
 
+        protected void BotClientRestart(object o, BotClientNotice e)
+        {
+            Console.WriteLine("Dialog service [Attached to new client]");
+            GetClient().Network.LoggedOut += BotLoggedOut;
+            GetClient().Network.SimConnected += BotLoggedIn;
+        }
+
+        protected void BotLoggedOut(object o, LoggedOutEventArgs e)
+        {
+            GetClient().Network.SimConnected += BotLoggedIn;
+            Console.WriteLine("Dialog service [waiting for new client]");
+            if (GetClient() != null)
+            {
+                GetClient().Self.ScriptDialog -= DialogWindowEvent;
+            }
+        }
+
+        protected void BotLoggedIn(object o, SimConnectedEventArgs e)
+        {
+            GetClient().Network.SimConnected -= BotLoggedIn;
+            botConnected = true;
+            // attach events
+            GetClient().Self.ScriptDialog += DialogWindowEvent;
+        }
 
         public override void Start()
         {

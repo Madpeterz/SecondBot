@@ -132,21 +132,27 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            SignedCommand C = new SignedCommand(e.IM.Message,
-                requireSigning, 
-                myConfig.GetEnforceTimeWindow(), 
+            CommandInterfaceCaller(e.IM.Message, requireSigning);
+        }
+
+        public KeyValuePair<bool, string> CommandInterfaceCaller(string message, bool requireSigning=false, bool viaCustomCommand=false)
+        {
+            SignedCommand C = new SignedCommand(message,
+                requireSigning,
+                myConfig.GetEnforceTimeWindow(),
                 myConfig.GetTimeWindowSecs(),
                 myConfig.GetSharedSecret()
             );
             if (C.accepted == false)
             {
-                return;
+                return new KeyValuePair<bool, string>(false, "Not accepted via signing");
             }
-            KeyValuePair<bool, string> reply = RunCommand(C);
-            if(C.replyTarget != null)
+            KeyValuePair<bool, string> reply = RunCommand(C, viaCustomCommand);
+            if (C.replyTarget != null)
             {
                 SmartCommandReply(C.replyTarget, reply.Value, C.command);
             }
+            return reply;
         }
 
         public void SmartCommandReply(string target, string output, string command)
@@ -210,21 +216,10 @@ namespace SecondBotEvents.Services
         }
         protected HttpClient HTTPclient = new HttpClient();
 
-        public KeyValuePair<bool, string> RunCommand(SignedCommand C)
+        protected KeyValuePair<bool, string> RunBaseCommand(SignedCommand C)
         {
-            if(acceptNewCommands == false)
-            {
-                return new KeyValuePair<bool, string>(false, "Not accepting commands");
-            }
             try
             {
-                string lowerName = C.command.ToLower();
-                if(commandnameLowerToReal.ContainsKey(lowerName) == false)
-                {
-                    return new KeyValuePair<bool, string>(false, "Unknown command");
-                }
-                C.command = commandnameLowerToReal[lowerName];
-
                 CommandsAPI Endpoint = commandEndpoints[endpointcommandmap[C.command]];
                 MethodInfo theMethod = Endpoint.GetType().GetMethod(C.command);
                 if (theMethod != null)
@@ -258,6 +253,36 @@ namespace SecondBotEvents.Services
                     return new KeyValuePair<bool, string>(status, reply);
                 }
                 return new KeyValuePair<bool, string>(false, "theMethod is null");
+            }
+            catch (Exception e)
+            {
+                return new KeyValuePair<bool, string>(false, e.Message);
+            }
+        }
+        public KeyValuePair<bool, string> RunCommand(SignedCommand C, bool inCustomCommand=false)
+        {
+            if(acceptNewCommands == false)
+            {
+                return new KeyValuePair<bool, string>(false, "Not accepting commands");
+            }
+            try
+            {
+                string lowerName = C.command.ToLower();
+                if(commandnameLowerToReal.ContainsKey(lowerName) == false)
+                {
+                    return new KeyValuePair<bool, string>(false, "Unknown command");
+                }
+                C.command = commandnameLowerToReal[lowerName];
+                if(master.CustomCommandsService.HasCommand(C.command) == false)
+                {
+                    if(inCustomCommand == true)
+                    {
+                        return new KeyValuePair<bool, string>(false, "Custom command chaining is not allowed");
+                    }
+                    return master.CustomCommandsService.RunCommand(C);
+                }
+                return RunBaseCommand(C);
+
             }
             catch (Exception e)
             {
