@@ -368,35 +368,38 @@ namespace BetterSecondBot.bottypes
 
         protected void cleanupAvatarStorage()
         {
-            List<string> PurgeAvatars = new List<string>();
-            long now = helpers.UnixTimeNow();
-            foreach (KeyValuePair<string, long> entry in AvatarStorageLastUsed)
-            {
-                long dif = now - entry.Value;
-                if(dif > max_db_storage_age)
-                {
-                    if (PurgeAvatars.Contains(entry.Key) == false)
-                    {
-                        PurgeAvatars.Add(entry.Key);
-                    }
-                }
-            }
             lock (AvatarName2Key)
             {
                 lock (AvatarStorageLastUsed)
                 {
-                    foreach (string purge in PurgeAvatars)
+                    lock (AvatarKey2Name)
                     {
-                        if (purge != myconfig.Security_MasterUsername)
+                        List<string> PurgeAvatars = new List<string>();
+                        long now = helpers.UnixTimeNow();
+                        foreach (KeyValuePair<string, long> entry in AvatarStorageLastUsed)
                         {
-                            if (AvatarStorageLastUsed.ContainsKey(purge) == true)
+                            long dif = now - entry.Value;
+                            if (dif > max_db_storage_age)
                             {
-                                if (AvatarName2Key.ContainsKey(purge) == true)
+                                if (PurgeAvatars.Contains(entry.Key) == false)
                                 {
-                                    AvatarStorageLastUsed.Remove(purge);
-                                    UUID avuuid = AvatarName2Key[purge];
-                                    AvatarName2Key.Remove(purge);
-                                    AvatarKey2Name.Remove(avuuid);
+                                    PurgeAvatars.Add(entry.Key);
+                                }
+                            }
+                        }
+                        foreach (string purge in PurgeAvatars)
+                        {
+                            if (purge != myconfig.Security_MasterUsername)
+                            {
+                                if (AvatarStorageLastUsed.ContainsKey(purge) == true)
+                                {
+                                    if (AvatarName2Key.ContainsKey(purge) == true)
+                                    {
+                                        AvatarStorageLastUsed.Remove(purge);
+                                        UUID avuuid = AvatarName2Key[purge];
+                                        AvatarName2Key.Remove(purge);
+                                        AvatarKey2Name.Remove(avuuid);
+                                    }
                                 }
                             }
                         }
