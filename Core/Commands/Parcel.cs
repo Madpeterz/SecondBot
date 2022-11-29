@@ -57,7 +57,7 @@ namespace BetterSecondBot.HttpService
             targetparcel.AuthBuyerID = avataruuid;
             parcel_static.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
             parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
-            targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+            targetparcel.Update(bot.GetClient, bot.GetClient.Network.CurrentSim, false);
             return Failure("ok", "SetParcelSale", new [] { amount, avatar });
         }
 
@@ -106,7 +106,7 @@ namespace BetterSecondBot.HttpService
             }
             targetparcel.Landing = LandingType.LandingPoint;
             targetparcel.UserLocation = new Vector3(X, Y, Z);
-            targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+            targetparcel.Update(bot.GetClient, bot.GetClient.Network.CurrentSim, false);
             return BasicReply("ok", "SetParcelLandingZone", new [] { x, y, z });
         }
 
@@ -130,7 +130,7 @@ namespace BetterSecondBot.HttpService
                 return Failure("Parcel name is empty", "SetParcelName", new [] { name });
             }
             targetparcel.Name = name;
-            targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+            targetparcel.Update(bot.GetClient, bot.GetClient.Network.CurrentSim, false);
             return BasicReply("ok", "SetParcelName", new [] { name });
         }
 
@@ -148,7 +148,7 @@ namespace BetterSecondBot.HttpService
                 return Failure(tests.Value, "SetParcelDesc", new [] { desc });
             }
             targetparcel.Desc = desc;
-            targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+            targetparcel.Update(bot.GetClient, bot.GetClient.Network.CurrentSim, false);
             return BasicReply("ok", "SetParcelDesc", new [] { desc });
         }
 
@@ -262,7 +262,7 @@ namespace BetterSecondBot.HttpService
             entry.Flags = AccessList.Ban;
             entry.Time = new System.DateTime(3030, 03, 03);
             targetparcel.AccessBlackList.Add(entry);
-            targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+            targetparcel.Update(bot.GetClient, bot.GetClient.Network.CurrentSim, false);
             return BasicReply("ok", "ParcelBan", new [] { avatar });
         }
 
@@ -302,7 +302,7 @@ namespace BetterSecondBot.HttpService
                 return BasicReply("Avatar is already unbanned", "ParcelUnBan", new [] { avatar });
             }
             targetparcel.AccessBlackList.Remove(removeentry);
-            targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+            targetparcel.Update(bot.GetClient, bot.GetClient.Network.CurrentSim, false);
             return BasicReply("ok", "ParcelUnBan", new [] { avatar });
         }
 
@@ -382,7 +382,7 @@ namespace BetterSecondBot.HttpService
                     parcel_static.ParcelSetFlag(flags[cfg.Key], targetparcel, cfg.Value);
                 }
             }
-            targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+            targetparcel.Update(bot.GetClient, bot.GetClient.Network.CurrentSim, false);
             return BasicReply("Applying perms", "SetParcelFlag", new [] { escapedflagdata });
         }
 
@@ -433,7 +433,7 @@ namespace BetterSecondBot.HttpService
                 return Failure("Not in group", "ParcelDeedToGroup", new [] { group });
             }
             targetparcel.GroupID = groupuuid;
-            targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+            targetparcel.Update(bot.GetClient, bot.GetClient.Network.CurrentSim, false);
             Thread.Sleep(500);
             bot.GetClient.Parcels.DeedToGroup(bot.GetClient.Network.CurrentSim, targetparcel.LocalID, groupuuid);
             return BasicReply("ok", "ParcelDeedToGroup", new [] { group });
@@ -673,7 +673,7 @@ namespace BetterSecondBot.HttpService
                     }
                 }
             }
-            targetparcel.Update(bot.GetClient.Network.CurrentSim, false);
+            targetparcel.Update(bot.GetClient, bot.GetClient.Network.CurrentSim, false);
             return BasicReply("ok", "ParcelSetMedia", new [] { escapedflagdata });
         }
 
