@@ -51,7 +51,7 @@ namespace SecondBotEvents.Commands
             targetparcel.AuthBuyerID = avataruuid;
             parcel_static.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
             parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
-            targetparcel.Update(GetClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient());
             return Failure("ok", new [] { amount, avatar });
         }
 
@@ -98,7 +98,7 @@ namespace SecondBotEvents.Commands
             }
             targetparcel.Landing = LandingType.LandingPoint;
             targetparcel.UserLocation = new Vector3(X, Y, Z);
-            targetparcel.Update(GetClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient());
             return BasicReply("ok", new [] { x, y, z });
         }
 
@@ -121,7 +121,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Parcel name is empty", new [] { name });
             }
             targetparcel.Name = name;
-            targetparcel.Update(GetClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient());
             return BasicReply("ok", new [] { name });
         }
 
@@ -138,7 +138,7 @@ namespace SecondBotEvents.Commands
                 return Failure(tests.Value, new [] { desc });
             }
             targetparcel.Desc = desc;
-            targetparcel.Update(GetClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient());
             return BasicReply("ok", new [] { desc });
         }
 
@@ -242,7 +242,7 @@ namespace SecondBotEvents.Commands
             entry.Flags = AccessList.Ban;
             entry.Time = new System.DateTime(3030, 03, 03);
             targetparcel.AccessBlackList.Add(entry);
-            targetparcel.Update(GetClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient());
             return BasicReply("ok", new [] { avatar });
         }
 
@@ -281,7 +281,7 @@ namespace SecondBotEvents.Commands
                 return BasicReply("Avatar is already unbanned", new [] { avatar });
             }
             targetparcel.AccessBlackList.Remove(removeentry);
-            targetparcel.Update(GetClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient());
             return BasicReply("ok", new [] { avatar });
         }
 
@@ -359,7 +359,7 @@ namespace SecondBotEvents.Commands
                     parcel_static.ParcelSetFlag(flags[cfg.Key], targetparcel, cfg.Value);
                 }
             }
-            targetparcel.Update(GetClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient());
             return BasicReply("Applying perms", new [] { escapedflagdata });
         }
 
@@ -409,7 +409,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Not in group", new [] { group });
             }
             targetparcel.GroupID = groupuuid;
-            targetparcel.Update(GetClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient());
             Thread.Sleep(500);
             GetClient().Parcels.DeedToGroup(GetClient().Network.CurrentSim, targetparcel.LocalID, groupuuid);
             return BasicReply("ok", new [] { group });
@@ -632,7 +632,7 @@ namespace SecondBotEvents.Commands
                     }
                 }
             }
-            targetparcel.Update(GetClient().Network.CurrentSim, false);
+            targetparcel.Update(GetClient());
             return BasicReply("ok", new [] { escapedflagdata });
         }
 

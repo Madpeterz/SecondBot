@@ -202,9 +202,9 @@ namespace OpenMetaverse
         public bool SEND_PINGS = true;
 
         /// <summary>Should we connect to multiple sims? This will allow
-        /// viewing in to neighboring simulators and sim crossings
+        /// viewing into neighboring simulators and sim crossings
         /// (Experimental)</summary>
-        public bool MULTIPLE_SIMS = true;
+        public bool MULTIPLE_SIMS = false;
 
         /// <summary>If true, all object update packets will be decoded in to
         /// native objects. If false, only updates for our own agent will be
@@ -342,16 +342,16 @@ namespace OpenMetaverse
         /// You will get no output on the console. This behavior can be overriden by creating
         /// a logger configuration file for log4net
         /// </summary>
-        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.None;
+        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.Debug;
 
         /// <summary>Attach avatar names to log messages</summary>
-        public bool LOG_NAMES = false;
+        public bool LOG_NAMES = true;
 
         /// <summary>Log packet retransmission info</summary>
-        public bool LOG_RESENDS = false;
+        public bool LOG_RESENDS = true;
 
         /// <summary>Log disk cache misses and other info</summary>
-        public bool LOG_DISKCACHE = false;
+        public bool LOG_DISKCACHE = true;
         
         #endregion
         #region Private Fields

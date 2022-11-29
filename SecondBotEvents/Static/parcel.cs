@@ -12,7 +12,7 @@ namespace SecondBotEvents
             if (p.MusicURL != url)
             {
                 p.MusicURL = url;
-                p.Update(bot.Network.CurrentSim, false);
+                p.Update(bot);
             }
             return true;
         }
