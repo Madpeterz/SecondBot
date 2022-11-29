@@ -190,12 +190,14 @@ namespace SecondBotEvents.Services
                 return;
             }
             Stop();
+            running = true;
             master.BotClientNoticeEvent += BotClientRestart;
             Console.WriteLine("Interaction Service [Starting]");
         }
 
         public override void Stop()
         {
+            running = false;
             if (myConfig.GetEnabled() == false)
             {
                 return;

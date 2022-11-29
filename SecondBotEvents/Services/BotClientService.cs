@@ -34,6 +34,7 @@ namespace SecondBotEvents.Services
 
         public override void Start()
         {
+            running = true;
             Console.WriteLine("Client service [Starting]");
             AutoRestartLoginTimer = new Timer();
             AutoRestartLoginTimer.Interval = 30 * 1000;
@@ -43,6 +44,7 @@ namespace SecondBotEvents.Services
         }
         public override void Stop()
         {
+            running = false;
             AutoRestartLoginTimer.Stop();
             Console.WriteLine("Client service [Stopping]");
             ResetClient();

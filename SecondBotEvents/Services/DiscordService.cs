@@ -404,7 +404,8 @@ namespace SecondBotEvents.Services
 
         public override void Start()
         {
-            if(myConfig.GetEnabled() == false)
+            running = true;
+            if (myConfig.GetEnabled() == false)
             {
                 Console.WriteLine("Discord service [Disabled]");
                 return;
@@ -431,6 +432,7 @@ namespace SecondBotEvents.Services
 
         public override void Stop()
         {
+            running = false;
             Console.WriteLine("Discord service [Stopping]");
             master.BotClientNoticeEvent -= BotClientRestart;
             master.SystemStatusMessagesEvent -= SystemStatusEvent;

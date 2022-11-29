@@ -1043,12 +1043,14 @@ namespace SecondBotEvents.Services
         public override void Start()
         {
             Stop();
+            running = true;
             master.BotClientNoticeEvent += BotClientRestart;
             Console.WriteLine("DataStore Service [Starting]");
         }
 
         public override void Stop()
         {
+            running = false;
             Reset();
             master.BotClientNoticeEvent -= BotClientRestart;
             if (master.BotClient != null)

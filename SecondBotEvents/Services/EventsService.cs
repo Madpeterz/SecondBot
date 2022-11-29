@@ -344,6 +344,7 @@ namespace SecondBotEvents.Services
                 return;
             }
             Stop();
+            running = true;
             master.BotClientNoticeEvent += BotClientRestart;
             master.SystemStatusMessagesEvent += BotStatusMessage;
         }
@@ -354,6 +355,7 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
+            running = false;
             master.BotClientNoticeEvent -= BotClientRestart;
             master.SystemStatusMessagesEvent -= BotStatusMessage;
             removeEvents();

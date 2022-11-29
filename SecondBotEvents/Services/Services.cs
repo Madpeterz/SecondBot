@@ -8,6 +8,7 @@ namespace SecondBotEvents.Services
     public abstract class BotServices
     {
         public EventsSecondBot master;
+        protected bool running = false;
         public BotServices(EventsSecondBot setMaster)
         {
             master = setMaster;
@@ -32,15 +33,18 @@ namespace SecondBotEvents.Services
 
         public virtual void Start()
         {
-
+            running = true;
         }
         public virtual void Stop()
         {
-
+            running = false;
         }
         public void Restart()
         {
-            Stop();
+            if (running == true)
+            {
+                Stop();
+            }
             Start();
         }
     }

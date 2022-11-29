@@ -68,11 +68,13 @@ namespace SecondBotEvents.Services
         }
         public override void Start()
         {
+            running = true;
             master.BotClientNoticeEvent += BotClientRestart;
         }
 
         public override void Stop()
         {
+            running = false;
             acceptNewCommands = false;
         }
 

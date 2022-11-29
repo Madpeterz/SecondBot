@@ -267,12 +267,14 @@ namespace SecondBotEvents.Services
                 return;
             }
             Stop();
+            running = true;
             master.BotClientNoticeEvent += BotClientRestart;
             Console.WriteLine("Homebound Service [Starting]");
         }
 
         public override void Stop()
         {
+            running = false;
             master.BotClientNoticeEvent -= BotClientRestart;
             if (master.BotClient != null)
             {

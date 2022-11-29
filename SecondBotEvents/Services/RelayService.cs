@@ -130,12 +130,14 @@ namespace SecondBotEvents.Services
         public override void Start()
         {
             Stop();
+            running = true;
             master.BotClientNoticeEvent += BotClientRestart;
             Console.WriteLine("Relay Service [Starting]");
         }
 
         public override void Stop()
         {
+            running = false;
             master.BotClientNoticeEvent -= BotClientRestart;
             if (master.BotClient != null)
             {

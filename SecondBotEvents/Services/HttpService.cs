@@ -84,11 +84,13 @@ namespace SecondBotEvents.Services
                 return;
             }
             Stop();
+            running = true;
             master.BotClientNoticeEvent += BotClientRestart;
         }
 
         public override void Stop()
         {
+            running = false;
             if (myConfig.GetEnabled() == false)
             {
                 return;
