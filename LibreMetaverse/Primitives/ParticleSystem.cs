@@ -25,8 +25,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using OpenMetaverse.StructuredData;
 
 namespace OpenMetaverse
@@ -46,6 +44,7 @@ namespace OpenMetaverse
             /// <summary>
             /// Particle source pattern
             /// </summary>
+            [Flags]
             public enum SourcePattern : byte
             {
                 /// <summary>None</summary>
@@ -461,9 +460,8 @@ namespace OpenMetaverse
             public static ParticleSystem FromOSD(OSD osd)
             {
                 ParticleSystem partSys = new ParticleSystem();
-                OSDMap map = osd as OSDMap;
 
-                if (map != null)
+                if (osd is OSDMap map)
                 {
                     partSys.CRC = map["crc"].AsUInteger();
                     partSys.PartFlags = map["part_flags"].AsUInteger();
