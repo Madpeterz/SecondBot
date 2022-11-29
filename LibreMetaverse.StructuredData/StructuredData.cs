@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
- * Copyright (c) 2021, Sjofn LLC.
+ * Copyright (c) 2021-2022, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -893,6 +893,11 @@ namespace OpenMetaverse.StructuredData
             return new OSDMap(new Dictionary<string, OSD>(_mMap));
         }
 
+        public Hashtable ToHashtable()
+        {
+            return new Hashtable(_mMap);
+        }
+
         #region IDictionary Implementation
 
         public int Count => _mMap.Count;
@@ -1123,6 +1128,11 @@ namespace OpenMetaverse.StructuredData
         public override string ToString()
         {
             return OSDParser.SerializeJsonString(this, true);
+        }
+
+        public ArrayList ToArrayList()
+        {
+            return new ArrayList(_mArray);
         }
 
         #region IList Implementation
