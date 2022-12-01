@@ -19,7 +19,6 @@ Secondbot is a CommandLine based bot for SecondLife based on libremetaverse reta
 
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3765/badge)](https://bestpractices.coreinfrastructure.org/projects/3765)
 
-
 ### Getting started guides
 ---
 Wiki /  [Docker-with-Portainer](https://github.com/Madpeterz/SecondBot/wiki/Setting-up-(Docker-with-Portainer))
