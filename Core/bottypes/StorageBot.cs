@@ -60,6 +60,7 @@ namespace BetterSecondBot.bottypes
                 Hashtable T = new Hashtable();
                 T.Add("keyname", key);
                 T.Add("keyvalue", value);
+                InsertSQL("INSERT INTO `keypairstorage` (`id`, `name`, `value`) VALUES (NULL, @keyname, @keyvalue)", T);
             }
         }
 
@@ -72,8 +73,144 @@ namespace BetterSecondBot.bottypes
                     LocalKeyValueStorage.Remove(key);
                     Hashtable T = new Hashtable();
                     T.Add("keyname", key);
+                    DeleteSQL("DELETE FROM `keypairstorage` WHERE `keypairstorage`.`name` = @keyname", T);
                 }
             }
+        }
+
+        public int InsertSQL(string sql)
+        {
+            return InsertSQL(sql, new Hashtable());
+        }
+        public int InsertSQL(string sql, Hashtable hashtable)
+        {
+            if (myconfig.SQLDB_Enabled == false)
+            {
+                return 0;
+            }
+            try
+            {
+                SqlCommand command = new SqlCommand(sql, sqlClient);
+                foreach (DictionaryEntry s in hashtable)
+                {
+                    command.Parameters.AddWithValue("@" + s.Key, s.Value);
+                }
+                return command.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                Warn("SQL going away: " + e.Message);
+                sqlStatus = false;
+                attemptedSQL = true;
+                return 0;
+            }
+        }
+
+        public int DeleteSQL(string sql)
+        {
+            return DeleteSQL(sql, new Hashtable());
+        }
+        public int DeleteSQL(string sql, Hashtable hashtable)
+        {
+            if (myconfig.SQLDB_Enabled == false)
+            {
+                return 0;
+            }
+            if (SqlAvailable() == false)
+            {
+                return 0;
+            }
+            try
+            {
+                SqlCommand command = new SqlCommand(sql, sqlClient);
+                foreach (DictionaryEntry s in hashtable)
+                {
+                    command.Parameters.AddWithValue("@" + s.Key, s.Value);
+                }
+                return command.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                Warn("SQL going away: " + e.Message);
+                sqlStatus = false;
+                attemptedSQL = true;
+                return 0;
+            }
+
+        }
+
+        public List<Dictionary<string, string>> SelectSQL(string sql, string[] fields)
+        {
+            return SelectSQL(sql, fields, new Hashtable());
+        }
+        public List<Dictionary<string, string>> SelectSQL(string sql, string[] fields, Hashtable hashtable)
+        {
+            if(myconfig.SQLDB_Enabled == false)
+            {
+                return null;
+            }
+            if(SqlAvailable() == false)
+            {
+                return null;
+            }
+            try
+            {
+                SqlCommand command = new SqlCommand(sql, sqlClient);
+                foreach (DictionaryEntry s in hashtable)
+                {
+                    command.Parameters.AddWithValue("@" + s.Key, s.Value);
+                }
+                List<Dictionary<string, string>> reply = new List<Dictionary<string, string>>();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    Dictionary<string, string> entry = new Dictionary<string, string>();
+                    foreach (string A in fields)
+                    {
+                        entry.Add(A, (string)reader[A]);
+                    }
+                    reply.Add(entry);
+                }
+                return reply;
+            }
+            catch (Exception e)
+            {
+                Warn("SQL going away: " + e.Message);
+                sqlStatus = false;
+                attemptedSQL = true;
+                return null;
+            }
+        }
+
+
+        protected bool attemptedSQL = false;
+        protected bool sqlStatus = false;
+        protected SqlConnection sqlClient;
+        protected bool SqlAvailable()
+        {
+            if(attemptedSQL == true)
+            {
+                return sqlStatus;
+            }
+            try
+            {
+                attemptedSQL = true;
+                sqlClient = new SqlConnection(
+                    "Data Source=" + myconfig.SQLDB_Host + ":" + myconfig.SQLDB_Port.ToString() + ";" +
+                    "Initial Catalog=" + myconfig.SQLDB_Database + ";" +
+                    "Persist Security Info=True;" +
+                    "User ID=" + myconfig.SQLDB_Username + ";" +
+                    "Password=" + myconfig.SQLDB_Password + ";" +
+                    "Connection Timeout=" + myconfig.SQLDB_Timeout.ToString()
+                 );
+                sqlStatus = true;
+                return true;
+            }
+            catch (Exception E)
+            {
+                Crit("SQL connection failed: " + E.Message);
+                return false;
+            }
+
         }
 
 

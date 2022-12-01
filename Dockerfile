@@ -47,7 +47,14 @@ ENV Basic_BotUserName='' \
 	Setting_LogCommands='false' \
 	Agent_Channel='auto' \
 	Agent_Version='auto' \
-	OBJECT_CHAT='false'
+	OBJECT_CHAT='false' \
+	SQLDB_Enabled='false' \
+	SQLDB_Host='127.0.0.1' \
+	SQLDB_Port='3306' \
+	SQLDB_Username='' \
+	SQLDB_Password='' \
+	SQLDB_Timeout='3' \
+	SQLDB_Database='secondbot'
 
 EXPOSE 80
 ENV ASPNETCORE_URLS http://+:80

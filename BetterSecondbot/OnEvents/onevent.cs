@@ -47,6 +47,7 @@ namespace BetterSecondbot.OnEvents
                     Lockout.Remove(a);
                     Hashtable parms = new Hashtable();
                     parms.Add("uuid", a);
+                    controler.getBot().DeleteSQL("DELETE FROM `lockout` WHERE `lockout`.`uuid` = @uuid;", parms);
                 }
             }
         }
@@ -147,12 +148,14 @@ namespace BetterSecondbot.OnEvents
                                     Lockout.Remove(addUUID);
                                     parms = new Hashtable();
                                     parms.Add("uuid", addUUID);
+                                    controler.getBot().DeleteSQL("DELETE FROM `lockout` WHERE `lockout`.`uuid` = @uuid;", parms);
                                 }
                                 long expires = helpers.UnixTimeNow() + addsecs;
                                 Lockout.Add(addUUID, expires);
                                 parms = new Hashtable();
                                 parms.Add("uuid", addUUID);
                                 parms.Add("expires", expires);
+                                controler.getBot().InsertSQL("INSERT INTO `lockout` (`id`, `uuid`, `expires`) VALUES(NULL, @uuid, @expires))", parms);
                             }
                         }
                     }
@@ -863,6 +866,41 @@ namespace BetterSecondbot.OnEvents
             TriggerEvent("Clock", new Dictionary<string, string>(), true);
         }
 
+        protected void LoadFromDB()
+        {
+            // loads locks from SQL if enabled.
+            if (controler.getBot().getMyConfig.SQLDB_Enabled == false)
+            {
+                return; // :(
+            }
+
+            Hashtable parms = new Hashtable();
+            parms.Add("unixtime", helpers.UnixTimeNow());
+            controler.getBot().DeleteSQL("DELETE FROM `lockout` WHERE `lockout`.`expires` < @unixtime;", parms); // purge old entrys
+            List<Dictionary<string, string>> dataRead = controler.getBot().SelectSQL("SELECT uuid, expires FROM `lockout` LIMIT 0, 9999", new string[] { "uuid", "expires" });
+            if(dataRead != null)
+            {
+                controler.getBot().Info("Loading lockouts from DB");
+                foreach(Dictionary<string, string> entry in dataRead)
+                {
+                    if(long.TryParse(entry["expires"], out long expires) == true)
+                    {
+                        if(UUID.TryParse(entry["uuid"], out UUID uuid) == true)
+                        {
+                            if(Lockout.ContainsKey(uuid) == false)
+                            {
+                                Lockout.Add(uuid, 0);
+                            }
+                            if (Lockout[uuid] < expires)
+                            {
+                                Lockout[uuid] = expires;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         bool attachedEvents = false;
         protected void statusMessage(object o, StatusMessageEvent e)
         {
@@ -871,6 +909,7 @@ namespace BetterSecondbot.OnEvents
                 if(attachedEvents == false)
                 {
                     attachedEvents = true;
+                    LoadFromDB();
                     SetupMonitor();
                     attachEvents();
                 }
