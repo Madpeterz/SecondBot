@@ -267,8 +267,8 @@ namespace OpenMetaverse
         /// <returns>UUID</returns>
         public static UUID SecureRandom()
         {
-	        var rng = RandomNumberGenerator.Create();
-			byte[] data = new byte[16];
+            var rng = new RNGCryptoServiceProvider();
+            byte[] data = new byte[16];
             rng.GetBytes(data);
 
             // Mark as UUIDv4
@@ -297,8 +297,9 @@ namespace OpenMetaverse
         /// <returns>True if the object is a UUID and both UUIDs are equal</returns>
         public override bool Equals(object o)
         {
-            if (!(o is UUID uuid)) return false;
+            if (!(o is UUID)) return false;
 
+            UUID uuid = (UUID)o;
             return Guid == uuid.Guid;
         }
 

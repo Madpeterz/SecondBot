@@ -24,6 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+
 namespace OpenMetaverse
 {
     public class CRC32
