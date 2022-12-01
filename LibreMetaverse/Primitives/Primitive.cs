@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using OpenMetaverse.StructuredData;
 
 namespace OpenMetaverse
@@ -743,8 +744,9 @@ namespace OpenMetaverse
             {
                 PhysicsProperties ret = new PhysicsProperties();
 
-                if (osd is OSDMap map)
+                if (osd is OSDMap)
                 {
+                    OSDMap map = (OSDMap)osd;
                     ret.LocalID = map["LocalID"];
                     ret.Density = map["Density"];
                     ret.Friction = map["Friction"];
@@ -1315,7 +1317,7 @@ namespace OpenMetaverse
 
         public override bool Equals(object obj)
         {
-            return (obj is Primitive primitive) && this == primitive;
+            return (obj is Primitive) ? this == (Primitive)obj : false;
         }
 
         public bool Equals(Primitive other)

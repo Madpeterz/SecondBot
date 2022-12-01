@@ -29,6 +29,9 @@ using OpenMetaverse.StructuredData;
 
 namespace OpenMetaverse
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [Flags]
     public enum PermissionMask : uint
     {
@@ -44,6 +47,9 @@ namespace OpenMetaverse
         All = (1 << 13) | (1 << 14) | (1 << 15) | (1 << 19)
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     [Flags]
     public enum PermissionWho : byte
     {
@@ -61,7 +67,10 @@ namespace OpenMetaverse
         All = 0x1F
     }
 
-    [Serializable]
+    /// <summary>
+    /// 
+    /// </summary>
+    [Serializable()]
     public struct Permissions
     {
         public PermissionMask BaseMask;
@@ -108,8 +117,9 @@ namespace OpenMetaverse
         public static Permissions FromOSD(OSD llsd)
         {
             Permissions permissions = new Permissions();
+            OSDMap map = llsd as OSDMap;
 
-            if (llsd is OSDMap map)
+            if (map != null)
             {
                 permissions.BaseMask = (PermissionMask)map["base_mask"].AsUInteger();
                 permissions.EveryoneMask = (PermissionMask)map["everyone_mask"].AsUInteger();

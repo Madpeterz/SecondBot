@@ -27,7 +27,6 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
-using System.Linq;
 using OpenMetaverse.Packets;
 using OpenMetaverse.Interfaces;
 using OpenMetaverse.Messages.Linden;
@@ -356,7 +355,7 @@ namespace OpenMetaverse
         }
 
         /// <summary>
-        /// Parcel information returned from a <see cref="DirectoryManager.StartPlacesSearch"/> request
+        /// Parcel information returned from a <see cref="StartPlacesSearch"/> request
         /// <para>
         /// Represents one of the following:
         /// A parcel of land on the grid that has its Show In Search flag set
@@ -515,7 +514,8 @@ namespace OpenMetaverse
         protected virtual void OnEventInfo(EventInfoReplyEventArgs e)
         {
             EventHandler<EventInfoReplyEventArgs> handler = m_EventInfoReply;
-            handler?.Invoke(this, e);
+            if (handler != null)
+                handler(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -537,20 +537,21 @@ namespace OpenMetaverse
         protected virtual void OnDirEvents(DirEventsReplyEventArgs e)
         {
             EventHandler<DirEventsReplyEventArgs> handler = m_DirEvents;
-            handler?.Invoke(this, e);
+            if (handler != null)
+                handler(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
         private readonly object m_DirEventsLock = new object();
 
-        /// <summary>Raised when the data server responds to a <see cref="DirectoryManager.StartEventsSearch"/> request.</summary>
+        /// <summary>Raised when the data server responds to a <see cref="StartEventsSearch"/> request.</summary>
         public event EventHandler<DirEventsReplyEventArgs> DirEventsReply
         {
             add { lock (m_DirEventsLock) { m_DirEvents += value; } }
             remove { lock (m_DirEventsLock) { m_DirEvents -= value; } }
         }
         
-        /// <summary>The event subscribers. null if no subscribers</summary>
+        /// <summary>The event subscribers. null if no subcribers</summary>
         private EventHandler<PlacesReplyEventArgs> m_Places;
 
         /// <summary>Raises the PlacesReply event</summary>
@@ -559,20 +560,21 @@ namespace OpenMetaverse
         protected virtual void OnPlaces(PlacesReplyEventArgs e)
         {
             EventHandler<PlacesReplyEventArgs> handler = m_Places;
-            handler?.Invoke(this, e);
+            if (handler != null)
+                handler(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
         private readonly object m_PlacesLock = new object();
 
-        /// <summary>Raised when the data server responds to a <see cref="DirectoryManager.StartPlacesSearch"/> request.</summary>
+        /// <summary>Raised when the data server responds to a <see cref="StartPlacesSearch"/> request.</summary>
         public event EventHandler<PlacesReplyEventArgs> PlacesReply
         {
             add { lock (m_PlacesLock) { m_Places += value; } }
             remove { lock (m_PlacesLock) { m_Places -= value; } }
         }
         
-        /// <summary>The event subscribers. null if no subscribers</summary>
+        /// <summary>The event subscribers. null if no subcribers</summary>
         private EventHandler<DirPlacesReplyEventArgs> m_DirPlaces;
 
         /// <summary>Raises the DirPlacesReply event</summary>
@@ -581,13 +583,14 @@ namespace OpenMetaverse
         protected virtual void OnDirPlaces(DirPlacesReplyEventArgs e)
         {
             EventHandler<DirPlacesReplyEventArgs> handler = m_DirPlaces;
-            handler?.Invoke(this, e);
+            if (handler != null)
+                handler(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
         private readonly object m_DirPlacesLock = new object();
 
-        /// <summary>Raised when the data server responds to a <see cref="DirectoryManager.StartDirPlacesSearch"/> request.</summary>
+        /// <summary>Raised when the data server responds to a <see cref="StartDirPlacesSearch"/> request.</summary>
         public event EventHandler<DirPlacesReplyEventArgs> DirPlacesReply
         {
             add { lock (m_DirPlacesLock) { m_DirPlaces += value; } }
@@ -603,13 +606,14 @@ namespace OpenMetaverse
         protected virtual void OnDirClassifieds(DirClassifiedsReplyEventArgs e)
         {
             EventHandler<DirClassifiedsReplyEventArgs> handler = m_DirClassifieds;
-            handler?.Invoke(this, e);
+            if (handler != null)
+                handler(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
         private readonly object m_DirClassifiedsLock = new object();
 
-        /// <summary>Raised when the data server responds to a <see cref="DirectoryManager.StartClassifiedSearch"/> request.</summary>
+        /// <summary>Raised when the data server responds to a <see cref="StartClassifiedSearch"/> request.</summary>
         public event EventHandler<DirClassifiedsReplyEventArgs> DirClassifiedsReply
         {
             add { lock (m_DirClassifiedsLock) { m_DirClassifieds += value; } }
@@ -625,13 +629,14 @@ namespace OpenMetaverse
         protected virtual void OnDirGroups(DirGroupsReplyEventArgs e)
         {
             EventHandler<DirGroupsReplyEventArgs> handler = m_DirGroups;
-            handler?.Invoke(this, e);
+            if (handler != null)
+                handler(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
         private readonly object m_DirGroupsLock = new object();
 
-        /// <summary>Raised when the data server responds to a <see cref="DirectoryManager.StartGroupSearch"/> request.</summary>
+        /// <summary>Raised when the data server responds to a <see cref="StartGroupSearch"/> request.</summary>
         public event EventHandler<DirGroupsReplyEventArgs> DirGroupsReply
         {
             add { lock (m_DirGroupsLock) { m_DirGroups += value; } }
@@ -647,13 +652,14 @@ namespace OpenMetaverse
         protected virtual void OnDirPeople(DirPeopleReplyEventArgs e)
         {
             EventHandler<DirPeopleReplyEventArgs> handler = m_DirPeople;
-            handler?.Invoke(this, e);
+            if (handler != null)
+                handler(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
         private readonly object m_DirPeopleLock = new object();
 
-        /// <summary>Raised when the data server responds to a <see cref="DirectoryManager.StartPeopleSearch"/> request.</summary>
+        /// <summary>Raised when the data server responds to a <see cref="StartPeopleSearch"/> request.</summary>
         public event EventHandler<DirPeopleReplyEventArgs> DirPeopleReply
         {
             add { lock (m_DirPeopleLock) { m_DirPeople += value; } }
@@ -669,13 +675,14 @@ namespace OpenMetaverse
         protected virtual void OnDirLand(DirLandReplyEventArgs e)
         {
             EventHandler<DirLandReplyEventArgs> handler = m_DirLandReply;
-            handler?.Invoke(this, e);
+            if (handler != null)
+                handler(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
         private readonly object m_DirLandLock = new object();
 
-        /// <summary>Raised when the data server responds to a <see cref="DirectoryManager.StartLandSearch"/> request.</summary>
+        /// <summary>Raised when the data server responds to a <see cref="StartLandSearch"/> request.</summary>
         public event EventHandler<DirLandReplyEventArgs> DirLandReply
         {
             add { lock (m_DirLandLock) { m_DirLandReply += value; } }
@@ -925,23 +932,15 @@ namespace OpenMetaverse
         public void StartLandSearch(DirFindFlags findFlags, SearchTypeFlags typeFlags, int priceLimit,
             int areaLimit, int queryStart)
         {
-            DirLandQueryPacket query = new DirLandQueryPacket
-            {
-                AgentData =
-                {
-                    AgentID = Client.Self.AgentID,
-                    SessionID = Client.Self.SessionID
-                },
-                QueryData =
-                {
-                    Area = areaLimit,
-                    Price = priceLimit,
-                    QueryStart = queryStart,
-                    SearchType = (uint)typeFlags,
-                    QueryFlags = (uint)findFlags,
-                    QueryID = UUID.Random()
-                }
-            };
+            DirLandQueryPacket query = new DirLandQueryPacket();
+            query.AgentData.AgentID = Client.Self.AgentID;
+            query.AgentData.SessionID = Client.Self.SessionID;
+            query.QueryData.Area = areaLimit;
+            query.QueryData.Price = priceLimit;
+            query.QueryData.QueryStart = queryStart;
+            query.QueryData.SearchType = (uint)typeFlags;
+            query.QueryData.QueryFlags = (uint)findFlags;
+            query.QueryData.QueryID = UUID.Random();
 
             Client.Network.SendPacket(query);            
         }
@@ -967,21 +966,13 @@ namespace OpenMetaverse
         /// <returns></returns>
         public UUID StartGroupSearch(string searchText, int queryStart, DirFindFlags flags)
         {
-            DirFindQueryPacket find = new DirFindQueryPacket
-            {
-                AgentData =
-                {
-                    AgentID = Client.Self.AgentID,
-                    SessionID = Client.Self.SessionID
-                },
-                QueryData =
-                {
-                    QueryFlags = (uint)flags,
-                    QueryText = Utils.StringToBytes(searchText),
-                    QueryID = UUID.Random(),
-                    QueryStart = queryStart
-                }
-            };
+            DirFindQueryPacket find = new DirFindQueryPacket();
+            find.AgentData.AgentID = Client.Self.AgentID;
+            find.AgentData.SessionID = Client.Self.SessionID;
+            find.QueryData.QueryFlags = (uint)flags;
+            find.QueryData.QueryText = Utils.StringToBytes(searchText);
+            find.QueryData.QueryID = UUID.Random();
+            find.QueryData.QueryStart = queryStart;
 
             Client.Network.SendPacket(find);
 
@@ -996,21 +987,13 @@ namespace OpenMetaverse
         /// <returns></returns>
         public UUID StartPeopleSearch(string searchText, int queryStart)
         {
-            DirFindQueryPacket find = new DirFindQueryPacket
-            {
-                AgentData =
-                {
-                    AgentID = Client.Self.AgentID,
-                    SessionID = Client.Self.SessionID
-                },
-                QueryData =
-                {
-                    QueryFlags = (uint)DirFindFlags.People,
-                    QueryText = Utils.StringToBytes(searchText),
-                    QueryID = UUID.Random(),
-                    QueryStart = queryStart
-                }
-            };
+            DirFindQueryPacket find = new DirFindQueryPacket();
+            find.AgentData.AgentID = Client.Self.AgentID;
+            find.AgentData.SessionID = Client.Self.SessionID;
+            find.QueryData.QueryFlags = (uint)DirFindFlags.People;
+            find.QueryData.QueryText = Utils.StringToBytes(searchText);
+            find.QueryData.QueryID = UUID.Random();
+            find.QueryData.QueryStart = queryStart;
 
             Client.Network.SendPacket(find);
 
@@ -1061,26 +1044,17 @@ namespace OpenMetaverse
         public UUID StartPlacesSearch(DirFindFlags findFlags, ParcelCategory searchCategory, string searchText, string simulatorName, 
             UUID groupID, UUID transactionID)
         {
-            PlacesQueryPacket find = new PlacesQueryPacket
-            {
-                AgentData =
-                {
-                    AgentID = Client.Self.AgentID,
-                    SessionID = Client.Self.SessionID,
-                    QueryID = groupID
-                },
-                TransactionData =
-                {
-                    TransactionID = transactionID
-                },
-                QueryData =
-                {
-                    QueryText = Utils.StringToBytes(searchText),
-                    QueryFlags = (uint)findFlags,
-                    Category = (sbyte)searchCategory,
-                    SimName = Utils.StringToBytes(simulatorName)
-                }
-            };
+            PlacesQueryPacket find = new PlacesQueryPacket();
+            find.AgentData.AgentID = Client.Self.AgentID;
+            find.AgentData.SessionID = Client.Self.SessionID;
+            find.AgentData.QueryID = groupID;
+
+            find.TransactionData.TransactionID = transactionID;
+
+            find.QueryData.QueryText = Utils.StringToBytes(searchText);
+            find.QueryData.QueryFlags = (uint)findFlags;
+            find.QueryData.Category = (sbyte)searchCategory;
+            find.QueryData.SimName = Utils.StringToBytes(simulatorName);
 
             Client.Network.SendPacket(find);
             return transactionID;
@@ -1117,14 +1091,9 @@ namespace OpenMetaverse
         /// <returns>UUID of query to correlate results in callback.</returns>
         public UUID StartEventsSearch(string searchText, DirFindFlags queryFlags, string eventDay, uint queryStart, EventCategories category)
         {
-            DirFindQueryPacket find = new DirFindQueryPacket
-            {
-                AgentData =
-                {
-                    AgentID = Client.Self.AgentID,
-                    SessionID = Client.Self.SessionID
-                }
-            };
+            DirFindQueryPacket find = new DirFindQueryPacket();
+            find.AgentData.AgentID = Client.Self.AgentID;
+            find.AgentData.SessionID = Client.Self.SessionID;
 
             UUID queryID = UUID.Random();
 
@@ -1141,18 +1110,11 @@ namespace OpenMetaverse
         /// <param name="eventID">ID of Event returned from the <see cref="StartEventsSearch"/> method</param>
         public void EventInfoRequest(uint eventID)
         {
-            EventInfoRequestPacket find = new EventInfoRequestPacket
-            {
-                AgentData =
-                {
-                    AgentID = Client.Self.AgentID,
-                    SessionID = Client.Self.SessionID
-                },
-                EventData =
-                {
-                    EventID = eventID
-                }
-            };
+            EventInfoRequestPacket find = new EventInfoRequestPacket();
+            find.AgentData.AgentID = Client.Self.AgentID;
+            find.AgentData.SessionID = Client.Self.SessionID;
+
+            find.EventData.EventID = eventID;
 
             Client.Network.SendPacket(find);
         }
@@ -1204,15 +1166,14 @@ namespace OpenMetaverse
 
                 foreach (DirClassifiedReplyPacket.QueryRepliesBlock block in reply.QueryReplies)
                 {
-                    Classified classified = new Classified
-                    {
-                        CreationDate = Utils.UnixTimeToDateTime(block.CreationDate),
-                        ExpirationDate = Utils.UnixTimeToDateTime(block.ExpirationDate),
-                        Flags = (ClassifiedFlags)block.ClassifiedFlags,
-                        ID = block.ClassifiedID,
-                        Name = Utils.BytesToString(block.Name),
-                        Price = block.PriceForListing
-                    };
+                    Classified classified = new Classified();
+
+                    classified.CreationDate = Utils.UnixTimeToDateTime(block.CreationDate);
+                    classified.ExpirationDate = Utils.UnixTimeToDateTime(block.ExpirationDate);
+                    classified.Flags = (ClassifiedFlags)block.ClassifiedFlags;
+                    classified.ID = block.ClassifiedID;
+                    classified.Name = Utils.BytesToString(block.Name);
+                    classified.Price = block.PriceForListing;
 
                     classifieds.Add(classified);
                 }
@@ -1233,15 +1194,14 @@ namespace OpenMetaverse
 
                 foreach (DirLandReplyPacket.QueryRepliesBlock block in reply.QueryReplies)
                 {
-                    DirectoryParcel dirParcel = new DirectoryParcel
-                    {
-                        ActualArea = block.ActualArea,
-                        ID = block.ParcelID,
-                        Name = Utils.BytesToString(block.Name),
-                        SalePrice = block.SalePrice,
-                        Auction = block.Auction,
-                        ForSale = block.ForSale
-                    };
+                    DirectoryParcel dirParcel = new DirectoryParcel();
+
+                    dirParcel.ActualArea = block.ActualArea;
+                    dirParcel.ID = block.ParcelID;
+                    dirParcel.Name = Utils.BytesToString(block.Name);
+                    dirParcel.SalePrice = block.SalePrice;
+                    dirParcel.Auction = block.Auction;
+                    dirParcel.ForSale = block.ForSale;
 
                     parcelsForSale.Add(dirParcel);
                 }
@@ -1263,15 +1223,14 @@ namespace OpenMetaverse
 
                 foreach (DirLandReplyMessage.QueryReply block in reply.QueryReplies)
                 {
-                    DirectoryParcel dirParcel = new DirectoryParcel
-                    {
-                        ActualArea = block.ActualArea,
-                        ID = block.ParcelID,
-                        Name = block.Name,
-                        SalePrice = block.SalePrice,
-                        Auction = block.Auction,
-                        ForSale = block.ForSale
-                    };
+                    DirectoryParcel dirParcel = new DirectoryParcel();
+
+                    dirParcel.ActualArea = block.ActualArea;
+                    dirParcel.ID = block.ParcelID;
+                    dirParcel.Name = block.Name;
+                    dirParcel.SalePrice = block.SalePrice;
+                    dirParcel.Auction = block.Auction;
+                    dirParcel.ForSale = block.ForSale;
 
                     parcelsForSale.Add(dirParcel);
                 }
@@ -1291,13 +1250,11 @@ namespace OpenMetaverse
                 List<AgentSearchData> matches = new List<AgentSearchData>(peopleReply.QueryReplies.Length);
                 foreach (DirPeopleReplyPacket.QueryRepliesBlock reply in peopleReply.QueryReplies)
                 {
-                    AgentSearchData searchData = new AgentSearchData
-                    {
-                        Online = reply.Online,
-                        FirstName = Utils.BytesToString(reply.FirstName),
-                        LastName = Utils.BytesToString(reply.LastName),
-                        AgentID = reply.AgentID
-                    };
+                    AgentSearchData searchData = new AgentSearchData();
+                    searchData.Online = reply.Online;
+                    searchData.FirstName = Utils.BytesToString(reply.FirstName);
+                    searchData.LastName = Utils.BytesToString(reply.LastName);
+                    searchData.AgentID = reply.AgentID;
                     matches.Add(searchData);
                 }
 
@@ -1317,12 +1274,10 @@ namespace OpenMetaverse
                 List<GroupSearchData> matches = new List<GroupSearchData>(groupsReply.QueryReplies.Length);
                 foreach (DirGroupsReplyPacket.QueryRepliesBlock reply in groupsReply.QueryReplies)
                 {
-                    GroupSearchData groupsData = new GroupSearchData
-                    {
-                        GroupID = reply.GroupID,
-                        GroupName = Utils.BytesToString(reply.GroupName),
-                        Members = reply.Members
-                    };
+                    GroupSearchData groupsData = new GroupSearchData();
+                    groupsData.GroupID = reply.GroupID;
+                    groupsData.GroupName = Utils.BytesToString(reply.GroupName);
+                    groupsData.Members = reply.Members;
                     matches.Add(groupsData);
                 }
 
@@ -1341,25 +1296,23 @@ namespace OpenMetaverse
                 PlacesReplyMessage replyMessage = (PlacesReplyMessage)message;
                 List<PlacesSearchData> places = new List<PlacesSearchData>();
 
-                foreach (var query in replyMessage.QueryDataBlocks)
+                for (int i = 0; i < replyMessage.QueryDataBlocks.Length; i++)
                 {
-                    PlacesSearchData place = new PlacesSearchData
-                    {
-                        ActualArea = query.ActualArea,
-                        BillableArea = query.BillableArea,
-                        Desc = query.Description,
-                        Dwell = query.Dwell,
-                        Flags = (DirectoryManager.PlacesFlags)(byte)query.Flags,
-                        GlobalX = query.GlobalX,
-                        GlobalY = query.GlobalY,
-                        GlobalZ = query.GlobalZ,
-                        Name = query.Name,
-                        OwnerID = query.OwnerID,
-                        Price = query.Price,
-                        SimName = query.SimName,
-                        SnapshotID = query.SnapShotID,
-                        SKU = query.ProductSku
-                    };
+                    PlacesSearchData place = new PlacesSearchData();
+                    place.ActualArea = replyMessage.QueryDataBlocks[i].ActualArea;
+                    place.BillableArea = replyMessage.QueryDataBlocks[i].BillableArea;
+                    place.Desc = replyMessage.QueryDataBlocks[i].Description;
+                    place.Dwell = replyMessage.QueryDataBlocks[i].Dwell;
+                    place.Flags = (DirectoryManager.PlacesFlags)(byte)replyMessage.QueryDataBlocks[i].Flags;
+                    place.GlobalX = replyMessage.QueryDataBlocks[i].GlobalX;
+                    place.GlobalY = replyMessage.QueryDataBlocks[i].GlobalY;
+                    place.GlobalZ = replyMessage.QueryDataBlocks[i].GlobalZ;
+                    place.Name = replyMessage.QueryDataBlocks[i].Name;
+                    place.OwnerID = replyMessage.QueryDataBlocks[i].OwnerID;
+                    place.Price = replyMessage.QueryDataBlocks[i].Price;
+                    place.SimName = replyMessage.QueryDataBlocks[i].SimName;
+                    place.SnapshotID = replyMessage.QueryDataBlocks[i].SnapShotID;
+                    place.SKU = replyMessage.QueryDataBlocks[i].ProductSku;
                     places.Add(place);
                 }
 
@@ -1380,22 +1333,20 @@ namespace OpenMetaverse
 
                 foreach (PlacesReplyPacket.QueryDataBlock block in placesReply.QueryData)
                 {
-                    PlacesSearchData place = new PlacesSearchData
-                    {
-                        OwnerID = block.OwnerID,
-                        Name = Utils.BytesToString(block.Name),
-                        Desc = Utils.BytesToString(block.Desc),
-                        ActualArea = block.ActualArea,
-                        BillableArea = block.BillableArea,
-                        Flags = (PlacesFlags)block.Flags,
-                        GlobalX = block.GlobalX,
-                        GlobalY = block.GlobalY,
-                        GlobalZ = block.GlobalZ,
-                        SimName = Utils.BytesToString(block.SimName),
-                        SnapshotID = block.SnapshotID,
-                        Dwell = block.Dwell,
-                        Price = block.Price
-                    };
+                    PlacesSearchData place = new PlacesSearchData();
+                    place.OwnerID = block.OwnerID;
+                    place.Name = Utils.BytesToString(block.Name);
+                    place.Desc = Utils.BytesToString(block.Desc);
+                    place.ActualArea = block.ActualArea;
+                    place.BillableArea = block.BillableArea;
+                    place.Flags = (PlacesFlags)block.Flags;
+                    place.GlobalX = block.GlobalX;
+                    place.GlobalY = block.GlobalY;
+                    place.GlobalZ = block.GlobalZ;
+                    place.SimName = Utils.BytesToString(block.SimName);
+                    place.SnapshotID = block.SnapshotID;
+                    place.Dwell = block.Dwell;
+                    place.Price = block.Price;
 
                     places.Add(place);
                 }
@@ -1417,15 +1368,13 @@ namespace OpenMetaverse
 
                 foreach (DirEventsReplyPacket.QueryRepliesBlock reply in eventsReply.QueryReplies)
                 {
-                    EventsSearchData eventsData = new EventsSearchData
-                    {
-                        Owner = reply.OwnerID,
-                        Name = Utils.BytesToString(reply.Name),
-                        ID = reply.EventID,
-                        Date = Utils.BytesToString(reply.Date),
-                        Time = reply.UnixTime,
-                        Flags = (EventFlags)reply.EventFlags
-                    };
+                    EventsSearchData eventsData = new EventsSearchData();
+                    eventsData.Owner = reply.OwnerID;
+                    eventsData.Name = Utils.BytesToString(reply.Name);
+                    eventsData.ID = reply.EventID;
+                    eventsData.Date = Utils.BytesToString(reply.Date);
+                    eventsData.Time = reply.UnixTime;
+                    eventsData.Flags = (EventFlags)reply.EventFlags;
                     matches.Add(eventsData);
                 }
 
@@ -1442,22 +1391,20 @@ namespace OpenMetaverse
             {
                 Packet packet = e.Packet;
                 EventInfoReplyPacket eventReply = (EventInfoReplyPacket)packet;
-                EventInfo evinfo = new EventInfo
-                {
-                    ID = eventReply.EventData.EventID,
-                    Name = Utils.BytesToString(eventReply.EventData.Name),
-                    Desc = Utils.BytesToString(eventReply.EventData.Desc),
-                    Amount = eventReply.EventData.Amount,
-                    Category = (EventCategories)Utils.BytesToUInt(eventReply.EventData.Category),
-                    Cover = eventReply.EventData.Cover,
-                    Creator = (UUID)Utils.BytesToString(eventReply.EventData.Creator),
-                    Date = Utils.BytesToString(eventReply.EventData.Date),
-                    DateUTC = eventReply.EventData.DateUTC,
-                    Duration = eventReply.EventData.Duration,
-                    Flags = (EventFlags)eventReply.EventData.EventFlags,
-                    SimName = Utils.BytesToString(eventReply.EventData.SimName),
-                    GlobalPos = eventReply.EventData.GlobalPos
-                };
+                EventInfo evinfo = new EventInfo();
+                evinfo.ID = eventReply.EventData.EventID;
+                evinfo.Name = Utils.BytesToString(eventReply.EventData.Name);
+                evinfo.Desc = Utils.BytesToString(eventReply.EventData.Desc);
+                evinfo.Amount = eventReply.EventData.Amount;
+                evinfo.Category = (EventCategories)Utils.BytesToUInt(eventReply.EventData.Category);
+                evinfo.Cover = eventReply.EventData.Cover;
+                evinfo.Creator = (UUID)Utils.BytesToString(eventReply.EventData.Creator);
+                evinfo.Date = Utils.BytesToString(eventReply.EventData.Date);
+                evinfo.DateUTC = eventReply.EventData.DateUTC;
+                evinfo.Duration = eventReply.EventData.Duration;
+                evinfo.Flags = (EventFlags)eventReply.EventData.EventFlags;
+                evinfo.SimName = Utils.BytesToString(eventReply.EventData.SimName);
+                evinfo.GlobalPos = eventReply.EventData.GlobalPos;
 
                 OnEventInfo(new EventInfoReplyEventArgs(evinfo));
             }
@@ -1472,15 +1419,20 @@ namespace OpenMetaverse
             {
                 Packet packet = e.Packet;
                 DirPlacesReplyPacket reply = (DirPlacesReplyPacket)packet;
-                List<DirectoryParcel> result = reply.QueryReplies.Select(t => new DirectoryParcel
-                    {
-                        ID = t.ParcelID,
-                        Name = Utils.BytesToString(t.Name),
-                        Dwell = t.Dwell,
-                        Auction = t.Auction,
-                        ForSale = t.ForSale
-                    })
-                    .ToList();
+                List<DirectoryParcel> result = new List<DirectoryParcel>();
+
+                for (int i = 0; i < reply.QueryReplies.Length; i++)
+                {
+                    DirectoryParcel p = new DirectoryParcel();
+
+                    p.ID = reply.QueryReplies[i].ParcelID;
+                    p.Name = Utils.BytesToString(reply.QueryReplies[i].Name);
+                    p.Dwell = reply.QueryReplies[i].Dwell;
+                    p.Auction = reply.QueryReplies[i].Auction;
+                    p.ForSale = reply.QueryReplies[i].ForSale;
+
+                    result.Add(p);
+                }
 
                 OnDirPlaces(new DirPlacesReplyEventArgs(reply.QueryData[0].QueryID, result));                
             }
@@ -1494,27 +1446,32 @@ namespace OpenMetaverse
     /// <summary>Contains the Event data returned from the data server from an EventInfoRequest</summary>
     public class EventInfoReplyEventArgs : EventArgs
     {
+        private readonly DirectoryManager.EventInfo m_MatchedEvent;
+
         /// <summary>
         /// A single EventInfo object containing the details of an event
         /// </summary>
-        public DirectoryManager.EventInfo MatchedEvent { get; }
+        public DirectoryManager.EventInfo MatchedEvent { get { return m_MatchedEvent; } }
 
         /// <summary>Construct a new instance of the EventInfoReplyEventArgs class</summary>
         /// <param name="matchedEvent">A single EventInfo object containing the details of an event</param>
         public EventInfoReplyEventArgs(DirectoryManager.EventInfo matchedEvent)
         {
-            this.MatchedEvent = matchedEvent;
+            this.m_MatchedEvent = matchedEvent;
         }        
     }
 
     /// <summary>Contains the "Event" detail data returned from the data server</summary>
     public class DirEventsReplyEventArgs : EventArgs
     {
+        private readonly UUID m_QueryID;
         /// <summary>The ID returned by <see cref="DirectoryManager.StartEventsSearch"/></summary>
-        public UUID QueryID { get; }
+        public UUID QueryID { get { return m_QueryID; } }
+
+        private readonly List<DirectoryManager.EventsSearchData> m_matchedEvents;
 
         /// <summary>A list of "Events" returned by the data server</summary>
-        public List<DirectoryManager.EventsSearchData> MatchedEvents { get; }
+        public List<DirectoryManager.EventsSearchData> MatchedEvents { get { return m_matchedEvents; } }
 
         /// <summary>Construct a new instance of the DirEventsReplyEventArgs class</summary>
         /// <param name="queryID">The ID of the query returned by the data server. 
@@ -1522,19 +1479,22 @@ namespace OpenMetaverse
         /// <param name="matchedEvents">A list containing the "Events" returned by the search query</param>
         public DirEventsReplyEventArgs(UUID queryID, List<DirectoryManager.EventsSearchData> matchedEvents)
         {
-            this.QueryID = queryID;
-            this.MatchedEvents = matchedEvents;
+            this.m_QueryID = queryID;
+            this.m_matchedEvents = matchedEvents;
         }
     }
 
     /// <summary>Contains the "Event" list data returned from the data server</summary>
     public class PlacesReplyEventArgs : EventArgs
     {
+        private readonly UUID m_QueryID;
         /// <summary>The ID returned by <see cref="DirectoryManager.StartPlacesSearch"/></summary>
-        public UUID QueryID { get; }
+        public UUID QueryID { get { return m_QueryID; } }
+
+        private readonly List<DirectoryManager.PlacesSearchData> m_MatchedPlaces;
 
         /// <summary>A list of "Places" returned by the data server</summary>
-        public List<DirectoryManager.PlacesSearchData> MatchedPlaces { get; }
+        public List<DirectoryManager.PlacesSearchData> MatchedPlaces { get { return m_MatchedPlaces; } }
 
         /// <summary>Construct a new instance of PlacesReplyEventArgs class</summary>
         /// <param name="queryID">The ID of the query returned by the data server. 
@@ -1542,53 +1502,60 @@ namespace OpenMetaverse
         /// <param name="matchedPlaces">A list containing the "Places" returned by the data server query</param>
         public PlacesReplyEventArgs(UUID queryID, List<DirectoryManager.PlacesSearchData> matchedPlaces)
         {
-            this.QueryID = queryID;
-            this.MatchedPlaces = matchedPlaces;
+            this.m_QueryID = queryID;
+            this.m_MatchedPlaces = matchedPlaces;
         }
     }
 
     /// <summary>Contains the places data returned from the data server</summary>
     public class DirPlacesReplyEventArgs : EventArgs
     {
+        private readonly UUID m_QueryID;
         /// <summary>The ID returned by <see cref="DirectoryManager.StartDirPlacesSearch"/></summary>
-        public UUID QueryID { get; }
+        public UUID QueryID { get { return m_QueryID; } }
+
+        private readonly List<DirectoryManager.DirectoryParcel> m_MatchedParcels;
 
         /// <summary>A list containing Places data returned by the data server</summary>
-        public List<DirectoryManager.DirectoryParcel> MatchedParcels { get; }
-
+        public List<DirectoryManager.DirectoryParcel> MatchedParcels { get { return m_MatchedParcels; } }
+        
         /// <summary>Construct a new instance of the DirPlacesReplyEventArgs class</summary>
         /// <param name="queryID">The ID of the query returned by the data server. 
         /// This will correlate to the ID returned by the <see cref="StartDirPlacesSearch"/> method</param>
         /// <param name="matchedParcels">A list containing land data returned by the data server</param>
         public DirPlacesReplyEventArgs(UUID queryID, List<DirectoryManager.DirectoryParcel> matchedParcels)
         {
-            this.QueryID = queryID;
-            this.MatchedParcels = matchedParcels;
+            this.m_QueryID = queryID;
+            this.m_MatchedParcels = matchedParcels;
         }
     }
 
     /// <summary>Contains the classified data returned from the data server</summary>
     public class DirClassifiedsReplyEventArgs : EventArgs
     {
+        private readonly List<DirectoryManager.Classified> m_Classifieds;
         /// <summary>A list containing Classified Ads returned by the data server</summary>
-        public List<DirectoryManager.Classified> Classifieds { get; }
+        public List<DirectoryManager.Classified> Classifieds { get { return m_Classifieds; } }
 
         /// <summary>Construct a new instance of the DirClassifiedsReplyEventArgs class</summary>
         /// <param name="classifieds">A list of classified ad data returned from the data server</param>
         public DirClassifiedsReplyEventArgs(List<DirectoryManager.Classified> classifieds)
         {
-            this.Classifieds = classifieds;
+            this.m_Classifieds = classifieds;
         }
     }
 
     /// <summary>Contains the group data returned from the data server</summary>
     public class DirGroupsReplyEventArgs : EventArgs
     {
+        private readonly UUID m_QueryID;
         /// <summary>The ID returned by <see cref="DirectoryManager.StartGroupSearch"/></summary>
-        public UUID QueryID { get; }
+        public UUID QueryID { get { return m_QueryID; } }
+
+        private readonly List<DirectoryManager.GroupSearchData> m_matchedGroups;
 
         /// <summary>A list containing Groups data returned by the data server</summary>
-        public List<DirectoryManager.GroupSearchData> MatchedGroups { get; }
+        public List<DirectoryManager.GroupSearchData> MatchedGroups { get { return m_matchedGroups; } }
 
         /// <summary>Construct a new instance of the DirGroupsReplyEventArgs class</summary>
         /// <param name="queryID">The ID of the query returned by the data server. 
@@ -1596,19 +1563,22 @@ namespace OpenMetaverse
         /// <param name="matchedGroups">A list of groups data returned by the data server</param>
         public DirGroupsReplyEventArgs(UUID queryID, List<DirectoryManager.GroupSearchData> matchedGroups)
         {
-            this.QueryID = queryID;
-            this.MatchedGroups = matchedGroups;
+            this.m_QueryID = queryID;
+            this.m_matchedGroups = matchedGroups;
         }
     }
 
     /// <summary>Contains the people data returned from the data server</summary>
     public class DirPeopleReplyEventArgs : EventArgs
     {
+        private readonly UUID m_QueryID;
         /// <summary>The ID returned by <see cref="DirectoryManager.StartPeopleSearch"/></summary>
-        public UUID QueryID { get; }
+        public UUID QueryID { get { return m_QueryID; } }
+
+        private readonly List<DirectoryManager.AgentSearchData> m_MatchedPeople;
 
         /// <summary>A list containing People data returned by the data server</summary>
-        public List<DirectoryManager.AgentSearchData> MatchedPeople { get; }
+        public List<DirectoryManager.AgentSearchData> MatchedPeople { get { return m_MatchedPeople; } }
 
         /// <summary>Construct a new instance of the DirPeopleReplyEventArgs class</summary>
         /// <param name="queryID">The ID of the query returned by the data server. 
@@ -1616,22 +1586,24 @@ namespace OpenMetaverse
         /// <param name="matchedPeople">A list of people data returned by the data server</param>
         public DirPeopleReplyEventArgs(UUID queryID, List<DirectoryManager.AgentSearchData> matchedPeople)
         {
-            this.QueryID = queryID;
-            this.MatchedPeople = matchedPeople;
+            this.m_QueryID = queryID;
+            this.m_MatchedPeople = matchedPeople;
         }
     }
 
     /// <summary>Contains the land sales data returned from the data server</summary>
     public class DirLandReplyEventArgs : EventArgs
     {
+        private readonly List<DirectoryManager.DirectoryParcel> m_DirParcels;
+
         /// <summary>A list containing land forsale data returned by the data server</summary>
-        public List<DirectoryManager.DirectoryParcel> DirParcels { get; }
+        public List<DirectoryManager.DirectoryParcel> DirParcels { get { return m_DirParcels; } }
 
         /// <summary>Construct a new instance of the DirLandReplyEventArgs class</summary>
         /// <param name="dirParcels">A list of parcels for sale returned by the data server</param>
         public DirLandReplyEventArgs(List<DirectoryManager.DirectoryParcel> dirParcels)
         {
-            this.DirParcels = dirParcels;
+            this.m_DirParcels = dirParcels;
         }
     }
     #endregion

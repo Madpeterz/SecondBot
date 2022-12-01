@@ -28,7 +28,6 @@ using OpenMetaverse.Packets;
 using OpenMetaverse.Interfaces;
 using OpenMetaverse.Messages.Linden;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace OpenMetaverse
 {
@@ -571,15 +570,15 @@ namespace OpenMetaverse
         public void SetRegionInfo(bool blockTerraform, bool blockFly, bool allowDamage, bool allowLandResell, bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus, bool mature)
         {
             List<string> listParams = new List<string>();
-            listParams.Add(blockTerraform ? "Y" : "N");
-            listParams.Add(blockFly ? "Y" : "N");
-            listParams.Add(allowDamage ? "Y" : "N");
-            listParams.Add(allowLandResell ? "Y" : "N");
-            listParams.Add(agentLimit.ToString(CultureInfo.InvariantCulture));
-            listParams.Add(objectBonus.ToString(CultureInfo.InvariantCulture));
-            listParams.Add(mature ? "21" : "13"); //FIXME - enumerate these settings
-            listParams.Add(restrictPushing ? "Y" : "N");
-            listParams.Add(allowParcelJoinDivide ? "Y" : "N");
+            if (blockTerraform) listParams.Add("Y"); else listParams.Add("N");
+            if (blockFly) listParams.Add("Y"); else listParams.Add("N");
+            if (allowDamage) listParams.Add("Y"); else listParams.Add("N");
+            if (allowLandResell) listParams.Add("Y"); else listParams.Add("N");
+            listParams.Add(agentLimit.ToString());
+            listParams.Add(objectBonus.ToString());
+            if (mature) listParams.Add("21"); else listParams.Add("13"); //FIXME - enumerate these settings
+            if (restrictPushing) listParams.Add("Y"); else listParams.Add("N");
+            if (allowParcelJoinDivide) listParams.Add("Y"); else listParams.Add("N");
             EstateOwnerMessage("setregioninfo", listParams);
         }
 
@@ -587,9 +586,9 @@ namespace OpenMetaverse
         public void SetRegionDebug(bool disableScripts, bool disableCollisions, bool disablePhysics)
         {
             List<string> listParams = new List<string>();
-            listParams.Add(disableScripts ? "Y" : "N");
-            listParams.Add(disableCollisions ? "Y" : "N");
-            listParams.Add(disablePhysics ? "Y" : "N");
+            if (disableScripts) listParams.Add("Y"); else listParams.Add("N");
+            if (disableCollisions) listParams.Add("Y"); else listParams.Add("N");
+            if (disablePhysics) listParams.Add("Y"); else listParams.Add("N");
             EstateOwnerMessage("setregiondebug", listParams);
         }
 
@@ -601,10 +600,10 @@ namespace OpenMetaverse
         public void SetRegionTerrain(UUID low, UUID midLow, UUID midHigh, UUID high)
         {
             List<string> listParams = new List<string>();
-            listParams.Add("0 " + low);
-            listParams.Add("1 " + midLow);
-            listParams.Add("2 " + midHigh);
-            listParams.Add("3 " + high);
+            listParams.Add("0 " + low.ToString());
+            listParams.Add("1 " + midLow.ToString());
+            listParams.Add("2 " + midHigh.ToString());
+            listParams.Add("3 " + high.ToString());
             EstateOwnerMessage("texturedetail", listParams);
             EstateOwnerMessage("texturecommit", "");
         }
@@ -985,66 +984,72 @@ namespace OpenMetaverse
     /// <summary>Raised on LandStatReply when the report type is for "top colliders"</summary>
     public class TopCollidersReplyEventArgs : EventArgs
     {
+        private readonly int m_objectCount;
+        private readonly Dictionary<UUID, EstateTask> m_Tasks;
+
         /// <summary>
         /// The number of returned items in LandStatReply
         /// </summary>
-        public int ObjectCount { get; }
-
+        public int ObjectCount { get { return m_objectCount; } }
         /// <summary>
         /// A Dictionary of Object UUIDs to tasks returned in LandStatReply
         /// </summary>
-        public Dictionary<UUID, EstateTask> Tasks { get; }
+        public Dictionary<UUID, EstateTask> Tasks { get { return m_Tasks; } }
 
         /// <summary>Construct a new instance of the TopCollidersReplyEventArgs class</summary>
         /// <param name="objectCount">The number of returned items in LandStatReply</param>
         /// <param name="tasks">Dictionary of Object UUIDs to tasks returned in LandStatReply</param>
         public TopCollidersReplyEventArgs(int objectCount, Dictionary<UUID, EstateTask> tasks)
         {
-            this.ObjectCount = objectCount;
-            this.Tasks = tasks;
+            this.m_objectCount = objectCount;
+            this.m_Tasks = tasks;
         }
     }
 
     /// <summary>Raised on LandStatReply when the report type is for "top Scripts"</summary>
     public class TopScriptsReplyEventArgs : EventArgs
     {
+        private readonly int m_objectCount;
+        private readonly Dictionary<UUID, EstateTask> m_Tasks;
+
         /// <summary>
         /// The number of scripts returned in LandStatReply
         /// </summary>
-        public int ObjectCount { get; }
-
+        public int ObjectCount { get { return m_objectCount; } }
         /// <summary>
         /// A Dictionary of Object UUIDs to tasks returned in LandStatReply
         /// </summary>
-        public Dictionary<UUID, EstateTask> Tasks { get; }
+        public Dictionary<UUID, EstateTask> Tasks { get { return m_Tasks; } }
 
         /// <summary>Construct a new instance of the TopScriptsReplyEventArgs class</summary>
         /// <param name="objectCount">The number of returned items in LandStatReply</param>
         /// <param name="tasks">Dictionary of Object UUIDs to tasks returned in LandStatReply</param>
         public TopScriptsReplyEventArgs(int objectCount, Dictionary<UUID, EstateTask> tasks)
         {
-            this.ObjectCount = objectCount;
-            this.Tasks = tasks;
+            this.m_objectCount = objectCount;
+            this.m_Tasks = tasks;
         }
     }
 
     /// <summary>Returned, along with other info, upon a successful .RequestInfo()</summary>
     public class EstateBansReplyEventArgs : EventArgs
     {
+        private readonly uint m_estateID;
+        private readonly int m_count;
+        private readonly List<UUID> m_banned;
+
         /// <summary>
         /// The identifier of the estate
         /// </summary>
-        public uint EstateID { get; }
-
+        public uint EstateID { get { return m_estateID; } }
         /// <summary>
         /// The number of returned itmes
         /// </summary>
-        public int Count { get; }
-
+        public int Count { get { return m_count; } }
         /// <summary>
         /// List of UUIDs of Banned Users
         /// </summary>
-        public List<UUID> Banned { get; }
+        public List<UUID> Banned { get { return m_banned; } }
 
         /// <summary>Construct a new instance of the EstateBansReplyEventArgs class</summary>
         /// <param name="estateID">The estate's identifier on the grid</param>
@@ -1052,29 +1057,31 @@ namespace OpenMetaverse
         /// <param name="banned">User UUIDs banned</param>
         public EstateBansReplyEventArgs(uint estateID, int count, List<UUID> banned)
         {
-            this.EstateID = estateID;
-            this.Count = count;
-            this.Banned = banned;
+            this.m_estateID = estateID;
+            this.m_count = count;
+            this.m_banned = banned;
         }
     }
 
     /// <summary>Returned, along with other info, upon a successful .RequestInfo()</summary>
     public class EstateUsersReplyEventArgs : EventArgs
     {
+        private readonly uint m_estateID;
+        private readonly int m_count;
+        private readonly List<UUID> m_allowedUsers;
+
         /// <summary>
         /// The identifier of the estate
         /// </summary>
-        public uint EstateID { get; }
-
+        public uint EstateID { get { return m_estateID; } }
         /// <summary>
         /// The number of returned items
         /// </summary>
-        public int Count { get; }
-
+        public int Count { get { return m_count; } }
         /// <summary>
         /// List of UUIDs of Allowed Users
         /// </summary>
-        public List<UUID> AllowedUsers { get; }
+        public List<UUID> AllowedUsers { get { return m_allowedUsers; } }
 
         /// <summary>Construct a new instance of the EstateUsersReplyEventArgs class</summary>
         /// <param name="estateID">The estate's identifier on the grid</param>
@@ -1082,29 +1089,31 @@ namespace OpenMetaverse
         /// <param name="allowedUsers">Allowed users UUIDs</param>
         public EstateUsersReplyEventArgs(uint estateID, int count, List<UUID> allowedUsers)
         {
-            this.EstateID = estateID;
-            this.Count = count;
-            this.AllowedUsers = allowedUsers;
+            this.m_estateID = estateID;
+            this.m_count = count;
+            this.m_allowedUsers = allowedUsers;
         }
     }
 
     /// <summary>Returned, along with other info, upon a successful .RequestInfo()</summary>
     public class EstateGroupsReplyEventArgs : EventArgs
     {
+        private readonly uint m_estateID;
+        private readonly int m_count;
+        private readonly List<UUID> m_allowedGroups;
+
         /// <summary>
         /// The identifier of the estate
         /// </summary>
-        public uint EstateID { get; }
-
+        public uint EstateID { get { return m_estateID; } }
         /// <summary>
         /// The number of returned items
         /// </summary>
-        public int Count { get; }
-
+        public int Count { get { return m_count; } }
         /// <summary>
         /// List of UUIDs of Allowed Groups
         /// </summary>
-        public List<UUID> AllowedGroups { get; }
+        public List<UUID> AllowedGroups { get { return m_allowedGroups; } }
 
         /// <summary>Construct a new instance of the EstateGroupsReplyEventArgs class</summary>
         /// <param name="estateID">The estate's identifier on the grid</param>
@@ -1112,29 +1121,31 @@ namespace OpenMetaverse
         /// <param name="allowedGroups">Allowed Groups UUIDs</param>
         public EstateGroupsReplyEventArgs(uint estateID, int count, List<UUID> allowedGroups)
         {
-            this.EstateID = estateID;
-            this.Count = count;
-            this.AllowedGroups = allowedGroups;
+            this.m_estateID = estateID;
+            this.m_count = count;
+            this.m_allowedGroups = allowedGroups;
         }
     }
 
     /// <summary>Returned, along with other info, upon a successful .RequestInfo()</summary>
     public class EstateManagersReplyEventArgs : EventArgs
     {
+        private readonly uint m_estateID;
+        private readonly int m_count;
+        private readonly List<UUID> m_Managers;
+
         /// <summary>
         /// The identifier of the estate
         /// </summary>
-        public uint EstateID { get; }
-
+        public uint EstateID { get { return m_estateID; } }
         /// <summary>
         /// The number of returned items
         /// </summary>
-        public int Count { get; }
-
+        public int Count { get { return m_count; } }
         /// <summary>
         /// List of UUIDs of the Estate's Managers
         /// </summary>
-        public List<UUID> Managers { get; }
+        public List<UUID> Managers { get { return m_Managers; } }
 
         /// <summary>Construct a new instance of the EstateManagersReplyEventArgs class</summary>
         /// <param name="estateID">The estate's identifier on the grid</param>
@@ -1142,34 +1153,36 @@ namespace OpenMetaverse
         /// <param name="managers"> Managers UUIDs</param>
         public EstateManagersReplyEventArgs(uint estateID, int count, List<UUID> managers)
         {
-            this.EstateID = estateID;
-            this.Count = count;
-            this.Managers = managers;
+            this.m_estateID = estateID;
+            this.m_count = count;
+            this.m_Managers = managers;
         }
     }
 
     /// <summary>Returned, along with other info, upon a successful .RequestInfo()</summary>
     public class EstateCovenantReplyEventArgs : EventArgs
     {
+        private readonly UUID m_covenantID;
+        private readonly long m_timestamp;
+        private readonly string m_estateName;
+        private readonly UUID m_estateOwnerID;
+
         /// <summary>
         /// The Covenant
         /// </summary>
-        public UUID CovenantID { get; }
-
+        public UUID CovenantID { get { return m_covenantID; } }
         /// <summary>
         /// The timestamp
         /// </summary>
-        public long Timestamp { get; }
-
+        public long Timestamp { get { return m_timestamp; } }
         /// <summary>
         /// The Estate name
         /// </summary>
-        public String EstateName { get; }
-
+        public String EstateName { get { return m_estateName; } }
         /// <summary>
         /// The Estate Owner's ID (can be a GroupID)
         /// </summary>
-        public UUID EstateOwnerID { get; }
+        public UUID EstateOwnerID { get { return m_estateOwnerID; } }
 
         /// <summary>Construct a new instance of the EstateCovenantReplyEventArgs class</summary>
         /// <param name="covenantID">The Covenant ID</param>
@@ -1178,10 +1191,10 @@ namespace OpenMetaverse
         /// <param name="estateOwnerID">The Estate Owner's ID (can be a GroupID)</param>
         public EstateCovenantReplyEventArgs(UUID covenantID, long timestamp, string estateName, UUID estateOwnerID)
         {
-            this.CovenantID = covenantID;
-            this.Timestamp = timestamp;
-            this.EstateName = estateName;
-            this.EstateOwnerID = estateOwnerID;
+            this.m_covenantID = covenantID;
+            this.m_timestamp = timestamp;
+            this.m_estateName = estateName;
+            this.m_estateOwnerID = estateOwnerID;
 
         }
     }
@@ -1190,23 +1203,25 @@ namespace OpenMetaverse
     /// <summary>Returned, along with other info, upon a successful .RequestInfo()</summary>
     public class EstateUpdateInfoReplyEventArgs : EventArgs
     {
+        private readonly uint m_estateID;
+        private readonly bool m_denyNoPaymentInfo;
+        private readonly string m_estateName;
+        private readonly UUID m_estateOwner;
+
         /// <summary>
         /// The estate's name
         /// </summary>
-        public String EstateName { get; }
-
+        public String EstateName { get { return m_estateName; } }
         /// <summary>
         /// The Estate Owner's ID (can be a GroupID)
         /// </summary>
-        public UUID EstateOwner { get; }
-
+        public UUID EstateOwner { get { return m_estateOwner; } }
         /// <summary>
         /// The identifier of the estate on the grid
         /// </summary>
-        public uint EstateID { get; }
-
+        public uint EstateID { get { return m_estateID; } }
         /// <summary></summary>
-        public bool DenyNoPaymentInfo { get; }
+        public bool DenyNoPaymentInfo { get { return m_denyNoPaymentInfo; } }
 
         /// <summary>Construct a new instance of the EstateUpdateInfoReplyEventArgs class</summary>
         /// <param name="estateName">The estate's name</param>
@@ -1215,10 +1230,10 @@ namespace OpenMetaverse
         /// <param name="denyNoPaymentInfo"></param>
         public EstateUpdateInfoReplyEventArgs(string estateName, UUID estateOwner, uint estateID, bool denyNoPaymentInfo)
         {
-            this.EstateName = estateName;
-            this.EstateOwner = estateOwner;
-            this.EstateID = estateID;
-            this.DenyNoPaymentInfo = denyNoPaymentInfo;
+            this.m_estateName = estateName;
+            this.m_estateOwner = estateOwner;
+            this.m_estateID = estateID;
+            this.m_denyNoPaymentInfo = denyNoPaymentInfo;
 
         }
     }

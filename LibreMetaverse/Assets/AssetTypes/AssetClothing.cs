@@ -24,6 +24,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using OpenMetaverse;
+
 namespace OpenMetaverse.Assets
 {
     /// <summary>

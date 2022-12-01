@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
- * Copyright (c) 2021-2022, Sjofn LLC.
+ * Copyright (c) 2021, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using OpenMetaverse.Http;
 using OpenMetaverse.Packets;
 using OpenMetaverse.Interfaces;
@@ -190,7 +188,7 @@ namespace OpenMetaverse
         const int MAX_UUIDS_PER_PACKET = 100;
 
         #region Events
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<AvatarAnimationEventArgs> m_AvatarAnimation;
 
         ///<summary>Raises the AvatarAnimation Event</summary>
@@ -213,7 +211,7 @@ namespace OpenMetaverse
             remove { lock (m_AvatarAnimationLock) { m_AvatarAnimation -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<AvatarAppearanceEventArgs> m_AvatarAppearance;
 
         ///<summary>Raises the AvatarAppearance Event</summary>
@@ -236,7 +234,7 @@ namespace OpenMetaverse
             remove { lock (m_AvatarAppearanceLock) { m_AvatarAppearance -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<UUIDNameReplyEventArgs> m_UUIDNameReply;
 
         ///<summary>Raises the UUIDNameReply Event</summary>
@@ -259,7 +257,7 @@ namespace OpenMetaverse
             remove { lock (m_UUIDNameReplyLock) { m_UUIDNameReply -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<AvatarInterestsReplyEventArgs> m_AvatarInterestsReply;
 
         ///<summary>Raises the AvatarInterestsReply Event</summary>
@@ -282,7 +280,7 @@ namespace OpenMetaverse
             remove { lock (m_AvatarInterestsReplyLock) { m_AvatarInterestsReply -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<AvatarNotesReplyEventArgs> m_AvatarNotesReply;
 
         ///<summary>Raises the AvatarNotesReply Event</summary>
@@ -305,7 +303,7 @@ namespace OpenMetaverse
             remove { lock (m_AvatarNotesReplyLock) { m_AvatarNotesReply -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<AvatarPropertiesReplyEventArgs> m_AvatarPropertiesReply;
 
         ///<summary>Raises the AvatarPropertiesReply Event</summary>
@@ -328,7 +326,7 @@ namespace OpenMetaverse
             remove { lock (m_AvatarPropertiesReplyLock) { m_AvatarPropertiesReply -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<AvatarGroupsReplyEventArgs> m_AvatarGroupsReply;
 
         ///<summary>Raises the AvatarGroupsReply Event</summary>
@@ -351,7 +349,7 @@ namespace OpenMetaverse
             remove { lock (m_AvatarGroupsReplyLock) { m_AvatarGroupsReply -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<AvatarPickerReplyEventArgs> m_AvatarPickerReply;
 
         ///<summary>Raises the AvatarPickerReply Event</summary>
@@ -374,7 +372,7 @@ namespace OpenMetaverse
             remove { lock (m_AvatarPickerReplyLock) { m_AvatarPickerReply -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<ViewerEffectPointAtEventArgs> m_ViewerEffectPointAt;
 
         ///<summary>Raises the ViewerEffectPointAt Event</summary>
@@ -397,7 +395,7 @@ namespace OpenMetaverse
             remove { lock (m_ViewerEffectPointAtLock) { m_ViewerEffectPointAt -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<ViewerEffectLookAtEventArgs> m_ViewerEffectLookAt;
 
         ///<summary>Raises the ViewerEffectLookAt Event</summary>
@@ -420,7 +418,7 @@ namespace OpenMetaverse
             remove { lock (m_ViewerEffectLookAtLock) { m_ViewerEffectLookAt -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<ViewerEffectEventArgs> m_ViewerEffect;
 
         ///<summary>Raises the ViewerEffect Event</summary>
@@ -443,7 +441,7 @@ namespace OpenMetaverse
             remove { lock (m_ViewerEffectLock) { m_ViewerEffect -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<AvatarPicksReplyEventArgs> m_AvatarPicksReply;
 
         ///<summary>Raises the AvatarPicksReply Event</summary>
@@ -466,7 +464,7 @@ namespace OpenMetaverse
             remove { lock (m_AvatarPicksReplyLock) { m_AvatarPicksReply -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<PickInfoReplyEventArgs> m_PickInfoReply;
 
         ///<summary>Raises the PickInfoReply Event</summary>
@@ -489,7 +487,7 @@ namespace OpenMetaverse
             remove { lock (m_PickInfoReplyLock) { m_PickInfoReply -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<AvatarClassifiedReplyEventArgs> m_AvatarClassifiedReply;
 
         ///<summary>Raises the AvatarClassifiedReply Event</summary>
@@ -512,7 +510,7 @@ namespace OpenMetaverse
             remove { lock (m_AvatarClassifiedReplyLock) { m_AvatarClassifiedReply -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<ClassifiedInfoReplyEventArgs> m_ClassifiedInfoReply;
 
         ///<summary>Raises the ClassifiedInfoReply Event</summary>
@@ -535,7 +533,7 @@ namespace OpenMetaverse
             remove { lock (m_ClassifiedInfoReplyLock) { m_ClassifiedInfoReply -= value; } }
         }
 
-        /// <summary>The event subscribers, null if no subscribers</summary>
+        /// <summary>The event subscribers, null of no subscribers</summary>
         private EventHandler<DisplayNameUpdateEventArgs> m_DisplayNameUpdate;
 
         ///<summary>Raises the DisplayNameUpdate Event</summary>
@@ -718,26 +716,25 @@ namespace OpenMetaverse
 
             Uri uri = new Uri(Client.Network.CurrentSim.Caps.CapabilityURI("GetDisplayNames").AbsoluteUri + "/?" + query);
 
-            Task req = Client.HttpCapsClient.GetRequestAsync(uri, CancellationToken.None, (response, data, error) =>
-            {
-                try
-                {
-                    if (error != null) { throw error; }
-                    GetDisplayNamesMessage msg = new GetDisplayNamesMessage();
-                    OSD result = OSDParser.Deserialize(data);
-                    if (result is OSDMap respMap)
-                    {
-                        msg.Deserialize(respMap);
-                        callback(true, msg.Agents, msg.BadIDs);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log("Failed to call GetDisplayNames capability: ",
-                        Helpers.LogLevel.Warning, Client, ex);
-                    callback(false, null, null);
-                }
-            });
+            CapsClient cap = new CapsClient(uri, "GetDisplayNames");
+            cap.OnComplete += (CapsClient client, OSD result, Exception error) =>
+                                  {
+                                      try
+                                      {
+                                          if (error != null)
+                                              throw error;
+                                          GetDisplayNamesMessage msg = new GetDisplayNamesMessage();
+                                          msg.Deserialize((OSDMap)result);
+                                          callback(true, msg.Agents, msg.BadIDs);
+                                      }
+                                      catch (Exception ex)
+                                      {
+                                          Logger.Log("Failed to call GetDisplayNames capability: ",
+                                                     Helpers.LogLevel.Warning, Client, ex);
+                                          callback(false, null, null);
+                                      }
+                                  };
+            cap.GetRequestAsync(Client.Settings.CAPS_TIMEOUT);
         }
 
         /// <summary>
@@ -1224,31 +1221,31 @@ namespace OpenMetaverse
                 switch (type)
                 {
                     case EffectType.Text:
-                        Logger.Log("Received a ViewerEffect of type " + type + ", implement me!",
+                        Logger.Log("Received a ViewerEffect of type " + type.ToString() + ", implement me!",
                             Helpers.LogLevel.Warning, Client);
                         break;
                     case EffectType.Icon:
-                        Logger.Log("Received a ViewerEffect of type " + type + ", implement me!",
+                        Logger.Log("Received a ViewerEffect of type " + type.ToString() + ", implement me!",
                             Helpers.LogLevel.Warning, Client);
                         break;
                     case EffectType.Connector:
-                        Logger.Log("Received a ViewerEffect of type " + type + ", implement me!",
+                        Logger.Log("Received a ViewerEffect of type " + type.ToString() + ", implement me!",
                             Helpers.LogLevel.Warning, Client);
                         break;
                     case EffectType.FlexibleObject:
-                        Logger.Log("Received a ViewerEffect of type " + type + ", implement me!",
+                        Logger.Log("Received a ViewerEffect of type " + type.ToString() + ", implement me!",
                             Helpers.LogLevel.Warning, Client);
                         break;
                     case EffectType.AnimalControls:
-                        Logger.Log("Received a ViewerEffect of type " + type + ", implement me!",
+                        Logger.Log("Received a ViewerEffect of type " + type.ToString() + ", implement me!",
                             Helpers.LogLevel.Warning, Client);
                         break;
                     case EffectType.AnimationObject:
-                        Logger.Log("Received a ViewerEffect of type " + type + ", implement me!",
+                        Logger.Log("Received a ViewerEffect of type " + type.ToString() + ", implement me!",
                             Helpers.LogLevel.Warning, Client);
                         break;
                     case EffectType.Cloth:
-                        Logger.Log("Received a ViewerEffect of type " + type + ", implement me!",
+                        Logger.Log("Received a ViewerEffect of type " + type.ToString() + ", implement me!",
                             Helpers.LogLevel.Warning, Client);
                         break;
                     case EffectType.Glow:
@@ -1272,7 +1269,7 @@ namespace OpenMetaverse
                             }
                             else
                             {
-                                Logger.Log("Received a " + type +
+                                Logger.Log("Received a " + type.ToString() +
                                     " ViewerEffect with an incorrect TypeData size of " +
                                     block.TypeData.Length + " bytes", Helpers.LogLevel.Warning, Client);
                             }

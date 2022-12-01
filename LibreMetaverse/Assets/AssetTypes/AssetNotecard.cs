@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using OpenMetaverse;
 
 namespace OpenMetaverse.Assets
 {
@@ -146,7 +147,7 @@ namespace OpenMetaverse.Assets
             }
 
             output.Append("}\n");
-            output.Append("Text length " + (Utils.StringToBytes(body).Length - 1) + "\n");
+            output.Append("Text length " + (Utils.StringToBytes(body).Length - 1).ToString() + "\n");
             output.Append(body + "}\n");
 
             AssetData = Utils.StringToBytes(output.ToString());

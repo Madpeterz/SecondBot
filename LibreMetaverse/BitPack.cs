@@ -43,14 +43,14 @@ namespace OpenMetaverse
         {
             get
             {
-                if (bytePos != 0 && BitPos == 0)
+                if (bytePos != 0 && bitPos == 0)
                     return bytePos - 1;
                 return bytePos;
             }
         }
 
         /// <summary></summary>
-        public int BitPos { get; private set; }
+        public int BitPos => bitPos;
 
 
         private const int MAX_BITS = 8;
@@ -58,7 +58,8 @@ namespace OpenMetaverse
         private static readonly byte[] Off = { 0 };
 
         private int bytePos;
-
+        private int bitPos;
+        
         /// <summary>
         /// Default constructor, initialize the bit packer / bit unpacker
         /// with a byte array and starting position
@@ -300,7 +301,7 @@ namespace OpenMetaverse
 
         public string UnpackString(int size)
         {
-            if (BitPos != 0 || bytePos + size > Data.Length) throw new IndexOutOfRangeException();
+            if (bitPos != 0 || bytePos + size > Data.Length) throw new IndexOutOfRangeException();
 
             string str = System.Text.Encoding.UTF8.GetString(Data, bytePos, size);
             bytePos += size;
@@ -309,7 +310,7 @@ namespace OpenMetaverse
 
         public UUID UnpackUUID()
         {
-            if (BitPos != 0) throw new IndexOutOfRangeException();
+            if (bitPos != 0) throw new IndexOutOfRangeException();
 
             UUID val = new UUID(Data, bytePos);
             bytePos += 16;
@@ -337,7 +338,7 @@ namespace OpenMetaverse
 
                 while (count > 0)
                 {
-                    byte curBit = (byte)(0x80 >> BitPos);
+                    byte curBit = (byte)(0x80 >> bitPos);
 
                     if ((data[curBytePos] & (0x01 << (count - 1))) != 0)
                         Data[bytePos] |= curBit;
@@ -345,12 +346,12 @@ namespace OpenMetaverse
                         Data[bytePos] &= (byte)~curBit;
 
                     --count;
-                    ++BitPos;
+                    ++bitPos;
                     ++curBitPos;
 
-                    if (BitPos >= MAX_BITS)
+                    if (bitPos >= MAX_BITS)
                     {
-                        BitPos = 0;
+                        bitPos = 0;
                         ++bytePos;
                     }
                     if (curBitPos >= MAX_BITS)
@@ -388,15 +389,15 @@ namespace OpenMetaverse
                     output[curBytePos] <<= 1;
 
                     // Grab one bit
-                    if ((Data[bytePos] & (0x80 >> BitPos++)) != 0)
+                    if ((Data[bytePos] & (0x80 >> bitPos++)) != 0)
                         ++output[curBytePos];
 
                     --count;
                     ++curBitPos;
 
-                    if (BitPos >= MAX_BITS)
+                    if (bitPos >= MAX_BITS)
                     {
-                        BitPos = 0;
+                        bitPos = 0;
                         ++bytePos;
                     }
                     if (curBitPos >= MAX_BITS)

@@ -27,7 +27,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Xml;
+using OpenMetaverse;
 
 namespace OpenMetaverse.Assets
 {
@@ -90,7 +92,7 @@ namespace OpenMetaverse.Assets
                             extension = ArchiveConstants.ASSET_TYPE_TO_EXTENSION[asset.AssetType];
                         }
 
-                        xtw.WriteElementString("filename", uuid + extension);
+                        xtw.WriteElementString("filename", uuid.ToString() + extension);
 
                         xtw.WriteElementString("name", uuid.ToString());
                         xtw.WriteElementString("description", String.Empty);
@@ -137,7 +139,7 @@ namespace OpenMetaverse.Assets
                 asset.Encode();
 
                 archive.WriteFile(
-                    ArchiveConstants.ASSETS_PATH + uuid + extension,
+                    ArchiveConstants.ASSETS_PATH + uuid.ToString() + extension,
                     asset.AssetData);
 
                 assetsAdded++;

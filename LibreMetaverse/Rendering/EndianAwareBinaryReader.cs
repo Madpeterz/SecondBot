@@ -64,9 +64,7 @@ namespace OpenMetaverse.Rendering
         {
             if ((format == SourceFormat.BigEndian && BitConverter.IsLittleEndian) ||
                 (format == SourceFormat.LittleEndian && !BitConverter.IsLittleEndian))
-            {
                 m_shouldReverseOrder = true;
-            }
         }
 
         /// <summary>

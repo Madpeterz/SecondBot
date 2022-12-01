@@ -447,20 +447,16 @@ namespace OpenMetaverse.Imaging
                     header.ImageSpec.PixelDepth != 16 &&
                     header.ImageSpec.PixelDepth != 24 &&
                     header.ImageSpec.PixelDepth != 32)
-                {
                     throw new ArgumentException("Not a supported tga file.");
-                }
 
                 if (header.ImageSpec.AlphaBits > 8)
                     throw new ArgumentException("Not a supported tga file.");
 
                 if (header.ImageSpec.Width > 4096 ||
                     header.ImageSpec.Height > 4096)
-                {
                     throw new ArgumentException("Image too large.");
-                }
 
-                Bitmap b;
+				Bitmap b;
 				BitmapData bd;
 
 				// Create a bitmap for the image.
@@ -521,7 +517,7 @@ namespace OpenMetaverse.Imaging
             }
         }
 
-        public static ManagedImage LoadTGAImage(System.IO.Stream source)
+        public static unsafe ManagedImage LoadTGAImage(System.IO.Stream source)
         {
             return LoadTGAImage(source, false);
         }
@@ -542,18 +538,14 @@ namespace OpenMetaverse.Imaging
                     header.ImageSpec.PixelDepth != 16 &&
                     header.ImageSpec.PixelDepth != 24 &&
                     header.ImageSpec.PixelDepth != 32)
-                {
                     throw new ArgumentException("Not a supported tga file.");
-                }
 
                 if (header.ImageSpec.AlphaBits > 8)
                     throw new ArgumentException("Not a supported tga file.");
 
                 if (header.ImageSpec.Width > 4096 ||
                     header.ImageSpec.Height > 4096)
-                {
                     throw new ArgumentException("Image too large.");
-                }
 
                 byte[] decoded = new byte[header.ImageSpec.Width * header.ImageSpec.Height * 4];
                 BitmapData bd = new BitmapData();

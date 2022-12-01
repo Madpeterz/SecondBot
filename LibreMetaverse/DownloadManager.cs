@@ -1,6 +1,6 @@
 ﻿/*
  * Copyright (c) 2006-2016, openmetaverse.co
- * Copyright (c) 2019-2022, Sjofn LLC.
+ * Copyright (c) 2019, Cinderblocks Design Co.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without 
@@ -25,14 +25,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using LibreMetaverse;
+using System.Security.Cryptography.X509Certificates;
+using OpenMetaverse.Http;
 
-namespace OpenMetaverse.Http
+namespace OpenMetaverse
 {
     /// <summary>
     /// Represents individual HTTP Download request
@@ -41,10 +39,12 @@ namespace OpenMetaverse.Http
     {
         /// <summary>URI of the item to fetch</summary>
         public Uri Address;
+        /// <summary>Timout specified in milliseconds</summary>
+        public int MillisecondsTimeout;
         /// <summary>Download progress callback</summary>
-        public DownloadProgressHandler DownloadProgressCallback;
+        public CapsBase.DownloadProgressEventHandler DownloadProgressCallback;
         /// <summary>Download completed callback</summary>
-        public DownloadCompleteHandler CompletedCallback;
+        public CapsBase.RequestCompletedEventHandler CompletedCallback;
         /// <summary>Accept the following content type</summary>
         public string ContentType;
         /// <summary>How many times will this request be retried</summary>
@@ -52,117 +52,174 @@ namespace OpenMetaverse.Http
         /// <summary>Current fetch attempt</summary>
         public int Attempt = 0;
 
-        /// <summary>Constructor</summary>
-        public DownloadRequest(Uri address, string contentType,
-            DownloadProgressHandler downloadProgressCallback,
-            DownloadCompleteHandler completedCallback)
+        /// <summary>Default constructor</summary>
+        public DownloadRequest()
         {
-            Address = address;
-            DownloadProgressCallback = downloadProgressCallback;
-            CompletedCallback = completedCallback;
-            ContentType = contentType;
+        }
+
+        /// <summary>Constructor</summary>
+        public DownloadRequest(Uri address, int millisecondsTimeout,
+            string contentType,
+            CapsBase.DownloadProgressEventHandler downloadProgressCallback,
+            CapsBase.RequestCompletedEventHandler completedCallback)
+        {
+            this.Address = address;
+            this.MillisecondsTimeout = millisecondsTimeout;
+            this.DownloadProgressCallback = downloadProgressCallback;
+            this.CompletedCallback = completedCallback;
+            this.ContentType = contentType;
         }
     }
 
     internal class ActiveDownload
     {
-        public List<DownloadProgressHandler> ProgressHandlers = new List<DownloadProgressHandler>();
-        public List<DownloadCompleteHandler> CompletedHandlers = new List<DownloadCompleteHandler>();
-        public CancellationTokenSource CancellationToken = new CancellationTokenSource();
+        public List<CapsBase.DownloadProgressEventHandler> ProgresHandlers = new List<CapsBase.DownloadProgressEventHandler>();
+        public List<CapsBase.RequestCompletedEventHandler> CompletedHandlers = new List<CapsBase.RequestCompletedEventHandler>();
+        public HttpWebRequest Request;
     }
 
     /// <summary>
     /// Manages async HTTP downloads with a limit on maximum
     /// concurrent downloads
     /// </summary>
-    public class DownloadManager : IDisposable
+    public class DownloadManager
     {
-        private readonly ConcurrentQueue<DownloadRequest> queue = new ConcurrentQueue<DownloadRequest>();
-        private readonly ConcurrentDictionary<string, ActiveDownload> activeDownloads = new ConcurrentDictionary<string, ActiveDownload>();
+        Queue<DownloadRequest> queue = new Queue<DownloadRequest>();
+        Dictionary<string, ActiveDownload> activeDownloads = new Dictionary<string, ActiveDownload>();
 
         /// <summary>Maximum number of parallel downloads from a single endpoint</summary>
         public int ParallelDownloads { get; set; }
 
-        private readonly GridClient Client;
+        /// <summary>Client certificate</summary>
+        public X509Certificate2 ClientCert { get; set; }
 
         /// <summary>Default constructor</summary>
-        public DownloadManager(GridClient client)
+        public DownloadManager()
         {
-            Client = client;
             ParallelDownloads = 8;
         }
 
         /// <summary>Cleanup method</summary>
         public virtual void Dispose()
         {
-            foreach (var download in activeDownloads.Values)
+            lock (activeDownloads)
             {
-                download.CancellationToken.Cancel();
-                download.CancellationToken.Dispose();
+                foreach (ActiveDownload download in activeDownloads.Values)
+                {
+                    try
+                    {
+                        download.Request?.Abort();
+                    }
+                    catch { }
+                }
+                activeDownloads.Clear();
             }
-            activeDownloads.Clear();
+        }
+
+        /// <summary>Setup http download request</summary>
+        protected virtual HttpWebRequest SetupRequest(Uri address, string acceptHeader)
+        {
+            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(address);
+            request.Method = "GET";
+
+            if (!string.IsNullOrEmpty(acceptHeader))
+                request.Accept = acceptHeader;
+
+            // Add the client certificate to the request if one was given
+            if (ClientCert != null)
+                request.ClientCertificates.Add(ClientCert);
+
+            // Leave idle connections to this endpoint open for up to 60 seconds
+            request.ServicePoint.MaxIdleTime = 0;
+            // Disable stupid Expect-100: Continue header
+            request.ServicePoint.Expect100Continue = false;
+            // Crank up the max number of connections per endpoint
+            if (request.ServicePoint.ConnectionLimit < Settings.MAX_HTTP_CONNECTIONS)
+            {
+                Logger.Log(
+                    "In DownloadManager.SetupRequest() setting conn limit for " +
+                    $"{address.Host}:{address.Port} to {Settings.MAX_HTTP_CONNECTIONS}", Helpers.LogLevel.Debug);
+                request.ServicePoint.ConnectionLimit = Settings.MAX_HTTP_CONNECTIONS;
+            }
+
+            return request;
         }
 
         /// <summary>Check the queue for pending work</summary>
         private void EnqueuePending()
         {
-            if (queue.Count <= 0) { return; }
-
-            var nr = activeDownloads.Count;
-
-            // Logger.DebugLog(nr.ToString() + " active downloads. Queued textures: " + queue.Count.ToString());
-
-            for (var i = nr; i < ParallelDownloads && queue.Count > 0; ++i)
+            lock (queue)
             {
-                if (!queue.TryDequeue(out var item)) { return; }
+                if (queue.Count <= 0) return;
 
-                var addr = item.Address.ToString();
-                if (activeDownloads.ContainsKey(addr))
+                int nr = 0;
+                lock (activeDownloads)
                 {
-                    activeDownloads[addr].CompletedHandlers.Add(item.CompletedCallback);
-                    if (item.DownloadProgressCallback != null)
-                    {
-                        activeDownloads[addr].ProgressHandlers.Add(item.DownloadProgressCallback);
-                    }
+                    nr = activeDownloads.Count;
                 }
-                else
-                {
-                    var activeDownload = new ActiveDownload();
-                    activeDownload.CompletedHandlers.Add(item.CompletedCallback);
-                    if (item.DownloadProgressCallback != null)
-                    {
-                        activeDownload.ProgressHandlers.Add(item.DownloadProgressCallback);
-                    }
 
-                    Logger.DebugLog($"Requesting {item.Address}");
-                    
-                    Task req = Client.HttpCapsClient.GetRequestAsync(item.Address, activeDownload.CancellationToken.Token,
-                            (response, responseData, error)  =>
-                            {
-                                activeDownloads.TryRemove(addr, out _);
-                                if (error == null || item.Attempt >= item.Retries || response.StatusCode == HttpStatusCode.NotFound)
-                                {
-                                    foreach (var handler in activeDownload.CompletedHandlers)
-                                    {
-                                        handler(response, responseData, error);
-                                    }
-                                }
-                                else
-                                {
-                                    item.Attempt++;
-                                    Logger.Log($"{item.Address} HTTP download failed, trying again retry {item.Attempt}/{item.Retries}",
-                                        Helpers.LogLevel.Warning);
-                                    lock (queue) queue.Enqueue(item);
-                                }
-                                EnqueuePending();
-                        }, (totalBytes, totalReceived, progressPercent) =>
+                // Logger.DebugLog(nr.ToString() + " active downloads. Queued textures: " + queue.Count.ToString());
+
+                for (int i = nr; i < ParallelDownloads && queue.Count > 0; i++)
+                {
+                    DownloadRequest item = queue.Dequeue();
+                    lock (activeDownloads)
+                    {
+                        string addr = item.Address.ToString();
+                        if (activeDownloads.ContainsKey(addr))
                         {
-                            foreach (var handler in activeDownload.ProgressHandlers)
+                            activeDownloads[addr].CompletedHandlers.Add(item.CompletedCallback);
+                            if (item.DownloadProgressCallback != null)
                             {
-                                handler(totalBytes, totalReceived, progressPercent);
+                                activeDownloads[addr].ProgresHandlers.Add(item.DownloadProgressCallback);
                             }
-                        }, null);
-                    activeDownloads[addr] = activeDownload;
+                        }
+                        else
+                        {
+                            ActiveDownload activeDownload = new ActiveDownload();
+                            activeDownload.CompletedHandlers.Add(item.CompletedCallback);
+                            if (item.DownloadProgressCallback != null)
+                            {
+                                activeDownload.ProgresHandlers.Add(item.DownloadProgressCallback);
+                            }
+
+                            Logger.DebugLog("Requesting " + item.Address);
+                            activeDownload.Request = SetupRequest(item.Address, item.ContentType);
+                            CapsBase.DownloadDataAsync(
+                                activeDownload.Request,
+                                item.MillisecondsTimeout,
+                                (request, response, bytesReceived, totalBytesToReceive) =>
+                                {
+                                    foreach (CapsBase.DownloadProgressEventHandler handler in activeDownload.ProgresHandlers)
+                                    {
+                                        handler(request, response, bytesReceived, totalBytesToReceive);
+                                    }
+                                },
+                                (request, response, responseData, error) =>
+                                {
+                                    lock (activeDownloads) activeDownloads.Remove(addr);
+                                    if (error == null || item.Attempt >= item.Retries || error.Message.Contains("404"))
+                                    {
+                                        foreach (CapsBase.RequestCompletedEventHandler handler in activeDownload.CompletedHandlers)
+                                        {
+                                            handler(request, response, responseData, error);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        item.Attempt++;
+                                        Logger.Log($"{item.Address} HTTP download failed, trying again retry {item.Attempt}/{item.Retries}", 
+                                            Helpers.LogLevel.Warning);
+                                        lock (queue) queue.Enqueue(item);
+                                    }
+
+                                    EnqueuePending();
+                                }
+                            );
+
+                            activeDownloads[addr] = activeDownload;
+                        }
+                    }
                 }
             }
         }
@@ -170,18 +227,24 @@ namespace OpenMetaverse.Http
         /// <summary>Enqueue a new HTTP download</summary>
         public void QueueDownload(DownloadRequest req)
         {
-            var addr = req.Address.ToString();
-            if (activeDownloads.ContainsKey(addr))
+            lock (activeDownloads)
             {
-                activeDownloads[addr].CompletedHandlers.Add(req.CompletedCallback);
-                if (req.DownloadProgressCallback != null)
+                string addr = req.Address.ToString();
+                if (activeDownloads.ContainsKey(addr))
                 {
-                    activeDownloads[addr].ProgressHandlers.Add(req.DownloadProgressCallback);
+                    activeDownloads[addr].CompletedHandlers.Add(req.CompletedCallback);
+                    if (req.DownloadProgressCallback != null)
+                    {
+                        activeDownloads[addr].ProgresHandlers.Add(req.DownloadProgressCallback);
+                    }
+                    return;
                 }
-                return;
             }
 
-            queue.Enqueue(req);
+            lock (queue)
+            {
+                queue.Enqueue(req);
+            }
             EnqueuePending();
         }
     }

@@ -192,28 +192,34 @@ namespace OpenMetaverse
     // <summary>Provides data for LandPatchReceived</summary>
     public class LandPatchReceivedEventArgs : EventArgs
     {
+        private readonly Simulator m_Simulator;
+        private readonly int m_X;
+        private readonly int m_Y;
+        private readonly int m_PatchSize;
+        private readonly float[] m_HeightMap;
+
         /// <summary>Simulator from that sent tha data</summary>
-        public Simulator Simulator { get; }
+        public Simulator Simulator => m_Simulator;
 
         /// <summary>Sim coordinate of the patch</summary>
-        public int X { get; }
+        public int X => m_X;
 
         /// <summary>Sim coordinate of the patch</summary>
-        public int Y { get; }
+        public int Y => m_Y;
 
         /// <summary>Size of tha patch</summary>
-        public int PatchSize { get; }
+        public int PatchSize => m_PatchSize;
 
         /// <summary>Heightmap for the patch</summary>
-        public float[] HeightMap { get; }
+        public float[] HeightMap => m_HeightMap;
 
         public LandPatchReceivedEventArgs(Simulator simulator, int x, int y, int patchSize, float[] heightMap)
         {
-            Simulator = simulator;
-            X = x;
-            Y = y;
-            PatchSize = patchSize;
-            HeightMap = heightMap;
+            m_Simulator = simulator;
+            m_X = x;
+            m_Y = y;
+            m_PatchSize = patchSize;
+            m_HeightMap = heightMap;
         }
     }
     #endregion

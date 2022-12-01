@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
- * Copyright (c) 2021-2022, Sjofn LLC
+ * Copyright (c) 2021, Sjofn LLC
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without 
@@ -30,12 +30,11 @@ using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using OpenMetaverse.Http;
 using OpenMetaverse.Packets;
 using OpenMetaverse.Interfaces;
 using OpenMetaverse.StructuredData;
 using OpenMetaverse.Messages.Linden;
-using System.Threading.Tasks;
-using LibreMetaverse;
 
 namespace OpenMetaverse
 {
@@ -552,7 +551,7 @@ namespace OpenMetaverse
         public Vector3 UserLookAt;
         /// <summary>The type of landing enforced from the <see cref="LandingType"/> enum</summary>
         public LandingType Landing;
-        /// <summary>Traffic count</summary>
+        /// <summary></summary>
         public float Dwell;
         /// <summary></summary>
         public bool RegionDenyAnonymous;
@@ -590,7 +589,7 @@ namespace OpenMetaverse
             return fields.Aggregate("", (current, field) => current + (field.Name + " = " + field.GetValue(this) + " "));
         }
         /// <summary>
-        /// Default constructor
+        /// Defalt constructor
         /// </summary>
         /// <param name="localID">Local ID of this parcel</param>
         public Parcel(int localID)
@@ -598,9 +597,9 @@ namespace OpenMetaverse
             LocalID = localID;
             ClaimDate = Utils.Epoch;
             Bitmap = Utils.EmptyBytes;
-            Name = string.Empty;
-            Desc = string.Empty;
-            MusicURL = string.Empty;
+            Name = String.Empty;
+            Desc = String.Empty;
+            MusicURL = String.Empty;
             AccessWhiteList = new List<ParcelManager.ParcelAccessEntry>(0);
             AccessBlackList = new List<ParcelManager.ParcelAccessEntry>(0);
             Media = new ParcelMedia();
@@ -609,16 +608,15 @@ namespace OpenMetaverse
         /// <summary>
         /// Update the simulator with any local changes to this Parcel object
         /// </summary>
-        /// <param name="client">Client message originates from</param>
         /// <param name="simulator">Simulator to send updates to</param>
         /// <param name="wantReply">Whether we want the simulator to confirm
         /// the update with a reply packet or not</param>
-        public void Update(GridClient client, Simulator simulator, bool wantReply)
+        public void Update(Simulator simulator, bool wantReply)
         {
-            Uri cap = simulator.Caps.CapabilityURI("ParcelPropertiesUpdate");
-            if (cap != null)
+            CapsClient request = simulator.Caps.CreateCapsClient("ParcelPropertiesUpdate");
+            if (request != null)
             {
-                ParcelPropertiesUpdateMessage payload = new ParcelPropertiesUpdateMessage
+                ParcelPropertiesUpdateMessage req = new ParcelPropertiesUpdateMessage
                 {
                     AuthBuyerID = AuthBuyerID,
                     Category = Category,
@@ -650,10 +648,11 @@ namespace OpenMetaverse
                     GroupAVSounds = GroupAVSounds
                 };
 
-                Task req = client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, payload.Serialize(),
-                    CancellationToken.None, null);
+                OSDMap body = req.Serialize();
+
+                request.PostRequestAsync(body, OSDFormat.Xml, simulator.Client.Settings.CAPS_TIMEOUT);
             }
-            else // lludp fallback
+            else
             {
                 ParcelPropertiesUpdatePacket updatePacket = new ParcelPropertiesUpdatePacket
                 {
@@ -678,10 +677,9 @@ namespace OpenMetaverse
                     }
                 };
 
-                if (wantReply)
-                {
-                    updatePacket.ParcelData.Flags = 1;
-                }
+
+
+                if (wantReply) updatePacket.ParcelData.Flags = 1;
                 updatePacket.ParcelData.ParcelFlags = (uint)Flags;
                 updatePacket.ParcelData.PassHours = PassHours;
                 updatePacket.ParcelData.PassPrice = PassPrice;
@@ -1140,11 +1138,9 @@ namespace OpenMetaverse
 
             if (refresh)
             {
-                for (int y = 0; y < 64; y++)
-                {
-                    for (int x = 0; x < 64; x++)
+                    for (int y = 0; y < 64; y++)
+                        for (int x = 0; x < 64; x++)
                             simulator.ParcelMap[y, x] = 0;
-                }
             }
 
             ThreadPool.QueueUserWorkItem((_) =>
@@ -1356,7 +1352,7 @@ namespace OpenMetaverse
             }
             else
             {
-                request.OwnerIDs = Array.Empty<ParcelReturnObjectsPacket.OwnerIDsBlock>();
+                request.OwnerIDs = new ParcelReturnObjectsPacket.OwnerIDsBlock[0];
             }
 
             Client.Network.SendPacket(request, simulator);
@@ -1657,14 +1653,14 @@ namespace OpenMetaverse
         /// <param name="regionHandle">Remote region handle</param>
         /// <param name="regionID">Remote region UUID</param>
         /// <returns>If successful UUID of the remote parcel, UUID.Zero otherwise</returns>
-        public async Task<UUID> RequestRemoteParcelIDAsync(Vector3 location, ulong regionHandle, UUID regionID)
+        public UUID RequestRemoteParcelID(Vector3 location, ulong regionHandle, UUID regionID)
         {
             if (Client.Network.CurrentSim == null || Client.Network.CurrentSim.Caps == null)
                 return UUID.Zero;
 
-            Uri cap = Client.Network.CurrentSim.Caps.CapabilityURI("RemoteParcelRequest");
+            CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("RemoteParcelRequest");
 
-            if (cap != null)
+            if (request != null)
             {
                 RemoteParcelRequestRequest msg = new RemoteParcelRequestRequest
                 {
@@ -1675,20 +1671,14 @@ namespace OpenMetaverse
 
                 try
                 {
-                    OSD res = null;
-                    await Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, msg.Serialize(), CancellationToken.None,
-                            (response, data, error) => res = OSDParser.Deserialize(data));
-
-                    if (res is OSDMap result)
-                    {
-                        RemoteParcelRequestReply response = new RemoteParcelRequestReply();
-                        response.Deserialize(result);
-                        return response.ParcelID;
-                    }
+                    OSDMap result = request.PostRequest(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT) as OSDMap;
+                    RemoteParcelRequestReply response = new RemoteParcelRequestReply();
+                    response.Deserialize(result);
+                    return response.ParcelID;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Logger.Log("Failed to fetch remote parcel ID", Helpers.LogLevel.Debug, Client, ex);
+                    Logger.Log("Failed to fetch remote parcel ID", Helpers.LogLevel.Debug, Client);
                 }
             }
             
@@ -1697,71 +1687,52 @@ namespace OpenMetaverse
         }
 
         /// <summary>
-        /// Requests the UUID of the parcel in a remote region at a specified location
-        /// </summary>
-        /// <param name="location">Location of the parcel in the remote region</param>
-        /// <param name="regionHandle">Remote region handle</param>
-        /// <param name="regionID">Remote region UUID</param>
-        /// <returns>If successful UUID of the remote parcel, UUID.Zero otherwise</returns>
-        public UUID RequestRemoteParcelID(Vector3 location, ulong regionHandle, UUID regionID)
-        {
-            return RequestRemoteParcelIDAsync(location, regionHandle, regionID).Result;
-        }
-
-        /// <summary>
         /// Retrieves information on resources used by the parcel
         /// </summary>
         /// <param name="parcelID">UUID of the parcel</param>
         /// <param name="getDetails">Should per object resource usage be requested</param>
         /// <param name="callback">Callback invoked when the request is complete</param>
-        public void GetParcelResources(UUID parcelID, bool getDetails, LandResourcesCallback callback)
+        public void GetParcelResouces(UUID parcelID, bool getDetails, LandResourcesCallback callback)
         {
             try
             {
-                LandResourcesRequest req = new LandResourcesRequest { ParcelID = parcelID };
-                Uri cap = Client.Network.CurrentSim.Caps.CapabilityURI("LandResources");
-                Task httpReq = Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, req.Serialize(),
-                    CancellationToken.None, (httpResponse, data, error) =>
+                CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("LandResources");
+
+                request.OnComplete += delegate(CapsClient client, OSD result, Exception error)
+                {
+                    try
                     {
-                        try
+                        if (result == null || error != null)
                         {
-                            if (error != null)
-                            {
-                                callback(false, null);
-                            }
-
-                            OSD result = OSDParser.Deserialize(data);
-                            LandResourcesMessage landResourcesMessage = new LandResourcesMessage();
-                            landResourcesMessage.Deserialize((OSDMap)result);
-
-                            OSD summaryResponse = null;
-                            AsyncHelper.Sync(() => Client.HttpCapsClient.GetRequestAsync(
-                                Client.Network.CurrentSim.Caps.CapabilityURI("ScriptResourceSummary"),
-                                CancellationToken.None,
-                                (response, respData, err) => summaryResponse = OSDParser.Deserialize(respData)));
-
-                            LandResourcesInfo resInfo = new LandResourcesInfo();
-                            resInfo.Deserialize((OSDMap)summaryResponse);
-
-                            if (landResourcesMessage.ScriptResourceDetails != null && getDetails)
-                            {
-                                OSD detailResponse = null;
-                                AsyncHelper.Sync(() => Client.HttpCapsClient.GetRequestAsync(
-                                    Client.Network.CurrentSim.Caps.CapabilityURI("ScriptResourceDetails"),
-                                    CancellationToken.None,
-                                    (response, respData, err) => detailResponse = OSDParser.Deserialize(respData)));
-
-                                resInfo.Deserialize((OSDMap)detailResponse);
-                            }
-
-                            callback(true, resInfo);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Log("Failed fetching land resources", Helpers.LogLevel.Error, Client, ex);
                             callback(false, null);
                         }
-                    });
+                        LandResourcesMessage response = new LandResourcesMessage();
+                        response.Deserialize((OSDMap)result);
+
+                        CapsClient summaryRequest = new CapsClient(response.ScriptResourceSummary, "ScriptResourceSummary");
+                        OSD summaryResponse = summaryRequest.GetRequest(Client.Settings.CAPS_TIMEOUT);
+
+                        LandResourcesInfo res = new LandResourcesInfo();
+                        res.Deserialize((OSDMap)summaryResponse);
+
+                        if (response.ScriptResourceDetails != null && getDetails)
+                        {
+                            CapsClient detailRequest = new CapsClient(response.ScriptResourceDetails, "ScriptResourceDetails");
+                            OSD detailResponse = detailRequest.GetRequest(Client.Settings.CAPS_TIMEOUT);
+                            res.Deserialize((OSDMap)detailResponse);
+                        }
+                        callback(true, res);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log("Failed fetching land resources", Helpers.LogLevel.Error, Client, ex);
+                        callback(false, null);
+                    }
+                };
+
+                LandResourcesRequest param = new LandResourcesRequest {ParcelID = parcelID};
+                request.PostRequestAsync(param.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+
             }
             catch (Exception ex)
             {
@@ -1944,10 +1915,8 @@ namespace OpenMetaverse
 
             // auto request acl, will be stored in parcel tracking dictionary if enabled
             if (Client.Settings.ALWAYS_REQUEST_PARCEL_ACL)
-            {
                 Client.Parcels.RequestParcelAccessList(simulator, parcel.LocalID,
                     AccessList.Both, sequenceID);
-            }
 
             // auto request dwell, will be stored in parcel tracking dictionary if enables
             if (Client.Settings.ALWAYS_REQUEST_PARCEL_DWELL)
@@ -2145,14 +2114,18 @@ namespace OpenMetaverse
     /// <summary>Contains a parcels dwell data returned from the simulator in response to an <see cref="RequestParcelDwell"/></summary>
     public class ParcelDwellReplyEventArgs : EventArgs
     {
+        private readonly UUID m_ParcelID;
+        private readonly int m_LocalID;
+        private readonly float m_Dwell;
+
         /// <summary>Get the global ID of the parcel</summary>
-        public UUID ParcelID { get; }
+        public UUID ParcelID => m_ParcelID;
 
         /// <summary>Get the simulator specific ID of the parcel</summary>
-        public int LocalID { get; }
+        public int LocalID => m_LocalID;
 
         /// <summary>Get the calculated dwell</summary>
-        public float Dwell { get; }
+        public float Dwell => m_Dwell;
 
         /// <summary>
         /// Construct a new instance of the ParcelDwellReplyEventArgs class
@@ -2162,18 +2135,20 @@ namespace OpenMetaverse
         /// <param name="dwell">The calculated dwell for the parcel</param>
         public ParcelDwellReplyEventArgs(UUID parcelID, int localID, float dwell)
         {
-            ParcelID = parcelID;
-            LocalID = localID;
-            Dwell = dwell;
+            m_ParcelID = parcelID;
+            m_LocalID = localID;
+            m_Dwell = dwell;
         }
     }
 
     /// <summary>Contains basic parcel information data returned from the 
     /// simulator in response to an <see cref="RequestParcelInfo"/> request</summary>
     public class ParcelInfoReplyEventArgs : EventArgs
-    {
+    {        
+        private readonly ParcelInfo m_Parcel;
+
         /// <summary>Get the <see cref="ParcelInfo"/> object containing basic parcel info</summary>
-        public ParcelInfo Parcel { get; }
+        public ParcelInfo Parcel => m_Parcel;
 
         /// <summary>
         /// Construct a new instance of the ParcelInfoReplyEventArgs class
@@ -2181,33 +2156,40 @@ namespace OpenMetaverse
         /// <param name="parcel">The <see cref="ParcelInfo"/> object containing basic parcel info</param>
         public ParcelInfoReplyEventArgs(ParcelInfo parcel)
         {
-            Parcel = parcel;
+            m_Parcel = parcel;
         }
     }
 
     /// <summary>Contains basic parcel information data returned from the simulator in response to an <see cref="RequestParcelInfo"/> request</summary>
     public class ParcelPropertiesEventArgs : EventArgs
     {
+        private readonly Simulator m_Simulator;
+        private Parcel m_Parcel;
+        private readonly ParcelResult m_Result;
+        private readonly int m_SelectedPrims;
+        private readonly int m_SequenceID;
+        private readonly bool m_SnapSelection;
+
         /// <summary>Get the simulator the parcel is located in</summary>
-        public Simulator Simulator { get; }
+        public Simulator Simulator => m_Simulator;
 
         /// <summary>Get the <see cref="Parcel"/> object containing the details</summary>
         /// <remarks>If Result is NoData, this object will not contain valid data</remarks>
-        public Parcel Parcel { get; }
+        public Parcel Parcel => m_Parcel;
 
         /// <summary>Get the result of the request</summary>
-        public ParcelResult Result { get; }
+        public ParcelResult Result => m_Result;
 
         /// <summary>Get the number of primitieves your agent is 
         /// currently selecting and or sitting on in this parcel</summary>
-        public int SelectedPrims { get; }
+        public int SelectedPrims => m_SelectedPrims;
 
         /// <summary>Get the user assigned ID used to correlate a request with
         /// these results</summary>
-        public int SequenceID { get; }
+        public int SequenceID => m_SequenceID;
 
         /// <summary>TODO:</summary>
-        public bool SnapSelection { get; }
+        public bool SnapSelection => m_SnapSelection;
 
         /// <summary>
         /// Construct a new instance of the ParcelPropertiesEventArgs class
@@ -2223,33 +2205,39 @@ namespace OpenMetaverse
         public ParcelPropertiesEventArgs(Simulator simulator, Parcel parcel, ParcelResult result, int selectedPrims,
             int sequenceID, bool snapSelection)
         {
-            Simulator = simulator;
-            Parcel = parcel;
-            Result = result;
-            SelectedPrims = selectedPrims;
-            SequenceID = sequenceID;
-            SnapSelection = snapSelection;
+            m_Simulator = simulator;
+            m_Parcel = parcel;
+            m_Result = result;
+            m_SelectedPrims = selectedPrims;
+            m_SequenceID = sequenceID;
+            m_SnapSelection = snapSelection;
         }
     }
     
     /// <summary>Contains blacklist and whitelist data returned from the simulator in response to an <see cref="RequestParcelAccesslist"/> request</summary>
     public class ParcelAccessListReplyEventArgs : EventArgs
     {
+        private readonly Simulator m_Simulator;
+        private readonly int m_SequenceID;
+        private readonly int m_LocalID;
+        private readonly uint m_Flags;
+        private readonly List<ParcelManager.ParcelAccessEntry> m_AccessList;
+
         /// <summary>Get the simulator the parcel is located in</summary>
-        public Simulator Simulator { get; }
+        public Simulator Simulator => m_Simulator;
 
         /// <summary>Get the user assigned ID used to correlate a request with
         /// these results</summary>
-        public int SequenceID { get; }
+        public int SequenceID => m_SequenceID;
 
         /// <summary>Get the simulator specific ID of the parcel</summary>
-        public int LocalID { get; }
+        public int LocalID => m_LocalID;
 
         /// <summary>TODO</summary>
-        public uint Flags { get; }
+        public uint Flags => m_Flags;
 
         /// <summary>Get the list containing the white/blacklisted agents for the parcel</summary>
-        public List<ParcelManager.ParcelAccessEntry> AccessList { get; }
+        public List<ParcelManager.ParcelAccessEntry> AccessList => m_AccessList;
 
         /// <summary>
         /// Construct a new instance of the ParcelAccessListReplyEventArgs class
@@ -2262,11 +2250,11 @@ namespace OpenMetaverse
         /// <param name="accessEntries">The list containing the white/blacklisted agents for the parcel</param>
         public ParcelAccessListReplyEventArgs(Simulator simulator, int sequenceID, int localID, uint flags, List<ParcelManager.ParcelAccessEntry> accessEntries)
         {
-            Simulator = simulator;
-            SequenceID = sequenceID;
-            LocalID = localID;
-            Flags = flags;
-            AccessList = accessEntries;
+            m_Simulator = simulator;
+            m_SequenceID = sequenceID;
+            m_LocalID = localID;
+            m_Flags = flags;
+            m_AccessList = accessEntries;
         }
     }
     
@@ -2274,11 +2262,14 @@ namespace OpenMetaverse
     /// simulator in response to an <see cref="RequestParcelAccesslist"/> request</summary>
     public class ParcelObjectOwnersReplyEventArgs : EventArgs
     {
+        private readonly Simulator m_Simulator;
+        private readonly List<ParcelManager.ParcelPrimOwners> m_Owners;
+
         /// <summary>Get the simulator the parcel is located in</summary>
-        public Simulator Simulator { get; }
+        public Simulator Simulator => m_Simulator;
 
         /// <summary>Get the list containing prim ownership counts</summary>
-        public List<ParcelManager.ParcelPrimOwners> PrimOwners { get; }
+        public List<ParcelManager.ParcelPrimOwners> PrimOwners => m_Owners;
 
         /// <summary>
         /// Construct a new instance of the ParcelObjectOwnersReplyEventArgs class
@@ -2287,23 +2278,27 @@ namespace OpenMetaverse
         /// <param name="primOwners">The list containing prim ownership counts</param>
         public ParcelObjectOwnersReplyEventArgs(Simulator simulator, List<ParcelManager.ParcelPrimOwners> primOwners)
         {
-            Simulator = simulator;
-            PrimOwners = primOwners;
+            m_Simulator = simulator;
+            m_Owners = primOwners;
         }
     }
 
     /// <summary>Contains the data returned when all parcel data has been retrieved from a simulator</summary>
     public class SimParcelsDownloadedEventArgs : EventArgs
     {
+        private readonly Simulator m_Simulator;
+        private readonly InternalDictionary<int, Parcel> m_Parcels;
+        private readonly int[,] m_ParcelMap;
+
         /// <summary>Get the simulator the parcel data was retrieved from</summary>
-        public Simulator Simulator { get; }
+        public Simulator Simulator => m_Simulator;
 
         /// <summary>A dictionary containing the parcel data where the key correlates to the ParcelMap entry</summary>
-        public InternalDictionary<int, Parcel> Parcels { get; }
+        public InternalDictionary<int, Parcel> Parcels => m_Parcels;
 
         /// <summary>Get the multidimensional array containing a x,y grid mapped
         /// to each 64x64 parcel's LocalID.</summary>
-        public int[,] ParcelMap { get; }
+        public int[,] ParcelMap => m_ParcelMap;
 
         /// <summary>
         /// Construct a new instance of the SimParcelsDownloadedEventArgs class
@@ -2314,24 +2309,28 @@ namespace OpenMetaverse
         /// to each 64x64 parcel's LocalID.</param>
         public SimParcelsDownloadedEventArgs(Simulator simulator, InternalDictionary<int, Parcel> simParcels, int[,] parcelMap)
         {
-            Simulator = simulator;
-            Parcels = simParcels;
-            ParcelMap = parcelMap;
+            m_Simulator = simulator;
+            m_Parcels = simParcels;
+            m_ParcelMap = parcelMap;
         }
     }
     
     /// <summary>Contains the data returned when a <see cref="RequestForceSelectObjects"/> request</summary>
     public class ForceSelectObjectsReplyEventArgs : EventArgs
     {
+        private readonly Simulator m_Simulator;
+        private readonly List<uint> m_ObjectIDs;
+        private readonly bool m_ResetList;
+
         /// <summary>Get the simulator the parcel data was retrieved from</summary>
-        public Simulator Simulator { get; }
+        public Simulator Simulator => m_Simulator;
 
         /// <summary>Get the list of primitive IDs</summary>
-        public List<uint> ObjectIDs { get; }
+        public List<uint> ObjectIDs => m_ObjectIDs;
 
         /// <summary>true if the list is clean and contains the information
         /// only for a given request</summary>
-        public bool ResetList { get; }
+        public bool ResetList => m_ResetList;
 
         /// <summary>
         /// Construct a new instance of the ForceSelectObjectsReplyEventArgs class
@@ -2342,20 +2341,23 @@ namespace OpenMetaverse
         /// only for a given request</param>
         public ForceSelectObjectsReplyEventArgs(Simulator simulator, List<uint> objectIDs, bool resetList)
         {
-            this.Simulator = simulator;
-            this.ObjectIDs = objectIDs;
-            this.ResetList = resetList;
+            this.m_Simulator = simulator;
+            this.m_ObjectIDs = objectIDs;
+            this.m_ResetList = resetList;
         }
     }
    
     /// <summary>Contains data when the media data for a parcel the avatar is on changes</summary>
     public class ParcelMediaUpdateReplyEventArgs : EventArgs
     {
+        private readonly Simulator m_Simulator;
+        private readonly ParcelMedia m_ParcelMedia;
+
         /// <summary>Get the simulator the parcel media data was updated in</summary>
-        public Simulator Simulator { get; }
+        public Simulator Simulator => m_Simulator;
 
         /// <summary>Get the updated media information</summary>
-        public ParcelMedia Media { get; }
+        public ParcelMedia Media => m_ParcelMedia;
 
         /// <summary>
         /// Construct a new instance of the ParcelMediaUpdateReplyEventArgs class
@@ -2364,28 +2366,34 @@ namespace OpenMetaverse
         /// <param name="media">The updated media information</param>
         public ParcelMediaUpdateReplyEventArgs(Simulator simulator, ParcelMedia media)
         {
-            this.Simulator = simulator;
-            this.Media = media;
+            this.m_Simulator = simulator;
+            this.m_ParcelMedia = media;
         }
     }
 
     /// <summary>Contains the media command for a parcel the agent is currently on</summary>
     public class ParcelMediaCommandEventArgs : EventArgs
     {
+        private readonly Simulator m_Simulator;
+        private readonly uint m_Sequence;
+        private readonly ParcelFlags m_ParcelFlags;
+        private readonly ParcelMediaCommand m_MediaCommand;
+        private readonly float m_Time;
+
         /// <summary>Get the simulator the parcel media command was issued in</summary>
-        public Simulator Simulator { get; }
+        public Simulator Simulator => m_Simulator;
 
         /// <summary></summary>
-        public uint Sequence { get; }
+        public uint Sequence => m_Sequence;
 
         /// <summary></summary>
-        public ParcelFlags ParcelFlags { get; }
+        public ParcelFlags ParcelFlags => m_ParcelFlags;
 
         /// <summary>Get the media command that was sent</summary>
-        public ParcelMediaCommand MediaCommand { get; }
+        public ParcelMediaCommand MediaCommand => m_MediaCommand;
 
         /// <summary></summary>
-        public float Time { get; }
+        public float Time => m_Time;
 
         /// <summary>
         /// Construct a new instance of the ParcelMediaCommandEventArgs class
@@ -2397,11 +2405,11 @@ namespace OpenMetaverse
         /// <param name="time"></param>
         public ParcelMediaCommandEventArgs(Simulator simulator, uint sequence, ParcelFlags flags, ParcelMediaCommand command, float time)
         {
-            Simulator = simulator;
-            Sequence = sequence;
-            ParcelFlags = flags;
-            MediaCommand = command;
-            Time = time;
+            m_Simulator = simulator;
+            m_Sequence = sequence;
+            m_ParcelFlags = flags;
+            m_MediaCommand = command;
+            m_Time = time;
         }
     }
     #endregion

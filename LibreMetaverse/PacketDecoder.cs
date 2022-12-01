@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Text;
 
@@ -883,7 +884,7 @@ namespace OpenMetaverse.Packets
             if (hasMeshFlags)
             {
                 result.AppendFormat("{0,30}", "<MeshFlags>" + Environment.NewLine);
-                result.AppendFormat("{0,30}", meshFlags + Environment.NewLine);
+                result.AppendFormat("{0,30}", meshFlags.ToString() + Environment.NewLine);
                 result.AppendFormat("{0,30}", "</MeshFlags>" + Environment.NewLine);
             }
 
@@ -1459,21 +1460,21 @@ namespace OpenMetaverse.Packets
 
             FieldInfo[] fields = packet.GetType().GetFields();
 
-            foreach (var t in fields)
+            for (int i = 0; i < fields.Length; i++)
             {
                 // we're not interested in any of these here
-                if (t.Name == "Type" || t.Name == "Header" || t.Name == "HasVariableBlocks")
+                if (fields[i].Name == "Type" || fields[i].Name == "Header" || fields[i].Name == "HasVariableBlocks")
                     continue;
 
-                if (t.FieldType.IsArray)
+                if (fields[i].FieldType.IsArray)
                 {
-                    result.AppendFormat("{0,30} []" + Environment.NewLine, "-- " + t.Name + " --");
-                    RecursePacketArray(t, packet, ref result);
+                    result.AppendFormat("{0,30} []" + Environment.NewLine, "-- " + fields[i].Name + " --");
+                    RecursePacketArray(fields[i], packet, ref result);
                 }
                 else
                 {
-                    result.AppendFormat("{0,30}" + Environment.NewLine, "-- " + t.Name + " --");
-                    RecursePacketField(t, packet, ref result);
+                    result.AppendFormat("{0,30}" + Environment.NewLine, "-- " + fields[i].Name + " --");
+                    RecursePacketField(fields[i], packet, ref result);
                 }
             }
 

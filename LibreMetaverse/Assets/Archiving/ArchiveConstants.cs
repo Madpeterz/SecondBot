@@ -25,6 +25,7 @@
  */
 
 using System.Collections.Generic;
+using OpenMetaverse;
 
 namespace OpenMetaverse.Assets
 {

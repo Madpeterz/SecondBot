@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022, Sjofn LLC
+ * Copyright (c) 2019-2021, Sjofn LLC
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -43,9 +43,13 @@ namespace LibreMetaverse
         [NonSerialized]
         private readonly GridClient Client;
 
+        private static readonly HttpClient httpClient = new HttpClient();
+
         public InventoryAISClient(GridClient client)
         {
             Client = client;
+            httpClient.DefaultRequestHeaders.Accept.Clear();
+            httpClient.DefaultRequestHeaders.Add("User-Agent", $"{Settings.USER_AGENT} AIS Client");
         }
 
         public bool IsAvailable => (Client.Network.CurrentSim.Caps != null &&
@@ -80,7 +84,7 @@ namespace LibreMetaverse
 
                 using (var content = new StringContent(payload, Encoding.UTF8, "application/llsd+xml"))
                 {
-                    using (var reply = await Client.HttpCapsClient.PostAsync(uri, content))
+                    using (var reply = await httpClient.PostAsync(uri, content))
                     {
                         success = reply.IsSuccessStatusCode;
 
@@ -141,7 +145,7 @@ namespace LibreMetaverse
 
                 using (var content = new StringContent(payload, Encoding.UTF8, "application/llsd+xml"))
                 {
-                    using (var reply = await Client.HttpCapsClient.PutAsync(uri, content))
+                    using (var reply = await httpClient.PutAsync(uri, content))
                     {
                         success = reply.IsSuccessStatusCode;
 
@@ -162,7 +166,7 @@ namespace LibreMetaverse
             }
         }
 
-        public async Task RemoveCategory(UUID categoryUuid, Action<bool, UUID> callback)
+        public async Task RemoveCategory(UUID categoryUuid, Action<bool> callback)
         {
             var cap = getInventoryCap();
             if (cap == null)
@@ -184,7 +188,7 @@ namespace LibreMetaverse
                     return;
                 }
 
-                using (var reply = await Client.HttpCapsClient.DeleteAsync(uri))
+                using (var reply = await httpClient.DeleteAsync(uri))
                 {
                     success = reply.IsSuccessStatusCode;
 
@@ -200,11 +204,11 @@ namespace LibreMetaverse
             }
             finally
             {
-                callback?.Invoke(success, categoryUuid);
+                callback?.Invoke(success);
             }
         }
 
-        public async Task RemoveItem(UUID itemUuid, Action<bool, UUID> callback)
+        public async Task RemoveItem(UUID itemUuid, Action<bool> callback)
         {
             var cap = getInventoryCap();
             if (cap == null)
@@ -226,7 +230,7 @@ namespace LibreMetaverse
                     return;
                 }
 
-                using (var reply = await Client.HttpCapsClient.DeleteAsync(uri))
+                using (var reply = await httpClient.DeleteAsync(uri))
                 {
                     success = reply.IsSuccessStatusCode;
 
@@ -243,7 +247,7 @@ namespace LibreMetaverse
             }
             finally
             {
-                callback?.Invoke(success, itemUuid);
+                callback?.Invoke(success);
             }
         }
 
@@ -280,7 +284,7 @@ namespace LibreMetaverse
                     message.Method = new HttpMethod("COPY");
                     message.Headers.Add("Destination", destUuid.ToString());
 
-                    using (var reply = await Client.HttpCapsClient.SendAsync(message))
+                    using (var reply = await httpClient.SendAsync(message))
                     {
                         success = reply.IsSuccessStatusCode;
 
@@ -323,7 +327,7 @@ namespace LibreMetaverse
                     return;
                 }
 
-                using (var reply = await Client.HttpCapsClient.DeleteAsync(uri))
+                using (var reply = await httpClient.DeleteAsync(uri))
                 {
                     success = reply.IsSuccessStatusCode;
 
@@ -364,8 +368,10 @@ namespace LibreMetaverse
 
                     return;
                 }
-                // TODO: 2.1 Standard has built in HttpMethod.Patch. Fix when the time comes we can utilize it.
-                using (var message = new HttpRequestMessage(new HttpMethod("PATCH"), uri))
+
+                var method = new HttpMethod("PATCH");
+
+                using (var message = new HttpRequestMessage(method, uri))
                 {
                     var payload = OSDParser.SerializeLLSDXmlString(updates);
 
@@ -373,7 +379,7 @@ namespace LibreMetaverse
                     {
                         message.Content = content;
 
-                        using (var reply = await Client.HttpCapsClient.SendAsync(message))
+                        using (var reply = await httpClient.SendAsync(message))
                         {
                             success = reply.IsSuccessStatusCode;
 
@@ -417,8 +423,10 @@ namespace LibreMetaverse
 
                     return;
                 }
-                // TODO: 2.1 Standard has built in HttpMethod.Patch. Fix when the time comes we can utilize it.
-                using (var message = new HttpRequestMessage(new HttpMethod("PATCH"), uri))
+
+                var method = new HttpMethod("PATCH");
+
+                using (var message = new HttpRequestMessage(method, uri))
                 {
                     var payload = OSDParser.SerializeLLSDXmlString(updates);
 
@@ -426,7 +434,7 @@ namespace LibreMetaverse
                     {
                         message.Content = content;
 
-                        using (var reply = await Client.HttpCapsClient.SendAsync(message))
+                        using (var reply = await httpClient.SendAsync(message))
                         {
                             success = reply.IsSuccessStatusCode;
 
