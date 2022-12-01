@@ -613,7 +613,7 @@ namespace OpenMetaverse
         /// <param name="simulator">Simulator to send updates to</param>
         /// <param name="wantReply">Whether we want the simulator to confirm
         /// the update with a reply packet or not</param>
-        public void Update(GridClient client, Simulator simulator, bool wantReply=false)
+        public void Update(GridClient client, Simulator simulator, bool wantReply)
         {
             Uri cap = simulator.Caps.CapabilityURI("ParcelPropertiesUpdate");
             if (cap != null)
