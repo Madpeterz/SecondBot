@@ -14,7 +14,7 @@ namespace BetterSecondBot
         {
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.UnhandledException += new UnhandledExceptionEventHandler(PanicMode);
-            if (helpers.notempty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")) == true)
+            if (helpers.notempty(Environment.GetEnvironmentVariable("Basic_BotUserName")) == true)
             {
                 new CliDocker();
             }
