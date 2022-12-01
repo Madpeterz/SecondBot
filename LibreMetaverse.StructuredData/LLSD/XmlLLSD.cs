@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
- * Copyright (c) 2021-2022, Sjofn LLC.
+ * Copyright (c) 2021, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Xml;
 using System.Text;
 
@@ -49,7 +48,15 @@ namespace OpenMetaverse.StructuredData
         public static OSD DeserializeLLSDXml(Stream xmlStream)
         {
             // XmlReader don't take no shit from nobody. Parse out Linden Lab's bad PI.
-            bool match = linden_lab_loves_bad_pi.All(t => xmlStream.ReadByte() == t);
+            bool match = true;
+            for (int i = 0; i < linden_lab_loves_bad_pi.Length; ++i)
+            {
+                if (xmlStream.ReadByte() != linden_lab_loves_bad_pi[i])
+                {
+                    match = false;
+                    break;
+                }
+            }
             if (match)
             {
                 // read until the linebreak >

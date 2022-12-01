@@ -14,7 +14,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -123,16 +122,18 @@ namespace LitJson
 
         #region IDictionary Indexer
         object IDictionary.this[object key] {
-            get => EnsureDictionary ()[key];
+            get {
+                return EnsureDictionary ()[key];
+            }
 
             set {
-                if (! (key is string str))
+                if (! (key is String))
                     throw new ArgumentException (
                         "The key has to be a string");
 
                 JsonData data = ToJsonData (value);
 
-                this[str] = data;
+                this[(string) key] = data;
             }
         }
         #endregion
@@ -848,7 +849,7 @@ namespace LitJson
                 return inst_boolean.ToString ();
 
             case JsonType.Double:
-                return inst_double.ToString (CultureInfo.InvariantCulture);
+                return inst_double.ToString ();
 
             case JsonType.Int:
                 return inst_int.ToString ();
