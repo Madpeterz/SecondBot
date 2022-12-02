@@ -606,7 +606,13 @@ namespace OpenMetaverse
             Media = new ParcelMedia();
         }
 
-        public void Update(GridClient client, bool wantReply=false)
+        /// <summary>
+        /// Update the parcel (in the current sim)
+        /// </summary>
+        /// <param name="client">Client message originates from</param>
+        /// <param name="wantReply">Whether we want the simulator to confirm
+        /// the update with a reply packet or not [default false]</param>
+        public void Update(GridClient client, bool wantReply = false)
         {
             Update(client, client.Network.CurrentSim, wantReply);
         }
