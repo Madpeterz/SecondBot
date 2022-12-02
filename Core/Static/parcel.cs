@@ -13,7 +13,7 @@ namespace BetterSecondBot
             if (p.MusicURL != url)
             {
                 p.MusicURL = url;
-                p.Update(bot.GetClient.Network.CurrentSim, false);
+                p.Update(bot.GetClient, false);
             }
             return true;
         }

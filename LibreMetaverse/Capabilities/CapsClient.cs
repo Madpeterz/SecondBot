@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
- * Copyright (c) 2019-2021, Sjofn, LLC.
+ * Copyright (c) 2019-2022, Sjofn, LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@ using OpenMetaverse.StructuredData;
 
 namespace OpenMetaverse.Http
 {
+    [Obsolete("Obsolete due to reliance on HttpWebRequest. Use LibreMetaverse.HttpCapsClient instead.")]
     public class CapsClient
     {
         public delegate void DownloadProgressCallback(CapsClient client, int bytesReceived, int totalBytesToReceive);
@@ -260,7 +261,7 @@ namespace OpenMetaverse.Http
 
         public OSD DeleteRequest(byte[] postData, string contentType, int msTimeout)
         {
-            PatchRequestAsync(postData, contentType, msTimeout);
+            DeleteRequestAsync(postData, contentType, msTimeout);
             _ResponseEvent.WaitOne(msTimeout, false);
             return _Response;
         }

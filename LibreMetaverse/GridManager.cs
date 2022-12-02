@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
+ * Copyright (c) 2022, Sjofn, LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -28,8 +29,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using OpenMetaverse.StructuredData;
-using OpenMetaverse.Http;
 using OpenMetaverse.Packets;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace OpenMetaverse
 {
@@ -49,7 +51,7 @@ namespace OpenMetaverse
     }
 
     /// <summary>
-    /// Type of grid item, such as telehub, event, populator location, etc.
+    /// Type of grid item, such as telehub, event, popular location, etc.
     /// </summary>
     public enum GridItemType : uint
     {
@@ -88,11 +90,11 @@ namespace OpenMetaverse
 		public int Y;
         /// <summary>Sim Name (NOTE: In lowercase!)</summary>
 		public string Name;
-        /// <summary></summary>
+        /// <summary>Access level</summary>
 		public SimAccess Access;
         /// <summary>Appears to always be zero (None)</summary>
         public RegionFlags RegionFlags;
-        /// <summary>Sim's defined Water Height</summary>
+        /// <summary>Water Height</summary>
 		public byte WaterHeight;
         /// <summary></summary>
 		public byte Agents;
@@ -103,41 +105,24 @@ namespace OpenMetaverse
 		public ulong RegionHandle;
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public override string ToString()
         {
-            return String.Format("{0} ({1}/{2}), Handle: {3}, MapImage: {4}, Access: {5}, Flags: {6}",
-                Name, X, Y, RegionHandle, MapImageID, Access, RegionFlags);
+            return $"{Name} ({X}/{Y}), Handle: {RegionHandle}, MapImage: {MapImageID}, Access: {Access}";
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public override int GetHashCode()
         {
             return X.GetHashCode() ^ Y.GetHashCode();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if (obj is GridRegion region)
-                return Equals(region);
-            else
-                return false;
+            return (obj is GridRegion region) && Equals(region);
         }
 
         private bool Equals(GridRegion region)
         {
-            return (this.X == region.X && this.Y == region.Y);
+            return this.X == region.X && this.Y == region.Y;
         }
 	}
 
@@ -154,7 +139,7 @@ namespace OpenMetaverse
 
         public bool ContainsRegion(int x, int y)
         {
-            return (x >= Left && x <= Right && y >= Bottom && y <= Top);
+            return x >= Left && x <= Right && y >= Bottom && y <= Top;
         }
     }
 
@@ -260,7 +245,7 @@ namespace OpenMetaverse
     {
         #region Delegates
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<CoarseLocationUpdateEventArgs> m_CoarseLocationUpdate;
 
         /// <summary>Raises the CoarseLocationUpdate event</summary>
@@ -269,8 +254,7 @@ namespace OpenMetaverse
         protected virtual void OnCoarseLocationUpdate(CoarseLocationUpdateEventArgs e)
         {
             EventHandler<CoarseLocationUpdateEventArgs> handler = m_CoarseLocationUpdate;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -284,7 +268,7 @@ namespace OpenMetaverse
             remove { lock (m_CoarseLocationUpdateLock) { m_CoarseLocationUpdate -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<GridRegionEventArgs> m_GridRegion;
 
         /// <summary>Raises the GridRegion event</summary>
@@ -293,8 +277,7 @@ namespace OpenMetaverse
         protected virtual void OnGridRegion(GridRegionEventArgs e)
         {
             EventHandler<GridRegionEventArgs> handler = m_GridRegion;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -308,7 +291,7 @@ namespace OpenMetaverse
             remove { lock (m_GridRegionLock) { m_GridRegion -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<GridLayerEventArgs> m_GridLayer;
 
         /// <summary>Raises the GridLayer event</summary>
@@ -317,8 +300,7 @@ namespace OpenMetaverse
         protected virtual void OnGridLayer(GridLayerEventArgs e)
         {
             EventHandler<GridLayerEventArgs> handler = m_GridLayer;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -332,7 +314,7 @@ namespace OpenMetaverse
             remove { lock (m_GridLayerLock) { m_GridLayer -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<GridItemsEventArgs> m_GridItems;
 
         /// <summary>Raises the GridItems event</summary>
@@ -341,8 +323,7 @@ namespace OpenMetaverse
         protected virtual void OnGridItems(GridItemsEventArgs e)
         {
             EventHandler<GridItemsEventArgs> handler = m_GridItems;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -356,7 +337,7 @@ namespace OpenMetaverse
             remove { lock (m_GridItemsLock) { m_GridItems -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<RegionHandleReplyEventArgs> m_RegionHandleReply;
 
         /// <summary>Raises the RegionHandleReply event</summary>
@@ -365,8 +346,7 @@ namespace OpenMetaverse
         protected virtual void OnRegionHandleReply(RegionHandleReplyEventArgs e)
         {
             EventHandler<RegionHandleReplyEventArgs> handler = m_RegionHandleReply;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -382,24 +362,23 @@ namespace OpenMetaverse
         #endregion Delegates
 
         /// <summary>Unknown</summary>
-        public float SunPhase { get { return sunPhase; } }
-		/// <summary>Current direction of the sun</summary>
-        public Vector3 SunDirection { get { return sunDirection; } }
+        public float SunPhase { get; private set; }
+
+        /// <summary>Current direction of the sun</summary>
+        public Vector3 SunDirection { get; private set; }
+
         /// <summary>Current angular velocity of the sun</summary>
-        public Vector3 SunAngVelocity { get { return sunAngVelocity; } }
+        public Vector3 SunAngVelocity { get; private set; }
+
         /// <summary>Microseconds since the start of SL 4-hour day</summary>
-        public ulong TimeOfDay { get { return timeOfDay; } }
+        public ulong TimeOfDay { get; private set; }
 
         /// <summary>A dictionary of all the regions, indexed by region name</summary>
         internal Dictionary<string, GridRegion> Regions = new Dictionary<string, GridRegion>();
         /// <summary>A dictionary of all the regions, indexed by region handle</summary>
         internal Dictionary<ulong, GridRegion> RegionsByHandle = new Dictionary<ulong, GridRegion>();
 
-		private GridClient Client;
-        private float sunPhase;
-        private Vector3 sunDirection;
-        private Vector3 sunAngVelocity;
-        private ulong timeOfDay;
+		private readonly GridClient Client;
 
         /// <summary>
         /// Constructor
@@ -418,43 +397,48 @@ namespace OpenMetaverse
 		}
 
         /// <summary>
-        /// 
+        /// Request a map layer from simulator capability
         /// </summary>
-        /// <param name="layer"></param>
+        /// <param name="layer">Requested <seealso cref="GridLayerType"/></param>
         public void RequestMapLayer(GridLayerType layer)
         {
-            CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("MapLayer");
-
-            if (request != null)
+            Uri cap = Client.Network.CurrentSim.Caps.CapabilityURI("MapLayer");
+            if (cap != null)
             {
-                OSDMap body = new OSDMap {["Flags"] = OSD.FromInteger((int) layer)};
-
-                request.OnComplete += new CapsClient.CompleteCallback(MapLayerResponseHandler);
-                request.PostRequestAsync(body, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                OSDMap payload = new OSDMap {["Flags"] = OSD.FromInteger((int) layer)};
+                Task req = Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, payload, 
+                    CancellationToken.None, MapLayerResponseHandler);
             }
         }
 
         /// <summary>
-        /// Request a map layer
+        /// Request a map layer through the simulator
         /// </summary>
         /// <param name="regionName">The name of the region</param>
-        /// <param name="layer">The type of layer</param>
+        /// <param name="layer">Requested <seealso cref="GridLayerType"/></param>
         public void RequestMapRegion(string regionName, GridLayerType layer)
         {
-            MapNameRequestPacket request = new MapNameRequestPacket();
-
-            request.AgentData.AgentID = Client.Self.AgentID;
-            request.AgentData.SessionID = Client.Self.SessionID;
-            request.AgentData.Flags = (uint)layer;
-            request.AgentData.EstateID = 0; // Filled in on the sim
-            request.AgentData.Godlike = false; // Filled in on the sim
-            request.NameData.Name = Utils.StringToBytes(regionName);
+            MapNameRequestPacket request = new MapNameRequestPacket
+            {
+                AgentData =
+                {
+                    AgentID = Client.Self.AgentID,
+                    SessionID = Client.Self.SessionID,
+                    Flags = (uint)layer,
+                    EstateID = 0, // Filled in on the sim
+                    Godlike = false // Filled in on the sim
+                },
+                NameData =
+                {
+                    Name = Utils.StringToBytes(regionName)
+                }
+            };
 
             Client.Network.SendPacket(request);
         }
 
         /// <summary>
-        /// 
+        /// Return map blocks for a given segment of the world map
         /// </summary>
         /// <param name="layer"></param>
         /// <param name="minX"></param>
@@ -465,11 +449,16 @@ namespace OpenMetaverse
         public void RequestMapBlocks(GridLayerType layer, ushort minX, ushort minY, ushort maxX, ushort maxY, 
             bool returnNonExistent)
         {
-            MapBlockRequestPacket request = new MapBlockRequestPacket();
+            MapBlockRequestPacket request = new MapBlockRequestPacket
+            {
+                AgentData =
+                {
+                    AgentID = Client.Self.AgentID,
+                    SessionID = Client.Self.SessionID,
+                    Flags = (uint)layer
+                }
+            };
 
-            request.AgentData.AgentID = Client.Self.AgentID;
-            request.AgentData.SessionID = Client.Self.SessionID;
-            request.AgentData.Flags = (uint)layer;
             request.AgentData.Flags |= (uint)(returnNonExistent ? 0x10000 : 0);
             request.AgentData.EstateID = 0; // Filled in at the simulator
             request.AgentData.Godlike = false; // Filled in at the simulator
@@ -495,43 +484,49 @@ namespace OpenMetaverse
             List<MapItem> itemList = null;
             AutoResetEvent itemsEvent = new AutoResetEvent(false);
 
-            EventHandler<GridItemsEventArgs> callback =
-                delegate(object sender, GridItemsEventArgs e)
+            void Callback(object sender, GridItemsEventArgs e)
+            {
+                if (e.Type == GridItemType.AgentLocations)
                 {
-                    if (e.Type == GridItemType.AgentLocations)
-                    {
-                        itemList = e.Items;
-                        itemsEvent.Set();
-                    }
-                };
+                    itemList = e.Items;
+                    itemsEvent.Set();
+                }
+            }
 
-            GridItems += callback;
+            GridItems += Callback;
 
             RequestMapItems(regionHandle, item, layer);
             itemsEvent.WaitOne(timeoutMS, false);
 
-            GridItems -= callback;
+            GridItems -= Callback;
 
             return itemList;
         }
 
         /// <summary>
-        /// 
+        /// Request <seealso cref="GridItemType"/> for a given region
         /// </summary>
-        /// <param name="regionHandle"></param>
-        /// <param name="item"></param>
-        /// <param name="layer"></param>
+        /// <param name="regionHandle">Requested region handle</param>
+        /// <param name="item"><seealso cref="GridItemType"/> being requested</param>
+        /// <param name="layer"><seealso cref="GridLayerType"/> being requested</param>
         public void RequestMapItems(ulong regionHandle, GridItemType item, GridLayerType layer)
         {
-            MapItemRequestPacket request = new MapItemRequestPacket();
-            request.AgentData.AgentID = Client.Self.AgentID;
-            request.AgentData.SessionID = Client.Self.SessionID;
-            request.AgentData.Flags = (uint)layer;
-            request.AgentData.Godlike = false; // Filled in on the sim
-            request.AgentData.EstateID = 0; // Filled in on the sim
-
-            request.RequestData.ItemType = (uint)item;
-            request.RequestData.RegionHandle = regionHandle;
+            MapItemRequestPacket request = new MapItemRequestPacket
+            {
+                AgentData =
+                {
+                    AgentID = Client.Self.AgentID,
+                    SessionID = Client.Self.SessionID,
+                    Flags = (uint)layer,
+                    Godlike = false, // Filled in on the sim
+                    EstateID = 0 // Filled in on the sim
+                },
+                RequestData =
+                {
+                    ItemType = (uint)item,
+                    RegionHandle = regionHandle
+                }
+            };
 
             Client.Network.SendPacket(request);
         }
@@ -550,25 +545,29 @@ namespace OpenMetaverse
         /// <param name="regionID">UUID of the region to look up</param>
         public void RequestRegionHandle(UUID regionID)
         {
-            RegionHandleRequestPacket request = new RegionHandleRequestPacket();
-            request.RequestBlock = new RegionHandleRequestPacket.RequestBlockBlock();
-            request.RequestBlock.RegionID = regionID;
+            RegionHandleRequestPacket request = new RegionHandleRequestPacket
+            {
+                RequestBlock = new RegionHandleRequestPacket.RequestBlockBlock
+                {
+                    RegionID = regionID
+                }
+            };
             Client.Network.SendPacket(request);
         }
 
         /// <summary>
-        /// Get grid region information using the region name, this function
-        /// will block until it can find the region or gives up
+        /// Retrieves <seealso cref="GridRegion"/> information using the region name
         /// </summary>
-        /// <param name="name">Name of sim you're looking for</param>
-        /// <param name="layer">Layer that you are requesting</param>
-        /// <param name="region">Will contain a GridRegion for the sim you're
-        /// looking for if successful, otherwise an empty structure</param>
-        /// <returns>True if the GridRegion was successfully fetched, otherwise
-        /// false</returns>
+        /// <remarks>This function will block until it can find the region or gives up</remarks>
+        /// <param name="name">Name of requested <seealso cref="GridRegion"/></param>
+        /// <param name="layer"><seealso cref="GridLayerType"/> for the
+        /// <seealso cref="GridRegion"/> being requested</param>
+        /// <param name="region">Output for the fetched <seealso cref="GridRegion"/>,
+        /// or empty struct if failure</param>
+        /// <returns>True if the <seealso cref="GridRegion"/> was fetched, otherwise false</returns>
         public bool GetGridRegion(string name, GridLayerType layer, out GridRegion region)
         {
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
             {
                 Logger.Log("GetGridRegion called with a null or empty region name", Helpers.LogLevel.Error, Client);
                 region = new GridRegion();
@@ -581,44 +580,47 @@ namespace OpenMetaverse
                 region = Regions[name];
                 return true;
             }
+
+            AutoResetEvent regionEvent = new AutoResetEvent(false);
+
+            void Callback(object sender, GridRegionEventArgs e)
+            {
+                if (e.Region.Name == name)
+                {
+                    regionEvent.Set();
+                }
+            }
+
+            GridRegion += Callback;
+
+            RequestMapRegion(name, layer);
+            regionEvent.WaitOne(Client.Settings.MAP_REQUEST_TIMEOUT, false);
+
+            GridRegion -= Callback;
+
+            if (Regions.ContainsKey(name))
+            {
+                // The region was found after our request
+                region = Regions[name];
+                return true;
+            }
             else
             {
-                AutoResetEvent regionEvent = new AutoResetEvent(false);
-                EventHandler<GridRegionEventArgs> callback =
-                    delegate(object sender, GridRegionEventArgs e)
-                    {
-                        if (e.Region.Name == name)
-                            regionEvent.Set();
-                    };
-                GridRegion += callback;
-
-                RequestMapRegion(name, layer);
-                regionEvent.WaitOne(Client.Settings.MAP_REQUEST_TIMEOUT, false);
-
-                GridRegion -= callback;
-
-                if (Regions.ContainsKey(name))
-                {
-                    // The region was found after our request
-                    region = Regions[name];
-                    return true;
-                }
-                else
-                {
-                    Logger.Log("Couldn't find region " + name, Helpers.LogLevel.Warning, Client);
-                    region = new GridRegion();
-                    return false;
-                }
+                Logger.Log($"Could not find region named {name}", Helpers.LogLevel.Warning, Client);
+                region = new GridRegion();
+                return false;
             }
         }
         
-        protected void MapLayerResponseHandler(CapsClient client, OSD result, Exception error)
+        protected void MapLayerResponseHandler(HttpResponseMessage response, byte[] responseData, Exception error)
         {
-            if (result == null)
+            if (error != null)
             {
-                Logger.Log("MapLayerResponseHandler error: " + error.Message + ": " + error.StackTrace, Helpers.LogLevel.Error, Client);
+                Logger.Log($"MapLayerResponseHandler error: {error.Message}", Helpers.LogLevel.Error, Client, error);
                 return;
             }
+
+            OSD result = OSDParser.Deserialize(responseData);
             OSDMap body = (OSDMap)result;
             OSDArray layerData = (OSDArray)body["LayerData"];
 
@@ -702,11 +704,13 @@ namespace OpenMetaverse
                     switch (type)
                     {
                         case GridItemType.AgentLocations:
-                            MapAgentLocation location = new MapAgentLocation();
-                            location.GlobalX = data.X;
-                            location.GlobalY = data.Y;
-                            location.Identifier = name;
-                            location.AvatarCount = data.Extra;
+                            MapAgentLocation location = new MapAgentLocation
+                            {
+                                GlobalX = data.X,
+                                GlobalY = data.Y,
+                                Identifier = name,
+                                AvatarCount = data.Extra
+                            };
                             items.Add(location);
                             break;
                         case GridItemType.Classified:
@@ -714,29 +718,35 @@ namespace OpenMetaverse
                             Logger.Log("FIXME", Helpers.LogLevel.Error, Client);
                             break;
                         case GridItemType.LandForSale:
-                            MapLandForSale landsale = new MapLandForSale();
-                            landsale.GlobalX = data.X;
-                            landsale.GlobalY = data.Y;
-                            landsale.ID = data.ID;
-                            landsale.Name = name;
-                            landsale.Size = data.Extra;
-                            landsale.Price = data.Extra2;
+                            MapLandForSale landsale = new MapLandForSale
+                            {
+                                GlobalX = data.X,
+                                GlobalY = data.Y,
+                                ID = data.ID,
+                                Name = name,
+                                Size = data.Extra,
+                                Price = data.Extra2
+                            };
                             items.Add(landsale);
                             break;
                         case GridItemType.MatureEvent:
-                            MapMatureEvent matureEvent = new MapMatureEvent();
-                            matureEvent.GlobalX = data.X;
-                            matureEvent.GlobalY = data.Y;
-                            matureEvent.Description = name;
-                            matureEvent.Flags = (DirectoryManager.EventFlags)data.Extra2;
+                            MapMatureEvent matureEvent = new MapMatureEvent
+                            {
+                                GlobalX = data.X,
+                                GlobalY = data.Y,
+                                Description = name,
+                                Flags = (DirectoryManager.EventFlags)data.Extra2
+                            };
                             items.Add(matureEvent);
                             break;
                         case GridItemType.PgEvent:
-                            MapPGEvent PGEvent = new MapPGEvent();
-                            PGEvent.GlobalX = data.X;
-                            PGEvent.GlobalY = data.Y;
-                            PGEvent.Description = name;
-                            PGEvent.Flags = (DirectoryManager.EventFlags)data.Extra2;
+                            MapPGEvent PGEvent = new MapPGEvent
+                            {
+                                GlobalX = data.X,
+                                GlobalY = data.Y,
+                                Description = name,
+                                Flags = (DirectoryManager.EventFlags)data.Extra2
+                            };
                             items.Add(PGEvent);
                             break;
                         case GridItemType.Popular:
@@ -744,31 +754,37 @@ namespace OpenMetaverse
                             Logger.Log("FIXME", Helpers.LogLevel.Error, Client);
                             break;
                         case GridItemType.Telehub:
-                            MapTelehub teleHubItem = new MapTelehub();
-                            teleHubItem.GlobalX = data.X;
-                            teleHubItem.GlobalY = data.Y;
+                            MapTelehub teleHubItem = new MapTelehub
+                            {
+                                GlobalX = data.X,
+                                GlobalY = data.Y
+                            };
                             items.Add(teleHubItem);
                             break;
                         case GridItemType.AdultLandForSale:
-                            MapAdultLandForSale adultLandsale = new MapAdultLandForSale();
-                            adultLandsale.GlobalX = data.X;
-                            adultLandsale.GlobalY = data.Y;
-                            adultLandsale.ID = data.ID;
-                            adultLandsale.Name = name;
-                            adultLandsale.Size = data.Extra;
-                            adultLandsale.Price = data.Extra2;
+                            MapAdultLandForSale adultLandsale = new MapAdultLandForSale
+                            {
+                                GlobalX = data.X,
+                                GlobalY = data.Y,
+                                ID = data.ID,
+                                Name = name,
+                                Size = data.Extra,
+                                Price = data.Extra2
+                            };
                             items.Add(adultLandsale);
                             break;
                         case GridItemType.AdultEvent:
-                            MapAdultEvent adultEvent = new MapAdultEvent();
-                            adultEvent.GlobalX = data.X;
-                            adultEvent.GlobalY = data.Y;
-                            adultEvent.Description = Utils.BytesToString(data.Name);
-                            adultEvent.Flags = (DirectoryManager.EventFlags)data.Extra2;
+                            MapAdultEvent adultEvent = new MapAdultEvent
+                            {
+                                GlobalX = data.X,
+                                GlobalY = data.Y,
+                                Description = Utils.BytesToString(data.Name),
+                                Flags = (DirectoryManager.EventFlags)data.Extra2
+                            };
                             items.Add(adultEvent);
                             break;
                         default:
-                            Logger.Log("Unknown map item type " + type, Helpers.LogLevel.Warning, Client);
+                            Logger.Log($"Unknown map item type: {type}", Helpers.LogLevel.Warning, Client);
                             break;
                     }
                 }
@@ -784,10 +800,10 @@ namespace OpenMetaverse
         {
             SimulatorViewerTimeMessagePacket time = (SimulatorViewerTimeMessagePacket)e.Packet;
             
-            sunPhase = time.TimeInfo.SunPhase;
-            sunDirection = time.TimeInfo.SunDirection;
-            sunAngVelocity = time.TimeInfo.SunAngVelocity;
-            timeOfDay = time.TimeInfo.UsecSinceStart;
+            SunPhase = time.TimeInfo.SunPhase;
+            SunDirection = time.TimeInfo.SunDirection;
+            SunAngVelocity = time.TimeInfo.SunAngVelocity;
+            TimeOfDay = time.TimeInfo.UsecSinceStart;
             // TODO: Does anyone have a use for the time stuff?
         }
 
@@ -835,7 +851,7 @@ namespace OpenMetaverse
 
             if (m_CoarseLocationUpdate != null)
             {
-                ThreadPool.QueueUserWorkItem(delegate(object o)
+                ThreadPool.QueueUserWorkItem((object o) =>
                 { OnCoarseLocationUpdate(new CoarseLocationUpdateEventArgs(e.Simulator, newEntries, removedEntries)); });
             }
         }
@@ -857,72 +873,59 @@ namespace OpenMetaverse
 
     public class CoarseLocationUpdateEventArgs : EventArgs
     {
-        private readonly Simulator m_Simulator;
-        private readonly List<UUID> m_NewEntries;
-        private readonly List<UUID> m_RemovedEntries;
-
-        public Simulator Simulator { get { return m_Simulator; } }
-        public List<UUID> NewEntries { get { return m_NewEntries; } }
-        public List<UUID> RemovedEntries { get { return m_RemovedEntries; } }
+        public Simulator Simulator { get; }
+        public List<UUID> NewEntries { get; }
+        public List<UUID> RemovedEntries { get; }
 
         public CoarseLocationUpdateEventArgs(Simulator simulator, List<UUID> newEntries, List<UUID> removedEntries)
         {
-            this.m_Simulator = simulator;
-            this.m_NewEntries = newEntries;
-            this.m_RemovedEntries = removedEntries;
+            this.Simulator = simulator;
+            this.NewEntries = newEntries;
+            this.RemovedEntries = removedEntries;
         }
     }
 
     public class GridRegionEventArgs : EventArgs
     {
-        private readonly GridRegion m_Region;
-        public GridRegion Region { get { return m_Region; } }
+        public GridRegion Region { get; }
 
         public GridRegionEventArgs(GridRegion region)
         {
-            this.m_Region = region;
+            this.Region = region;
         }
     }
 
     public class GridLayerEventArgs : EventArgs
     {
-        private readonly GridLayer m_Layer;
-
-        public GridLayer Layer { get { return m_Layer; } }
+        public GridLayer Layer { get; }
 
         public GridLayerEventArgs(GridLayer layer)
         {
-            this.m_Layer = layer;
+            this.Layer = layer;
         }
     }
 
     public class GridItemsEventArgs : EventArgs
     {
-        private readonly GridItemType m_Type;
-        private readonly List<MapItem> m_Items;
-
-        public GridItemType Type { get { return m_Type; } }
-        public List<MapItem> Items { get { return m_Items; } }
+        public GridItemType Type { get; }
+        public List<MapItem> Items { get; }
 
         public GridItemsEventArgs(GridItemType type, List<MapItem> items)
         {
-            this.m_Type = type;
-            this.m_Items = items;
+            this.Type = type;
+            this.Items = items;
         }
     }
 
     public class RegionHandleReplyEventArgs : EventArgs
     {
-        private readonly UUID m_RegionID;
-        private readonly ulong m_RegionHandle;
-
-        public UUID RegionID { get { return m_RegionID; } }
-        public ulong RegionHandle { get { return m_RegionHandle; } }
+        public UUID RegionID { get; }
+        public ulong RegionHandle { get; }
 
         public RegionHandleReplyEventArgs(UUID regionID, ulong regionHandle)
         {
-            this.m_RegionID = regionID;
-            this.m_RegionHandle = regionHandle;
+            this.RegionID = regionID;
+            this.RegionHandle = regionHandle;
         }
     }
 

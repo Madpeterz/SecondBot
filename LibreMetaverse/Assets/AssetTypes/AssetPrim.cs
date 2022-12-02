@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2006-2016, openmetaverse.co
  * All rights reserved.
  *
@@ -28,7 +28,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 
 namespace OpenMetaverse.Assets
@@ -809,7 +808,7 @@ namespace OpenMetaverse.Assets
                 }
                 else
                 {
-                    Items = new ItemBlock[0];
+                    Items = Array.Empty<ItemBlock>();
                 }
             }
         }

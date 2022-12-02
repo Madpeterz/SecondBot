@@ -30,13 +30,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using System.Threading.Tasks;
-using LibreMetaverse;
-using Microsoft.Collections.Extensions;
 using OpenMetaverse.Packets;
 using OpenMetaverse.Imaging;
 using OpenMetaverse.Assets;
 using OpenMetaverse.Http;
 using OpenMetaverse.StructuredData;
+using LibreMetaverse;
 
 namespace OpenMetaverse
 {
@@ -485,7 +484,7 @@ namespace OpenMetaverse
 
             // This is the first time setting appearance, run through the entire sequence
             AppearanceThread = new Thread(
-                delegate ()
+                () =>
                 {
                     var cancellationToken = CancellationTokenSource.Token;
                     bool success = true;
@@ -529,7 +528,7 @@ namespace OpenMetaverse
 
                             if (!ServerBakingDone || forceRebake)
                             {
-                                if (UpdateAvatarAppearance())
+                                if (UpdateAvatarAppearanceAsync(cancellationToken).Result)
                                 {
                                     ServerBakingDone = true;
                                 }
@@ -999,8 +998,8 @@ namespace OpenMetaverse
         }
 
         /// <summary>
-        /// Calls either <seealso cref="ReplaceOutfit"/> or
-        /// <seealso cref="AddToOutfit"/> depending on the value of
+        /// Calls either <seealso cref="AppearanceManager.ReplaceOutfit"/> or
+        /// <seealso cref="AppearanceManager.AddToOutfit"/> depending on the value of
         /// replaceItems
         /// </summary>
         /// <param name="wearables">List of wearable inventory items to add
@@ -2071,25 +2070,19 @@ namespace OpenMetaverse
         }
 
         /// <summary>
-        /// Initate server baking process
+        /// Initiate server baking process
         /// </summary>
         /// <returns>True if the server baking was successful</returns>
-        private bool UpdateAvatarAppearance()
+        private async Task<bool> UpdateAvatarAppearanceAsync(CancellationToken cancellationToken)
         {
             Caps caps = Client.Network.CurrentSim.Caps;
-            if (caps == null)
-            {
-                return false;
-            }
+            if (caps == null) { return false; }
+            
+            Uri cap = caps.CapabilityURI("UpdateAvatarAppearance");
+            if (cap == null) { return false; }
 
-            CapsClient capsRequest = Client.Network.CurrentSim.Caps.CreateCapsClient("UpdateAvatarAppearance");
-            if (capsRequest == null)
-            {
-                return false;
-            }
-
-            InventoryFolder COF = GetCOF();
-            if (COF == null)
+            InventoryFolder currentoutfitfolder = GetCOF();
+            if (currentoutfitfolder == null)
             {
                 return false;
             }
@@ -2098,11 +2091,14 @@ namespace OpenMetaverse
                 // TODO: create Current Outfit Folder
             }
 
-            OSDMap request = new OSDMap(1) { ["cof_version"] = COF.Version };
+            OSDMap request = new OSDMap(1) { ["cof_version"] = currentoutfitfolder.Version };
 
-            string msg = "Setting server side baking failed";
+            string msg = "Server side baking failed";
 
-            OSD res = capsRequest.PostRequest(request, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT * 2);
+            OSD res = null;
+
+            await Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, request, cancellationToken,
+                (response, data, error) => res = OSDParser.Deserialize(data));
 
             if (res is OSDMap result)
             {

@@ -25,6 +25,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -654,7 +655,7 @@ namespace OpenMetaverse
         /// <example>0x7fffffff</example>
         public static string UIntToHexString(uint i)
         {
-            return string.Format("{0:x8}", i);
+            return $"{i:x8}";
         }
 
         /// <summary>
@@ -680,7 +681,7 @@ namespace OpenMetaverse
 
         private static string GetString(byte[] bytes, int index, int count)
         {
-            string cnv = UTF8Encoding.UTF8.GetString(bytes, index, count);
+            string cnv = Encoding.UTF8.GetString(bytes, index, count);
             return InternStrings ? string.Intern(cnv) : cnv;
         }
 
@@ -729,7 +730,7 @@ namespace OpenMetaverse
                         if (j != 0)
                             output.Append(' ');
 
-                        output.Append(String.Format("{0:X2}", bytes[i + j]));
+                        output.Append($"{bytes[i + j]:X2}");
                     }
                 }
             }
@@ -744,9 +745,11 @@ namespace OpenMetaverse
         /// <returns>A null-terminated UTF8 byte array</returns>
         public static byte[] StringToBytes(string str)
         {
-            if (String.IsNullOrEmpty(str)) { return EmptyBytes; }
-            if (!str.EndsWith("\0")) { str += "\0"; }
-            return UTF8Encoding.UTF8.GetBytes(str);
+            if (string.IsNullOrEmpty(str)) { return EmptyBytes; }
+            // HACK: Say it ain't so .NET5
+            return str.EndsWith("\0", StringComparison.Ordinal)
+                ? Encoding.UTF8.GetBytes(str) 
+                : Encoding.UTF8.GetBytes(str + '\0');
         }
 
         /// <summary>
@@ -801,14 +804,14 @@ namespace OpenMetaverse
         /// </summary>
         /// <param name="c">Character to test</param>
         /// <returns>true if hex digit, false if not</returns>
-        private static bool IsHexDigit(Char c)
+        private static bool IsHexDigit(char c)
         {
             const int numA = 65;
             const int num0 = 48;
 
             int numChar;
 
-            c = Char.ToUpper(c);
+            c = char.ToUpper(c);
             numChar = Convert.ToInt32(c);
 
             if (numChar >= numA && numChar < (numA + 6))
@@ -1217,9 +1220,7 @@ namespace OpenMetaverse
         /// <param name="rhs">Second value</param>
         public static void Swap<T>(ref T lhs, ref T rhs)
         {
-            T temp = lhs;
-            lhs = rhs;
-            rhs = temp;
+            (lhs, rhs) = (rhs, lhs);
         }
 
         /// <summary>

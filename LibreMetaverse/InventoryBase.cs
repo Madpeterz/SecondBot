@@ -1,7 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/*
+ * Copyright (c) 2006-2016, openmetaverse.co
+ * Copyright (c) 2021-2022, Sjofn LLC.
+ * All rights reserved.
+ *
+ * - Redistribution and use in source and binary forms, with or without
+ *   modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * - Neither the name of the openmetaverse.co nor the names
+ *   of its contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+using System;
 using System.Runtime.Serialization;
-using System.Text;
 using OpenMetaverse.StructuredData;
 
 namespace OpenMetaverse
@@ -9,7 +34,7 @@ namespace OpenMetaverse
     /// <summary>
     /// Base Class for Inventory Items
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public abstract class InventoryBase : ISerializable
     {
         /// <summary><seealso cref="OpenMetaverse.UUID"/> of item/folder</summary>
@@ -69,7 +94,7 @@ namespace OpenMetaverse
         }
 
         /// <summary>
-        /// Determine whether the specified <seealso cref="OpenMetaverse.InventoryBase"/> object is equal to the current object
+        /// Determine whether the specified <seealso cref="InventoryBase"/> object is equal to the current object
         /// </summary>
         /// <param name="obj">InventoryBase object to compare against</param>
         /// <returns>true if objects are the same</returns>
@@ -79,7 +104,7 @@ namespace OpenMetaverse
         }
 
         /// <summary>
-        /// Determine whether the specified <seealso cref="OpenMetaverse.InventoryBase"/> object is equal to the current object
+        /// Determine whether the specified <seealso cref="InventoryBase"/> object is equal to the current object
         /// </summary>
         /// <param name="o">InventoryBase object to compare against</param>
         /// <returns>true if objects are the same</returns>
@@ -106,10 +131,9 @@ namespace OpenMetaverse
     {
         public override string ToString()
         {
-            return AssetType + " " + AssetUUID + " (" + InventoryType + " " + UUID + ") '" + Name + "'/'" +
-                   Description + "' " + Permissions;
+            return $"{AssetType} {AssetUUID} ({InventoryType} {UUID}) '{Name}'/'{Description}' {Permissions}";
         }
-        /// <summary>The <seealso cref="OpenMetaverse.UUID"/> of this item</summary>
+        /// <summary>The <seealso cref="UUID"/> of this item</summary>
         public UUID AssetUUID;
         /// <summary>The combined <seealso cref="OpenMetaverse.Permissions"/> of this item</summary>
         public Permissions Permissions;
@@ -117,11 +141,11 @@ namespace OpenMetaverse
         public AssetType AssetType;
         /// <summary>The type of item from the <seealso cref="OpenMetaverse.InventoryType"/> enum</summary>
         public InventoryType InventoryType;
-        /// <summary>The <seealso cref="OpenMetaverse.UUID"/> of the creator of this item</summary>
+        /// <summary>The <seealso cref="UUID"/> of the creator of this item</summary>
         public UUID CreatorID;
         /// <summary>A Description of this item</summary>
         public string Description;
-        /// <summary>The <seealso cref="OpenMetaverse.Group"/>s <seealso cref="OpenMetaverse.UUID"/> this item is set to or owned by</summary>
+        /// <summary>The <seealso cref="Group"/>s <seealso cref="UUID"/> this item is set to or owned by</summary>
         public UUID GroupID;
         /// <summary>If true, item is owned by a group</summary>
         public bool GroupOwned;
@@ -129,20 +153,20 @@ namespace OpenMetaverse
         public int SalePrice;
         /// <summary>The type of sale from the <seealso cref="OpenMetaverse.SaleType"/> enum</summary>
         public SaleType SaleType;
-        /// <summary>Combined flags from <seealso cref="OpenMetaverse.InventoryItemFlags"/></summary>
+        /// <summary>Combined flags from <seealso cref="InventoryItemFlags"/></summary>
         public uint Flags;
         /// <summary>Time and date this inventory item was created, stored as
         /// UTC (Coordinated Universal Time)</summary>
         public DateTime CreationDate;
         /// <summary>Used to update the AssetID in requests sent to the server</summary>
         public UUID TransactionID;
-        /// <summary>The <seealso cref="OpenMetaverse.UUID"/> of the previous owner of the item</summary>
+        /// <summary>The <seealso cref="UUID"/> of the previous owner of the item</summary>
         public UUID LastOwnerID;
 
         /// <summary>
         ///  Construct a new InventoryItem object
         /// </summary>
-        /// <param name="itemID">The <seealso cref="OpenMetaverse.UUID"/> of the item</param>
+        /// <param name="itemID">The <seealso cref="UUID"/> of the item</param>
         public InventoryItem(UUID itemID)
             : base(itemID) { }
 
@@ -245,9 +269,9 @@ namespace OpenMetaverse
         }
 
         /// <summary>
-        /// Determine whether the specified <seealso cref="OpenMetaverse.InventoryItem"/> object is equal to the current object
+        /// Determine whether the specified <seealso cref="InventoryItem"/> object is equal to the current object
         /// </summary>
-        /// <param name="o">The <seealso cref="OpenMetaverse.InventoryItem"/> object to compare against</param>
+        /// <param name="o">The <seealso cref="InventoryItem"/> object to compare against</param>
         /// <returns>true if objects are the same</returns>
         public bool Equals(InventoryItem o)
         {
@@ -348,14 +372,14 @@ namespace OpenMetaverse
     /// InventoryTexture Class representing a graphical image
     /// </summary>
     /// <seealso cref="T:OpenMetaverse.Imaging.ManagedImage" />
-    [Serializable()]
+    [Serializable]
     public class InventoryTexture : InventoryItem
     {
         /// <summary>
         /// Construct an InventoryTexture object
         /// </summary>
-        /// <param name="itemID">A <seealso cref="OpenMetaverse.UUID"/> which becomes the 
-        /// <seealso cref="OpenMetaverse.InventoryItem"/> objects AssetUUID</param>
+        /// <param name="itemID">A <seealso cref="UUID"/> which becomes the 
+        /// <seealso cref="InventoryItem"/> objects AssetUUID</param>
         public InventoryTexture(UUID itemID)
             : base(itemID)
         {
@@ -376,14 +400,14 @@ namespace OpenMetaverse
     /// <summary>
     /// InventorySound Class representing a playable sound
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class InventorySound : InventoryItem
     {
         /// <summary>
         /// Construct an InventorySound object
         /// </summary>
-        /// <param name="itemID">A <seealso cref="OpenMetaverse.UUID"/> which becomes the 
-        /// <seealso cref="OpenMetaverse.InventoryItem"/> objects AssetUUID</param>
+        /// <param name="itemID">A <seealso cref="UUID"/> which becomes the 
+        /// <seealso cref="InventoryItem"/> objects AssetUUID</param>
         public InventorySound(UUID itemID)
             : base(itemID)
         {
@@ -404,14 +428,14 @@ namespace OpenMetaverse
     /// <summary>
     /// InventoryCallingCard Class, contains information on another avatar
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class InventoryCallingCard : InventoryItem
     {
         /// <summary>
         /// Construct an InventoryCallingCard object
         /// </summary>
-        /// <param name="itemID">A <seealso cref="OpenMetaverse.UUID"/> which becomes the 
-        /// <seealso cref="OpenMetaverse.InventoryItem"/> objects AssetUUID</param>
+        /// <param name="itemID">A <seealso cref="UUID"/> which becomes the 
+        /// <seealso cref="InventoryItem"/> objects AssetUUID</param>
         public InventoryCallingCard(UUID itemID)
             : base(itemID)
         {
@@ -432,14 +456,14 @@ namespace OpenMetaverse
     /// <summary>
     /// InventoryLandmark Class, contains details on a specific location
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class InventoryLandmark : InventoryItem
     {
         /// <summary>
         /// Construct an InventoryLandmark object
         /// </summary>
-        /// <param name="itemID">A <seealso cref="OpenMetaverse.UUID"/> which becomes the 
-        /// <seealso cref="OpenMetaverse.InventoryItem"/> objects AssetUUID</param>
+        /// <param name="itemID">A <seealso cref="UUID"/> which becomes the 
+        /// <seealso cref="InventoryItem"/> objects AssetUUID</param>
         public InventoryLandmark(UUID itemID)
             : base(itemID)
         {
@@ -474,14 +498,14 @@ namespace OpenMetaverse
     /// <summary>
     /// InventoryObject Class contains details on a primitive or coalesced set of primitives
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class InventoryObject : InventoryItem
     {
         /// <summary>
         /// Construct an InventoryObject object
         /// </summary>
-        /// <param name="itemID">A <seealso cref="OpenMetaverse.UUID"/> which becomes the 
-        /// <seealso cref="OpenMetaverse.InventoryItem"/> objects AssetUUID</param>
+        /// <param name="itemID">A <seealso cref="UUID"/> which becomes the 
+        /// <seealso cref="InventoryItem"/> objects AssetUUID</param>
         public InventoryObject(UUID itemID)
             : base(itemID)
         {
@@ -520,14 +544,14 @@ namespace OpenMetaverse
     /// <summary>
     /// InventoryNotecard Class, contains details on an encoded text document
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class InventoryNotecard : InventoryItem
     {
         /// <summary>
         /// Construct an InventoryNotecard object
         /// </summary>
-        /// <param name="itemID">A <seealso cref="OpenMetaverse.UUID"/> which becomes the 
-        /// <seealso cref="OpenMetaverse.InventoryItem"/> objects AssetUUID</param>
+        /// <param name="itemID">A <seealso cref="UUID"/> which becomes the 
+        /// <seealso cref="InventoryItem"/> objects AssetUUID</param>
         public InventoryNotecard(UUID itemID)
             : base(itemID)
         {
@@ -549,14 +573,14 @@ namespace OpenMetaverse
     /// InventoryCategory Class
     /// </summary>
     /// <remarks>TODO: Is this even used for anything?</remarks>
-    [Serializable()]
+    [Serializable]
     public class InventoryCategory : InventoryItem
     {
         /// <summary>
         /// Construct an InventoryCategory object
         /// </summary>
-        /// <param name="itemID">A <seealso cref="OpenMetaverse.UUID"/> which becomes the 
-        /// <seealso cref="OpenMetaverse.InventoryItem"/> objects AssetUUID</param>
+        /// <param name="itemID">A <seealso cref="UUID"/> which becomes the 
+        /// <seealso cref="InventoryItem"/> objects AssetUUID</param>
         public InventoryCategory(UUID itemID)
             : base(itemID)
         {
@@ -577,14 +601,14 @@ namespace OpenMetaverse
     /// <summary>
     /// InventoryLSL Class, represents a Linden Scripting Language object
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class InventoryLSL : InventoryItem
     {
         /// <summary>
         /// Construct an InventoryLSL object
         /// </summary>
-        /// <param name="itemID">A <seealso cref="OpenMetaverse.UUID"/> which becomes the 
-        /// <seealso cref="OpenMetaverse.InventoryItem"/> objects AssetUUID</param>
+        /// <param name="itemID">A <seealso cref="UUID"/> which becomes the 
+        /// <seealso cref="InventoryItem"/> objects AssetUUID</param>
         public InventoryLSL(UUID itemID)
             : base(itemID)
         {
@@ -605,7 +629,7 @@ namespace OpenMetaverse
     /// <summary>
     /// InventorySnapshot Class, an image taken with the viewer
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class InventorySnapshot : InventoryItem
     {
         /// <inheritdoc />
@@ -633,14 +657,14 @@ namespace OpenMetaverse
     /// <summary>
     /// InventoryAttachment Class, contains details on an attachable object
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class InventoryAttachment : InventoryItem
     {
         /// <summary>
         /// Construct an InventoryAttachment object
         /// </summary>
-        /// <param name="itemID">A <seealso cref="OpenMetaverse.UUID"/> which becomes the 
-        /// <seealso cref="OpenMetaverse.InventoryItem"/> objects AssetUUID</param>
+        /// <param name="itemID">A <seealso cref="UUID"/> which becomes the 
+        /// <seealso cref="InventoryItem"/> objects AssetUUID</param>
         public InventoryAttachment(UUID itemID)
             : base(itemID)
         {
@@ -670,14 +694,14 @@ namespace OpenMetaverse
     /// <summary>
     /// InventoryWearable Class, details on a clothing item or body part
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class InventoryWearable : InventoryItem
     {
         /// <summary>
         /// Construct an InventoryWearable object
         /// </summary>
-        /// <param name="itemID">A <seealso cref="OpenMetaverse.UUID"/> which becomes the 
-        /// <seealso cref="OpenMetaverse.InventoryItem"/> objects AssetUUID</param>
+        /// <param name="itemID">A <seealso cref="UUID"/> which becomes the 
+        /// <seealso cref="InventoryItem"/> objects AssetUUID</param>
         public InventoryWearable(UUID itemID) : base(itemID) { InventoryType = InventoryType.Wearable; }
 
         /// <summary>
@@ -703,14 +727,14 @@ namespace OpenMetaverse
     /// <summary>
     /// InventoryAnimation Class, A bvh encoded object which animates an avatar
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class InventoryAnimation : InventoryItem
     {
         /// <summary>
         /// Construct an InventoryAnimation object
         /// </summary>
-        /// <param name="itemID">A <seealso cref="OpenMetaverse.UUID"/> which becomes the 
-        /// <seealso cref="OpenMetaverse.InventoryItem"/> objects AssetUUID</param>
+        /// <param name="itemID">A <seealso cref="UUID"/> which becomes the 
+        /// <seealso cref="InventoryItem"/> objects AssetUUID</param>
         public InventoryAnimation(UUID itemID)
             : base(itemID)
         {
@@ -731,14 +755,14 @@ namespace OpenMetaverse
     /// <summary>
     /// InventoryGesture Class, details on a series of animations, sounds, and actions
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class InventoryGesture : InventoryItem
     {
         /// <summary>
         /// Construct an InventoryGesture object
         /// </summary>
-        /// <param name="itemID">A <seealso cref="OpenMetaverse.UUID"/> which becomes the 
-        /// <seealso cref="OpenMetaverse.InventoryItem"/> objects AssetUUID</param>
+        /// <param name="itemID">A <seealso cref="UUID"/> which becomes the 
+        /// <seealso cref="InventoryItem"/> objects AssetUUID</param>
         public InventoryGesture(UUID itemID)
             : base(itemID)
         {
@@ -760,7 +784,7 @@ namespace OpenMetaverse
     /// A folder contains <seealso cref="T:OpenMetaverse.InventoryItem" />s and has certain attributes specific 
     /// to itself
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class InventoryFolder : InventoryBase
     {
         /// <summary>The Preferred <seealso cref="T:OpenMetaverse.FolderType"/> for a folder.</summary>
