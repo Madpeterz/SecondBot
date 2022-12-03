@@ -733,23 +733,23 @@ namespace BetterSecondBot.bottypes
 
         protected override void GroupInvite(InstantMessageEventArgs e)
         {
-            string[] stage1 = e.IM.FromAgentName.ToLowerInvariant().Split('.');
+            string fromname = e.IM.FromAgentName;
+            string[] stage1 = fromname.Split('.');
             if (stage1.Length == 1)
             {
-                stage1 = e.IM.FromAgentName.ToLowerInvariant().Split(" ");
-            }
-            string name = "" + stage1[0].FirstCharToUpper() + "";
-            if (stage1.Length == 1)
-            {
-                name = " Resident";
-            }
-            else
-            {
-                name = "" + name + " " + stage1[1].FirstCharToUpper() + "";
+                stage1 = fromname.Split(" ");
+                if (stage1.Length == 1)
+                {
+                    fromname = fromname + " Resident";
+                }
+                else
+                {
+                    fromname = stage1[0].FirstCharToUpper() + " " + stage1[1];
+                }
             }
             bool accept_invite;
             string whyAccept = "";
-            if (Is_avatar_master(name) == true)
+            if (Is_avatar_master(fromname) == true)
             {
                 accept_invite = true;
                 whyAccept = "Master";
