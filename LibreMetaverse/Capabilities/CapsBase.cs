@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
- * Copyright (c) 2019-2021, Sjofn LLC.
+ * Copyright (c) 2019-2022, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without 
@@ -33,6 +33,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace OpenMetaverse.Http
 {
+    [Obsolete("Obsolete due to reliance on HttpWebRequest. Use LibreMetaverse.HttpCapsClient instead.")]
     public static class CapsBase
     {
         #region http methods
@@ -54,12 +55,12 @@ namespace OpenMetaverse.Http
 
         private class RequestState
         {
-            public HttpWebRequest Request;
-            public byte[] UploadData;
-            public int MillisecondsTimeout;
-            public OpenWriteEventHandler OpenWriteCallback;
-            public DownloadProgressEventHandler DownloadProgressCallback;
-            public RequestCompletedEventHandler CompletedCallback;
+            public readonly HttpWebRequest Request;
+            public readonly byte[] UploadData;
+            public readonly int MillisecondsTimeout;
+            public readonly OpenWriteEventHandler OpenWriteCallback;
+            public readonly DownloadProgressEventHandler DownloadProgressCallback;
+            public readonly RequestCompletedEventHandler CompletedCallback;
 
             public RequestState(HttpWebRequest request, byte[] uploadData, int millisecondsTimeout, OpenWriteEventHandler openWriteCallback,
                 DownloadProgressEventHandler downloadProgressCallback, RequestCompletedEventHandler completedCallback)
@@ -279,7 +280,7 @@ namespace OpenMetaverse.Http
                         int totalBytesRead = 0;
                         int totalSize = nolength ? 0 : size;
 
-                        while ((bytesRead = responseStream.Read(buffer, offset, size)) != 0)
+                        while (responseStream != null && (bytesRead = responseStream.Read(buffer, offset, size)) != 0)
                         {
                             totalBytesRead += bytesRead;
 

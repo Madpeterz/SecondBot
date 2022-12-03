@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
- * Copyright (c) 2019-2021, Sjofn LLC
+ * Copyright (c) 2019-2022, Sjofn LLC
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without 
@@ -30,13 +30,15 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using OpenMetaverse.StructuredData;
-using OpenMetaverse.Http;
 using OpenMetaverse.Assets;
 using OpenMetaverse.Packets;
 using OpenMetaverse.Interfaces;
 using OpenMetaverse.Messages.Linden;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace OpenMetaverse
 {
@@ -136,11 +138,11 @@ namespace OpenMetaverse
         ConsoleAndChatHistory = 21,
         /// <summary>Send a teleport lure</summary>
         RequestTeleport = 22,
-        /// <summary>Response sent to the agent which inititiated a teleport invitation</summary>
+        /// <summary>Response sent to the agent who initiated a teleport invitation</summary>
         AcceptTeleport = 23,
-        /// <summary>Response sent to the agent which inititiated a teleport invitation</summary>
+        /// <summary>Response sent to the agent who initiated a teleport invitation</summary>
         DenyTeleport = 24,
-        /// <summary>Only useful if you have Linden permissions</summary>
+        /// <summary>Forceful admin teleport</summary>
         GodLikeRequestTeleport = 25,
         /// <summary>Request a teleport lure</summary>
         RequestLure = 26,
@@ -642,7 +644,7 @@ namespace OpenMetaverse
     {
         /// <summary>Object muted by name</summary>
         ByName = 0,
-        /// <summary>Muted residet</summary>
+        /// <summary>Muted resident</summary>
         Resident = 1,
         /// <summary>Object muted by UUID</summary>
         Object = 2,
@@ -764,7 +766,7 @@ namespace OpenMetaverse
 
         #region Event Delegates
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<ChatEventArgs> m_Chat;
 
         /// <summary>Raises the ChatFromSimulator event</summary>
@@ -786,11 +788,11 @@ namespace OpenMetaverse
             remove { lock (m_ChatLock) { m_Chat -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<ScriptDialogEventArgs> m_ScriptDialog;
 
         /// <summary>Raises the ScriptDialog event</summary>
-        /// <param name="e">A SctriptDialogEventArgs object containing the
+        /// <param name="e">A ScriptDialogEventArgs object containing the
         /// data returned from the data server</param>
         protected virtual void OnScriptDialog(ScriptDialogEventArgs e)
         {
@@ -808,7 +810,7 @@ namespace OpenMetaverse
             remove { lock (m_ScriptDialogLock) { m_ScriptDialog -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<ScriptQuestionEventArgs> m_ScriptQuestion;
 
         /// <summary>Raises the ScriptQuestion event</summary>
@@ -829,7 +831,7 @@ namespace OpenMetaverse
             remove { lock (m_ScriptQuestionLock) { m_ScriptQuestion -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<LoadUrlEventArgs> m_LoadURL;
 
         /// <summary>Raises the LoadURL event</summary>
@@ -850,7 +852,7 @@ namespace OpenMetaverse
             remove { lock (m_LoadUrlLock) { m_LoadURL -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<BalanceEventArgs> m_Balance;
 
         /// <summary>Raises the MoneyBalance event</summary>
@@ -872,7 +874,7 @@ namespace OpenMetaverse
             remove { lock (m_BalanceLock) { m_Balance -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<MoneyBalanceReplyEventArgs> m_MoneyBalance;
 
         /// <summary>Raises the MoneyBalanceReply event</summary>
@@ -894,7 +896,7 @@ namespace OpenMetaverse
             remove { lock (m_MoneyBalanceReplyLock) { m_MoneyBalance -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<InstantMessageEventArgs> m_InstantMessage;
 
         /// <summary>Raises the IM event</summary>
@@ -916,7 +918,7 @@ namespace OpenMetaverse
             remove { lock (m_InstantMessageLock) { m_InstantMessage -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<TeleportEventArgs> m_Teleport;
 
         /// <summary>Raises the TeleportProgress event</summary>
@@ -938,7 +940,7 @@ namespace OpenMetaverse
             remove { lock (m_TeleportLock) { m_Teleport += value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<AgentDataReplyEventArgs> m_AgentData;
 
         /// <summary>Raises the AgentDataReply event</summary>
@@ -960,7 +962,7 @@ namespace OpenMetaverse
             remove { lock (m_AgentDataLock) { m_AgentData -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<AnimationsChangedEventArgs> m_AnimationsChanged;
 
         /// <summary>Raises the AnimationsChanged event</summary>
@@ -982,7 +984,7 @@ namespace OpenMetaverse
             remove { lock (m_AnimationsChangedLock) { m_AnimationsChanged -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<MeanCollisionEventArgs> m_MeanCollision;
 
         /// <summary>Raises the MeanCollision event</summary>
@@ -1004,7 +1006,7 @@ namespace OpenMetaverse
             remove { lock (m_MeanCollisionLock) { m_MeanCollision -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<RegionCrossedEventArgs> m_RegionCrossed;
 
         /// <summary>Raises the RegionCrossed event</summary>
@@ -1026,7 +1028,7 @@ namespace OpenMetaverse
             remove { lock (m_RegionCrossedLock) { m_RegionCrossed -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<GroupChatJoinedEventArgs> m_GroupChatJoined;
 
         /// <summary>Raises the GroupChatJoined event</summary>
@@ -1071,7 +1073,7 @@ namespace OpenMetaverse
             remove { lock (m_AlertMessageLock) { m_AlertMessage -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<ScriptControlEventArgs> m_ScriptControl;
 
         /// <summary>Raises the ScriptControlChange event</summary>
@@ -1093,7 +1095,7 @@ namespace OpenMetaverse
             remove { lock (m_ScriptControlLock) { m_ScriptControl -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<CameraConstraintEventArgs> m_CameraConstraint;
 
         /// <summary>Raises the CameraConstraint event</summary>
@@ -1117,7 +1119,7 @@ namespace OpenMetaverse
             remove { lock (m_CameraConstraintLock) { m_CameraConstraint -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<ScriptSensorReplyEventArgs> m_ScriptSensorReply;
 
         /// <summary>Raises the ScriptSensorReply event</summary>
@@ -1140,7 +1142,7 @@ namespace OpenMetaverse
             remove { lock (m_ScriptSensorReplyLock) { m_ScriptSensorReply -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<AvatarSitResponseEventArgs> m_AvatarSitResponse;
 
         /// <summary>Raises the AvatarSitResponse event</summary>
@@ -1163,7 +1165,7 @@ namespace OpenMetaverse
             remove { lock (m_AvatarSitResponseLock) { m_AvatarSitResponse -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<ChatSessionMemberAddedEventArgs> m_ChatSessionMemberAdded;
 
         /// <summary>Raises the ChatSessionMemberAdded event</summary>
@@ -1185,7 +1187,7 @@ namespace OpenMetaverse
             remove { lock (m_ChatSessionMemberAddedLock) { m_ChatSessionMemberAdded -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<ChatSessionMemberLeftEventArgs> m_ChatSessionMemberLeft;
 
         /// <summary>Raises the ChatSessionMemberLeft event</summary>
@@ -1207,7 +1209,7 @@ namespace OpenMetaverse
             remove { lock (m_ChatSessionMemberLeftLock) { m_ChatSessionMemberLeft -= value; } }
         }
 
-        /// <summary>The event subscribers, null of no subscribers</summary>
+        /// <summary>The event subscribers, null if no subscribers</summary>
         private EventHandler<SetDisplayNameReplyEventArgs> m_SetDisplayNameReply;
 
         ///<summary>Raises the SetDisplayNameReply Event</summary>
@@ -1230,7 +1232,7 @@ namespace OpenMetaverse
             remove { lock (m_SetDisplayNameReplyLock) { m_SetDisplayNameReply -= value; } }
         }
 
-        /// <summary>The event subscribers. null if no subcribers</summary>
+        /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<EventArgs> m_MuteListUpdated;
 
         /// <summary>Raises the MuteListUpdated event</summary>
@@ -1263,7 +1265,7 @@ namespace OpenMetaverse
         public InternalDictionary<UUID, int> SignaledAnimations = new InternalDictionary<UUID, int>();
         /// <summary>Dictionary containing current Group Chat sessions and members</summary>
         public InternalDictionary<UUID, List<ChatSessionMember>> GroupChatSessions = new InternalDictionary<UUID, List<ChatSessionMember>>();
-        /// <summary>Dictionary containing mute list keyead on mute name and key</summary>
+        /// <summary>Dictionary containing mute list keyed on mute name and key</summary>
         public InternalDictionary<string, MuteEntry> MuteList = new InternalDictionary<string, MuteEntry>();
         public InternalDictionary<UUID, UUID> ActiveGestures { get; } = new InternalDictionary<UUID, UUID>();
 
@@ -1271,24 +1273,24 @@ namespace OpenMetaverse
 
         /// <summary>Your (client) avatars <see cref="UUID"/></summary>
         /// <remarks>"client", "agent", and "avatar" all represent the same thing</remarks>
-        public UUID AgentID => id;
+        public UUID AgentID { get; private set; }
 
         /// <summary>Temporary <seealso cref="UUID"/> assigned to this session, used for 
         /// verifying our identity in packets</summary>
-        public UUID SessionID => sessionID;
+        public UUID SessionID { get; private set; }
 
         /// <summary>Shared secret <seealso cref="UUID"/> that is never sent over the wire</summary>
-        public UUID SecureSessionID => secureSessionID;
+        public UUID SecureSessionID { get; private set; }
 
         /// <summary>Your (client) avatar ID, local to the current region/sim</summary>
         public uint LocalID => localID;
 
         /// <summary>Where the avatar started at login. Can be "last", "home" 
         /// or a login <seealso cref="T:OpenMetaverse.URI"/></summary>
-        public string StartLocation => startLocation;
+        public string StartLocation { get; private set; } = string.Empty;
 
         /// <summary>The access level of this agent, usually M, PG or A</summary>
-        public string AgentAccess => agentAccess;
+        public string AgentAccess { get; private set; } = string.Empty;
 
         /// <summary>The CollisionPlane of Agent</summary>
         public Vector4 CollisionPlane => collisionPlane;
@@ -1302,21 +1304,24 @@ namespace OpenMetaverse
         /// <summary>A <seealso cref="Vector3"/> which specifies the angular speed, and axis about which an Avatar is rotating.</summary>
         public Vector3 AngularVelocity => angularVelocity;
 
+        /// <summary>Region handle for 'home' region</summary>
+        public ulong HomeRegionHandle => home.RegionHandle;
+
         /// <summary>Position avatar client will goto when login to 'home' or during
         /// teleport request to 'home' region.</summary>
-        public Vector3 HomePosition => homePosition;
+        public Vector3 HomePosition => home.Position;
 
         /// <summary>LookAt point saved/restored with HomePosition</summary>
-        public Vector3 HomeLookAt => homeLookAt;
+        public Vector3 HomeLookAt => home.LookAt;
 
         /// <summary>Avatar First Name (i.e. Philip)</summary>
-        public string FirstName => firstName;
+        public string FirstName { get; private set; } = string.Empty;
 
         /// <summary>Avatar Last Name (i.e. Linden)</summary>
-        public string LastName => lastName;
+        public string LastName { get; private set; } = string.Empty;
 
         /// <summary>LookAt point received with the login response message</summary>
-        public Vector3 LookAt => lookAt;
+        public Vector3 LookAt { get; private set; }
 
         /// <summary>Avatar Full Name (i.e. Philip Linden)</summary>
         public string Name
@@ -1326,35 +1331,39 @@ namespace OpenMetaverse
                 // This is a fairly common request, so assume the name doesn't
                 // change mid-session and cache the result
                 if (fullName == null || fullName.Length < 2)
-                    fullName = $"{firstName} {lastName}";
+                    fullName = $"{FirstName} {LastName}";
                 return fullName;
             }
         }
         /// <summary>Gets the health of the agent</summary>
-        public float Health => health;
+        public float Health { get; private set; }
 
         /// <summary>Gets the current balance of the agent</summary>
-        public int Balance => balance;
+        public int Balance { get; private set; }
 
         /// <summary>Gets the local ID of the prim the agent is sitting on,
         /// zero if the avatar is not currently sitting</summary>
         public uint SittingOn => sittingOn;
 
         /// <summary>Gets the <seealso cref="UUID"/> of the agents active group.</summary>
-        public UUID ActiveGroup => activeGroup;
+        public UUID ActiveGroup { get; private set; }
 
         /// <summary>Gets the Agents powers in the currently active group</summary>
-        public GroupPowers ActiveGroupPowers => activeGroupPowers;
+        public GroupPowers ActiveGroupPowers { get; private set; }
 
         /// <summary>Current status message for teleporting</summary>
-        public string TeleportMessage => teleportMessage;
+        public string TeleportMessage { get; private set; } = string.Empty;
 
         /// <summary>Current position of the agent as a relative offset from
         /// the simulator, or the parent object if we are sitting on something</summary>
-        public Vector3 RelativePosition { get { return relativePosition; } set { relativePosition = value; } }
+        public Vector3 RelativePosition { get => relativePosition;
+            set => relativePosition = value;
+        }
         /// <summary>Current rotation of the agent as a relative rotation from
         /// the simulator, or the parent object if we are sitting on something</summary>
-        public Quaternion RelativeRotation { get { return relativeRotation; } set { relativeRotation = value; } }
+        public Quaternion RelativeRotation { get => relativeRotation;
+            set => relativeRotation = value;
+        }
         /// <summary>Current position of the agent in the simulator</summary>
         public Vector3 SimPosition
         {
@@ -1366,7 +1375,7 @@ namespace OpenMetaverse
                     return relativePosition;
                 }
 
-                // a bit more complicatated, agent sitting on a prim
+                // a bit more complicated, agent sitting on a prim
                 Primitive p;
                 Vector3 fullPosition = relativePosition;
 
@@ -1375,7 +1384,7 @@ namespace OpenMetaverse
                     fullPosition = p.Position + relativePosition * p.Rotation;
                 }
 
-                // go up the hiearchy trying to find the root prim
+                // go up the hierarchy trying to find the root prim
                 while (p != null && p.ParentID != 0)
                 {
                     Avatar av;
@@ -1398,13 +1407,13 @@ namespace OpenMetaverse
                     return fullPosition;
                 }
 
-                // Didn't find the seat's root prim, try returning coarse loaction
+                // Didn't find the seat's root prim, try returning coarse location
                 if (Client.Network.CurrentSim.avatarPositions.TryGetValue(AgentID, out fullPosition))
                 {
                     return fullPosition;
                 }
 
-                Logger.Log("Failed to determine agents sim position", Helpers.LogLevel.Warning, Client);
+                Logger.Log("Failed to determine agent sim position", Helpers.LogLevel.Warning, Client);
                 return relativePosition;
             }
         }
@@ -1467,25 +1476,11 @@ namespace OpenMetaverse
 
         #region Private Members
 
-        private UUID id;
-        private UUID sessionID;
-        private UUID secureSessionID;
-        private string startLocation = string.Empty;
-        private string agentAccess = string.Empty;
-        private Vector3 homePosition;
-        private Vector3 homeLookAt;
-        private Vector3 lookAt;
-        private string firstName = string.Empty;
-        private string lastName = string.Empty;
+        private HomeInfo home;
         private string fullName;
-        private string teleportMessage = string.Empty;
         private TeleportStatus teleportStat = TeleportStatus.None;
         private ManualResetEvent teleportEvent = new ManualResetEvent(false);
         private uint heightWidthGenCounter;
-        private float health;
-        private int balance;
-        private UUID activeGroup;
-        private GroupPowers activeGroupPowers;
         private Dictionary<UUID, AssetGesture> gestureCache = new Dictionary<UUID, AssetGesture>();
         #endregion Private Members
 
@@ -1580,17 +1575,17 @@ namespace OpenMetaverse
             {
                 int group_id = message_chunk_group_id;
                 message_chunk_group_id++;
-                if (message_chunk_group_id > 500) message_chunk_group_id = 1;
+                if (message_chunk_group_id > 500) { message_chunk_group_id = 1; }
                 string[] chunks = message.SplitBy(900).ToArray();
                 int chunkid = 1;
-                foreach(string C in chunks)
+                foreach(string chunk in chunks)
                 {
                     string chunk_grouping = "";
                     if(hide_chunk_grouping == false)
                     {
-                        chunk_grouping = "[" + group_id.ToString() + "|" + chunkid.ToString() + "|"+chunks.Length.ToString()+"]";
+                        chunk_grouping = $"[{group_id}|{chunkid}|{chunks.Length}]";
                     }
-                    Chat(""+ chunk_grouping+"" + C + "", channel, type, false);
+                    Chat($"{chunk_grouping}{chunk}", channel, type, false);
                     chunkid++;
                 }
             }
@@ -1600,7 +1595,7 @@ namespace OpenMetaverse
                 {
                     AgentData =
                         {
-                            AgentID = id,
+                            AgentID = AgentID,
                             SessionID = Client.Self.SessionID
                         },
                     ChatData =
@@ -1629,9 +1624,7 @@ namespace OpenMetaverse
                 return;
             }
 
-            var request = new CapsClient(offlineMsgsCap);
-            request.OnComplete += OfflineMessageHandlerCallback;
-            request.GetRequestAsync(Client.Settings.CAPS_TIMEOUT);
+            Task req = Client.HttpCapsClient.GetRequestAsync(offlineMsgsCap, CancellationToken.None, OfflineMessageHandlerCallback);
         }
 
         /// <summary>
@@ -1774,6 +1767,7 @@ namespace OpenMetaverse
         public void InstantMessageGroup(string fromName, UUID groupID, string message)
         {
             lock (GroupChatSessions.Dictionary)
+            {
                 if (GroupChatSessions.ContainsKey(groupID))
                 {
                     ImprovedInstantMessagePacket im = new ImprovedInstantMessagePacket
@@ -1806,6 +1800,7 @@ namespace OpenMetaverse
                     Logger.Log("No Active group chat session appears to exist, use RequestJoinGroupChat() to join one",
                         Helpers.LogLevel.Error, Client);
                 }
+            }
         }
 
         /// <summary>
@@ -1874,8 +1869,10 @@ namespace OpenMetaverse
             Client.Network.SendPacket(im);
 
             lock (GroupChatSessions.Dictionary)
+            {
                 if (GroupChatSessions.ContainsKey(groupID))
                     GroupChatSessions.Remove(groupID);
+            }
         }
 
         /// <summary>
@@ -1920,15 +1917,22 @@ namespace OpenMetaverse
                 throw new Exception("ChatSessionRequest capability is not currently available");
             }
 
-            CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("ChatSessionRequest");
-            if (request != null)
+            Uri cap = Client.Network.CurrentSim.Caps.CapabilityURI("ChatSessionRequest");
+            if (cap != null)
             {
                 ChatSessionAcceptInvitation acceptInvite = new ChatSessionAcceptInvitation {SessionID = session_id};
-                request.PostRequestAsync(acceptInvite.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
 
-                lock (GroupChatSessions.Dictionary)
-                    if (!GroupChatSessions.ContainsKey(session_id))
-                        GroupChatSessions.Add(session_id, new List<ChatSessionMember>());
+                Task req = Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, acceptInvite.Serialize(),
+                    CancellationToken.None, null);
+                req.ContinueWith(t =>
+                {
+                    lock (GroupChatSessions.Dictionary)
+                    {
+                        if (!GroupChatSessions.ContainsKey(session_id))
+                            GroupChatSessions.Add(session_id, new List<ChatSessionMember>());
+                    }
+                });
+
             }
             else
             {
@@ -1948,22 +1952,24 @@ namespace OpenMetaverse
             {
                 throw new Exception("ChatSessionRequest capability is not currently available");
             }
-            CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("ChatSessionRequest");
-            if (request != null)
+
+            Uri cap = Client.Network.CurrentSim.Caps.CapabilityURI("ChatSessionRequest");
+            if (cap != null)
             {
                 ChatSessionRequestStartConference startConference = new ChatSessionRequestStartConference
                 {
                     AgentsBlock = new UUID[participants.Count]
                 };
 
-                for (int i = 0; i < participants.Count; i++)
+                for (var i = 0; i < participants.Count; i++)
                 {
                     startConference.AgentsBlock[i] = participants[i];
                 }
 
                 startConference.SessionID = tmp_session_id;
 
-                request.PostRequestAsync(startConference.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                Task req = Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, startConference.Serialize(), 
+                    CancellationToken.None, null);
             }
             else
             {
@@ -2300,15 +2306,15 @@ namespace OpenMetaverse
             autopilot.ParamList = new GenericMessagePacket.ParamListBlock[3];
             autopilot.ParamList[0] = new GenericMessagePacket.ParamListBlock
             {
-                Parameter = Utils.StringToBytes(globalX.ToString())
+                Parameter = Utils.StringToBytes(globalX.ToString(CultureInfo.InvariantCulture))
             };
             autopilot.ParamList[1] = new GenericMessagePacket.ParamListBlock
             {
-                Parameter = Utils.StringToBytes(globalY.ToString())
+                Parameter = Utils.StringToBytes(globalY.ToString(CultureInfo.InvariantCulture))
             };
             autopilot.ParamList[2] = new GenericMessagePacket.ParamListBlock
             {
-                Parameter = Utils.StringToBytes(z.ToString())
+                Parameter = Utils.StringToBytes(z.ToString(CultureInfo.InvariantCulture))
             };
 
             Client.Network.SendPacket(autopilot);
@@ -2349,7 +2355,7 @@ namespace OpenMetaverse
             };
             autopilot.ParamList[2] = new GenericMessagePacket.ParamListBlock
             {
-                Parameter = Utils.StringToBytes(z.ToString())
+                Parameter = Utils.StringToBytes(z.ToString(CultureInfo.InvariantCulture))
             };
 
             Client.Network.SendPacket(autopilot);
@@ -2512,8 +2518,8 @@ namespace OpenMetaverse
         /// </summary>
         /// <param name="objectLocalID">The Objects Simulator Local ID</param>
         /// <seealso cref="Simulator.ObjectsPrimitives"/>
-        /// <seealso cref="Grab"/>
-        /// <seealso cref="GrabUpdate"/>
+        /// <seealso cref="AgentManager.Grab"/>
+        /// <seealso cref="AgentManager.GrabUpdate"/>
         public void DeGrab(uint objectLocalID)
         {
             DeGrab(objectLocalID, TOUCH_INVALID_TEXCOORD, TOUCH_INVALID_TEXCOORD, 
@@ -2680,14 +2686,14 @@ namespace OpenMetaverse
             {
                 AgentData =
                 {
-                    AgentID = id,
+                    AgentID = AgentID,
                     SessionID = Client.Self.SessionID
                 },
                 MoneyData =
                 {
                     Description = Utils.StringToBytes(description),
                     DestID = target,
-                    SourceID = id,
+                    SourceID = AgentID,
                     TransactionType = (int) type,
                     AggregatePermInventory = 0,
                     AggregatePermNextOwner = 0,
@@ -2935,7 +2941,7 @@ namespace OpenMetaverse
             }
 
             // TODO: Implement support for this
-            animate.PhysicalAvatarEventList = new AgentAnimationPacket.PhysicalAvatarEventListBlock[0];
+            animate.PhysicalAvatarEventList = Array.Empty<AgentAnimationPacket.PhysicalAvatarEventListBlock>();
 
             Client.Network.SendPacket(animate);
         }
@@ -2979,7 +2985,7 @@ namespace OpenMetaverse
                 teleportStat == TeleportStatus.Start ||
                 teleportStat == TeleportStatus.Progress)
             {
-                teleportMessage = "Teleport timed out.";
+                TeleportMessage = "Teleport timed out.";
                 teleportStat = TeleportStatus.Failed;
             }
 
@@ -3010,23 +3016,20 @@ namespace OpenMetaverse
         /// false</returns>
         public bool Teleport(string simName, Vector3 position, Vector3 lookAt)
         {
-            if (Client.Network.CurrentSim == null)
-                return false;
+            if (Client.Network.CurrentSim == null) { return false; }
 
             teleportStat = TeleportStatus.None;
 
             if (simName != Client.Network.CurrentSim.Name)
             {
                 // Teleporting to a foreign sim
-                GridRegion region;
-
-                if (Client.Grid.GetGridRegion(simName, GridLayerType.Objects, out region))
+                if (Client.Grid.GetGridRegion(simName, GridLayerType.Objects, out var region))
                 {
                     return Teleport(region.RegionHandle, position, lookAt);
                 }
                 else
                 {
-                    teleportMessage = "Unable to resolve name: " + simName;
+                    TeleportMessage = $"Unable to resolve simulator named: {simName}";
                     teleportStat = TeleportStatus.Failed;
                     return false;
                 }
@@ -3089,7 +3092,7 @@ namespace OpenMetaverse
                 teleportStat == TeleportStatus.Start ||
                 teleportStat == TeleportStatus.Progress)
             {
-                teleportMessage = "Teleport timed out.";
+                TeleportMessage = "Teleport timed out.";
                 teleportStat = TeleportStatus.Failed;
             }
 
@@ -3107,7 +3110,7 @@ namespace OpenMetaverse
         }
 
         /// <summary>
-        /// Request teleport to a another simulator
+        /// Request teleport to another region
         /// </summary>
         /// <param name="regionHandle">handle of region to teleport agent to</param>
         /// <param name="position"><seealso cref="Vector3"/> position in destination sim to teleport to</param>
@@ -3118,20 +3121,28 @@ namespace OpenMetaverse
                 Client.Network.CurrentSim.Caps != null &&
                 Client.Network.CurrentSim.Caps.IsEventQueueRunning)
             {
-                TeleportLocationRequestPacket teleport = new TeleportLocationRequestPacket();
-                teleport.AgentData.AgentID = Client.Self.AgentID;
-                teleport.AgentData.SessionID = Client.Self.SessionID;
-                teleport.Info.LookAt = lookAt;
-                teleport.Info.Position = position;
-                teleport.Info.RegionHandle = regionHandle;
+                TeleportLocationRequestPacket teleport = new TeleportLocationRequestPacket
+                {
+                    AgentData =
+                    {
+                        AgentID = Client.Self.AgentID,
+                        SessionID = Client.Self.SessionID
+                    },
+                    Info =
+                    {
+                        LookAt = lookAt,
+                        Position = position,
+                        RegionHandle = regionHandle
+                    }
+                };
 
-                Logger.Log("Requesting teleport to region handle " + regionHandle.ToString(), Helpers.LogLevel.Info, Client);
+                Logger.Log($"Requesting teleport to region handle {regionHandle}", Helpers.LogLevel.Info, Client);
 
                 Client.Network.SendPacket(teleport);
             }
             else
             {
-                teleportMessage = "CAPS event queue is not running";
+                TeleportMessage = "CAPS event queue is not running";
                 teleportEvent.Set();
                 teleportStat = TeleportStatus.Failed;
             }
@@ -3161,7 +3172,7 @@ namespace OpenMetaverse
         /// <param name="targetID">target avatars <seealso cref="UUID"/> to lure</param>
         public void SendTeleportLure(UUID targetID)
         {
-            SendTeleportLure(targetID, "Join me in " + Client.Network.CurrentSim.Name + "!");
+            SendTeleportLure(targetID, $"Join me in {Client.Network.CurrentSim.Name}!");
         }
 
         /// <summary>
@@ -3175,7 +3186,7 @@ namespace OpenMetaverse
             {
                 AgentData =
                 {
-                    AgentID = Client.Self.id,
+                    AgentID = Client.Self.AgentID,
                     SessionID = Client.Self.SessionID
                 },
                 Info =
@@ -3258,8 +3269,8 @@ namespace OpenMetaverse
             {
                 AgentData =
                 {
-                    AgentID = id,
-                    SessionID = sessionID
+                    AgentID = AgentID,
+                    SessionID = SessionID
                 },
                 PropertiesData =
                 {
@@ -3286,8 +3297,8 @@ namespace OpenMetaverse
             {
                 AgentData =
                 {
-                    AgentID = id,
-                    SessionID = sessionID
+                    AgentID = AgentID,
+                    SessionID = SessionID
                 },
                 PropertiesData =
                 {
@@ -3313,8 +3324,8 @@ namespace OpenMetaverse
             {
                 AgentData =
                 {
-                    AgentID = id,
-                    SessionID = sessionID
+                    AgentID = AgentID,
+                    SessionID = SessionID
                 },
                 Data =
                 {
@@ -3628,7 +3639,7 @@ namespace OpenMetaverse
                 AgentData =
                 {
                     AgentID = Client.Self.AgentID,
-                    SessionID = Client.Self.sessionID
+                    SessionID = Client.Self.SessionID
                 },
                 Data = {PickID = pickID}
             };
@@ -3694,7 +3705,7 @@ namespace OpenMetaverse
         /// Delete a classified ad
         /// </summary>
         /// <param name="classifiedID">The classified ads ID</param>
-        public void DeleteClassfied(UUID classifiedID)
+        public void DeleteClassified(UUID classifiedID)
         {
             ClassifiedDeletePacket classified = new ClassifiedDeletePacket
             {
@@ -3717,16 +3728,17 @@ namespace OpenMetaverse
         {
             try
             {
-                CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("AttachmentResources");
-
-                request.OnComplete += delegate(CapsClient client, OSD result, Exception error)
+                Uri cap = Client.Network.CurrentSim.Caps.CapabilityURI("AttachmentResources");
+                Task req = Client.HttpCapsClient.GetRequestAsync(cap, CancellationToken.None, 
+                    (response, data, error) =>
                 {
+                    if (error != null)
+                    {
+                        callback(false, null);
+                    }
                     try
                     {
-                        if (result == null || error != null)
-                        {
-                            callback(false, null);
-                        }
+                        OSD result = OSDParser.Deserialize(data);
                         AttachmentResourcesMessage info = AttachmentResourcesMessage.FromOSD(result);
                         callback(true, info);
 
@@ -3736,9 +3748,7 @@ namespace OpenMetaverse
                         Logger.Log("Failed fetching AttachmentResources", Helpers.LogLevel.Error, Client, ex);
                         callback(false, null);
                     }
-                };
-
-                request.GetRequestAsync(Client.Settings.CAPS_TIMEOUT);
+                });
             }
             catch (Exception ex)
             {
@@ -3756,16 +3766,15 @@ namespace OpenMetaverse
         {
             if (Client.Network.CurrentSim == null || Client.Network.CurrentSim.Caps == null)
             {
-                Logger.Log("Not connected to simulator. " +
-                           "Unable to set display name.",
+                Logger.Log("Not connected to simulator to set display name.",
                     Helpers.LogLevel.Warning, Client);
                 return;
             }
 
-            CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("SetDisplayName");
-            if (request == null)
+            Uri cap = Client.Network.CurrentSim.Caps.CapabilityURI("SetDisplayName");
+            if (cap == null)
             {
-                Logger.Log("Unable to obtain capability. Unable to set display name.", 
+                Logger.Log("Unable to obtain capability to set display name.",
                     Helpers.LogLevel.Warning, Client);
                 return;
             }
@@ -3776,7 +3785,8 @@ namespace OpenMetaverse
                 NewDisplayName = newName
             };
 
-            request.PostRequestAsync(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+            Task req = Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, msg.Serialize(), 
+                CancellationToken.None, null);
         }
 
         /// <summary>
@@ -3794,8 +3804,9 @@ namespace OpenMetaverse
                     LanguagePublic = isPublic
                 };
 
-                CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("UpdateAgentLanguage");
-                request?.PostRequestAsync(msg.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+                Uri cap = Client.Network.CurrentSim.Caps.CapabilityURI("UpdateAgentLanguage");
+                Task req = Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, msg.Serialize(), 
+                    CancellationToken.None, null);
             }
             catch (Exception ex)
             {
@@ -3821,44 +3832,42 @@ namespace OpenMetaverse
         /// <param name="callback">Callback function</param>
         public void SetAgentAccess(string access, AgentAccessCallback callback)
         {
-            if (Client == null || !Client.Network.Connected || Client.Network.CurrentSim.Caps == null) return;
+            if (Client == null || !Client.Network.Connected || Client.Network.CurrentSim.Caps == null) { return; }
 
-            CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("UpdateAgentInformation");
-            if (request == null) return;
-
-            request.OnComplete += (client, result, error) =>
-            {
-                bool success = true;
-
-                if (error == null && result is OSDMap)
-                {
-                    var map = ((OSDMap)result)["access_prefs"];
-                    agentAccess = ((OSDMap)map)["max"];
-                    Logger.Log($"Max maturity access set to {agentAccess}", Helpers.LogLevel.Info, Client );
-                }
-                else if (error == null)
-                {
-                    Logger.Log($"Max maturity unchanged at {agentAccess}", Helpers.LogLevel.Info, Client);
-                }
-                else
-                {
-                    Logger.Log("Failed setting max maturity access.", Helpers.LogLevel.Warning, Client);
-                    success = false;
-                }
-                
-                if (callback != null)
-                {
-                    try { callback(new AgentAccessEventArgs(success, agentAccess)); }
-                    catch { } // *TODO: So gross
-                }
-
-            };
-            OSDMap req = new OSDMap
+            OSDMap payload = new OSDMap
             {
                 ["access_prefs"] = new OSDMap { ["max"] = access }
             };
+            Uri cap = Client.Network.CurrentSim.Caps.CapabilityURI("UpdateAgentInformation");
+            if (cap == null) { return; }
 
-            request.PostRequestAsync(req, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+            Task req = Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, payload, CancellationToken.None,
+                (response, data, error) =>
+                {
+                    bool success = true;
+                    OSD result = OSDParser.Deserialize(data);
+                    if (error == null && result is OSDMap osdMap)
+                    {
+                        var map = osdMap["access_prefs"];
+                        AgentAccess = ((OSDMap)map)["max"];
+                        Logger.Log($"Max maturity access set to {AgentAccess}", Helpers.LogLevel.Info, Client);
+                    }
+                    else if (error == null)
+                    {
+                        Logger.Log($"Max maturity unchanged at {AgentAccess}", Helpers.LogLevel.Info, Client);
+                    }
+                    else
+                    {
+                        Logger.Log("Failed setting max maturity access.", Helpers.LogLevel.Warning, Client);
+                        success = false;
+                    }
+
+                    if (callback != null)
+                    {
+                        try { callback(new AgentAccessEventArgs(success, AgentAccess)); }
+                        catch { } // *TODO: So gross
+                    }
+                });
         }
 
         /// <summary>
@@ -3867,37 +3876,33 @@ namespace OpenMetaverse
         /// <param name="hoverHeight">Hover height [-2.0, 2.0]</param>
         public void SetHoverHeight(double hoverHeight)
         {
-            if (Client == null || !Client.Network.Connected || Client.Network.CurrentSim.Caps == null)
+            if (Client == null || !Client.Network.Connected || Client.Network.CurrentSim.Caps == null) { return; }
+
+            var postData = new OSDMap { ["hover_height"] = hoverHeight };
+
+            Uri cap = Client.Network.CurrentSim.Caps.CapabilityURI("AgentPreferences");
+            if (cap == null) { return; }
+
+            Task req = Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, postData, CancellationToken.None,
+                (response, data, error) =>
             {
-                return;
-            }
+                OSD result = OSDParser.Deserialize(data);
 
-            CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("AgentPreferences");
-            if (request == null) { return; }
-
-            request.OnComplete += (client, result, error) =>
-            {
-                var resultMap = result as OSDMap;
-
-                if(error != null)
+                if (error != null)
                 {
                     Logger.Log($"Failed to set hover height: {error}.", Helpers.LogLevel.Warning, Client);
                 }
-                else if (resultMap == null)
+                else if (!(result is OSDMap resultMap))
                 {
-                    Logger.Log($"Failed to set hover height: Expected {nameof(OSDMap)} response, but got {result.Type}", Helpers.LogLevel.Warning, Client);
+                    Logger.Log($"Failed to set hover height: Expected {nameof(OSDMap)} response, but got {result.Type}",
+                        Helpers.LogLevel.Warning, Client);
                 }
                 else
                 {
                     var confirmedHeight = resultMap["hover_height"];
-                    Logger.Log($"Hover height set to {confirmedHeight}", Helpers.LogLevel.Info, Client);
+                    Logger.Log($"Hover height set to {confirmedHeight}", Helpers.LogLevel.Debug, Client);
                 }
-            };
-
-            var postData = new OSDMap {
-                ["hover_height"] = hoverHeight
-            };
-            request.PostRequestAsync(postData, OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+            });
         }
 
         #endregion Misc
@@ -3940,21 +3945,21 @@ namespace OpenMetaverse
             }
         }
 
-        protected void OfflineMessageHandlerCallback(CapsClient client, OSD response, Exception error)
+        protected void OfflineMessageHandlerCallback(HttpResponseMessage response, byte[] data, Exception error)
         {
             if (error != null) {
                 Logger.Log($"Failed to retrieve offline messages from the simulator: {error.Message}",
                     Helpers.LogLevel.Warning);
                 RetrieveInstantMessagesLegacy();
-                return; 
+                return;
             }
 
-            if (m_InstantMessage == null) return; // don't bother if we don't have any listeners
+            if (m_InstantMessage == null) { return; } // don't bother if we don't have any listeners
 
-            if (response == null || !(response is OSDMap respMap) 
-                || respMap.Count == 0 || respMap.ContainsKey("messages"))
+            OSD result = OSDParser.Deserialize(data);
+            if (!(result is OSDMap respMap) || respMap.Count == 0 || respMap.ContainsKey("messages"))
             {
-                Logger.Log($"Failed to retrieve offline messages because the capability returned some goofy shit.",
+                Logger.Log("Failed to retrieve offline messages because the capability returned invalid shiz.",
                     Helpers.LogLevel.Warning);
                 RetrieveInstantMessagesLegacy();
                 return;
@@ -3985,11 +3990,10 @@ namespace OpenMetaverse
                         : new Vector3(msg["local_x"], msg["local_y"], msg["local_z"]);
                     message.BinaryBucket = msg.ContainsKey("binary_bucket")
                         ? msg["binary_bucket"].AsBinary() : new byte[] { 0 };
-                    message.GroupIM = msg.ContainsKey("from_group")
-                        ? msg["from_group"].AsBoolean() : false;
+                    message.GroupIM = msg.ContainsKey("from_group") && msg["from_group"].AsBoolean();
 
                     OnInstantMessage(new InstantMessageEventArgs(message, null));
-                }                
+                }
             }
         }
 
@@ -4135,7 +4139,7 @@ namespace OpenMetaverse
         protected void HealthHandler(object sender, PacketReceivedEventArgs e)
         {
             Packet packet = e.Packet;
-            health = ((HealthMessagePacket)packet).HealthData.Health;
+            Health = ((HealthMessagePacket)packet).HealthData.Health;
         }
 
         /// <summary>Process an incoming packet and raise the appropriate events</summary>
@@ -4150,22 +4154,22 @@ namespace OpenMetaverse
 
             if (p.AgentData.AgentID == simulator.Client.Self.AgentID)
             {
-                firstName = Utils.BytesToString(p.AgentData.FirstName);
-                lastName = Utils.BytesToString(p.AgentData.LastName);
-                activeGroup = p.AgentData.ActiveGroupID;
-                activeGroupPowers = (GroupPowers)p.AgentData.GroupPowers;
+                FirstName = Utils.BytesToString(p.AgentData.FirstName);
+                LastName = Utils.BytesToString(p.AgentData.LastName);
+                ActiveGroup = p.AgentData.ActiveGroupID;
+                ActiveGroupPowers = (GroupPowers)p.AgentData.GroupPowers;
 
                 if (m_AgentData == null) return;
 
                 string groupTitle = Utils.BytesToString(p.AgentData.GroupTitle);
                 string groupName = Utils.BytesToString(p.AgentData.GroupName);
 
-                OnAgentData(new AgentDataReplyEventArgs(firstName, lastName, activeGroup, groupTitle, activeGroupPowers, groupName));
+                OnAgentData(new AgentDataReplyEventArgs(FirstName, LastName, ActiveGroup, groupTitle, ActiveGroupPowers, groupName));
             }
             else
             {
-                Logger.Log("Got an AgentDataUpdate packet for avatar " + p.AgentData.AgentID.ToString() +
-                    " instead of " + Client.Self.AgentID.ToString() + ", this shouldn't happen", Helpers.LogLevel.Error, Client);
+                Logger.Log("Got an AgentDataUpdate packet for avatar " + p.AgentData.AgentID +
+                    " instead of " + Client.Self.AgentID + ", this shouldn't happen", Helpers.LogLevel.Error, Client);
             }
         }
 
@@ -4179,7 +4183,7 @@ namespace OpenMetaverse
             if (packet.Type == PacketType.MoneyBalanceReply)
             {
                 MoneyBalanceReplyPacket reply = (MoneyBalanceReplyPacket)packet;
-                this.balance = reply.MoneyData.MoneyBalance;
+                this.Balance = reply.MoneyData.MoneyBalance;
 
                 if (m_MoneyBalance != null)
                 {
@@ -4206,7 +4210,7 @@ namespace OpenMetaverse
 
             if (m_Balance != null)
             {
-                OnBalance(new BalanceEventArgs(balance));
+                OnBalance(new BalanceEventArgs(Balance));
             }
         }
 
@@ -4235,7 +4239,7 @@ namespace OpenMetaverse
         {
             EstablishAgentCommunicationMessage msg = (EstablishAgentCommunicationMessage)message;
 
-            if (!Client.Settings.MULTIPLE_SIMS) return;
+            if (!Client.Settings.MULTIPLE_SIMS) { return; }
             IPEndPoint endPoint = new IPEndPoint(msg.Address, msg.Port);
             Simulator sim = Client.Network.FindSimulator(endPoint);
 
@@ -4248,10 +4252,10 @@ namespace OpenMetaverse
             }
             else
             {
-                Logger.Log("Got EstablishAgentCommunication for " + sim,
+                Logger.Log($"Got EstablishAgentCommunication for {sim}",
                     Helpers.LogLevel.Info, Client);
 
-                sim.SetSeedCaps(msg.SeedCapability.ToString());
+                sim.SetSeedCaps(msg.SeedCapability);
             }
         }
 
@@ -4259,7 +4263,7 @@ namespace OpenMetaverse
         /// Process TeleportFailed message sent via EventQueue, informs agent its last teleport has failed and why.
         /// </summary>
         /// <param name="messageKey">The Message Key</param>
-        /// <param name="message">An IMessage object Deserialized from the recieved message event</param>
+        /// <param name="message">An IMessage object Deserialized from the received message event</param>
         /// <param name="simulator">The simulator originating the event message</param>
         public void TeleportFailedEventHandler(string messageKey, IMessage message, Simulator simulator)
         {
@@ -4322,7 +4326,7 @@ namespace OpenMetaverse
             {
                 TeleportStartPacket start = (TeleportStartPacket)packet;
 
-                teleportMessage = "Teleport started";
+                TeleportMessage = "Teleport started";
                 flags = (TeleportFlags)start.Info.TeleportFlags;
                 teleportStat = TeleportStatus.Start;
 
@@ -4332,28 +4336,28 @@ namespace OpenMetaverse
             {
                 TeleportProgressPacket progress = (TeleportProgressPacket)packet;
 
-                teleportMessage = Utils.BytesToString(progress.Info.Message);
+                TeleportMessage = Utils.BytesToString(progress.Info.Message);
                 flags = (TeleportFlags)progress.Info.TeleportFlags;
                 teleportStat = TeleportStatus.Progress;
 
-                Logger.DebugLog($"TeleportProgress received, Message: {teleportMessage}, Flags: {flags}", Client);
+                Logger.DebugLog($"TeleportProgress received, Message: {TeleportMessage}, Flags: {flags}", Client);
             }
             else if (packet.Type == PacketType.TeleportFailed)
             {
                 TeleportFailedPacket failed = (TeleportFailedPacket)packet;
 
-                teleportMessage = Utils.BytesToString(failed.Info.Reason);
+                TeleportMessage = Utils.BytesToString(failed.Info.Reason);
                 teleportStat = TeleportStatus.Failed;
                 finished = true;
 
-                Logger.DebugLog($"TeleportFailed received, Reason: {teleportMessage}", Client);
+                Logger.DebugLog($"TeleportFailed received, Reason: {TeleportMessage}", Client);
             }
             else if (packet.Type == PacketType.TeleportFinish)
             {
                 TeleportFinishPacket finish = (TeleportFinishPacket)packet;
 
                 flags = (TeleportFlags)finish.Info.TeleportFlags;
-                string seedcaps = Utils.BytesToString(finish.Info.SeedCapability);
+                Uri seedcaps = new Uri(Utils.BytesToString(finish.Info.SeedCapability));
                 finished = true;
 
                 Logger.DebugLog($"TeleportFinish received, Flags: {flags}", Client);
@@ -4365,25 +4369,25 @@ namespace OpenMetaverse
 
                 if (newSimulator != null)
                 {
-                    teleportMessage = "Teleport finished";
+                    TeleportMessage = "Teleport finished";
                     teleportStat = TeleportStatus.Finished;
 
                     Logger.Log($"Moved to new sim {newSimulator}", Helpers.LogLevel.Info, Client);
                 }
                 else
                 {
-                    teleportMessage = "Failed to connect to the new sim after a teleport";
+                    TeleportMessage = "Failed to connect to the new sim after a teleport";
                     teleportStat = TeleportStatus.Failed;
 
                     // We're going to get disconnected now
-                    Logger.Log(teleportMessage, Helpers.LogLevel.Error, Client);
+                    Logger.Log(TeleportMessage, Helpers.LogLevel.Error, Client);
                 }
             }
             else if (packet.Type == PacketType.TeleportCancel)
             {
                 //TeleportCancelPacket cancel = (TeleportCancelPacket)packet;
 
-                teleportMessage = "Cancelled";
+                TeleportMessage = "Cancelled";
                 teleportStat = TeleportStatus.Cancelled;
                 finished = true;
 
@@ -4393,7 +4397,7 @@ namespace OpenMetaverse
             {
                 TeleportLocalPacket local = (TeleportLocalPacket)packet;
 
-                teleportMessage = "Teleport finished";
+                TeleportMessage = "Teleport finished";
                 flags = (TeleportFlags)local.Info.TeleportFlags;
                 teleportStat = TeleportStatus.Finished;
                 relativePosition = local.Info.Position;
@@ -4407,10 +4411,10 @@ namespace OpenMetaverse
 
             if (m_Teleport != null)
             {
-                OnTeleport(new TeleportEventArgs(teleportMessage, teleportStat, flags));
+                OnTeleport(new TeleportEventArgs(TeleportMessage, teleportStat, flags));
             }
 
-            if (finished) teleportEvent.Set();
+            if (finished) { teleportEvent.Set(); }
         }
 
         /// <summary>Process an incoming packet and raise the appropriate events</summary>
@@ -4493,17 +4497,16 @@ namespace OpenMetaverse
         private void Network_OnLoginResponse(bool loginSuccess, bool redirect, string message, string reason,
             LoginResponseData reply)
         {
-            id = reply.AgentID;
-            sessionID = reply.SessionID;
-            secureSessionID = reply.SecureSessionID;
-            firstName = reply.FirstName;
-            lastName = reply.LastName;
-            startLocation = reply.StartLocation;
-            agentAccess = reply.AgentAccess;
+            AgentID = reply.AgentID;
+            SessionID = reply.SessionID;
+            SecureSessionID = reply.SecureSessionID;
+            FirstName = reply.FirstName;
+            LastName = reply.LastName;
+            StartLocation = reply.StartLocation;
+            AgentAccess = reply.AgentAccess;
             Movement.Camera.LookDirection(reply.LookAt);
-            homePosition = reply.HomePosition;
-            homeLookAt = reply.HomeLookAt;
-            lookAt = reply.LookAt;
+            home = reply.Home;
+            LookAt = reply.LookAt;
 
             if (reply.Gestures != null)
             {
@@ -4538,7 +4541,7 @@ namespace OpenMetaverse
             Logger.DebugLog($"Crossed in to new region area, attempting to connect to {endPoint}", Client);
 
             Simulator oldSim = Client.Network.CurrentSim;
-            Simulator newSim = Client.Network.Connect(endPoint, crossed.RegionHandle, true, crossed.SeedCapability.ToString());
+            Simulator newSim = Client.Network.Connect(endPoint, crossed.RegionHandle, true, crossed.SeedCapability);
 
             if (newSim != null)
             {
@@ -4566,7 +4569,7 @@ namespace OpenMetaverse
         {
             Packet packet = e.Packet;
             CrossedRegionPacket crossing = (CrossedRegionPacket)packet;
-            string seedCap = Utils.BytesToString(crossing.RegionData.SeedCapability);
+            Uri seedCap = new Uri(Utils.BytesToString(crossing.RegionData.SeedCapability));
             IPEndPoint endPoint = new IPEndPoint(crossing.RegionData.SimIP, crossing.RegionData.SimPort);
 
             Logger.DebugLog($"Crossed in to new region area, attempting to connect to {endPoint}", Client);
@@ -4621,8 +4624,10 @@ namespace OpenMetaverse
             if (msg.Success)
             {
                 lock (GroupChatSessions.Dictionary)
+                {
                     if (!GroupChatSessions.ContainsKey(msg.SessionID))
                         GroupChatSessions.Add(msg.SessionID, new List<ChatSessionMember>());
+                }
             }
 
             OnGroupChatJoined(new GroupChatJoinedEventArgs(msg.SessionID, msg.SessionName, msg.TempSessionID, msg.Success));
@@ -4639,8 +4644,10 @@ namespace OpenMetaverse
             ChatterBoxSessionAgentListUpdatesMessage msg = (ChatterBoxSessionAgentListUpdatesMessage)message;
 
             lock (GroupChatSessions.Dictionary)
+            {
                 if (!GroupChatSessions.ContainsKey(msg.SessionID))
                     GroupChatSessions.Add(msg.SessionID, new List<ChatSessionMember>());
+            }
 
             foreach (ChatterBoxSessionAgentListUpdatesMessage.AgentUpdatesBlock t in msg.Updates)
             {
@@ -4670,8 +4677,10 @@ namespace OpenMetaverse
                     else if (t.Transition.Equals("LEAVE"))
                     {
                         if (fndMbr.AvatarKey != UUID.Zero)
+                        {
                             lock (GroupChatSessions.Dictionary)
                                 GroupChatSessions[msg.SessionID].Remove(fndMbr);
+                        }
 
                         if (m_ChatSessionMemberLeft != null)
                         {
@@ -4758,24 +4767,21 @@ namespace OpenMetaverse
             if (Client.Network.CurrentSim == null || Client.Network.CurrentSim.Caps == null)
                 throw new Exception("ChatSessionRequest capability is not currently available");
 
-            CapsClient request = Client.Network.CurrentSim.Caps.CreateCapsClient("ChatSessionRequest");
+            Uri cap = Client.Network.CurrentSim.Caps.CapabilityURI("ChatSessionRequest");
 
-            if (request != null)
-            {
-                ChatSessionRequestMuteUpdate req = new ChatSessionRequestMuteUpdate
-                {
-                    RequestKey = key,
-                    RequestValue = moderate,
-                    SessionID = sessionID,
-                    AgentID = memberID
-                };
-
-                request.PostRequestAsync(req.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
-            }
-            else
+            if (cap == null)
             {
                 throw new Exception("ChatSessionRequest capability is not currently available");
             }
+
+            ChatSessionRequestMuteUpdate payload = new ChatSessionRequestMuteUpdate
+            {
+                RequestKey = key,
+                RequestValue = moderate,
+                SessionID = sessionID,
+                AgentID = memberID
+            };
+            Task req = Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, payload.Serialize(), CancellationToken.None, null);
         }
 
         /// <summary>Process an incoming packet and raise the appropriate events</summary>
@@ -5181,14 +5187,14 @@ namespace OpenMetaverse
         /// <summary>Get the InstantMessage object</summary>
         public InstantMessage IM { get; }
 
-        /// <summary>Get the simulator where the InstantMessage origniated</summary>
+        /// <summary>Get the simulator where the InstantMessage originated</summary>
         public Simulator Simulator { get; }
 
         /// <summary>
         /// Construct a new instance of the InstantMessageEventArgs object
         /// </summary>
         /// <param name="im">the InstantMessage object</param>
-        /// <param name="simulator">the simulator where the InstantMessage origniated</param>
+        /// <param name="simulator">the simulator where the InstantMessage originated</param>
         public InstantMessageEventArgs(InstantMessage im, Simulator simulator)
         {
             IM = im;
@@ -5200,21 +5206,21 @@ namespace OpenMetaverse
     public class BalanceEventArgs : EventArgs
     {
         /// <summary>
-        /// Get the currenct balance
+        /// Get current balance
         /// </summary>
         public int Balance { get; }
 
         /// <summary>
         /// Construct a new BalanceEventArgs object
         /// </summary>
-        /// <param name="balance">The currenct balance</param>
+        /// <param name="balance">The current balance</param>
         public BalanceEventArgs(int balance)
         {
             Balance = balance;
         }
     }
 
-    /// <summary>Contains the transaction summary when an item is purchased, 
+    /// <summary>Contains the transaction summary when an item is purchased,
     /// money is given, or land is purchased</summary>
     public class MoneyBalanceReplyEventArgs : EventArgs
     {
@@ -5246,7 +5252,7 @@ namespace OpenMetaverse
         /// <param name="transactionSuccess">True of the transaction was successful</param>
         /// <param name="balance">The current currency balance</param>
         /// <param name="metersCredit">The meters credited</param>
-        /// <param name="metersCommitted">The meters comitted</param>
+        /// <param name="metersCommitted">The meters committed</param>
         /// <param name="description">A brief description of the transaction</param>
         /// <param name="transactionInfo">Transaction info</param>
         public MoneyBalanceReplyEventArgs(UUID transactionID, bool transactionSuccess, int balance, int metersCredit, int metersCommitted, string description, TransactionInfo transactionInfo)

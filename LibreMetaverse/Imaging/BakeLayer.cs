@@ -25,7 +25,6 @@
  */
 
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using System.Drawing;
@@ -194,14 +193,18 @@ namespace OpenMetaverse.Imaging
                 // Is this Alpha wearable and does it have an alpha channel?
                 if (textures[i].TextureIndex >= AvatarTextureIndex.LowerAlpha &&
                         textures[i].TextureIndex <= AvatarTextureIndex.HairAlpha)
+                {
                     continue;
+                }
 
                 // Don't draw skin and tattoo on head bake first
                 // For head bake the skin and texture are drawn last, go figure
                 if (bakeType == BakeType.Head &&
                         (textures[i].TextureIndex == AvatarTextureIndex.HeadBodypaint ||
                         textures[i].TextureIndex == AvatarTextureIndex.HeadTattoo))
+                {
                     continue;
+                }
 
                 ManagedImage texture = textures[i].Texture.Image.Clone();
                 //File.WriteAllBytes(bakeType + "-texture-layer-" + textures[i].TextureIndex + "-" + i + ".tga", texture.ExportTGA());
@@ -338,7 +341,7 @@ namespace OpenMetaverse.Imaging
             }
 
             // Apply any alpha wearable textures to make parts of the avatar disappear
-            Logger.Log("[XBakes]: Number of alpha wearable textures: " + alphaWearableTextures.Count.ToString(), Helpers.LogLevel.Debug);
+            Logger.Log("[XBakes]: Number of alpha wearable textures: " + alphaWearableTextures.Count, Helpers.LogLevel.Debug);
             foreach (ManagedImage img in alphaWearableTextures)
                 AddAlpha(bakedTexture.Image, img);
 
@@ -536,7 +539,7 @@ namespace OpenMetaverse.Imaging
         /// </summary>
         /// <param name="dest">Destination image</param>
         /// <param name="src">Source image</param>
-        /// <returns>Sanitization was succefull</returns>
+        /// <returns>Sanitization was successful</returns>
         private bool SanitizeLayers(ManagedImage dest, ManagedImage src)
         {
             if (dest == null || src == null) return false;
