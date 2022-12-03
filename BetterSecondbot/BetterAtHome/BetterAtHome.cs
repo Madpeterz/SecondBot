@@ -74,6 +74,18 @@ namespace BetterSecondbot.BetterAtHome
 
         protected void resetSwitchs()
         {
+            if (sentLogout == false)
+            {
+                if(controler.getBot().GetClient != null)
+                {
+                    if (controler.getBot().GetClient.Network != null)
+                    {
+                        sentLogout = true;
+                        controler.getBot().GetClient.Network.Logout();
+                    }
+                }
+                
+            }
             whyloggedout = "";
             StartingLogin = false;
             LoginFailed = false;
@@ -290,6 +302,8 @@ namespace BetterSecondbot.BetterAtHome
             AvoidSimList[simname] = helpers.UnixTimeNow();
         }
 
+        protected bool sentLogout = false;
+
         protected void LoggedOutActions()
         {
             SetBetterAtHomeAction("Logged Out Actions");
@@ -310,9 +324,9 @@ namespace BetterSecondbot.BetterAtHome
                 }
                 else
                 {
-                    if (dif < 25)
+                    if (dif < 45)
                     {
-                        SetBetterAtHomeAction("[DC] Clearing logged in avatar 25 secs");
+                        SetBetterAtHomeAction("[DC] Clearing logged in avatar 45 secs");
                         return;
                     }
                 }
@@ -342,6 +356,7 @@ namespace BetterSecondbot.BetterAtHome
 
         protected void LoggedInAction()
         {
+            sentLogout = false;
             SetBetterAtHomeAction("Logged In Actions");
             if (controler.getBot().KillMe == true)
             {
@@ -385,7 +400,7 @@ namespace BetterSecondbot.BetterAtHome
             {
                 void_counter++;
                 SetBetterAtHomeAction("Void counter: " + void_counter.ToString());
-                if (void_counter == 10)
+                if (void_counter == 60)
                 {
                     void_counter = 0;
                     resetSwitchs();
