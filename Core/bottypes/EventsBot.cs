@@ -756,17 +756,16 @@ namespace BetterSecondBot.bottypes
             }
             else
             {
-                name = name.ToLowerInvariant();
-                accept_invite = Accept_action_from_name("group", name);
+                accept_invite = Accept_action_from_name("group", fromname);
                 if (accept_invite == true)
                 {
                     whyAccept = "Action auth";
-                    Remove_action_from_name("group", name);
+                    Remove_action_from_name("group", fromname);
                 }
             }
             if (accept_invite == true)
             {
-                LogFormater.Info("Group invite event from: " + e.IM.FromAgentName + " Accepted - " + whyAccept);
+                LogFormater.Info("Group invite event from: " + fromname + " Accepted - " + whyAccept);
                 GroupInvitationEventArgs G = new GroupInvitationEventArgs(e.Simulator, e.IM.FromAgentID, e.IM.FromAgentName, e.IM.Message);
                 Client.Self.GroupInviteRespond(G.AgentID, e.IM.IMSessionID, true);
                 Client.Groups.RequestCurrentGroups();

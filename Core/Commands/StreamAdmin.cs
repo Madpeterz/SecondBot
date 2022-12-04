@@ -47,14 +47,14 @@ namespace BetterSecondBot.HttpService
             string attempt_endpoint = endpoint + "sys.php";
             token = helpers.GetSHA1(helpers.UnixTimeNow().ToString() + "NotecardNext" + endpointcode);
             var client = new RestClient(attempt_endpoint);
-            var request = new RestRequest("Notecard/Next", Method.POST);
+            var request = new RestRequest("Notecard/Next", Method.Post);
             string unixtime = helpers.UnixTimeNow().ToString();
             request.AddParameter("token", token);
             request.AddParameter("unixtime", unixtime);
             request.AddParameter("method", "Notecard");
             request.AddParameter("action", "Next");
             request.AddHeader("content-type", "application/x-www-form-urlencoded");
-            IRestResponse endpoint_checks = client.Post(request);
+            RestResponse endpoint_checks = client.Post(request);
             if (endpoint_checks.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 return Failure("HTTP status code: " + endpoint_checks.StatusCode.ToString(), "FetchNextNotecard", new [] { endpoint, endpointcode });

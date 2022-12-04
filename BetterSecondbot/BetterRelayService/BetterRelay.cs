@@ -270,7 +270,7 @@ namespace BetterSecondBot.BetterRelayService
                             if (bits.Length == 2)
                             {
                                 var client = new RestClient(bits[0]);
-                                var request = new RestRequest(bits[1], Method.POST);
+                                var request = new RestRequest(bits[1], Method.Post);
                                 request.AddParameter("reply", sendmessage);
                                 request.AddHeader("content-type", "application/x-www-form-urlencoded");
                                 _ = client.ExecutePostAsync(request).ConfigureAwait(false);

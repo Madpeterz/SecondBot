@@ -16,7 +16,11 @@ namespace BetterSecondBot.DiscordSupervisor
         protected Timer ReconnectTimer;
         protected virtual async Task StartDiscordClientService()
         {
-            DiscordClient = new DiscordSocketClient();
+            var config = new DiscordSocketConfig()
+            {
+                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildIntegrations | GatewayIntents.MessageContent
+            };
+            DiscordClient = new DiscordSocketClient(config);
             DiscordClient.Ready += DiscordClientReady;
             DiscordClient.LoggedOut += DiscordClientLoggedOut;
             DiscordClient.LoggedIn += DicordClientLoggedin;

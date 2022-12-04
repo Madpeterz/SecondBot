@@ -80,8 +80,12 @@ namespace BetterSecondbot.BetterAtHome
                 {
                     if (controler.getBot().GetClient.Network != null)
                     {
-                        sentLogout = true;
-                        controler.getBot().GetClient.Network.Logout();
+
+                        if (controler.getBot().GetClient.Network.Connected == true)
+                        {
+                            sentLogout = true;
+                            controler.getBot().GetClient.Network.Logout();
+                        }
                     }
                 }
                 

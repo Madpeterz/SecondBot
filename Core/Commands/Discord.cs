@@ -350,7 +350,7 @@ namespace BetterSecondBot.HttpService
                 return new KeyValuePair<string, ulong>("Unable to process server id", 0);
             }
             SocketGuild server = Discord.GetGuild(serverid);
-            RestRole role = await server.CreateRoleAsync(givenrole, new GuildPermissions(), Color.DarkRed, false, null).ConfigureAwait(true);
+            RestRole role = await server.CreateRoleAsync(givenrole, new GuildPermissions(), Color.DarkRed, false, false).ConfigureAwait(true);
             return new KeyValuePair<string, ulong>("ok", role.Id);
         }
 
@@ -534,7 +534,7 @@ namespace BetterSecondBot.HttpService
                 { "Perm|ViewAuditLog", role.Permissions.ViewAuditLog.ToString() },
                 { "Perm|ManageWebhooks", role.Permissions.ManageWebhooks.ToString() },
                 { "Perm|ManageGuild", role.Permissions.ManageGuild.ToString() },
-                { "Perm|ManageEmojis", role.Permissions.ManageEmojis.ToString() }
+                { "Perm|ManageEmojis", role.Permissions.ManageEmojisAndStickers.ToString() }
             };
             return new KeyValuePair<bool, Dictionary<string, string>>(true, settings);
         }

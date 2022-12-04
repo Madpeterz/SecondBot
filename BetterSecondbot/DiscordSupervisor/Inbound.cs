@@ -49,6 +49,7 @@ namespace BetterSecondBot.DiscordSupervisor
             {
                 IGuildUser user = (IGuildUser)message.Author;
                 controler.getBot().GetClient.Self.Chat(message.Content, 0, ChatType.Normal);
+                await message.DeleteAsync();
                 return await MarkMessage(message, "✅");
             }
             return await MarkMessage(message, "❌");

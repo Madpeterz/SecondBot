@@ -26,6 +26,8 @@
  */
 
 using OpenMetaverse.Imaging;
+using System;
+using System.Drawing;
 
 namespace OpenMetaverse.Assets
 {
@@ -98,8 +100,14 @@ namespace OpenMetaverse.Assets
             {
                 // *hack: decode from ManagedImage directly or better yet, get rid of ManagedImage entirely!
                 if (!reader.ReadHeader()) { return false; }
-                Image = new ManagedImage(reader.DecodeToBitmap());
+                Bitmap bm = reader.DecodeToBitmap();
+                if(bm == null)
+                {
+                    throw new Exception("Failed to decode bitmap");
+                }
+                Image = new ManagedImage(bm);
             }
+
 
             if ((Image.Channels & ManagedImage.ImageChannels.Color) != 0)
                 Components += 3;
