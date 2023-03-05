@@ -171,7 +171,7 @@ namespace OpenMetaverse
             public int ConnectTime;
             /// <summary>Total number of packets that have been resent</summary>
             public int ResentPackets;
-            /// <summary>Total number of resent packets recieved</summary>
+            /// <summary>Total number of resent packets received</summary>
             public int ReceivedResends;
             /// <summary>Total number of pings sent to this simulator by this agent</summary>
             public int SentPings;
@@ -180,7 +180,7 @@ namespace OpenMetaverse
             /// <summary>
             /// Incoming bytes per second
             /// </summary>
-            /// <remarks>It would be nice to have this claculated on the fly, but
+            /// <remarks>It would be nice to have this calculated on the fly, but
             /// this is far, far easier</remarks>
             public int IncomingBPS;
             /// <summary>
@@ -497,10 +497,7 @@ namespace OpenMetaverse
         public readonly SimulatorDataPool DataPool;
         internal bool DownloadingParcelMap
         {
-            get
-            {
-                return Client.Settings.POOL_PARCEL_DATA ? DataPool.DownloadingParcelMap : _DownloadingParcelMap;
-            }
+            get => Client.Settings.POOL_PARCEL_DATA ? DataPool.DownloadingParcelMap : _DownloadingParcelMap;
             set
             {
                 if (Client.Settings.POOL_PARCEL_DATA) DataPool.DownloadingParcelMap = value;
@@ -648,7 +645,7 @@ namespace OpenMetaverse
         /// <summary>
         /// Initiates connection to the simulator
         /// </summary>
-        /// <param name="waitForAck">Should we block until ack for this packet is recieved</param>
+        /// <param name="waitForAck">Should we block until ack for this packet is received</param>
         public void UseCircuitCode(bool waitForAck)
         {
             // Send the UseCircuitCode packet to initiate the connection
@@ -690,17 +687,14 @@ namespace OpenMetaverse
                 Caps = null;
             }
 
-            if (Client.Settings.ENABLE_CAPS)
+            // Connect to the CAPS system
+            if (seedcaps != null)
             {
-                // Connect to the new CAPS system
-                if (seedcaps != null)
-                {
-                    Caps = new Caps(this, seedcaps);
-                }
-                else
-                {
-                    Logger.Log("Setting up a sim without a valid capabilities server!", Helpers.LogLevel.Error, Client);
-                }
+                Caps = new Caps(this, seedcaps);
+            }
+            else
+            {
+                Logger.Log("Setting up a sim without valid http capabilities", Helpers.LogLevel.Error, Client);
             }
         }
 
@@ -709,6 +703,8 @@ namespace OpenMetaverse
         /// </summary>
         public void Disconnect(bool sendCloseCircuit)
         {
+            DisconnectCandidate = false;
+
             if (!connected) return;
 
             connected = false;
@@ -1002,7 +998,7 @@ namespace OpenMetaverse
         /// <summary>
         /// Returns Simulator Name as a String
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Simulator name as String</returns>
         public override string ToString()
         {
             return !String.IsNullOrEmpty(Name)
@@ -1059,8 +1055,8 @@ namespace OpenMetaverse
             // Check if this packet came from the server we expected it to come from
             if (!remoteEndPoint.Address.Equals(((IPEndPoint)buffer.RemoteEndPoint).Address))
             {
-                Logger.Log("Received " + buffer.DataLength + " bytes of data from unrecognized source " +
-                    ((IPEndPoint)buffer.RemoteEndPoint), Helpers.LogLevel.Warning, Client);
+                Logger.Log($"Received {buffer.DataLength} bytes of data from unrecognized source {(IPEndPoint)buffer.RemoteEndPoint}",
+                    Helpers.LogLevel.Warning, Client);
                 return;
             }
 
@@ -1201,7 +1197,7 @@ namespace OpenMetaverse
 
         
         /// <summary>
-        /// Sends out pending acknowledgements
+        /// Sends out pending acknowledgments
         /// </summary>
         /// <returns>Number of ACKs sent</returns>
         private int SendAcks()

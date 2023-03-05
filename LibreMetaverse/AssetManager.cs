@@ -319,8 +319,7 @@ namespace OpenMetaverse
         protected virtual void OnXferReceived(XferReceivedEventArgs e)
         {
             EventHandler<XferReceivedEventArgs> handler = m_XferReceivedEvent;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -344,8 +343,7 @@ namespace OpenMetaverse
         protected virtual void OnAssetUploaded(AssetUploadEventArgs e)
         {
             EventHandler<AssetUploadEventArgs> handler = m_AssetUploadedEvent;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -369,8 +367,7 @@ namespace OpenMetaverse
         protected virtual void OnUploadProgress(AssetUploadEventArgs e)
         {
             EventHandler<AssetUploadEventArgs> handler = m_UploadProgressEvent;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -394,8 +391,7 @@ namespace OpenMetaverse
         protected virtual void OnInitiateDownload(InitiateDownloadEventArgs e)
         {
             EventHandler<InitiateDownloadEventArgs> handler = m_InitiateDownloadEvent;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -419,8 +415,7 @@ namespace OpenMetaverse
         protected virtual void OnImageReceiveProgress(ImageReceiveProgressEventArgs e)
         {
             EventHandler<ImageReceiveProgressEventArgs> handler = m_ImageReceiveProgressEvent;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -640,8 +635,7 @@ namespace OpenMetaverse
             }
 
             // If ViewerAsset capability exists, use that, if not, fallback to UDP (which is obsoleted on Second Life.)
-            if (Client.Network.CurrentSim.Caps != null
-                && Client.Network.CurrentSim.Caps.CapabilityURI("ViewerAsset") != null)
+            if (Client.Network.CurrentSim?.Caps?.CapabilityURI("ViewerAsset") != null)
             {
                 RequestAssetHTTP(assetID, transfer, callback);
             }
@@ -827,8 +821,7 @@ namespace OpenMetaverse
             }
             
             // If ViewerAsset capability exists, use that, if not, fallback to UDP
-            if (Client.Network.CurrentSim.Caps != null
-                && Client.Network.CurrentSim.Caps.CapabilityURI("ViewerAsset") != null)
+            if (Client.Network.CurrentSim?.Caps?.CapabilityURI("ViewerAsset") != null)
             {
                 RequestInventoryAssetHTTP(assetID, transfer, callback);
             }
@@ -1213,8 +1206,7 @@ namespace OpenMetaverse
             if (meshID == UUID.Zero || callback == null)
                 return;
 
-            if (Client.Network.CurrentSim.Caps != null &&
-                Client.Network.CurrentSim.Caps.GetMeshCapURI() != null)
+            if (Client.Network.CurrentSim?.Caps?.GetMeshCapURI() != null)
             {
                 // Do we have this mesh asset in the cache?
                 if (Client.Assets.Cache.HasAsset(meshID))
@@ -1329,8 +1321,7 @@ namespace OpenMetaverse
             uint packetStart, TextureDownloadCallback callback, bool progress)
         {
             if (Client.Settings.USE_HTTP_TEXTURES
-                && Client.Network.CurrentSim.Caps != null
-                && Client.Network.CurrentSim.Caps.GetTextureCapURI() != null)
+                && Client.Network.CurrentSim?.Caps?.GetTextureCapURI() != null)
             {
                 HttpRequestTexture(textureID, imageType, priority, discardLevel, packetStart, callback, progress);
             }

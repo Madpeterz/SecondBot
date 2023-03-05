@@ -349,6 +349,7 @@ namespace BetterSecondbot.BetterAtHome
             SetBetterAtHomeAction("[DC] Attempt to recover");
             if (StartingLogin == true)
             {
+                attach_events();
                 SetBetterAtHomeAction("[DC] Starting Login");
                 return;
             }
@@ -365,6 +366,12 @@ namespace BetterSecondbot.BetterAtHome
             if (controler.getBot().KillMe == true)
             {
                 SetBetterAtHomeAction("Marked for death");
+                return;
+            }
+            long dif = helpers.UnixTimeNow() - LastTeleportEvent;
+            if (dif < 85)
+            {
+                SetBetterAtHomeAction("Waiting for Teleport lockout");
                 return;
             }
             if (SimInAvoid() == true)
@@ -384,16 +391,10 @@ namespace BetterSecondbot.BetterAtHome
                 SetBetterAtHomeAction("Avoid restart lockout - about " + remaining.ToString() + " min('s) remaining");
                 return;
             }
-            long dif = helpers.UnixTimeNow() - LastLoginEvent;
+            dif = helpers.UnixTimeNow() - LastLoginEvent;
             if (dif < 15)
             {
                 SetBetterAtHomeAction("Waiting for Login cooldown");
-                return;
-            }
-            dif = helpers.UnixTimeNow() - LastTeleportEvent;
-            if (dif < 45)
-            {
-                SetBetterAtHomeAction("Waiting for Teleport lockout");
                 return;
             }
             if ((simname == "") || (controler.getBot().GetClient.Self.SimPosition.Z == 0))
