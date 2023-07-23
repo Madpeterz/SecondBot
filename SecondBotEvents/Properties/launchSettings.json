@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SecondBotEvents": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
