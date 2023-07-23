@@ -275,7 +275,7 @@ namespace SecondBotEvents.Services
                     return new KeyValuePair<bool, string>(false, "Unknown command");
                 }
                 C.command = commandnameLowerToReal[lowerName];
-                if(master.CustomCommandsService.HasCommand(C.command) == false)
+                if(master.CustomCommandsService.HasCommand(C.command) == true)
                 {
                     if(inCustomCommand == true)
                     {

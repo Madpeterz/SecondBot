@@ -11,8 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		.gitignore = .gitignore
 		SecondBotEvents\Dockerfile = SecondBotEvents\Dockerfile
 		NuGet.Config = NuGet.Config
+		oldDockerfile = oldDockerfile
 		README.md = README.md
-		oldDockerfile. = oldDockerfile.
+		SecondBotEvents\settings.env = SecondBotEvents\settings.env
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecondBotEvents", "SecondBotEvents\SecondBotEvents.csproj", "{571AB1AF-4C74-4C37-AC5B-9B63383AC791}"

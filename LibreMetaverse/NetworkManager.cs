@@ -892,9 +892,14 @@ namespace OpenMetaverse
                     OnSimDisconnected(new SimDisconnectedEventArgs(CurrentSim, type));
                 }
             }
-            
-            _packetInbox.Writer.Complete();
-            _packetOutbox.Writer.Complete();
+            if (_packetInbox != null)
+            {
+                _packetInbox.Writer.Complete();
+            }
+            if (_packetOutbox != null)
+            {
+                _packetOutbox.Writer.Complete();
+            }
 
             _packetInbox = null;
             _packetOutbox = null;

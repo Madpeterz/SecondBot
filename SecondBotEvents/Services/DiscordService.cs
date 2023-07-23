@@ -432,8 +432,12 @@ namespace SecondBotEvents.Services
 
         public override void Stop()
         {
+            if(running == true)
+            {
+                Console.WriteLine("Discord service [Stopping]");
+            }
             running = false;
-            Console.WriteLine("Discord service [Stopping]");
+            
             master.BotClientNoticeEvent -= BotClientRestart;
             master.SystemStatusMessagesEvent -= SystemStatusEvent;
             AcceptEventsFromSL = false;

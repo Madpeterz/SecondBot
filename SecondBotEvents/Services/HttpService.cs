@@ -90,6 +90,10 @@ namespace SecondBotEvents.Services
 
         public override void Stop()
         {
+            if(running == true)
+            {
+                Console.WriteLine("HTTP service [Stopping]");
+            }
             running = false;
             if (myConfig.GetEnabled() == false)
             {
@@ -100,7 +104,7 @@ namespace SecondBotEvents.Services
             {
                 HTTPendpoint.Dispose();
                 HTTPendpoint = null;
-                Console.WriteLine("HTTP service [Stopping]");
+                
             }
         }
 

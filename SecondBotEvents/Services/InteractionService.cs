@@ -197,6 +197,10 @@ namespace SecondBotEvents.Services
 
         public override void Stop()
         {
+            if(running == true)
+            {
+                Console.WriteLine("Interaction Service [Stopping]");
+            }
             running = false;
             if (myConfig.GetEnabled() == false)
             {
@@ -212,7 +216,7 @@ namespace SecondBotEvents.Services
                     GetClient().Groups.GroupInvitation -= BotGroupInviteOffer;
                 }
             }
-            Console.WriteLine("Interaction Service [Stopping]");
+            
         }
     }
 

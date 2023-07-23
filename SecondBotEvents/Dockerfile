@@ -32,6 +32,7 @@ ENV basic_Username = 'SecondbotR5' \
 	commands_MastersCSV = 'Madpeter Zond' \
 	commands_EnforceTimeWindow = 'false' \
 	commands_TimeWindowSecs = 35 \
+	commands_Enabled='true' \
 	datastore_AutoCleanAvatars = 'true' \
 	datastore_AvatarsCleanAfterMins = 10 \
 	datastore_LocalChatHistoryLimit = 120 \
@@ -72,13 +73,13 @@ ENV basic_Username = 'SecondbotR5' \
 	homebound_AtHomeAutoSitUuid = '00000000-0000-0000-0000-000000000000' \
 	http_Enabled = 'false' \
 	http_Port = 80 \
-	Enabled = 'true' \
-	AcceptTeleports = 'false' \
-	AcceptGroupInvites = 'false' \
-	AcceptInventory = 'false' \
-	AcceptFriendRequests = 'false' \
-	EnableJsonOutputEvents = 'false' \
-	JsonOutputEventsTarget = 'none'
+	interaction_Enabled = 'true' \
+	interaction_AcceptTeleports = 'false' \
+	interaction_AcceptGroupInvites = 'false' \
+	interaction_AcceptInventory = 'false' \
+	interaction_AcceptFriendRequests = 'false' \
+	interaction_EnableJsonOutputEvents = 'false' \
+	interaction_JsonOutputEventsTarget = 'none'
 
 EXPOSE 80
 ENV ASPNETCORE_URLS http://+:80

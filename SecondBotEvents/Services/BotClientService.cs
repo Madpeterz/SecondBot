@@ -45,9 +45,12 @@ namespace SecondBotEvents.Services
         }
         public override void Stop()
         {
+            if(running == true)
+            {
+                Console.WriteLine("Client service [Stopping]");
+            }
             running = false;
             AutoRestartLoginTimer.Stop();
-            Console.WriteLine("Client service [Stopping]");
             ResetClient();
         }
 

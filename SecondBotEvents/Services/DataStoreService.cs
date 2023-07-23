@@ -1050,6 +1050,10 @@ namespace SecondBotEvents.Services
 
         public override void Stop()
         {
+            if(running == true)
+            {
+                Console.WriteLine("DataStore Service [Stopping]");
+            }
             running = false;
             Reset();
             master.BotClientNoticeEvent -= BotClientRestart;
@@ -1070,7 +1074,7 @@ namespace SecondBotEvents.Services
                     GetClient().Estate.EstateBansReply -= EstateBans;
                 }
             }
-            Console.WriteLine("DataStore Service [Stopping]");
+            
         }
     }
 

@@ -137,6 +137,10 @@ namespace SecondBotEvents.Services
 
         public override void Stop()
         {
+            if(running == true)
+            {
+                Console.WriteLine("Relay Service [Stopping]");
+            }
             running = false;
             master.BotClientNoticeEvent -= BotClientRestart;
             if (master.BotClient != null)
@@ -146,7 +150,7 @@ namespace SecondBotEvents.Services
 
                 }
             }
-            Console.WriteLine("Relay Service [Stopping]");
+            
         }
     }
 

@@ -286,6 +286,10 @@ namespace SecondBotEvents.Services
 
         public override void Stop()
         {
+            if(running == true)
+            {
+                Console.WriteLine("Homebound Service [Stopping]");
+            }
             running = false;
             master.BotClientNoticeEvent -= BotClientRestart;
             if (master.BotClient != null)
@@ -297,7 +301,7 @@ namespace SecondBotEvents.Services
                     GetClient().Network.SimChanged -= BotChangedSim;
                 }
             }
-            Console.WriteLine("Homebound Service [Stopping]");
+            
         }
     }
 
