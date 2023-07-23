@@ -46,11 +46,11 @@ namespace SecondBotEvents.Services
         protected bool attemptedTeleportBackup = false;
         protected long teleportActionLockout = 0;
 
-        public void GoHome()
+        public bool GoHome()
         {
             attemptedTeleportHome = true;
             LogFormater.Info("Teleporting to home sim");
-            GetClient().Self.Teleport(home.name, new Vector3(home.x, home.y, home.z), new Vector3(0, 0, 0));
+            return GetClient().Self.Teleport(home.name, new Vector3(home.x, home.y, home.z), new Vector3(0, 0, 0));
         }
         protected void Tick()
         {
@@ -85,8 +85,14 @@ namespace SecondBotEvents.Services
             }
             if (simNickname == "")
             {
-                simNickname = "Someplace # ";
-                return;
+                if (GetClient().Network.CurrentSim != null)
+                {
+                    simNickname = ""+ GetClient().Network.CurrentSim.Name+" # ";
+                }
+                else
+                {
+                    simNickname = "Someplace # ";
+                }
             }
             long dif = SecondbotHelpers.UnixTimeNow() - teleportActionLockout;
             if(dif < 30)
@@ -96,7 +102,10 @@ namespace SecondBotEvents.Services
             teleportActionLockout = SecondbotHelpers.UnixTimeNow();
             if (attemptedTeleportHome == false)
             {
-                GoHome();
+                if(GoHome() == false)
+                {
+                    LogFormater.Warn("Unable to teleport to home sim");
+                }
                 return;
             }
             else if(attemptedTeleportBackup == false)
@@ -104,7 +113,10 @@ namespace SecondBotEvents.Services
                 attemptedTeleportBackup = true;
                 LogFormater.Info("Teleporting to backup sim");
                 teleportActionLockout = SecondbotHelpers.UnixTimeNow();
-                GetClient().Self.Teleport(backup.name, new Vector3(backup.x, backup.y, backup.z), new Vector3(0, 0, 0));
+                if(GetClient().Self.Teleport(backup.name, new Vector3(backup.x, backup.y, backup.z), new Vector3(0, 0, 0)) == false)
+                {
+                    LogFormater.Warn("Unable to teleport to backup sim");
+                }
                 return;
             }
             attemptedTeleportHome = false;

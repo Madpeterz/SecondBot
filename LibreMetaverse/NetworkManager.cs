@@ -504,7 +504,7 @@ namespace OpenMetaverse
             if (dif > 10)
             {
                 lastpacketwarning = now;
-                Logger.Log(source+" is null (Are we disconnected?) - from: "+ function,
+                Logger.Log(source+" is null (Are we disconnected?) - from: " + function,
                     Helpers.LogLevel.Debug);
             }
         }
@@ -527,6 +527,19 @@ namespace OpenMetaverse
         }
 
         /// <summary>
+        /// Connect to simulator assuming legacy region size
+        /// </summary>
+        /// <param name="ip">IP address to connect to</param>
+        /// <param name="port">Port to connect to</param>
+        /// <param name="handle"></param>
+        /// <param name="setDefault"></param>
+        /// <param name="seedcaps"></param>
+        /// <returns></returns>
+        public Simulator Connect(IPAddress ip, ushort port, ulong handle, bool setDefault, Uri seedcaps)
+        {
+            return Connect(ip, port, handle, setDefault, seedcaps, Simulator.DefaultRegionSizeX, Simulator.DefaultRegionSizeY);
+        }
+        /// <summary>
         /// Connect to a simulator
         /// </summary>
         /// <param name="ip">IP address to connect to</param>
@@ -537,13 +550,26 @@ namespace OpenMetaverse
         /// connection, use this if the avatar is moving in to this simulator</param>
         /// <param name="seedcaps">URL of the capabilities server to use for
         /// this sim connection</param>
+        /// <param name="sizeX">Size of the region in X meters</param>
+        /// <param name="sizeY">Size of the region in Y meters</param>
         /// <returns>A Simulator object on success, otherwise null</returns>
-        public Simulator Connect(IPAddress ip, ushort port, ulong handle, bool setDefault, Uri seedcaps)
+        public Simulator Connect(IPAddress ip, ushort port, ulong handle, bool setDefault, Uri seedcaps, uint sizeX, uint sizeY)
         {
             IPEndPoint endPoint = new IPEndPoint(ip, port);
-            return Connect(endPoint, handle, setDefault, seedcaps);
+            return Connect(endPoint, handle, setDefault, seedcaps, sizeX, sizeY);
         }
 
+        /// <summary>
+        /// Connect to simulator assuming legacy region size
+        /// </summary>
+        /// <param name="endPoint"></param>
+        /// <param name="handle"></param>
+        /// <param name="setDefault"></param>
+        /// <param name="seedcaps"></param>
+        /// <returns></returns>
+        public Simulator Connect(IPEndPoint endPoint, ulong handle, bool setDefault, Uri seedcaps) {
+            return Connect(endPoint, handle, setDefault, seedcaps, Simulator.DefaultRegionSizeX, Simulator.DefaultRegionSizeY);
+        }
         /// <summary>
         /// Connect to a simulator
         /// </summary>
@@ -554,15 +580,17 @@ namespace OpenMetaverse
         /// connection, use this if the avatar is moving in to this simulator</param>
         /// <param name="seedcaps">URL of the capabilities server to use for
         /// this sim connection</param>
+        /// <param name="sizeX">Size of the region in X meters</param>
+        /// <param name="sizeY">Size of the region in Y meters</param>
         /// <returns>A Simulator object on success, otherwise null</returns>
-        public Simulator Connect(IPEndPoint endPoint, ulong handle, bool setDefault, Uri seedcaps)
+        public Simulator Connect(IPEndPoint endPoint, ulong handle, bool setDefault, Uri seedcaps, uint sizeX, uint sizeY)
         {
             Simulator simulator = FindSimulator(endPoint);
 
             if (simulator == null)
             {
                 // We're not tracking this sim, create a new Simulator object
-                simulator = new Simulator(Client, endPoint, handle);
+                simulator = new Simulator(Client, endPoint, handle, sizeX, sizeY);
 
                 // Immediately add this simulator to the list of current sims. It will be removed if the
                 // connection fails
@@ -639,7 +667,7 @@ namespace OpenMetaverse
                     lock (Simulators)
                     {
                         Simulators.Remove(simulator);
-                    }                    
+                    }                 
 
                     return null;
                 }
@@ -682,13 +710,13 @@ namespace OpenMetaverse
             // Otherwise we fire it manually with a NetworkTimeout type after LOGOUT_TIMEOUT
             System.Timers.Timer timeout = new System.Timers.Timer();
 
-            EventHandler<LoggedOutEventArgs> callback = delegate
+            void Callback(object sender, LoggedOutEventArgs e)
             {
                 Shutdown(DisconnectType.ClientInitiated);
                 timeout.Stop();
-            };
+            }
 
-            LoggedOut += callback;
+            LoggedOut += Callback;
 
             timeout.Interval = Client.Settings.LOGOUT_TIMEOUT;
             timeout.Elapsed += delegate
@@ -702,7 +730,7 @@ namespace OpenMetaverse
             // Send the packet requesting a clean logout
             RequestLogout();
 
-            LoggedOut -= callback;
+            LoggedOut -= Callback;
         }
 
         /// <summary>
@@ -713,9 +741,13 @@ namespace OpenMetaverse
         public void Logout()
         {
             AutoResetEvent logoutEvent = new AutoResetEvent(false);
-            EventHandler<LoggedOutEventArgs> callback = delegate { logoutEvent.Set(); };
 
-            LoggedOut += callback;
+            void Callback(object sender, LoggedOutEventArgs e)
+            {
+                logoutEvent.Set();
+            }
+
+            LoggedOut += Callback;
 
             // Send the packet requesting a clean logout
             RequestLogout();
@@ -724,9 +756,11 @@ namespace OpenMetaverse
             // will be fired in the callback. Otherwise we fire it manually with
             // a NetworkTimeout type
             if (!logoutEvent.WaitOne(Client.Settings.LOGOUT_TIMEOUT, false))
+            {
                 Shutdown(DisconnectType.NetworkTimeout);
+            }
 
-            LoggedOut -= callback;
+            LoggedOut -= Callback;
         }
 
         /// <summary>
@@ -787,7 +821,10 @@ namespace OpenMetaverse
                     simulatorsCount = Simulators.Count;
                 }
 
-                if (simulatorsCount == 0) Shutdown(DisconnectType.SimShutdown);
+                if (simulatorsCount == 0)
+                {
+                    Shutdown(DisconnectType.SimShutdown, $"You have disconnected from {simulator.Name}.");
+                }
             }
             else
             {
@@ -797,10 +834,13 @@ namespace OpenMetaverse
 
 
         /// <summary>
-        /// Shutdown will disconnect all the sims except for the current sim
-        /// first, and then kill the connection to CurrentSim. This should only
-        /// be called if the logout process times out on <code>RequestLogout</code>
+        /// This method disconnects Client from all simulators leaving CurrentSim
+        /// last to disconnect.
         /// </summary>
+        /// <remarks>
+        /// This should only be called if the logout process times out on
+        /// <code>RequestLogout</code>
+        /// </remarks>
         /// <param name="type">Type of shutdown</param>
         public void Shutdown(DisconnectType type)
         {
@@ -808,10 +848,13 @@ namespace OpenMetaverse
         }
 
         /// <summary>
-        /// Shutdown will disconnect all the sims except for the current sim
-        /// first, and then kill the connection to CurrentSim. This should only
-        /// be called if the logout process times out on <code>RequestLogout</code>
+        /// This method disconnects Client from all simulators leaving CurrentSim
+        /// last to disconnect.
         /// </summary>
+        /// <remarks>
+        /// This should only be called if the logout process times out on
+        /// <code>RequestLogout</code>
+        /// </remarks>
         /// <param name="type">Type of shutdown</param>
         /// <param name="message">Shutdown message</param>
         public void Shutdown(DisconnectType type, string message)
@@ -824,17 +867,14 @@ namespace OpenMetaverse
             lock (Simulators)
             {
                 // Disconnect all simulators except the current one
-                foreach (Simulator t in Simulators)
+                foreach (var sim in Simulators.Where(t => t != null && t != CurrentSim))
                 {
-                    if (t != null && t != CurrentSim)
-                    {
-                        t.Disconnect(sendCloseCircuit);
+                    sim.Disconnect(sendCloseCircuit);
 
-                        // Fire the SimDisconnected event if a handler is registered
-                        if (m_SimDisconnected != null)
-                        {
-                            OnSimDisconnected(new SimDisconnectedEventArgs(t, type));
-                        }
+                    // Fire the SimDisconnected event if a handler is registered
+                    if (m_SimDisconnected != null)
+                    {
+                        OnSimDisconnected(new SimDisconnectedEventArgs(sim, type));
                     }
                 }
 
@@ -843,7 +883,7 @@ namespace OpenMetaverse
 
             if (CurrentSim != null)
             {
-                // Kill the connection to the curent simulator
+                // Kill the connection to the current simulator
                 CurrentSim.Disconnect(sendCloseCircuit);
 
                 // Fire the SimDisconnected event if a handler is registered
@@ -881,10 +921,9 @@ namespace OpenMetaverse
         {
             lock (Simulators)
             {
-                foreach (Simulator t in Simulators)
+                foreach (var sim in Simulators.Where(t => t.IPEndPoint.Equals(endPoint)))
                 {
-                    if (t.IPEndPoint.Equals(endPoint))
-                        return t;
+                    return sim;
                 }
             }
 
@@ -1277,10 +1316,10 @@ namespace OpenMetaverse
 
                 if (FindSimulator(endPoint) != null) return;
 
-                if (Connect(ip, port, handle, false, null) == null)
+                if (Connect(ip, port, handle, false, null, t.RegionSizeX, t.RegionSizeY) == null)
                 {
                     Logger.Log($"Unable to connect to new sim {ip}:{port}",
-                        Helpers.LogLevel.Error, Client);
+                            Helpers.LogLevel.Error, Client);
                 }
             }
         }

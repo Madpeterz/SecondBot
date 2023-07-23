@@ -1,6 +1,7 @@
 ﻿using OpenMetaverse;
 using OpenMetaverse.Assets;
 using SecondBotEvents.Config;
+using Swan;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -200,7 +201,9 @@ namespace SecondBotEvents.Services
             {
                 return "No sim";
             }
-            return client.Network.CurrentSim.Name + " " + client.Self.SimPosition.ToString();
+            Vector3 pos = client.Self.SimPosition;
+            string loc = "" + Math.Round(pos.X).ToString() + "," + Math.Round(pos.Y).ToString() + "," + Math.Round(pos.Z).ToString();
+            return client.Network.CurrentSim.Name + " " + loc;
         }
     }
 }

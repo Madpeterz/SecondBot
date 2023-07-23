@@ -18,25 +18,25 @@ namespace SecondBotEvents.Services
             myConfig = new DataStoreConfig(master.fromEnv,master.fromFolder);
         }
 
-        protected Dictionary<string, UUID> avatarsName2Key = new Dictionary<string, UUID>();
-        protected Dictionary<UUID, long> avatarLastUsed =  new Dictionary<UUID, long>();
+        protected Dictionary<string, UUID> avatarsName2Key = new();
+        protected Dictionary<UUID, long> avatarLastUsed =  new();
 
-        protected Dictionary<UUID, string> groupsKey2Name = new Dictionary<UUID, string>();
+        protected Dictionary<UUID, string> groupsKey2Name = new();
 
-        protected Dictionary<UUID, List<UUID>> groupMembers = new Dictionary<UUID, List<UUID>>();
-        protected Dictionary<UUID, Dictionary<UUID, GroupRole>> groupRoles = new Dictionary<UUID, Dictionary<UUID, GroupRole>>();
+        protected Dictionary<UUID, List<UUID>> groupMembers = new();
+        protected Dictionary<UUID, Dictionary<UUID, GroupRole>> groupRoles = new();
 
-        protected List<string> localChatHistory = new List<string>();
+        protected List<string> localChatHistory = new();
 
-        protected Dictionary<UUID, List<string>> chatWindows = new Dictionary<UUID, List<string>>(); // sess, list chat
-        protected Dictionary<UUID, bool> chatWindowsUnread = new Dictionary<UUID, bool>(); // sess, bool
-        protected Dictionary<UUID, bool> chatWindowsIsGroup = new Dictionary<UUID, bool>(); // sess, bool
-        protected Dictionary<UUID, UUID> chatWindowsOwner = new Dictionary<UUID, UUID>(); // sess, owner id
+        protected Dictionary<UUID, List<string>> chatWindows = new(); // sess, list chat
+        protected Dictionary<UUID, bool> chatWindowsUnread = new(); // sess, bool
+        protected Dictionary<UUID, bool> chatWindowsIsGroup = new(); // sess, bool
+        protected Dictionary<UUID, UUID> chatWindowsOwner = new(); // sess, owner id
 
-        protected Dictionary<string, string> KeyValueStore = new Dictionary<string, string>();
-        protected Dictionary<string, long> KeyValueStoreLastUsed = new Dictionary<string, long>();
+        protected Dictionary<string, string> KeyValueStore = new();
+        protected Dictionary<string, long> KeyValueStoreLastUsed = new();
 
-        protected List<CommandHistory> commandHistories = new List<CommandHistory>();
+        protected List<CommandHistory> commandHistories = new();
 
         protected long lastCleanupKeyValueStore = 0;
         protected long lastCleanupAvatarStore = 0;
@@ -53,7 +53,7 @@ namespace SecondBotEvents.Services
                 return groupsKey2Name[group];
             }
             string reply = "lookup";
-            AutoResetEvent fetchEvent = new AutoResetEvent(false);
+            AutoResetEvent fetchEvent = new(false);
             void callback(object sender, CurrentGroupsEventArgs e)
             {
                 foreach(KeyValuePair<UUID,Group> entry in e.Groups)
@@ -91,7 +91,7 @@ namespace SecondBotEvents.Services
                 if (dif > 125)
                 {
                     lastCleanupKeyValueStore = unixtime;
-                    List<string> clearentrys = new List<string>();
+                    List<string> clearentrys = new();
                     foreach (KeyValuePair<string, long> entry in KeyValueStoreLastUsed)
                     {
                         dif = unixtime - entry.Value;
@@ -121,7 +121,7 @@ namespace SecondBotEvents.Services
                 if (dif > 75)
                 {
                     lastCleanupAvatarStore = unixtime;
-                    Dictionary<UUID, string> clearLinks = new Dictionary<UUID, string>();
+                    Dictionary<UUID, string> clearLinks = new();
                     foreach (KeyValuePair<string, UUID> entry in avatarsName2Key)
                     {
                         dif = unixtime - avatarLastUsed[entry.Value];
@@ -141,10 +141,10 @@ namespace SecondBotEvents.Services
                     }
                 }
             }
-            int sum = commandHistories.Count() + KeyValueStoreLastUsed.Count() + KeyValueStore.Count() +
-                chatWindowsOwner.Count() + chatWindowsIsGroup.Count() + chatWindowsUnread.Count() +
-                chatWindows.Count() + localChatHistory.Count() + groupRoles.Count() +
-                groupMembers.Count() + groupsKey2Name.Count() + avatarsName2Key.Count();
+            int sum = commandHistories.Count + KeyValueStoreLastUsed.Count + KeyValueStore.Count +
+                chatWindowsOwner.Count + chatWindowsIsGroup.Count + chatWindowsUnread.Count +
+                chatWindows.Count + localChatHistory.Count + groupRoles.Count +
+                groupMembers.Count + groupsKey2Name.Count + avatarsName2Key.Count;
             return sum.ToString();
         }
 
@@ -152,7 +152,7 @@ namespace SecondBotEvents.Services
         {
             lock (commandHistories)
             {
-                CommandHistory A = new CommandHistory(status, command, args, SecondbotHelpers.UnixTimeNow());
+                CommandHistory A = new(status, command, args, SecondbotHelpers.UnixTimeNow());
                 commandHistories.Add(A);
                 int c = commandHistories.Count;
                 while (c > myConfig.GetCommandHistoryLimit())
@@ -226,7 +226,7 @@ namespace SecondBotEvents.Services
 
         public List<UUID> GetAllGroupsChatWithUnread()
         {
-            List<UUID> reply = new List<UUID>();
+            List<UUID> reply = new();
             foreach(KeyValuePair<UUID, bool> windowState in chatWindowsUnread)
             {
                 if(windowState.Value == false)
@@ -299,11 +299,11 @@ namespace SecondBotEvents.Services
 
         public Dictionary<UUID, string> GetGroupRoles(UUID group)
         {
-            Dictionary<UUID, string> reply = new Dictionary<UUID, string>();
+            Dictionary<UUID, string> reply = new();
             if (groupRoles.ContainsKey(group) == false)
             {
                 
-                AutoResetEvent fetchEvent = new AutoResetEvent(false);
+                AutoResetEvent fetchEvent = new(false);
                 void callback(object sender, GroupRolesDataReplyEventArgs e)
                 {
                     if (e.GroupID == group)
@@ -341,7 +341,7 @@ namespace SecondBotEvents.Services
                 if (groupMembers[group].Contains(avatar) == false)
                 {
                     reply = false;
-                    AutoResetEvent fetchEvent = new AutoResetEvent(false);
+                    AutoResetEvent fetchEvent = new(false);
                     void callback(object sender, GroupMembersReplyEventArgs e)
                     {
                         if (e.GroupID == group)
@@ -395,7 +395,7 @@ namespace SecondBotEvents.Services
                 {
                     purgeLen = myConfig.GetGroupChatHistoryLimitPerGroup();
                 }
-                int counter = chatWindows[sessionID].Count();
+                int counter = chatWindows[sessionID].Count;
                 while (counter > purgeLen)
                 {
                     chatWindows[sessionID].RemoveAt(0);
@@ -471,7 +471,7 @@ namespace SecondBotEvents.Services
         }
 
 
-        protected Dictionary<string, KeyValuePair<string, long>> notecardDataStore = new Dictionary<string, KeyValuePair<string, long>>();
+        protected Dictionary<string, KeyValuePair<string, long>> notecardDataStore = new();
 
         public List<string> GetLocalChat()
         {
@@ -532,7 +532,7 @@ namespace SecondBotEvents.Services
                 if(avatarsName2Key.ContainsValue(avatarId) == false)
                 {
                     bool hasReply = false;
-                    AutoResetEvent fetchEvent = new AutoResetEvent(false);
+                    AutoResetEvent fetchEvent = new(false);
                     void callback(object sender, UUIDNameReplyEventArgs e)
                     {
                         foreach (KeyValuePair<UUID, string> av in e.Names)
@@ -563,7 +563,7 @@ namespace SecondBotEvents.Services
                 UUID wantedReplyID = UUID.SecureRandom();
                 
                 bool hasReply = false;
-                AutoResetEvent fetchEvent = new AutoResetEvent(false);
+                AutoResetEvent fetchEvent = new(false);
                 void callback(object sender, AvatarPickerReplyEventArgs e)
                 {
                     if (e.QueryID == wantedReplyID)
@@ -590,7 +590,7 @@ namespace SecondBotEvents.Services
 
         public void GetAvatarNames(List<UUID> avatars)
         {
-            List<UUID> lookup = new List<UUID>();
+            List<UUID> lookup = new();
             foreach (UUID id in avatars)
             {
                 if (avatarsName2Key.ContainsValue(id) == false)
@@ -664,7 +664,7 @@ namespace SecondBotEvents.Services
 
         public Dictionary<UUID,string> GetAvatarImWindows()
         {
-            Dictionary<UUID, string> windows = new Dictionary<UUID, string>();
+            Dictionary<UUID, string> windows = new();
             foreach (KeyValuePair<UUID,bool> links in chatWindowsIsGroup)
             {
                 if(links.Value == true)
@@ -728,7 +728,7 @@ namespace SecondBotEvents.Services
 
         public List<UUID> GetAvatarImWindowsUnread()
         {
-            List<UUID> windows = new List<UUID>();
+            List<UUID> windows = new();
             foreach (KeyValuePair<UUID, bool> links in chatWindowsIsGroup)
             {
                 if (links.Value == true)
@@ -834,8 +834,8 @@ namespace SecondBotEvents.Services
         {
             if (estateBanlist == null)
             {
-                List<UUID> reply = new List<UUID>();
-                AutoResetEvent fetchEvent = new AutoResetEvent(false);
+                List<UUID> reply = new();
+                AutoResetEvent fetchEvent = new(false);
                 void callback(object sender, EstateBansReplyEventArgs e)
                 {
                     reply = e.Banned;
@@ -1077,7 +1077,7 @@ namespace SecondBotEvents.Services
     public class CommandHistory
     {
         public string Command = "";
-        public string[] Args = new string[] { };
+        public string[] Args = Array.Empty<string>();
         public long Unixtime = 0;
         public bool status = false;
 

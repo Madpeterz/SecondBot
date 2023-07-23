@@ -44,8 +44,10 @@ namespace SecondBotEvents.Commands
                     break;
                 }
             }
-            AssetSound S = new AssetSound();
-            S.AssetData = audioData;
+            AssetSound S = new()
+            {
+                AssetData = audioData
+            };
             S.Encode();
 
             GetClient().Inventory.RequestCreateItemFromAsset(S.AssetData, inventoryName, "", AssetType.Sound, InventoryType.Sound, AA.UUID, null);
@@ -204,7 +206,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Cant find target folder", new [] { name });
             }
             List<InventoryBase> contents = GetClient().Inventory.FolderContents(AA.UUID, GetClient().Self.AgentID, true, true, InventorySortOrder.ByName, 5 * 1000);
-            List<InventoryItem> wareables = new List<InventoryItem>();
+            List<InventoryItem> wareables = new();
             if (contents == null)
             {
                 return Failure("target folder is empty or so full I cant get it in 5 secs...", new [] { name });
@@ -241,7 +243,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unable to find notecard folder");
             }
-            List<UUID> purge_notecards = new List<UUID>();
+            List<UUID> purge_notecards = new();
             List<InventoryBase> contents = GetClient().Inventory.FolderContents(NotecardFolder.UUID, GetClient().Self.AgentID, true, true, InventorySortOrder.ByDate, 40 * 1000);
             foreach (InventoryBase C in contents)
             {
@@ -255,7 +257,7 @@ namespace SecondBotEvents.Commands
                     }
                 }
             }
-            if (purge_notecards.Count() > 0)
+            if (purge_notecards.Count > 0)
             {
                 GetClient().Inventory.Remove(purge_notecards, new List<UUID>());
             }
@@ -266,7 +268,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Asset UUID or UUID zero")]
         [ReturnHints("Invaild item uuid")]
         [ArgHints("item", "inventory level UUID of item")]
-        public object getRealUUID(string item)
+        public object GetRealUUID(string item)
         {
             if (UUID.TryParse(item, out UUID itemUUID) == false)
             {
@@ -364,7 +366,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Unable to find inventory", new [] { item, objectuuid, running });
             }
             Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
-            KeyValuePair<uint, Primitive> RealObject = new KeyValuePair<uint, Primitive>(0,null);
+            KeyValuePair<uint, Primitive> RealObject = new(0, null);
             foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
             {
                 if (Obj.Value.ID == objectUUID)
@@ -431,7 +433,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("new folder name is too short, must be longer than 3 characters.")]
         [ArgHints("parentFolder", "UUID of folder to create a subfolder in")]
         [ArgHints("folderName", "name of the new folder")]
-        public object CreateInventoryFolder(string parentFolder, string folderName, string token)
+        public object CreateInventoryFolder(string parentFolder, string folderName)
         {
             if (UUID.TryParse(parentFolder, out UUID parentFolderUUID) == false)
             {

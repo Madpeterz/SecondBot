@@ -161,13 +161,16 @@ namespace SecondBotEvents.Services
             string UUIDfetch = master.DataStoreService.GetAvatarUUID(avatar);
             if (UUIDfetch != "lookup")
             {
-                UUID.TryParse(UUIDfetch, out avataruuid);
+                if(UUID.TryParse(UUIDfetch, out avataruuid) == false)
+                {
+                    avataruuid = UUID.Zero;
+                }
             }
         }
 
         protected object BasicReply(string input)
         {
-            return BasicReply(input, new string[] { }, GetCallingCommand());
+            return BasicReply(input, Array.Empty<string>(), GetCallingCommand());
         }
 
         protected object BasicReply(string input, string[] args)
@@ -178,13 +181,13 @@ namespace SecondBotEvents.Services
         protected object BasicReply(string input, string[] args, string command)
         {
             master.DataStoreService.AddCommandToHistory(true, command, args);
-            return new { command = command, args = args, reply = input, status = true };
+            return new { command, args, reply = input, status = true };
         }
 
         protected object Failure(string input, string command, string[] args, string whyfailed)
         {
             master.DataStoreService.AddCommandToHistory(false, command, args);
-            return new { command = command, args = args, reply = input, status = false, whyfailed = whyfailed };
+            return new { command, args, reply = input, status = false, whyfailed };
         }
 
         protected object Failure(string input, string[] args)
@@ -194,10 +197,10 @@ namespace SecondBotEvents.Services
 
         protected object Failure(string input)
         {
-            return Failure(input, GetCallingCommand(), new string[] { }, null);
+            return Failure(input, GetCallingCommand(), Array.Empty<string>(), null);
         }
 
-        protected string GetCallingCommand()
+        protected static string GetCallingCommand()
         {
             return (new System.Diagnostics.StackTrace()).GetFrame(2).GetMethod().Name;
         }
@@ -272,7 +275,7 @@ namespace SecondBotEvents.Services
 
         public string Run([FormField] string commandName, [FormField] string args, [FormField] string signing, [FormField] string unixtime)
         {
-            string[] myArgs = new string[] { };
+            string[] myArgs = Array.Empty<string>();
             if(args != null)
             {
                 myArgs = args.Split("~#~", StringSplitOptions.RemoveEmptyEntries);
@@ -285,7 +288,7 @@ namespace SecondBotEvents.Services
             {
                 return "No bot connected yet";
             }
-            SignedCommand C = new SignedCommand(commandName, signing, myArgs, cmdUnixtime, null, true, 5, master.CommandsService.myConfig.GetSharedSecret());
+            SignedCommand C = new(commandName, signing, myArgs, cmdUnixtime, null, true, 5, master.CommandsService.myConfig.GetSharedSecret());
             if(C.accepted == false)
             {
                 return "Command request rejected";

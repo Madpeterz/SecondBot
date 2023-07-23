@@ -910,7 +910,7 @@ namespace OpenMetaverse
 
         /// <summary>Thread sync lock object</summary>
         private readonly object m_InstantMessageLock = new object();
-        /// <summary>Raised when an ImprovedInstantMessage packet is recieved from the simulator, this is used for everything from
+        /// <summary>Raised when an ImprovedInstantMessage packet is received from the simulator, this is used for everything from
         /// private messaging to friendship offers. The Dialog field defines what type of message has arrived</summary>
         public event EventHandler<InstantMessageEventArgs> IM
         {
@@ -1104,8 +1104,7 @@ namespace OpenMetaverse
         protected virtual void OnCameraConstraint(CameraConstraintEventArgs e)
         {
             EventHandler<CameraConstraintEventArgs> handler = m_CameraConstraint;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -1128,8 +1127,7 @@ namespace OpenMetaverse
         protected virtual void OnScriptSensorReply(ScriptSensorReplyEventArgs e)
         {
             EventHandler<ScriptSensorReplyEventArgs> handler = m_ScriptSensorReply;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -1151,8 +1149,7 @@ namespace OpenMetaverse
         protected virtual void OnAvatarSitResponse(AvatarSitResponseEventArgs e)
         {
             EventHandler<AvatarSitResponseEventArgs> handler = m_AvatarSitResponse;
-            if (handler != null)
-                handler(this, e);
+            handler?.Invoke(this, e);
         }
 
         /// <summary>Thread sync lock object</summary>
@@ -1478,7 +1475,7 @@ namespace OpenMetaverse
 
         private HomeInfo home;
         private string fullName;
-        private TeleportStatus teleportStat = TeleportStatus.None;
+        private TeleportStatus teleportStatus = TeleportStatus.None;
         private ManualResetEvent teleportEvent = new ManualResetEvent(false);
         private uint heightWidthGenCounter;
         private Dictionary<UUID, AssetGesture> gestureCache = new Dictionary<UUID, AssetGesture>();
@@ -2966,7 +2963,13 @@ namespace OpenMetaverse
         /// <returns>true on success, false on failure</returns>
         public bool Teleport(UUID landmark)
         {
-            teleportStat = TeleportStatus.None;
+            if (teleportStatus == TeleportStatus.Progress)
+            {
+                Logger.Log("Teleport already in progress while attempting to teleport.", Helpers.LogLevel.Info, Client);
+                return false;
+            }
+
+            teleportStatus = TeleportStatus.None;
             teleportEvent.Reset();
             TeleportLandmarkRequestPacket p = new TeleportLandmarkRequestPacket
             {
@@ -2981,15 +2984,15 @@ namespace OpenMetaverse
 
             teleportEvent.WaitOne(Client.Settings.TELEPORT_TIMEOUT, false);
 
-            if (teleportStat == TeleportStatus.None ||
-                teleportStat == TeleportStatus.Start ||
-                teleportStat == TeleportStatus.Progress)
+            if (teleportStatus == TeleportStatus.None ||
+                teleportStatus == TeleportStatus.Start ||
+                teleportStatus == TeleportStatus.Progress)
             {
                 TeleportMessage = "Teleport timed out.";
-                teleportStat = TeleportStatus.Failed;
+                teleportStatus = TeleportStatus.Failed;
             }
 
-            return (teleportStat == TeleportStatus.Finished);
+            return (teleportStatus == TeleportStatus.Finished);
         }
 
         /// <summary>
@@ -3018,7 +3021,14 @@ namespace OpenMetaverse
         {
             if (Client.Network.CurrentSim == null) { return false; }
 
-            teleportStat = TeleportStatus.None;
+            if (teleportStatus == TeleportStatus.Progress)
+            {
+                Logger.Log($"Teleport already in progress while attempting to teleport to {simName}.",
+                    Helpers.LogLevel.Info, Client);
+                return false;
+            }
+
+            teleportStatus = TeleportStatus.None;
 
             if (simName != Client.Network.CurrentSim.Name)
             {
@@ -3030,7 +3040,7 @@ namespace OpenMetaverse
                 else
                 {
                     TeleportMessage = $"Unable to resolve simulator named: {simName}";
-                    teleportStat = TeleportStatus.Failed;
+                    teleportStatus = TeleportStatus.Failed;
                     return false;
                 }
             }
@@ -3063,40 +3073,46 @@ namespace OpenMetaverse
         /// <remarks>This call is blocking</remarks>
         public bool Teleport(ulong regionHandle, Vector3 position, Vector3 lookAt)
         {
+            if (teleportStatus == TeleportStatus.Progress)
+            {
+                Logger.Log("Teleport already in progress while attempting to teleport.", 
+                    Helpers.LogLevel.Info, Client);
+                return false;
+            }
+
             if (Client.Network.CurrentSim == null ||
                 Client.Network.CurrentSim.Caps == null ||
                 !Client.Network.CurrentSim.Caps.IsEventQueueRunning)
             {
                 // Wait a bit to see if the event queue comes online
                 AutoResetEvent queueEvent = new AutoResetEvent(false);
-                EventHandler<EventQueueRunningEventArgs> queueCallback =
-                    delegate(object sender, EventQueueRunningEventArgs e)
-                    {
-                        if (e.Simulator == Client.Network.CurrentSim)
-                            queueEvent.Set();
-                    };
 
-                Client.Network.EventQueueRunning += queueCallback;
+                void QueueCallback(object sender, EventQueueRunningEventArgs e)
+                {
+                    if (e.Simulator == Client.Network.CurrentSim) { queueEvent.Set(); }
+                }
+
+                Client.Network.EventQueueRunning += QueueCallback;
                 queueEvent.WaitOne(10 * 1000, false);
-                Client.Network.EventQueueRunning -= queueCallback;
+                Client.Network.EventQueueRunning -= QueueCallback;
             }
 
-            teleportStat = TeleportStatus.None;
+            teleportStatus = TeleportStatus.None;
             teleportEvent.Reset();
 
             RequestTeleport(regionHandle, position, lookAt);
 
             teleportEvent.WaitOne(Client.Settings.TELEPORT_TIMEOUT, false);
 
-            if (teleportStat == TeleportStatus.None ||
-                teleportStat == TeleportStatus.Start ||
-                teleportStat == TeleportStatus.Progress)
+            if (teleportStatus == TeleportStatus.None ||
+                teleportStatus == TeleportStatus.Start ||
+                teleportStatus == TeleportStatus.Progress)
             {
                 TeleportMessage = "Teleport timed out.";
-                teleportStat = TeleportStatus.Failed;
+                teleportStatus = TeleportStatus.Failed;
             }
 
-            return (teleportStat == TeleportStatus.Finished);
+            return (teleportStatus == TeleportStatus.Finished);
         }
 
         /// <summary>
@@ -3117,8 +3133,7 @@ namespace OpenMetaverse
         /// <param name="lookAt"><seealso cref="Vector3"/> direction in destination sim agent will look at</param>
         public void RequestTeleport(ulong regionHandle, Vector3 position, Vector3 lookAt)
         {
-            if (Client.Network.CurrentSim != null &&
-                Client.Network.CurrentSim.Caps != null &&
+            if (Client.Network?.CurrentSim?.Caps != null &&
                 Client.Network.CurrentSim.Caps.IsEventQueueRunning)
             {
                 TeleportLocationRequestPacket teleport = new TeleportLocationRequestPacket
@@ -3144,7 +3159,7 @@ namespace OpenMetaverse
             {
                 TeleportMessage = "CAPS event queue is not running";
                 teleportEvent.Set();
-                teleportStat = TeleportStatus.Failed;
+                teleportStatus = TeleportStatus.Failed;
             }
         }
 
@@ -3251,7 +3266,7 @@ namespace OpenMetaverse
         }
         public void SendTeleportLureRequest(UUID targetID)
         {
-            SendTeleportLureRequest(targetID, "Hi there I would like to teleport to you");
+            SendTeleportLureRequest(targetID, "Let me join you in your location");
         }
 
         #endregion Teleporting
@@ -4302,7 +4317,9 @@ namespace OpenMetaverse
                     SimAccess = (byte) msg.SimAccess,
                     SimIP = Utils.IPToUInt(msg.IP),
                     SimPort = (ushort) msg.Port,
-                    TeleportFlags = (uint) msg.Flags
+                    TeleportFlags = (uint) msg.Flags,
+                    RegionSizeX = msg.RegionSizeX,
+                    RegionSizeY = msg.RegionSizeY
                 }
             };
             // FIXME: Check This
@@ -4328,7 +4345,7 @@ namespace OpenMetaverse
 
                 TeleportMessage = "Teleport started";
                 flags = (TeleportFlags)start.Info.TeleportFlags;
-                teleportStat = TeleportStatus.Start;
+                teleportStatus = TeleportStatus.Start;
 
                 Logger.DebugLog($"TeleportStart received, Flags: {flags}", Client);
             }
@@ -4338,7 +4355,7 @@ namespace OpenMetaverse
 
                 TeleportMessage = Utils.BytesToString(progress.Info.Message);
                 flags = (TeleportFlags)progress.Info.TeleportFlags;
-                teleportStat = TeleportStatus.Progress;
+                teleportStatus = TeleportStatus.Progress;
 
                 Logger.DebugLog($"TeleportProgress received, Message: {TeleportMessage}, Flags: {flags}", Client);
             }
@@ -4347,7 +4364,7 @@ namespace OpenMetaverse
                 TeleportFailedPacket failed = (TeleportFailedPacket)packet;
 
                 TeleportMessage = Utils.BytesToString(failed.Info.Reason);
-                teleportStat = TeleportStatus.Failed;
+                teleportStatus = TeleportStatus.Failed;
                 finished = true;
 
                 Logger.DebugLog($"TeleportFailed received, Reason: {TeleportMessage}", Client);
@@ -4365,19 +4382,20 @@ namespace OpenMetaverse
                 // Connect to the new sim
                 Client.Network.CurrentSim.AgentMovementComplete = false; // we're not there anymore
                 Simulator newSimulator = Client.Network.Connect(new IPAddress(finish.Info.SimIP),
-                    finish.Info.SimPort, finish.Info.RegionHandle, true, seedcaps);
+                    finish.Info.SimPort, finish.Info.RegionHandle, true, seedcaps,
+                    finish.Info.RegionSizeX, finish.Info.RegionSizeY);
 
                 if (newSimulator != null)
                 {
                     TeleportMessage = "Teleport finished";
-                    teleportStat = TeleportStatus.Finished;
+                    teleportStatus = TeleportStatus.Finished;
 
-                    Logger.Log($"Moved to new sim {newSimulator}", Helpers.LogLevel.Info, Client);
+                    Logger.Log($"Moved to {newSimulator}", Helpers.LogLevel.Info, Client);
                 }
                 else
                 {
-                    TeleportMessage = "Failed to connect to the new sim after a teleport";
-                    teleportStat = TeleportStatus.Failed;
+                    TeleportMessage = $"Failed to connect to {newSimulator} after teleport";
+                    teleportStatus = TeleportStatus.Failed;
 
                     // We're going to get disconnected now
                     Logger.Log(TeleportMessage, Helpers.LogLevel.Error, Client);
@@ -4388,7 +4406,7 @@ namespace OpenMetaverse
                 //TeleportCancelPacket cancel = (TeleportCancelPacket)packet;
 
                 TeleportMessage = "Cancelled";
-                teleportStat = TeleportStatus.Cancelled;
+                teleportStatus = TeleportStatus.Cancelled;
                 finished = true;
 
                 Logger.DebugLog($"TeleportCancel received from {simulator}", Client);
@@ -4399,7 +4417,7 @@ namespace OpenMetaverse
 
                 TeleportMessage = "Teleport finished";
                 flags = (TeleportFlags)local.Info.TeleportFlags;
-                teleportStat = TeleportStatus.Finished;
+                teleportStatus = TeleportStatus.Finished;
                 relativePosition = local.Info.Position;
                 Movement.Camera.LookDirection(local.Info.LookAt);
                 // This field is apparently not used for anything
@@ -4411,7 +4429,7 @@ namespace OpenMetaverse
 
             if (m_Teleport != null)
             {
-                OnTeleport(new TeleportEventArgs(TeleportMessage, teleportStat, flags));
+                OnTeleport(new TeleportEventArgs(TeleportMessage, teleportStatus, flags));
             }
 
             if (finished) { teleportEvent.Set(); }
@@ -4541,7 +4559,8 @@ namespace OpenMetaverse
             Logger.DebugLog($"Crossed in to new region area, attempting to connect to {endPoint}", Client);
 
             Simulator oldSim = Client.Network.CurrentSim;
-            Simulator newSim = Client.Network.Connect(endPoint, crossed.RegionHandle, true, crossed.SeedCapability);
+            Simulator newSim = Client.Network.Connect(endPoint, crossed.RegionHandle, true, crossed.SeedCapability,
+                        crossed.RegionSizeX, crossed.RegionSizeY);
 
             if (newSim != null)
             {

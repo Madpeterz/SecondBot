@@ -366,7 +366,7 @@ namespace OpenMetaverse
         public static string MD5(string str)
         {
             StringBuilder digest = new StringBuilder(32);
-            byte[] hash = MD5(Encoding.Default.GetBytes(str));
+            byte[] hash = MD5(Encoding.UTF8.GetBytes(str));
 
             // Convert the hash to a hex string
             foreach (byte b in hash)
@@ -399,7 +399,7 @@ namespace OpenMetaverse
         /// <returns>The PBKDF2 hash of the supplied string</returns>
         public static string PBKDF2(string str)
         {
-            var derivebytes = new Rfc2898DeriveBytes(str, 32) {IterationCount = 10000};
+            var derivebytes = new Rfc2898DeriveBytes(str, 32, 10000, HashAlgorithmName.SHA1);
             byte[] hash = derivebytes.GetBytes(20);
             byte[] salt = derivebytes.Salt;
             return Convert.ToBase64String(salt) + "|" + Convert.ToBase64String(hash);

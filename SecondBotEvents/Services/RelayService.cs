@@ -13,7 +13,7 @@ namespace SecondBotEvents.Services
     {
         protected RelayConfig myConfig;
         protected bool botConnected = false;
-        protected List<RelaySys> Relays = new List<RelaySys>();
+        protected List<RelaySys> Relays = new();
         public RelayService(EventsSecondBot setMaster) : base(setMaster)
         {
             myConfig = new RelayConfig(master.fromEnv, master.fromFolder);
@@ -348,7 +348,7 @@ namespace SecondBotEvents.Services
         readonly string[] vaildToOptions = new[] { "avatar", "group", "localchat", "discord", "http" };
         readonly 
 
-        protected HttpClient HTTPclient = new HttpClient();
+        protected HttpClient HTTPclient = new();
         public void TriggerWith(string sourceType, string message, string filterOption1, string filterOption2=null, string filterOption3 = null)
         {
             // avatarim, {message}, avatarUUID
@@ -414,7 +414,7 @@ namespace SecondBotEvents.Services
                 case "http":
                     {
                         long unixtime = SecondbotHelpers.UnixTimeNow();
-                        Dictionary<string, string> values = new Dictionary<string, string>
+                        Dictionary<string, string> values = new()
                         {
                             { "fromType", fromType },
                             { "fromOption", fromOption },

@@ -5,9 +5,9 @@ using System.Text;
 
 namespace SecondBotEvents
 {
-    public static class parcel_static
+    public static class ParcelStatic
     {
-        public static bool set_parcel_music(GridClient bot, Parcel p, string url)
+        public static bool SetParcelMusic(GridClient bot, Parcel p, string url)
         {
             if (p.MusicURL != url)
             {
@@ -27,7 +27,7 @@ namespace SecondBotEvents
                 p.Flags |= F;
             }
         }
-        public static bool has_parcel_perm(Parcel P, GridClient bot)
+        public static bool HasParcelPerm(Parcel P, GridClient bot)
         {
             bool has_perm = true;
             if (P.OwnerID != bot.Self.AgentID)
@@ -54,30 +54,32 @@ namespace SecondBotEvents
             return has_perm;
 
         }
-        public static string[] get_flag_names()
+        public static string[] GetFlagNames()
         {
             System.Type enumType = typeof(ParcelFlags);
-            List<string> flagnames = new List<string>(System.Enum.GetNames(enumType));
+            List<string> flagnames = new(System.Enum.GetNames(enumType));
             flagnames.Remove("None");
             return flagnames.ToArray();
         }
 
-        public static Dictionary<string, string> get_media_list()
+        public static Dictionary<string, string> GetMediaList()
         {
-            Dictionary<string, string> flags = new Dictionary<string, string>();
-            flags.Add("MediaAutoScale", "Bool (True|False)");
-            flags.Add("MediaLoop", "Bool (True|False)");
-            flags.Add("MediaID", "UUID (Texture)");
-            flags.Add("MediaURL", "String");
-            flags.Add("MediaDesc", "String");
-            flags.Add("MediaHeight", "Int (256 to 1024)");
-            flags.Add("MediaWidth", "Int (256 to 1024)");
-            flags.Add("MediaType", "String [\"IMG-PNG\",\"IMG-JPG\",\"VID-MP4\",\"VID-AVI\" or \"Custom-MIME_TYPE_CODE\"]");
+            Dictionary<string, string> flags = new()
+            {
+                { "MediaAutoScale", "Bool (True|False)" },
+                { "MediaLoop", "Bool (True|False)" },
+                { "MediaID", "UUID (Texture)" },
+                { "MediaURL", "String" },
+                { "MediaDesc", "String" },
+                { "MediaHeight", "Int (256 to 1024)" },
+                { "MediaWidth", "Int (256 to 1024)" },
+                { "MediaType", "String [\"IMG-PNG\",\"IMG-JPG\",\"VID-MP4\",\"VID-AVI\" or \"Custom-MIME_TYPE_CODE\"]" }
+            };
             return flags;
         }
-        public static Dictionary<string, ParcelFlags> get_flags_list()
+        public static Dictionary<string, ParcelFlags> GetFlagsList()
         {
-            Dictionary<string, ParcelFlags> flags = new Dictionary<string, ParcelFlags>();
+            Dictionary<string, ParcelFlags> flags = new();
             Type enumType = typeof(ParcelFlags);
             Array enumValues = Enum.GetValues(enumType);
             Array enumNames = Enum.GetNames(enumType);

@@ -145,7 +145,6 @@ namespace OpenMetaverse
             {
                 AllowAutoRedirect = true,
                 AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-                MaxConnectionsPerServer = Settings.MAX_HTTP_CONNECTIONS,
                 ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) =>
                 {
                     if (sslPolicyErrors == SslPolicyErrors.None)
@@ -157,6 +156,10 @@ namespace OpenMetaverse
                     return true;
                 }
             };
+
+            if (Utils.GetRunningRuntime() != Utils.Runtime.Mono)
+                handler.MaxConnectionsPerServer = Settings.MAX_HTTP_CONNECTIONS;
+
             HttpCapsClient client = new HttpCapsClient(handler);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Add("User-Agent", $"{Settings.USER_AGENT}");

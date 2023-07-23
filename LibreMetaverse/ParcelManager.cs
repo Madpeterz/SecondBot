@@ -606,13 +606,12 @@ namespace OpenMetaverse
             Media = new ParcelMedia();
         }
 
-        /// <summary>
-        /// Update the parcel (in the current sim)
-        /// </summary>
-        /// <param name="client">Client message originates from</param>
-        /// <param name="wantReply">Whether we want the simulator to confirm
-        /// the update with a reply packet or not [default false]</param>
-        public void Update(GridClient client, bool wantReply = false)
+        public void Update(GridClient client)
+        {
+            Update(client, client.Network.CurrentSim, false);
+        }
+
+        public void Update(GridClient client, bool wantReply)
         {
             Update(client, client.Network.CurrentSim, wantReply);
         }
@@ -1688,7 +1687,17 @@ namespace OpenMetaverse
                 {
                     OSD res = null;
                     await Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, msg.Serialize(), CancellationToken.None,
-                            (response, data, error) => res = OSDParser.Deserialize(data));
+                        (response, data, error) =>
+                        {
+                            if (data != null)
+                            {
+                                res = OSDParser.Deserialize(data);
+                            }
+                            else if (error != null)
+                            {
+                                Logger.Log("Did not receive response from RemoteParcelRequest: " + error.Message, Helpers.LogLevel.Warning, Client);
+                            }
+                        });
 
                     if (res is OSDMap result)
                     {

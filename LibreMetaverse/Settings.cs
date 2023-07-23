@@ -217,10 +217,6 @@ namespace OpenMetaverse
         /// server the full object info will automatically be requested</summary>
         public bool ALWAYS_REQUEST_OBJECTS = true;
 
-        /// <summary>Whether to establish connections to HTTP capabilities
-        /// servers for simulators</summary>
-        public bool ENABLE_CAPS = true;
-
         /// <summary>Whether to decode sim stats</summary>
         public bool ENABLE_SIMSTATS = true;
 
@@ -342,11 +338,7 @@ namespace OpenMetaverse
         /// You will get no output on the console. This behavior can be overriden by creating
         /// a logger configuration file for log4net
         /// </summary>
-#if DEBUG
-        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.Debug;
-#else
         public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.None;
-#endif
 
         /// <summary>Attach avatar names to log messages</summary>
         public bool LOG_NAMES = true;

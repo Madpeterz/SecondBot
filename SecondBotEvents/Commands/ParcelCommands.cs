@@ -49,8 +49,8 @@ namespace SecondBotEvents.Commands
             }
             targetparcel.SalePrice = amountvalue;
             targetparcel.AuthBuyerID = avataruuid;
-            parcel_static.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
-            parcel_static.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
+            ParcelStatic.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
+            ParcelStatic.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
             targetparcel.Update(GetClient());
             return Failure("ok", new [] { amount, avatar });
         }
@@ -167,8 +167,8 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value);
             }
-            Dictionary<string, ParcelFlags> flags = parcel_static.get_flags_list();
-            Dictionary<string, string> collection = new Dictionary<string, string>();
+            Dictionary<string, ParcelFlags> flags = ParcelStatic.GetFlagsList();
+            Dictionary<string, string> collection = new();
             foreach (ParcelFlags cfg in flags.Values)
             {
                 collection.Add(cfg.ToString(), targetparcel.Flags.HasFlag(cfg).ToString());
@@ -237,10 +237,12 @@ namespace SecondBotEvents.Commands
             {
                 return BasicReply("Avatar is in the blacklist", new [] { avatar });
             }
-            ParcelAccessEntry entry = new ParcelAccessEntry();
-            entry.AgentID = avataruuid;
-            entry.Flags = AccessList.Ban;
-            entry.Time = new System.DateTime(3030, 03, 03);
+            ParcelAccessEntry entry = new()
+            {
+                AgentID = avataruuid,
+                Flags = AccessList.Ban,
+                Time = new System.DateTime(3030, 03, 03)
+            };
             targetparcel.AccessBlackList.Add(entry);
             targetparcel.Update(GetClient());
             return BasicReply("ok", new [] { avatar });
@@ -266,7 +268,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Invaild avatar", new [] { avatar });
             }
             bool alreadyBanned = false;
-            ParcelAccessEntry removeentry = new ParcelAccessEntry();
+            ParcelAccessEntry removeentry = new();
             foreach (ParcelAccessEntry E in targetparcel.AccessBlackList)
             {
                 if (E.AgentID == avataruuid)
@@ -298,7 +300,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value, new [] { musicurl });
             }
-            bool status = parcel_static.set_parcel_music(GetClient(), targetparcel, musicurl);
+            bool status = ParcelStatic.SetParcelMusic(GetClient(), targetparcel, musicurl);
             return BasicReply(status.ToString(), new [] { musicurl });
         }
 
@@ -319,11 +321,11 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value, new [] { escapedflagdata });
             }
-            List<string> acceptablewords = new List<string>();
-            Dictionary<string, ParcelFlags> flags = parcel_static.get_flags_list();
+            List<string> acceptablewords = new();
+            Dictionary<string, ParcelFlags> flags = ParcelStatic.GetFlagsList();
             acceptablewords.AddRange(new[] { "True", "False" });
 
-            Dictionary<string, bool> setflags = new Dictionary<string, bool>();
+            Dictionary<string, bool> setflags = new();
             string[] args = escapedflagdata.Split(":::");
             foreach (string a in args)
             {
@@ -348,7 +350,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("No accepted flags", new [] { escapedflagdata });
             }
-            if (parcel_static.has_parcel_perm(targetparcel, GetClient()) == false)
+            if (ParcelStatic.HasParcelPerm(targetparcel, GetClient()) == false)
             {
                 return Failure("Incorrect perms to control parcel", new [] { escapedflagdata });
             }
@@ -356,7 +358,7 @@ namespace SecondBotEvents.Commands
             {
                 if (flags.ContainsKey(cfg.Key) == true)
                 {
-                    parcel_static.ParcelSetFlag(flags[cfg.Key], targetparcel, cfg.Value);
+                    ParcelStatic.ParcelSetFlag(flags[cfg.Key], targetparcel, cfg.Value);
                 }
             }
             targetparcel.Update(GetClient());
@@ -494,7 +496,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value);
             }
-            GetParcelBanlistObject reply = new GetParcelBanlistObject();
+            GetParcelBanlistObject reply = new();
             int delays = 0;
             bool haslookup = true;
             while ((haslookup == true) && (delays < 3))
@@ -582,7 +584,7 @@ namespace SecondBotEvents.Commands
                 {
                     if (bits[0] == "MediaType")
                     {
-                        UpdateParcel_MediaType(targetparcel, bits[1]);
+                        UpdateParcelMediaType(targetparcel, bits[1]);
                     }
                     else if ((bits[0] == "MediaWidth") || (bits[0] == "MediaHeight"))
                     {
@@ -636,7 +638,7 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok", new [] { escapedflagdata });
         }
 
-        protected bool UpdateParcel_MediaType(Parcel targetparcel, string value)
+        protected static bool UpdateParcelMediaType(Parcel targetparcel, string value)
         {
             if (value == "IMG-PNG")
             {
@@ -670,7 +672,7 @@ namespace SecondBotEvents.Commands
 
     public class GetParcelBanlistObject
     {
-        public Dictionary<UUID, string> entrys = new Dictionary<UUID, string>();
+        public Dictionary<UUID, string> entrys = new();
         public string parcelName = "";
         public string regionName = "";
         public int delay = 0;

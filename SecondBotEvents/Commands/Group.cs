@@ -66,7 +66,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Unknown group", new[] { group, avatar, state });
             }
             ProcessAvatar(avatar);
-            if(avataruuid == null)
+            if(avataruuid == UUID.Zero)
             {
                 return Failure("Unknown avatar", new[] { group, avatar, state });
             }
@@ -75,8 +75,10 @@ namespace SecondBotEvents.Commands
             {
                 Action = GroupBanAction.Unban;
             }
-            List<UUID> avatarstoaction = new List<UUID>();
-            avatarstoaction.Add(avataruuid);
+            List<UUID> avatarstoaction = new()
+            {
+                avataruuid
+            };
             GetClient().Groups.RequestBanAction(groupuuid, Action, avatarstoaction.ToArray());
             return BasicReply("Accepted");
         }
@@ -104,7 +106,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Unknown group", new[] { group, avatar });
             }
             ProcessAvatar(avatar);
-            if (avataruuid == null)
+            if (avataruuid == UUID.Zero)
             {
                 return Failure("Unknown avatar", new[] { group, avatar});
             }
@@ -172,12 +174,13 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("avatar lookup", new [] { group, avatar, role });
             }
-            List<UUID> roles = new List<UUID>();
-            roles.Add(UUID.Zero);
-            if(role != "everyone")
+            List<UUID> roles = new()
             {
-                UUID roleuuid = UUID.Zero;
-                if (UUID.TryParse(role, out roleuuid) == false)
+                UUID.Zero
+            };
+            if (role != "everyone")
+            {
+                if (UUID.TryParse(role, out UUID roleuuid) == false)
                 {
                     return Failure("Unable to process role UUID", new[] { group, avatar, role });
                 }
@@ -215,10 +218,12 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Message empty", new [] { group, title, message });
             }
-            GroupNotice NewNotice = new GroupNotice();
-            NewNotice.Subject = title;
-            NewNotice.Message = message;
-            NewNotice.OwnerID = GetClient().Self.AgentID;
+            GroupNotice NewNotice = new()
+            {
+                Subject = title,
+                Message = message,
+                OwnerID = GetClient().Self.AgentID
+            };
             GetClient().Groups.SendGroupNotice(groupuuid, NewNotice);
             return BasicReply("Sending notice", new [] { group, title, message });
         }
@@ -301,11 +306,13 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Message empty", new [] { group, title, message, attachment });
             }
-            GroupNotice NewNotice = new GroupNotice();
-            NewNotice.Subject = title;
-            NewNotice.Message = message;
-            NewNotice.OwnerID = GetClient().Self.AgentID;
-            NewNotice.AttachmentID = inventoryuuid;
+            GroupNotice NewNotice = new()
+            {
+                Subject = title,
+                Message = message,
+                OwnerID = GetClient().Self.AgentID,
+                AttachmentID = inventoryuuid
+            };
             GetClient().Groups.SendGroupNotice(groupuuid, NewNotice);
             return BasicReply("Sending notice with attachment", new [] { group, title, message, attachment });
         }
@@ -351,8 +358,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("group", "the UUID of the group")]
         public object GroupchatGroupHasUnread(string group)
         {
-            UUID groupUUID = UUID.Zero;
-            if(UUID.TryParse(group,out groupUUID) == false)
+            if(UUID.TryParse(group,out UUID groupUUID) == false)
             {
                 return Failure("group value is invaild", new [] { group });
             }
@@ -400,8 +406,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unknown group")]
         public object Groupchat(string group, string message)
         {
-            UUID groupUUID = UUID.Zero;
-            if (UUID.TryParse(group, out groupUUID) == false)
+            if (UUID.TryParse(group, out UUID groupUUID) == false)
             {
                 return Failure("group value is invaild", new [] { group, message });
             }
