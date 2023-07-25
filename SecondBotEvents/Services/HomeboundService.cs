@@ -20,10 +20,16 @@ namespace SecondBotEvents.Services
         protected long lastGotoAction = 0;
         protected bool softDisable = false;
         protected bool closeToHome = false;
+        protected bool softDisableSit = false;
 
         public void MarkTeleport()
         {
             softDisable = true;
+        }
+
+        public void MarkStandup()
+        {
+            softDisableSit = true;
         }
 
         public HomeboundService(EventsSecondBot setMaster) : base(setMaster)
@@ -65,7 +71,10 @@ namespace SecondBotEvents.Services
                 {
                     if (GetClient().Self.SittingOn == 0)
                     {
-                        GetClient().Self.RequestSit(sitTarget, Vector3.Zero);
+                        if (softDisableSit == false)
+                        {
+                            GetClient().Self.RequestSit(sitTarget, Vector3.Zero);
+                        }
                     }
                 }
                 if (myConfig.GetAtHomeSeekLocation() == true)
@@ -246,7 +255,7 @@ namespace SecondBotEvents.Services
         protected void BotClientRestart(object o, BotClientNotice e)
         {
             botConnected = false;
-            Console.WriteLine("Homebound Service [Attached to new client]");
+            LogFormater.Info("Homebound Service [Attached to new client]");
             GetClient().Network.LoggedOut += BotLoggedOut;
             GetClient().Network.SimConnected += BotLoggedIn;
             GetClient().Self.AlertMessage += BotAlertMessage;
@@ -264,12 +273,12 @@ namespace SecondBotEvents.Services
             softDisable = false;
             closeToHome = false;
             lastGotoAction = SecondbotHelpers.UnixTimeNow();
-            Console.WriteLine("Homebound Service [Standby]");
+            LogFormater.Info("Homebound Service [Standby]");
         }
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
             botConnected = true;
-            Console.WriteLine("Homebound Service [Active]");
+            LogFormater.Info("Homebound Service [Active]");
         }
 
         public override void Start()
@@ -281,14 +290,14 @@ namespace SecondBotEvents.Services
             Stop();
             running = true;
             master.BotClientNoticeEvent += BotClientRestart;
-            Console.WriteLine("Homebound Service [Starting]");
+            LogFormater.Info("Homebound Service [Starting]");
         }
 
         public override void Stop()
         {
             if(running == true)
             {
-                Console.WriteLine("Homebound Service [Stopping]");
+                LogFormater.Info("Homebound Service [Stopping]");
             }
             running = false;
             master.BotClientNoticeEvent -= BotClientRestart;

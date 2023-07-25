@@ -17,7 +17,7 @@ namespace SecondBotEvents.Services
             myConfig = new InteractionConfig(master.fromEnv,master.fromFolder);
             if (myConfig.GetEnabled() == false)
             {
-                Console.WriteLine(Status());
+                LogFormater.Info(Status());
                 return;
             }
         }
@@ -68,7 +68,7 @@ namespace SecondBotEvents.Services
         protected void BotClientRestart(object o, BotClientNotice e)
         {
             botConnected = false;
-            Console.WriteLine("Interaction Service [Attached to new client]");
+            LogFormater.Info("Interaction Service [Attached to new client]");
             GetClient().Network.LoggedOut += BotLoggedOut;
             GetClient().Network.SimConnected += BotLoggedIn;
         }
@@ -168,7 +168,7 @@ namespace SecondBotEvents.Services
         {
             botConnected = false;
             GetClient().Network.SimConnected += BotLoggedIn;
-            Console.WriteLine("Interaction Service [Standby]");
+            LogFormater.Info("Interaction Service [Standby]");
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
@@ -179,27 +179,27 @@ namespace SecondBotEvents.Services
             GetClient().Groups.GroupInvitation += BotGroupInviteOffer;
             GetClient().Self.IM += BotTeleportOffer;
             botConnected = true;
-            Console.WriteLine("Interaction Service [Active]");
+            LogFormater.Info("Interaction Service [Active]");
         }
 
         public override void Start()
         {
             if (myConfig.GetEnabled() == false)
             {
-                Console.WriteLine("Interaction Service [- Not requested -]");
+                LogFormater.Info("Interaction Service [- Not requested -]");
                 return;
             }
             Stop();
             running = true;
             master.BotClientNoticeEvent += BotClientRestart;
-            Console.WriteLine("Interaction Service [Starting]");
+            LogFormater.Info("Interaction Service [Starting]");
         }
 
         public override void Stop()
         {
             if(running == true)
             {
-                Console.WriteLine("Interaction Service [Stopping]");
+                LogFormater.Info("Interaction Service [Stopping]");
             }
             running = false;
             if (myConfig.GetEnabled() == false)

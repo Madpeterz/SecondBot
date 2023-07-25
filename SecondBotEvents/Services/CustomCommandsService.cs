@@ -85,7 +85,7 @@ namespace SecondBotEvents.Services
 
         protected void BotClientRestart(object o, BotClientNotice e)
         {
-            Console.WriteLine("CustomCommands service [Attached to new client]");
+            LogFormater.Info("CustomCommands service [Attached to new client]");
             GetClient().Network.LoggedOut += BotLoggedOut;
             GetClient().Network.SimConnected += BotLoggedIn;
         }
@@ -93,7 +93,7 @@ namespace SecondBotEvents.Services
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
             GetClient().Network.SimConnected += BotLoggedIn;
-            Console.WriteLine("CustomCommands service [waiting for new client]");
+            LogFormater.Info("CustomCommands service [waiting for new client]");
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)

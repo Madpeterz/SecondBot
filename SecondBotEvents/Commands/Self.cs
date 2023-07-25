@@ -106,6 +106,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         public object Stand()
         {
+            master.HomeboundService.MarkStandup();
             GetClient().Self.Stand();
             return BasicReply("ok");
         }

@@ -790,7 +790,7 @@ namespace SecondBotEvents.Services
         protected void BotClientRestart(object o, BotClientNotice e)
         {
             botConnected = false;
-            Console.WriteLine("DataStore Service [Attached to new client]");
+            LogFormater.Info("DataStore Service [Attached to new client]");
             GetClient().Network.LoggedOut += BotLoggedOut;
             GetClient().Network.SimConnected += BotLoggedIn;
         }
@@ -799,7 +799,7 @@ namespace SecondBotEvents.Services
         {
             botConnected = false;
             GetClient().Network.SimConnected += BotLoggedIn;
-            Console.WriteLine("DataStore Service [Standby]");
+            LogFormater.Info("DataStore Service [Standby]");
         }
 
         protected void GroupRoles(object o, GroupRolesDataReplyEventArgs e)
@@ -877,7 +877,7 @@ namespace SecondBotEvents.Services
             GetClient().Estate.EstateBansReply += EstateBans;
             GetClient().Groups.RequestCurrentGroups();
             botConnected = true;
-            Console.WriteLine("DataStore Service [Active]");
+            LogFormater.Info("DataStore Service [Active]");
             GetAvatarName(GetClient().Self.AgentID);
         }
         readonly string[] hard_blocked_agents = new[] { "secondlife", "second life" };
@@ -1045,14 +1045,14 @@ namespace SecondBotEvents.Services
             Stop();
             running = true;
             master.BotClientNoticeEvent += BotClientRestart;
-            Console.WriteLine("DataStore Service [Starting]");
+            LogFormater.Info("DataStore Service [Starting]");
         }
 
         public override void Stop()
         {
             if(running == true)
             {
-                Console.WriteLine("DataStore Service [Stopping]");
+                LogFormater.Info("DataStore Service [Stopping]");
             }
             running = false;
             Reset();

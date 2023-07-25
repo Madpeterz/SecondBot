@@ -60,7 +60,7 @@ namespace SecondBotEvents.Services
 
         protected void BotClientRestart(object o, BotClientNotice e)
         {
-            Console.WriteLine("Events service [Attached to new client]");
+            LogFormater.Info("Events service [Attached to new client]");
             GetClient().Network.LoggedOut += BotLoggedOut;
             GetClient().Network.SimConnected += BotLoggedIn;
         }
@@ -68,7 +68,7 @@ namespace SecondBotEvents.Services
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
             GetClient().Network.SimConnected += BotLoggedIn;
-            Console.WriteLine("Events service [Bot commands disabled]");
+            LogFormater.Info("Events service [Bot commands disabled]");
             removeEvents();
         }
 
@@ -340,7 +340,7 @@ namespace SecondBotEvents.Services
         {
             if (myConfig.GetEnabled() == false)
             {
-                Console.WriteLine("Events service [Disabled]");
+                LogFormater.Info("Events service [Disabled]");
                 return;
             }
             Stop();

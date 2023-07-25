@@ -22,7 +22,7 @@ namespace SecondBotEvents.Services
             myConfig = new HttpConfig(master.fromEnv, master.fromFolder);
             if (myConfig.GetEnabled() == false)
             {
-                Console.WriteLine(Status());
+                LogFormater.Info(Status());
                 return;
             }
         }
@@ -57,7 +57,7 @@ namespace SecondBotEvents.Services
         protected void BotClientRestart(object o, BotClientNotice e)
         {
             acceptBotCommands = false;
-            Console.WriteLine("HTTP service [Attached to new client]");
+            LogFormater.Info("HTTP service [Attached to new client]");
             GetClient().Network.LoggedOut += BotLoggedOut;
             GetClient().Network.SimConnected += BotLoggedIn;
         }
@@ -66,7 +66,7 @@ namespace SecondBotEvents.Services
         {
             acceptBotCommands = false;
             GetClient().Network.SimConnected += BotLoggedIn;
-            Console.WriteLine("HTTP service [Bot commands disabled]");
+            LogFormater.Info("HTTP service [Bot commands disabled]");
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
@@ -80,7 +80,7 @@ namespace SecondBotEvents.Services
         {
             if (myConfig.GetEnabled() == false)
             {
-                Console.WriteLine("HTTP service [Disabled]");
+                LogFormater.Info("HTTP service [Disabled]");
                 return;
             }
             Stop();
@@ -92,7 +92,7 @@ namespace SecondBotEvents.Services
         {
             if(running == true)
             {
-                Console.WriteLine("HTTP service [Stopping]");
+                LogFormater.Info("HTTP service [Stopping]");
             }
             running = false;
             if (myConfig.GetEnabled() == false)
@@ -119,7 +119,7 @@ namespace SecondBotEvents.Services
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" }))
             );
             HTTPendpoint.RunAsync();
-            Console.WriteLine("HTTP service [Enabled] on port "+ myConfig.GetPort().ToString());
+            LogFormater.Info("HTTP service [Enabled] on port "+ myConfig.GetPort().ToString());
         }
     }
 

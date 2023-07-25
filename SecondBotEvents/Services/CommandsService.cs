@@ -309,7 +309,7 @@ namespace SecondBotEvents.Services
         protected void BotClientRestart(object o, BotClientNotice e)
         {
             acceptNewCommands = false;
-            Console.WriteLine("Commands service [Attached to new client]");
+            LogFormater.Info("Commands service [Attached to new client]");
             GetClient().Network.LoggedOut += BotLoggedOut;
             GetClient().Network.SimConnected += BotLoggedIn;
         }
@@ -317,7 +317,7 @@ namespace SecondBotEvents.Services
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
             GetClient().Network.SimConnected += BotLoggedIn;
-            Console.WriteLine("Commands service [Waiting for connect]");
+            LogFormater.Info("Commands service [Waiting for connect]");
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
@@ -332,7 +332,7 @@ namespace SecondBotEvents.Services
                 }
             }
             acceptNewCommands = true;
-            Console.WriteLine("Commands service [accepting IM commands]");
+            LogFormater.Info("Commands service [accepting IM commands]");
         }
     }
 

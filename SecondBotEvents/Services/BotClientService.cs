@@ -36,7 +36,7 @@ namespace SecondBotEvents.Services
         public override void Start()
         {
             running = true;
-            Console.WriteLine("Client service [Starting]");
+            LogFormater.Info("Client service [Starting]");
             AutoRestartLoginTimer = new Timer();
             AutoRestartLoginTimer.Interval = 30 * 1000;
             AutoRestartLoginTimer.AutoReset = false;
@@ -47,7 +47,7 @@ namespace SecondBotEvents.Services
         {
             if(running == true)
             {
-                Console.WriteLine("Client service [Stopping]");
+                LogFormater.Info("Client service [Stopping]");
             }
             running = false;
             AutoRestartLoginTimer.Stop();
@@ -56,35 +56,35 @@ namespace SecondBotEvents.Services
 
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
-            Console.WriteLine("Client service ~ Logged out");
+            LogFormater.Info("Client service ~ Logged out");
         }
 
         protected void BotSimConnected(object o, SimConnectedEventArgs e)
         {
             AutoRestartLoginTimer.Stop();
-            Console.WriteLine("Client service ~ Connected to sim: "+e.Simulator.Name);
+            LogFormater.Info("Client service ~ Connected to sim: "+e.Simulator.Name);
         }
 
         protected void BotSimDisconnected(object o, SimDisconnectedEventArgs e)
         {
-            Console.WriteLine("Client service ~ Disconnected from sim: " + e.Simulator.Name);
+            LogFormater.Info("Client service ~ Disconnected from sim: " + e.Simulator.Name);
         }
 
         protected void BotDisconnected(object o, DisconnectedEventArgs e)
         {
-            Console.WriteLine("Client service ~ Network disconnected: " + e.Message);
+            LogFormater.Info("Client service ~ Network disconnected: " + e.Message);
         }
 
         protected void BotLoginStatus(object o, LoginProgressEventArgs e)
         { 
             if(e.FailReason != "")
             {
-                Console.WriteLine("Client service ~ {FAILED} Login status: " + e.FailReason.ToString());
+                LogFormater.Info("Client service ~ {FAILED} Login status: " + e.FailReason.ToString());
                 client.Network.Logout();
                 ResetClient();
                 return;
             }
-            Console.WriteLine("Client service ~ Login status: " + e.Status.ToString());
+            LogFormater.Info("Client service ~ Login status: " + e.Status.ToString());
         }
         public void SendIM(UUID avatar, string message)
         {

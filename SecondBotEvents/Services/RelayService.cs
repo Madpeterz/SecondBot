@@ -35,7 +35,7 @@ namespace SecondBotEvents.Services
         protected void BotClientRestart(object o, BotClientNotice e)
         {
             botConnected = false;
-            Console.WriteLine("Relay Service [Attached to new client]");
+            LogFormater.Info("Relay Service [Attached to new client]");
             GetClient().Network.LoggedOut += BotLoggedOut;
             GetClient().Network.SimConnected += BotLoggedIn;
         }
@@ -44,7 +44,7 @@ namespace SecondBotEvents.Services
         {
             botConnected = false;
             GetClient().Network.SimConnected += BotLoggedIn;
-            Console.WriteLine("Relay Service [Standby]");
+            LogFormater.Info("Relay Service [Standby]");
         }
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
@@ -53,7 +53,7 @@ namespace SecondBotEvents.Services
             GetClient().Self.IM += BotImMessage;
             GetClient().Self.ChatFromSimulator += LocalChat;
             botConnected = true;
-            Console.WriteLine("Relay Service [Active]");
+            LogFormater.Info("Relay Service [Active]");
         }
 
         readonly string[] hard_blocked_agents = new[] { "secondlife", "second life" };
@@ -132,14 +132,14 @@ namespace SecondBotEvents.Services
             Stop();
             running = true;
             master.BotClientNoticeEvent += BotClientRestart;
-            Console.WriteLine("Relay Service [Starting]");
+            LogFormater.Info("Relay Service [Starting]");
         }
 
         public override void Stop()
         {
             if(running == true)
             {
-                Console.WriteLine("Relay Service [Stopping]");
+                LogFormater.Info("Relay Service [Stopping]");
             }
             running = false;
             master.BotClientNoticeEvent -= BotClientRestart;

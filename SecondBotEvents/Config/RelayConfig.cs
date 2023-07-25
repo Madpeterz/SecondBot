@@ -26,7 +26,7 @@ namespace SecondBotEvents.Config
 
         public int GetRelayCount()
         {
-            return ReadSettingAsInt("count", 1);
+            return ReadSettingAsInt("count", 0);
         }
 
         public bool GetRelayEnabled(int relayID)

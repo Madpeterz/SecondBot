@@ -278,6 +278,34 @@ namespace SecondBotEvents.Commands
             return BasicReply(reply.ToString(), new [] { item });
         }
 
+        [About("sends a item to an avatar via a path")]
+        [ReturnHints("ok")]
+        [ReturnHints("Failed")]
+        [ReturnHints("Invaild avatar uuid")]
+        [ReturnHints("Unable to find item")]
+        [ArgHints("path", "item name and path example: Notecard/sendme or Objects/DemoItem")]
+        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        public object SendItemByPath(string path, string avatar)
+        {
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("Invaild avatar uuid", new[] { path, avatar });
+            }
+            UUID targetitem = GetClient().Inventory.FindObjectByPath(GetClient().Inventory.Store.RootFolder.UUID, GetClient().Self.AgentID, path, (3 * 1000));
+            if(targetitem == UUID.Zero)
+            {
+                return Failure("Unable to find item via path", new[] { path, avatar });
+            }
+            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, (3 * 1000));
+            if (itm == null)
+            {
+                return Failure("Unable to find item with found uuid", new[] { path, avatar });
+            }
+            GetClient().Inventory.GiveItem(itm.UUID, itm.Name, itm.AssetType, avataruuid, false);
+            return BasicReply("ok", new[] { path, avatar });
+        }
+
         [About("sends a item to an avatar")]
         [ReturnHints("ok")]
         [ReturnHints("Failed")]
@@ -321,7 +349,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar uuid", new [] { folder, avatar });
             }
-            if (UUID.TryParse(folder, out UUID targetfolder) == true)
+            if (UUID.TryParse(folder, out UUID targetfolder) == false)
             {
                 return Failure("Invaild folder uuid", new [] { folder, avatar });
             }

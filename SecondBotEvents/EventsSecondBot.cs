@@ -155,7 +155,7 @@ namespace SecondBotEvents
             RegisterService("CustomCommandsService");
             if (BotClient.IsLoaded() == false)
             {
-                Console.WriteLine("Config is not loaded :(");
+                LogFormater.Info("Config is not loaded :(");
                 exitNow = true;
                 return;
             }

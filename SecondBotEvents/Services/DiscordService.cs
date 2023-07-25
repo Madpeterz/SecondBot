@@ -58,14 +58,14 @@ namespace SecondBotEvents.Services
 
         protected Task DiscordClientLoggedOut()
         {
-            Console.WriteLine("Discord service [Logged out]");
+            LogFormater.Info("Discord service [Logged out]");
             DiscordIsReady = false;
             return Task.CompletedTask;
         }
 
         protected Task DicordClientLoggedin()
         {
-            Console.WriteLine("Discord service [Logged in]");
+            LogFormater.Info("Discord service [Logged in]");
             DiscordDoingLogin = false;
             _ = DiscordClient.StartAsync();
             return Task.CompletedTask;   
@@ -73,7 +73,7 @@ namespace SecondBotEvents.Services
 
         protected Task DiscordClientReady()
         {
-            Console.WriteLine("Discord service [Ready]");
+            LogFormater.Info("Discord service [Ready]");
             DiscordIsReady = true;
             DoServerChannelSetup();
             return Task.CompletedTask;
@@ -358,7 +358,7 @@ namespace SecondBotEvents.Services
                 }
                 if (message.Author.Id != DiscordClient.CurrentUser.Id)
                 {
-                    GetClient().Self.Chat(message.Author.Username + ": " + message.CleanContent, 0, ChatType.Normal);
+                    GetClient().Self.Chat(message.CleanContent, 0, ChatType.Normal);
                     _ = message.DeleteAsync();
                 }
             }
@@ -380,7 +380,7 @@ namespace SecondBotEvents.Services
 
         protected Task DiscordDisconnected(Exception e)
         {
-            Console.WriteLine("Discord service [Disconnected: "+e.Message+"]");
+            LogFormater.Info("Discord service [Disconnected: "+e.Message+"]");
             DiscordIsReady = false;
             if(DiscordDisconnectExpected == false)
             {
@@ -407,21 +407,25 @@ namespace SecondBotEvents.Services
             running = true;
             if (myConfig.GetEnabled() == false)
             {
-                Console.WriteLine("Discord service [Disabled]");
+                LogFormater.Info("Discord service [Disabled]");
                 return;
             }
             if(myConfig.GetServerID() == 0)
             {
-                Console.WriteLine("Discord service [Invaild server id]");
+                LogFormater.Info("Discord service [Invaild server id]");
                 return;
             }
             DiscordServerChannelsSetup = false;
             DiscordDisconnectExpected = false;
             DiscordIsReady = false;
-            Console.WriteLine("Discord service [Starting]");
+            LogFormater.Info("Discord service [Starting]");
             master.SystemStatusMessagesEvent += SystemStatusEvent;
             master.BotClientNoticeEvent += BotClientRestart;
-            DiscordClient = new DiscordSocketClient();
+            var config = new DiscordSocketConfig()
+            {
+                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildIntegrations | GatewayIntents.MessageContent
+            };
+            DiscordClient = new DiscordSocketClient(config);
             DiscordClient.Ready += DiscordClientReady;
             DiscordClient.LoggedOut += DiscordClientLoggedOut;
             DiscordClient.LoggedIn += DicordClientLoggedin;
@@ -434,7 +438,7 @@ namespace SecondBotEvents.Services
         {
             if(running == true)
             {
-                Console.WriteLine("Discord service [Stopping]");
+                LogFormater.Info("Discord service [Stopping]");
             }
             running = false;
             
@@ -473,7 +477,7 @@ namespace SecondBotEvents.Services
         {
             if (e.isRestart == false)
             {
-                Console.WriteLine("Discord service [Avi link]");
+                LogFormater.Info("Discord service [Avi link]");
                 AcceptEventsFromSL = false;
                 GetClient().Network.LoggedOut += BotLoggedOut;
                 GetClient().Self.ChatFromSimulator -= LocalChat;
@@ -491,7 +495,7 @@ namespace SecondBotEvents.Services
             GetClient().Self.IM -= BotImMessage;
             GetClient().Groups.CurrentGroups -= GroupCurrent;
             AcceptEventsFromSL = false;
-            Console.WriteLine("Discord service [Avi link - standby]");
+            LogFormater.Info("Discord service [Avi link - standby]");
         }
 
         protected void BotImMessage(object o, InstantMessageEventArgs e)
@@ -536,6 +540,7 @@ namespace SecondBotEvents.Services
         protected async void DoServerChannelSetup()
         {
             LogFormater.Info("Setting up channels");
+            LoginEvents();
             Dictionary<string, string> WantedTextChannels = new Dictionary<string, string>
             {
                 { "status", StatusPrefill() },
@@ -830,10 +835,33 @@ namespace SecondBotEvents.Services
         {
             AcceptEventsFromSL = true;
             GetClient().Network.SimConnected -= BotLoggedIn;
-            GetClient().Self.IM += BotImMessage;
-            GetClient().Self.ChatFromSimulator += LocalChat;
-            GetClient().Groups.CurrentGroups += GroupCurrent;
-            Console.WriteLine("Discord service [Avi link - Active]");
+            LogFormater.Info("Discord service [Avi link - Active]");
+            LoginEvents();
+            BotCurrentSim(o, e);
+        }
+
+        protected void BotCurrentSim(object o, SimConnectedEventArgs e)
+        {
+            if (DiscordIsReady == true)
+            {
+                DiscordClient.SetGameAsync(e.Simulator.Name, null, ActivityType.Playing);
+            }
+        }
+
+        protected void LoginEvents()
+        {
+            if((AcceptEventsFromSL == true) && (DiscordIsReady == true))
+            {
+                GetClient().Self.IM += BotImMessage;
+                GetClient().Network.SimConnected -= BotCurrentSim;
+                GetClient().Self.ChatFromSimulator += LocalChat;
+                GetClient().Groups.CurrentGroups += GroupCurrent;
+                GetClient().Groups.RequestCurrentGroups();
+            }
+            else if(DiscordIsReady == true)
+            {
+                DiscordClient.SetGameAsync("Waiting for login", null, ActivityType.Listening);
+            }
         }
 
         #region discord helper functions
