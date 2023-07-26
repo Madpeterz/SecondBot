@@ -92,10 +92,13 @@ namespace SecondBotEvents.Services
             client.Self.InstantMessage(avatar, message);
         }
 
-        public bool SendNotecard(string name, string content, UUID sendToUUID)
+        public bool SendNotecard(string name, string content, UUID sendToUUID, bool attachDateTime=true)
         {
             bool returnstatus = true;
-            name = name + " " + DateTime.Now;
+            if (attachDateTime == true)
+            {
+                name = name + " " + DateTime.Now;
+            }
             client.Inventory.RequestCreateItem(
                 client.Inventory.FindFolderForType(AssetType.Notecard),
                 name,
