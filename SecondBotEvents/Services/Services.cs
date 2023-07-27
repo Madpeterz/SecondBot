@@ -14,6 +14,8 @@ namespace SecondBotEvents.Services
             master = setMaster;
         }
 
+        public bool isRunning() { return running; }
+
         public GridClient GetClient()
         {
             if(master == null)

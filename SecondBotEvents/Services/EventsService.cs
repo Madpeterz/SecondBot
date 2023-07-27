@@ -7,6 +7,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using System.Linq;
 using Swan;
+using RestSharp;
 
 namespace SecondBotEvents.Services
 {
@@ -198,7 +199,21 @@ namespace SecondBotEvents.Services
             {
                 GetClient().Self.InstantMessage(OutputAvatar, output);
             }
-            // @todo add HTTP output
+            if(myConfig.GetOutputHttpURL() != null)
+            {
+                long unixtime = SecondbotHelpers.UnixTimeNow();
+                string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "EventService" + GetClient().Self.AgentID + output);
+                var client = new RestClient(myConfig.GetOutputHttpURL());
+                var request = new RestRequest("Event/Service", Method.Post);
+                request.AddParameter("token", token);
+                request.AddParameter("unixtime", unixtime.ToString());
+                request.AddParameter("method", "Dialog");
+                request.AddParameter("action", "Relay");
+                request.AddParameter("botname", GetClient().Self.Name);
+                request.AddParameter("event", output);
+                request.AddHeader("content-type", "application/x-www-form-urlencoded");
+                client.ExecutePostAsync(request);
+            }
 
         }
 

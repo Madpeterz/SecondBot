@@ -2,6 +2,7 @@
 using Discord.Rest;
 using Discord.WebSocket;
 using OpenMetaverse;
+using SecondBotEvents.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -77,6 +78,16 @@ namespace SecondBotEvents.Services
             DiscordIsReady = true;
             DoServerChannelSetup();
             return Task.CompletedTask;
+        }
+
+        private readonly object m_discordEventChatLock = new object();
+        private EventHandler<SocketMessage> m_discordChatEvent;
+
+        /// <summary>Raised when a scripted object or agent within range sends a public message</summary>
+        public event EventHandler<SocketMessage> DiscordMessageEvent
+        {
+            add { lock (m_discordEventChatLock) { m_discordChatEvent += value; } }
+            remove { lock (m_discordEventChatLock) { m_discordChatEvent -= value; } }
         }
 
         protected Task DiscordClientMessageReceived(SocketMessage message)

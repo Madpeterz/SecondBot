@@ -6,6 +6,11 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
+using OpenMetaverse.ImportExport.Collada14;
+using System.Configuration;
+using RestSharp;
+using System.Security.Policy;
+using Discord.WebSocket;
 
 namespace SecondBotEvents.Services
 {
@@ -13,7 +18,6 @@ namespace SecondBotEvents.Services
     {
         protected RelayConfig myConfig;
         protected bool botConnected = false;
-        protected List<RelaySys> Relays = new();
         public RelayService(EventsSecondBot setMaster) : base(setMaster)
         {
             myConfig = new RelayConfig(master.fromEnv, master.fromFolder);
@@ -52,8 +56,14 @@ namespace SecondBotEvents.Services
             GetClient().Network.SimConnected -= BotLoggedIn;
             GetClient().Self.IM += BotImMessage;
             GetClient().Self.ChatFromSimulator += LocalChat;
+            master.DiscordService.DiscordMessageEvent += DiscordMessage;
             botConnected = true;
             LogFormater.Info("Relay Service [Active]");
+        }
+
+        protected void DiscordMessage(object o, SocketMessage e)
+        {
+            triggerRelayEvent("discord", e.Source.ToString(), e.Channel.ToString(), e.Author.Username, e.CleanContent);
         }
 
         readonly string[] hard_blocked_agents = new[] { "secondlife", "second life" };
@@ -72,24 +82,21 @@ namespace SecondBotEvents.Services
                         {
                             break;
                         }
-                        string source = ":person_bald:";
+                        string source = "avatar";
                         if (e.SourceType == ChatSourceType.Object)
                         {
-                            source = ":diamond_shape_with_a_dot_inside:";
+                            source = "object";
                         }
                         else if (e.SourceType == ChatSourceType.System)
                         {
-                            source = ":comet:";
+                            source = "system";
                         }
                         if (e.Type == ChatType.OwnerSay)
                         {
-                            source = ":robot:";
-                        }
-                        else if (e.Type == ChatType.RegionSayTo)
-                        {
-                            source = ":dart:";
+                            source = "ownersay";
                         }
                         // trigger localchat
+                        triggerRelayEvent("localchat", source, e.SourceID.ToString(), e.FromName, e.Message);
                         break;
                     }
                 default:
@@ -106,6 +113,7 @@ namespace SecondBotEvents.Services
                 case InstantMessageDialog.MessageFromObject:
                     {
                         // trigger object IM
+                        triggerRelayEvent("object", e.IM.FromAgentID.ToString(), e.IM.IMSessionID.ToString(), e.IM.FromAgentName, e.IM.Message);
                         break;
                     }
                 case InstantMessageDialog.MessageFromAgent: // shared with SessionSend
@@ -114,15 +122,117 @@ namespace SecondBotEvents.Services
                         if (master.DataStoreService.GetIsGroup(e.IM.IMSessionID) == false)
                         {
                             // trigger avatar IM
+                            triggerRelayEvent("avatar", e.IM.FromAgentID.ToString(), e.IM.IMSessionID.ToString(), e.IM.FromAgentName, e.IM.Message);
                             break;
                         }
                         // trigger group IM
+                        string groupname = "?";
+                        if(GetClient().Groups.GroupName2KeyCache.ContainsKey(e.IM.IMSessionID) == true)
+                        {
+                            groupname = GetClient().Groups.GroupName2KeyCache[e.IM.IMSessionID];
+                        }
+                        triggerRelayEvent("group", groupname, e.IM.IMSessionID.ToString(), e.IM.FromAgentName, e.IM.Message);
                         break;
                     }
                 default:
                     {
                         break;
                     }
+            }
+        }
+        
+        protected void triggerRelayEvent(string source, string filter, string sourceuuid, string name, string message)
+        {
+            int loop = 1;
+            if(message.Contains("{Relay}") == true)
+            {
+                return;
+            }
+            message = "{Relay} " + message;
+            relayEvent a = new relayEvent();
+            a.message = message;
+            a.name = name;
+            a.sourcetype = source;
+            a.sourceoption = filter;
+            string eventMessage = JsonConvert.SerializeObject(a);
+            while (loop <= myConfig.GetRelayCount())
+            {
+                int index = loop;
+                loop++;
+                if (myConfig.GetRelayEnabled(index) != true)
+                {
+                    continue;
+                }
+                if(myConfig.RelaySourceType(index) != source)
+                {
+                    continue;
+                }
+                if ((myConfig.RelaySourceOption(index) != filter) && (myConfig.RelaySourceOption(index) != sourceuuid))
+                {
+                    continue;
+                }
+                string targetType = myConfig.RelayTargetType(index);
+                string targetOption = myConfig.RelayTargetOption(index);
+                if(targetType == "localchat")
+                {
+                    if(int.TryParse(targetOption, out int target) == false)
+                    {
+                        continue;
+                    }
+                    GetClient().Self.Chat(eventMessage, target, ChatType.Normal);
+                }
+                else if(targetType == "group")
+                {
+                    if (UUID.TryParse(targetOption, out UUID targetuuid) == false)
+                    {
+                        continue;
+                    }
+                    GetClient().Self.InstantMessageGroup(targetuuid, eventMessage);
+                }
+                else if(targetType == "avatar")
+                {
+                    if (UUID.TryParse(targetOption, out UUID targetuuid) == false)
+                    {
+                        continue;
+                    }
+                    GetClient().Self.InstantMessage(targetuuid, eventMessage);
+                }
+                else if(targetType == "http")
+                {
+                    long unixtime = SecondbotHelpers.UnixTimeNow();
+                    string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "RelayService" + GetClient().Self.AgentID + eventMessage);
+                    var client = new RestClient(targetOption);
+                    var request = new RestRequest("Relay/Service", Method.Post);
+                    request.AddParameter("token", token);
+                    request.AddParameter("unixtime", unixtime.ToString());
+                    request.AddParameter("method", "Relay");
+                    request.AddParameter("action", "Service");
+                    request.AddParameter("botname", GetClient().Self.Name);
+                    request.AddParameter("event", eventMessage);
+                    request.AddHeader("content-type", "application/x-www-form-urlencoded");
+                    client.ExecutePostAsync(request);
+                }
+                else if(targetType == "discord")
+                {
+                    if(master.DiscordService.isRunning() == false)
+                    {
+                        continue;
+                    }
+                    string[] bits = targetOption.Split('|');
+                    if(bits.Length != 2 )
+                    {
+                        continue;
+                    }
+                    if (ulong.TryParse(bits[0],out ulong targetserver) == false)
+                    {
+                        continue;
+                    }
+                    if (ulong.TryParse(bits[1], out ulong targetchannel) == false)
+                    {
+                        continue;
+                    }
+                    master.DiscordService.SendMessageToChannel(targetserver, targetchannel, message);
+                }
             }
         }
 
@@ -143,332 +253,16 @@ namespace SecondBotEvents.Services
             }
             running = false;
             master.BotClientNoticeEvent -= BotClientRestart;
-            if (master.BotClient != null)
-            {
-                if (GetClient() != null)
-                {
-
-                }
-            }
             
         }
     }
 
-    public class RelaySys
+    public class relayEvent
     {
-        protected RelayService master;
-        public bool enabled = false;
-        public string fromType = "";
-        public string fromOption = "";
-
-        public ulong fromDiscordArg = 0; // discord channel/user/server filter
-        public UUID fromUUID = UUID.Zero; // object/avatar/group UUID filter
-        public int fromChannelNumber = 0; // localchat channel number filter
-        public string fromChatType = "";
-
-
-        public string toType = "";
-        public string toOption = "";
-        protected int filterOnIndex = 0;
-        protected int relayID = 0;
-
-        protected UUID targetuuid = UUID.Zero;
-        protected int targetchannel = 0;
-
-        protected ulong targetulong1 = 0;
-        protected ulong targetulong2 = 0;
-
-        protected string targeturl = "";
-        protected string targetsharedsecret = "";
-        protected int nonce = 1;
-
-        public RelaySys(RelayService setMaster, bool setEnabled, string setFromType, string setFromOption, string setToType, string setToOption)
-        {
-            master = setMaster;
-            enabled = setEnabled;
-            fromType = setFromType;
-            fromOption = setFromOption;
-            toType = setToType;
-            toOption = setToOption;
-            Vaildate();
-        }
-
-
-        protected void Vaildate()
-        {
-            bool setFlag = enabled;
-            enabled = false;
-            if(VaildateFrom() == false)
-            {
-                return;
-            }
-            if (vaildToOptions.Contains(toType) == false)
-            {
-                return;
-            }
-            
-            enabled = setFlag;
-        }
-
-        protected bool VaildateFrom()
-        {
-            string[] vaildFromOptions = new[] { "avatarim", "groupim", "localchat", "discord", "objectchat", "*" };
-            if (vaildFromOptions.Contains(fromType) == false)
-            {
-                return false;
-            }
-            string[] bits = fromOption.Split("@");
-            if(bits[0] == "*")
-            {
-                fromOption = "*";
-                return true;
-            }
-            if(fromType == "discord")
-            {
-                return VaildateFromDiscord();
-            }
-            else if (fromType == "objectchat")
-            {
-                return VaildateFromObjectChat();
-            }
-            else if (fromType == "localchat")
-            {
-                return VaildateFromLocalChat();
-            }
-            else if(fromType == "groupim")
-            {
-                return VaildateFromGroupChat();
-            }
-            else if(fromType == "avatarim")
-            {
-                return VaildateFromAvatarIm();
-            }
-            return false;
-        }
-
-        protected bool VaildateFromAvatarIm()
-        {
-            string[] bits = fromOption.Split("@");
-            string[] vaildFromFilters = new string[] { "avatar" };
-            if (bits.Length != 2)
-            {
-                return false;
-            }
-            if (vaildFromFilters.Contains(bits[0]) == false)
-            {
-                return false;
-            }
-            if (UUID.TryParse(bits[1], out fromUUID) == false)
-            {
-                return false;
-            }
-            fromOption = bits[0];
-            return true;
-        }
-
-        protected bool VaildateFromGroupChat()
-        {
-            string[] bits = fromOption.Split("@");
-            string[] vaildFromFilters = new string[] { "group" };
-            if (bits.Length != 2)
-            {
-                return false;
-            }
-            if (vaildFromFilters.Contains(bits[0]) == false)
-            {
-                return false;
-            }
-            fromOption = bits[0];
-            return UUID.TryParse(bits[1], out fromUUID);
-        }
-
-        protected bool VaildateFromLocalChat()
-        {
-            string[] bits = fromOption.Split("@");
-            string[] vaildFromFilters = new string[] { "channel", "type", "uuid" };
-            if (bits.Length != 2)
-            {
-                return false;
-            }
-            if (vaildFromFilters.Contains(bits[0]) == false)
-            {
-                return false;
-            }
-            fromOption = bits[0];
-            if(fromOption == "channel")
-            {
-                return int.TryParse(bits[1], out fromChannelNumber);
-            }
-            else if (fromOption == "type")
-            {
-                vaildFromFilters = new string[] { "avatar", "object", "service" };
-                fromChatType = bits[1];
-                return vaildFromFilters.Contains(bits[1]);
-            }
-            return UUID.TryParse(bits[1], out fromUUID);
-        }
-
-        protected bool VaildateFromObjectChat()
-        {
-            string[] bits = fromOption.Split("@");
-            string[] vaildFromFilters = new string[] { "object" };
-            if (bits.Length != 2)
-            {
-                return false;
-            }
-            if (vaildFromFilters.Contains(bits[0]) == false)
-            {
-                return false;
-            }
-            if (UUID.TryParse(bits[1], out fromUUID) == false)
-            {
-                return false;
-            }
-            fromOption = bits[0];
-            return true;
-        }
-
-        protected bool VaildateFromDiscord()
-        {
-            string[] bits = fromOption.Split("@");
-            string[] vaildFromFilters = new string[] { "server", "channel", "user" };
-            if(bits.Length != 2)
-            {
-                return false;
-            }
-            if(vaildFromFilters.Contains(bits[0]) == false)
-            {
-                return false;
-            }
-            if (ulong.TryParse(bits[1], out fromDiscordArg) == false)
-            {
-                return false;
-            }
-            fromOption = bits[0];
-            return true;
-        }
-
-
-        readonly string[] vaildToOptions = new[] { "avatar", "group", "localchat", "discord", "http" };
-        readonly 
-
-        protected HttpClient HTTPclient = new();
-        public void TriggerWith(string sourceType, string message, string filterOption1, string filterOption2=null, string filterOption3 = null)
-        {
-            // avatarim, {message}, avatarUUID
-            // groupim, {message}, groupUUID
-            // localchat, {message}, channel, TalkerType, TalkerUUID
-            // discord, {message}, serverid, channelid, talkerid
-            // objectchat, {message}, objectUUID
-            /*
-             *  fromType=discord
-             *  fromOption=*
-             *  fromOption=server@XXX
-             *  fromOption=channel@XXX
-             *  fromOption=user@XXX
-             *  
-             *  fromType=localchat
-             *  fromOption=*
-             *  fromOption=channel@4
-             *  fromOption=type@avatar|object
-             *  fromOption=uuid@XXX-XXX-XXX-XXX
-             *  
-             *  fromType=groupim
-             *  fromOption=*
-             *  fromOption=group@XXX-XXX-XXX-XXX
-             *  
-             *  fromType=avatarim
-             *  fromOption=*
-             *  fromOption=avatar@XXX-XXX-XXX-XXX
-             *  
-             *  fromType=objectchat
-             *  fromOption=*
-             *  fromOption=object@XXX-XXX-XXX-XXX
-             *  
-             *  toType=discord
-             *  toOption=channelid
-             *  
-             *  toType=http
-             *  toOption=url@sharedsecret
-             *  
-             *  toType=localchat
-             *  toOption=channel
-             *  
-             *  toType=avatar
-             *  toOption=avataruuid
-             *  
-             *  toType=group
-             *  toOption=groupuuid
-             */
-            if (enabled == false) { return; } // not enabled 
-            if (message.Contains("{RELAY}") == true) { return; } // no messages from a relay should be relayed we dont like loops here
-            else if ((sourceType != fromType) && (sourceType != "*")) { return; } // not for this relay
-            else if ((filterOnIndex == 0) && (fromOption != "*")) { return; } // invaild filter selected [but some how not disabled]
-            else if ((filterOnIndex == 1) && (fromOption != filterOption1)) { return; } // did not match filter
-            else if ((filterOnIndex == 2) && (fromOption != filterOption2)) { return; } // did not match filter
-            else if ((filterOnIndex == 3) && (fromOption != filterOption3)) { return; } // did not match filter
-            message = "{RELAY}" + message;
-            switch (toType)
-            {
-                case "discord":
-                    {
-                        master.master.DiscordService.SendMessageToChannel(targetulong1, targetulong2, message);
-                        break;
-                    }
-                case "http":
-                    {
-                        long unixtime = SecondbotHelpers.UnixTimeNow();
-                        Dictionary<string, string> values = new()
-                        {
-                            { "fromType", fromType },
-                            { "fromOption", fromOption },
-                            { "arg1", filterOption1 },
-                            { "arg2", filterOption2 },
-                            { "arg3", filterOption3 },
-                            { "message", message },
-                            { "unixtime", unixtime.ToString() },
-                            { "nonce", nonce.ToString() }
-                        };
-                        nonce++;
-                        string raw = "";
-                        foreach(string A in values.Values)
-                        {
-                            raw += A;
-                        }
-                        values.Add("hash", SecondbotHelpers.GetSHA1(raw + targetsharedsecret));
-
-                        var content = new FormUrlEncodedContent(values);
-                        try
-                        {
-                            HTTPclient.PostAsync(targeturl, content);
-                        }
-                        catch (Exception e)
-                        {
-                            LogFormater.Crit("[Relay] HTTP failed: " + e.Message + "");
-                        }
-                        break;
-                    }
-                case "localchat":
-                    {
-                        master.GetClient().Self.Chat(message, targetchannel, ChatType.Normal);
-                        break;
-                    }
-                case "avatar":
-                    {
-                        master.GetClient().Self.InstantMessage(targetuuid, message);
-                        break;
-                    }
-                case "group":
-                    {
-                        master.GetClient().Self.InstantMessageGroup(targetuuid, message);
-                        break;
-                    }
-                default:
-                    {
-                        break;
-                    }
-            }
-        }
+        public string name = "";
+        public string message = "";
+        public string sourcetype = "";
+        public string sourceoption = "";
     }
 }
 

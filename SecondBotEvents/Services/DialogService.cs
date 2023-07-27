@@ -8,6 +8,9 @@ using Newtonsoft.Json;
 using System.Linq;
 using Swan;
 using SecondBotEvents.Commands;
+using RestSharp;
+using Swan.Parsers;
+using Newtonsoft.Json.Linq;
 
 namespace SecondBotEvents.Services
 {
@@ -169,12 +172,14 @@ namespace SecondBotEvents.Services
                     nextDialogWindow = 1;
                 }
                 DialogWindows.Add(windowid, e);
-                DialogWindowsExpire.Add(windowid, SecondbotHelpers.UnixTimeNow() + 440);
+                long expiresAt = SecondbotHelpers.UnixTimeNow() + 440;
+                DialogWindowsExpire.Add(windowid, expiresAt);
                 DialogWindow window = new DialogWindow();
                 window.buttons = e.ButtonLabels.ToArray<string>();
                 window.dialogid = windowid;
                 window.message = e.Message;
                 window.objectname = e.ObjectName;
+                window.expires = expiresAt;
                 string eventMessage = JsonConvert.SerializeObject(window);
                 foreach(int a in DialogRelayChannels)
                 {
@@ -187,7 +192,22 @@ namespace SecondBotEvents.Services
                 {
                     GetClient().Self.InstantMessage(av, eventMessage);
                 }
-                // @todo add http output
+                foreach(string url in DialogRelayHTTP)
+                {
+                    long unixtime = SecondbotHelpers.UnixTimeNow();
+                    string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "DialogRelay"+GetClient().Self.AgentID+ eventMessage);
+                    var client = new RestClient(url);
+                    var request = new RestRequest("Dialog/Relay", Method.Post);
+                    request.AddParameter("token", token);
+                    request.AddParameter("unixtime", unixtime.ToString());
+                    request.AddParameter("method", "Dialog");
+                    request.AddParameter("action", "Relay");
+                    request.AddParameter("botname", GetClient().Self.Name);
+                    request.AddParameter("event", eventMessage);
+                    request.AddHeader("content-type", "application/x-www-form-urlencoded");
+                    client.ExecutePostAsync(request);
+                }
+
             }
         }
 
@@ -237,5 +257,6 @@ namespace SecondBotEvents.Services
         public string[] buttons;
         public string objectname;
         public int dialogid;
+        public long expires;
     }
 }

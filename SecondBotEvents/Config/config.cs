@@ -21,7 +21,6 @@ namespace SecondBotEvents.Config
             MakeSettings();
             LoadSettings(fromENV, fromFolder);
         }
-
         public bool IsLoaded()
         {
             return loaded;
