@@ -7,7 +7,6 @@ using EmbedIO.WebApi;
 using System.Threading;
 using Swan.Logging;
 using System.Collections.Generic;
-using EmbedIO.Security;
 using BetterSecondBotShared.Static;
 using System.Net;
 using EmbedIO.Routing;

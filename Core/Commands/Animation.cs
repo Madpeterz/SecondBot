@@ -3,6 +3,7 @@ using BetterSecondBot.Static;
 using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
+using EmbedIO;
 using System;
 using System.Collections.Generic;
 using System.Text;
