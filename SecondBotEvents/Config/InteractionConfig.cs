@@ -16,12 +16,19 @@ namespace SecondBotEvents.Config
             settings.Add("EnableJsonOutputEvents");
             settings.Add("JsonOutputEventsTarget");
             settings.Add("AcceptFriendRequests");
+            settings.Add("AcceptTeleports");
+            settings.Add("AcceptFromMasterOnly");
             settings.Add("Enabled");
         }
 
         public bool GetEnabled()
         {
             return ReadSettingAsBool("Enabled", true);
+        }
+
+        public bool GetAcceptFromMasterOnly()
+        {
+            return ReadSettingAsBool("AcceptFromMasterOnly", true);
         }
 
         public bool GetAcceptTeleports()
@@ -39,6 +46,11 @@ namespace SecondBotEvents.Config
             return ReadSettingAsBool("AcceptInventory", true);
         }
 
+        public bool GetAcceptFriendRequests()
+        {
+            return ReadSettingAsBool("AcceptFriendRequests", true);
+        }
+
         public string GetJsonOutputEventsTarget()
         {
             return ReadSettingAsString("JsonOutputEventsTarget", "none");
@@ -47,11 +59,6 @@ namespace SecondBotEvents.Config
         public bool GetEnableJsonOutputEvents()
         {
             return ReadSettingAsBool("EnableJsonOutputEvents", true);
-        }
-
-        public bool GetAcceptFriendRequests()
-        {
-            return ReadSettingAsBool("AcceptFriendRequests", true);
         }
     }
 
