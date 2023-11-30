@@ -716,12 +716,20 @@ namespace SecondBotEvents.Services
             return reply.Id;
         }
 
-        public ulong SendMessageToChannel(ulong serverid, ulong channelid, string message)
+        public ulong? SendMessageToChannel(ulong serverid, ulong channelid, string message)
         {
-            SocketGuild server = DiscordClient.GetGuild(serverid);
-            ITextChannel channel = server.GetTextChannel(channelid);
-            IMessage reply = channel.SendMessageAsync(message).GetAwaiter().GetResult();
-            return reply.Id;
+            try
+            {
+                SocketGuild server = DiscordClient.GetGuild(serverid);
+                ITextChannel channel = server.GetTextChannel(channelid);
+                IMessage reply = channel.SendMessageAsync(message).GetAwaiter().GetResult();
+                return reply.Id;
+            }
+            catch (Exception e)
+            {
+                LogFormater.Crit("Discord service: Failed to send message to channel "+channelid.ToString()+" on server: "+serverid.ToString()+" because: "+e.Message);
+                return null;
+            }
         }
 
         protected string GetChannelName(string input)
