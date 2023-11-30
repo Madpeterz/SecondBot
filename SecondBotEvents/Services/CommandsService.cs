@@ -388,6 +388,7 @@ namespace SecondBotEvents.Services
                 raw += unixtimeOfCommand.ToString();
             }
             raw += secret;
+            LogFormater.Info("raw="+raw);
             string cooked = SecondbotHelpers.GetSHA1(raw);
             if (cooked != signingCode)
             {
