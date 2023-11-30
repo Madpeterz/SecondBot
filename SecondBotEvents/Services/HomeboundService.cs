@@ -42,11 +42,12 @@ namespace SecondBotEvents.Services
                 return;
             }
             home = new SimSlURL(myConfig.GetHomeSimSlUrl());
-            backup = new SimSlURL(myConfig.GetBackupSimSLUrl());
-            if(home.name == "null")
+            if (home.name == "null")
             {
                 myConfig.setEnabled(false);
+                return;
             }
+            backup = new SimSlURL(myConfig.GetBackupSimSLUrl());
             if(backup.name == "null")
             {
                 LogFormater.Info("No backup sim was found using a default");
