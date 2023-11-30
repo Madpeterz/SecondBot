@@ -332,20 +332,29 @@ namespace SecondBotEvents.Services
         public int x = 0;
         public int y = 0;
         public int z = 0;
-        public SimSlURL(string url)
+        public SimSlURL(string? url)
         {
+            if(url == null)
+            {
+                name = "null";
+                x = 0;
+                y = 0;
+                z = 0;
+                return;
+            }
             // http://maps.secondlife.com/secondlife/Viserion/66/166/23
             url = url.Replace("maps.secondlife.com/secondlife/", "");
             url = url.Replace("http://", "");
             url = url.Replace("https://", "");
             // Viserion/66/166/23
             string[] bits = url.Split("/");
-            if(bits.Count() != 3)
+            if(bits.Count() != 4)
             {
                 name = "null";
                 x = 0;
                 y = 0;
                 z = 0;
+                return;
             }
             name = System.Net.WebUtility.UrlDecode(bits[0]);
             x = int.Parse(bits[1]);
