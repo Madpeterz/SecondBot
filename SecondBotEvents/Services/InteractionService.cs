@@ -46,7 +46,7 @@ namespace SecondBotEvents.Services
                 JsonOuput(false, sourceName, avatarName, "Interactions hooks disabled");
                 return false;
             }
-            if (master.CommandsService.myConfig.GetEnableMasterControls() == )
+            if (master.CommandsService.myConfig.GetEnableMasterControls() == false)
             {
                 // master avatars list is not enabled. unable to continue
                 JsonOuput(false, sourceName, avatarName, "masters AV list is disabled: Please set EnableMasterControls in Commands service to true");
@@ -54,6 +54,11 @@ namespace SecondBotEvents.Services
             }
             if (myConfig.GetAcceptFromMasterOnly() == true)
             {
+                if(master.CommandsService.myConfig.GetMastersCSV().Contains(avatarName) == false)
+                {
+                    JsonOuput(false, sourceName, avatarName, "interactions are locked to master only");
+                    return false;
+                }
                 return true;
             }
             if (enabledByConfig == false)
