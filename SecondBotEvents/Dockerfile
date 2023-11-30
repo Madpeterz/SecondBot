@@ -22,7 +22,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-ENV basic_Username = 'SecondbotR5' \
+ENV basic_Username = '' \
 	basic_Password = '' \
 	basic_LoginURI = 'secondlife' \ 
 	commands_AllowFundsCommands = 'false' \

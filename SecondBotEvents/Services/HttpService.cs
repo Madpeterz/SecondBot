@@ -42,7 +42,6 @@ namespace SecondBotEvents.Services
             {
                 return "- Not requested -";
             }
-            // @todo HTTP server check here
             if (HTTPendpoint == null)
             {
                 return "not online";
