@@ -16,18 +16,12 @@ namespace SecondBotEvents.Config
             settings.Add("EnableJsonOutputEvents");
             settings.Add("JsonOutputEventsTarget");
             settings.Add("AcceptFriendRequests");
-            settings.Add("AcceptFromMasterOnly");
             settings.Add("Enabled");
         }
 
         public bool GetEnabled()
         {
             return ReadSettingAsBool("Enabled", true);
-        }
-
-        public bool GetAcceptFromMasterOnly()
-        {
-            return ReadSettingAsBool("AcceptFromMasterOnly", true);
         }
 
         public bool GetAcceptTeleports()
