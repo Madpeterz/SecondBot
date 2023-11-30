@@ -16,7 +16,6 @@ namespace SecondBotEvents.Config
             settings.Add("EnableJsonOutputEvents");
             settings.Add("JsonOutputEventsTarget");
             settings.Add("AcceptFriendRequests");
-            settings.Add("AcceptTeleports");
             settings.Add("AcceptFromMasterOnly");
             settings.Add("Enabled");
         }
