@@ -629,6 +629,7 @@ namespace SecondBotEvents.Services
 
         public string GetAvatarUUID(string name)
         {
+
             if (KnownAvatar(name) == false)
             {
                 return "lookup";
