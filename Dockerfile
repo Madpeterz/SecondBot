@@ -78,6 +78,7 @@ ENV basic_Username='' \
 	interaction_AcceptGroupInvites='false' \
 	interaction_AcceptInventory='false' \
 	interaction_AcceptFriendRequests='false' \
+	interaction_AcceptFromMasterOnly='true' \
 	interaction_EnableJsonOutputEvents='false' \
 	interaction_JsonOutputEventsTarget='none'
 
