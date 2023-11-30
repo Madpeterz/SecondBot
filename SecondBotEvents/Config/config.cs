@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -20,6 +21,10 @@ namespace SecondBotEvents.Config
         {
             MakeSettings();
             LoadSettings(fromENV, fromFolder);
+        }
+        public void setEnabled(bool enabled)
+        {
+            mysettings["Enabled"] = enabled.ToString();
         }
         public bool IsLoaded()
         {
