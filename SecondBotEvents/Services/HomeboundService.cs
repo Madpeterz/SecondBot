@@ -1,6 +1,8 @@
-﻿using OpenMetaverse;
+﻿using Discord.Rest;
+using OpenMetaverse;
 using SecondBotEvents.Config;
 using System;
+using System.Linq;
 
 namespace SecondBotEvents.Services
 {
@@ -41,6 +43,15 @@ namespace SecondBotEvents.Services
             }
             home = new SimSlURL(myConfig.GetHomeSimSlUrl());
             backup = new SimSlURL(myConfig.GetBackupSimSLUrl());
+            if(home.name == "null")
+            {
+                myConfig.setEnabled(false);
+            }
+            if(backup.name == "null")
+            {
+                LogFormater.Info("No backup sim was found using a default");
+                backup = new SimSlURL("WELCOMEHUB/130/86/25");
+            }
             if(UUID.TryParse(myConfig.GetAtHomeAutoSitUuid(), out sitTarget) == false)
             {
                 sitTarget = UUID.Zero;
@@ -328,6 +339,13 @@ namespace SecondBotEvents.Services
             url = url.Replace("https://", "");
             // Viserion/66/166/23
             string[] bits = url.Split("/");
+            if(bits.Count() != 3)
+            {
+                name = "null";
+                x = 0;
+                y = 0;
+                z = 0;
+            }
             name = System.Net.WebUtility.UrlDecode(bits[0]);
             x = int.Parse(bits[1]);
             y = int.Parse(bits[2]);
