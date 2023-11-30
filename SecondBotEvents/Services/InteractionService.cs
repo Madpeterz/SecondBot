@@ -54,7 +54,7 @@ namespace SecondBotEvents.Services
             }
             if (myConfig.GetAcceptFromMasterOnly() == true)
             {
-                if(master.CommandsService.myConfig.GetMastersCSV().Contains(avatarName) == false)
+                if (master.CommandsService.myConfig.GetMastersCSV().Contains(avatarName) == false)
                 {
                     JsonOuput(false, sourceName, avatarName, "interactions are locked to master only");
                     return false;
@@ -63,6 +63,10 @@ namespace SecondBotEvents.Services
             }
             if (enabledByConfig == false)
             {
+                if (master.CommandsService.myConfig.GetMastersCSV().Contains(avatarName) == true)
+                {
+                    return true;
+                }
                 JsonOuput(false, sourceName, avatarName, "disabled by config");
                 return false;
             }
