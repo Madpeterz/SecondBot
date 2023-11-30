@@ -52,25 +52,16 @@ namespace SecondBotEvents.Services
                 JsonOuput(false, sourceName, avatarName, "masters AV list is disabled: Please set EnableMasterControls in Commands service to true");
                 return false;
             }
-            if (myConfig.GetAcceptFromMasterOnly() == true)
+            if(enabledByConfig == true)
             {
-                if (master.CommandsService.myConfig.GetMastersCSV().Contains(avatarName) == false)
-                {
-                    JsonOuput(false, sourceName, avatarName, "interactions are locked to master only");
-                    return false;
-                }
                 return true;
             }
-            if (enabledByConfig == false)
+            if (master.CommandsService.myConfig.GetMastersCSV().Contains(avatarName) == true)
             {
-                if (master.CommandsService.myConfig.GetMastersCSV().Contains(avatarName) == true)
-                {
-                    return true;
-                }
-                JsonOuput(false, sourceName, avatarName, "disabled by config");
-                return false;
+                return true;
             }
-            return true;
+            JsonOuput(false, sourceName, avatarName, "disabled by config");
+            return false;
         }
 
         protected void BotClientRestart(object o, BotClientNotice e)
