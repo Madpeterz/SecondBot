@@ -1,4 +1,5 @@
-﻿using OpenMetaverse;
+﻿using OggVorbisEncoder.Setup.Templates;
+using OpenMetaverse;
 using SecondBotEvents.Services;
 using System;
 using System.Collections.Generic;
@@ -192,12 +193,11 @@ namespace SecondBotEvents.Commands
         [ArgHints("z", "z location to teleport to")]
         public object Teleport(string region, string x, string y, string z)
         {
-            bool status = TeleportRequest(new [] { region, x, y, z });
+            bool status = TeleportRequest(region+"/"+x+"/"+y+"/"+z);
             if (status == false)
             {
                 return Failure("Error Unable to Teleport to location", new [] { region, x, y, z });
             }
-            master.HomeboundService.MarkTeleport();
             return BasicReply("Accepted", new [] { region, x, y, z });
         }
 
@@ -212,39 +212,24 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("slurl is empty", new [] { slurl });
             }
-            return BasicReply(TeleportRequest(new [] { slurl }).ToString(), new [] { slurl });
+            return BasicReply(TeleportRequest(slurl).ToString(), new [] { slurl });
         }
 
-        protected bool TeleportRequest(string[] args)
+        protected bool TeleportRequest(string url)
         {
+            // Viserion/66/166/23
             GetClient().Self.AutoPilotCancel();
-            if (args[0].Contains("http://maps.secondlife.com/secondlife/") == true)
+            SimSlURL A = new SimSlURL(url);
+            if(A.name == null)
             {
-                return false; // @todo SL url teleport
+                return false;
             }
-            else
+            if(GetClient().Self.Teleport(A.name, new Vector3(A.x, A.y, A.z)) == true)
             {
-                List<string> argvalues = new List<string>(args);
-                if(argvalues.Count == 3)
-                {
-                    string regionName = GetClient().Network.CurrentSim.Name;
-                    argvalues = new List<string>() { regionName };
-                    argvalues.AddRange(args);
-                }
-                if (argvalues.Count == 4)
-                {
-                    string regionName = argvalues[0];
-                    float.TryParse(argvalues[1], out float posX);
-                    float.TryParse(argvalues[2], out float posY);
-                    float.TryParse(argvalues[3], out float posZ);
-                    bool status = GetClient().Self.Teleport(regionName, new Vector3(posX, posY, posZ));
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                master.HomeboundService.MarkTeleport();
+                return true;
             }
+            return false;
         }
     }
 }
