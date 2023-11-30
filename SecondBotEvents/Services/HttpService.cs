@@ -160,6 +160,13 @@ namespace SecondBotEvents.Services
 
         protected void ProcessAvatar(string avatar)
         {
+            if (UUID.TryParse(avatar, out avataruuid) == true)
+            {
+                // sent a UUID not  a name, thats fine
+                // try and load the name anyway
+                master.DataStoreService.GetAvatarName(avataruuid);
+                return;
+            }
             avataruuid = UUID.Zero;
             string UUIDfetch = master.DataStoreService.GetAvatarUUID(avatar);
             if (UUIDfetch != "lookup")
