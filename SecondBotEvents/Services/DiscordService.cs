@@ -601,9 +601,9 @@ namespace SecondBotEvents.Services
                     continue;
                 }
                 WantedCategoryChannels.Remove(category.Name);
-                if (ChannelMap.ContainsKey(category.Name) == false)
+                if (CategoryMap.ContainsKey(category.Name) == false)
                 {
-                    ChannelMap[category.Name] = category.Id;
+                    CategoryMap[category.Name] = category.Id;
                     return;
                 }
                 CategoryMap.Add(category.Name, category.Id);
