@@ -832,7 +832,7 @@ namespace SecondBotEvents.Services
                 return;
             }
             long dif = SecondbotHelpers.UnixTimeNow() - LastUpdatedSystemStatus;
-            if (dif < 15)
+            if (dif < 5)
             {
                 return;
             }
@@ -840,7 +840,6 @@ namespace SecondBotEvents.Services
             if ((e.changed == false) && (LastStatusMessageId != 0))
             {
                 LastUpdatedSystemStatus = SecondbotHelpers.UnixTimeNow();
-
                 if (messageHasEndDot == false)
                 {
                     await statusChannel.
