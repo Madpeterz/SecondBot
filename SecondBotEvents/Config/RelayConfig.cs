@@ -12,6 +12,7 @@ namespace SecondBotEvents.Config
         {
             filename = "relay";
             settings.Add("count");
+            settings.Add("HideStatusOutput");
             int loop = 1;
             while(loop <= GetRelayCount())
             {

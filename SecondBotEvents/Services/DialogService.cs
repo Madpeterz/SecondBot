@@ -46,7 +46,15 @@ namespace SecondBotEvents.Services
         }
         public override string Status()
         {
-            if(botConnected == false)
+            if (myConfig == null)
+            {
+                return "No Config";
+            }
+            else if (myConfig.GetHideStatusOutput() == true)
+            {
+                return "hidden";
+            }
+            if (botConnected == false)
             {
                 return "Waiting for client";
             }

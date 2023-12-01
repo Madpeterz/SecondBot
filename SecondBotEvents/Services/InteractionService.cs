@@ -24,15 +24,19 @@ namespace SecondBotEvents.Services
 
         public override string Status()
         {
-            if(myConfig == null)
+            if (myConfig == null)
             {
-                return "Config broken";
+                return "No Config";
             }
-            if (myConfig.GetEnabled() == false)
+            else if (myConfig.GetHideStatusOutput() == true)
+            {
+                return "hidden";
+            }
+            else if (myConfig.GetEnabled() == false)
             {
                 return "- Not requested -";
             }
-            if (botConnected == false)
+            else if (botConnected == false)
             {
                 return "Waiting for bot";
             }

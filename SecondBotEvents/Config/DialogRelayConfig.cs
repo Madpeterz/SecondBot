@@ -15,6 +15,7 @@ namespace SecondBotEvents.Config
             settings.Add("RelayAvatar");
             settings.Add("RelayObjectOwnerOnly");
             settings.Add("RelayHttpurl");
+            settings.Add("HideStatusOutput");
         }
 
         public string GetRelayHttpurl()

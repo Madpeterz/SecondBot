@@ -17,6 +17,7 @@ namespace SecondBotEvents.Config
             settings.Add("AtHomeSeekLocation");
             settings.Add("AtBackupSeekLocation");
             settings.Add("AtHomeAutoSitUuid");
+            settings.Add("HideStatusOutput");
         }
 
         public string GetAtHomeAutoSitUuid()

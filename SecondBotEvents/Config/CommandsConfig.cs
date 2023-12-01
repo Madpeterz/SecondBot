@@ -19,6 +19,7 @@ namespace SecondBotEvents.Config
             settings.Add("EnforceTimeWindow");
             settings.Add("TimeWindowSecs");
             settings.Add("Enabled");
+            settings.Add("HideStatusOutput");
         }
 
         public bool GetEnabled()

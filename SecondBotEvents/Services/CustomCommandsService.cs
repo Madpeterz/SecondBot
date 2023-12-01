@@ -76,6 +76,10 @@ namespace SecondBotEvents.Services
             {
                 return "Config broken";
             }
+            else if (myConfig.GetHideStatusOutput() == true)
+            {
+                return "hidden";
+            }
             else if (botConnected == false)
             {
                 return "Waiting for client";

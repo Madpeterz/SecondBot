@@ -21,6 +21,7 @@ namespace SecondBotEvents.Config
             settings.Add("AutoCleanKeyValueStore");
             settings.Add("CleanKeyValueStoreAfterMins");
             settings.Add("CommandHistoryLimit");
+            settings.Add("HideStatusOutput");
         }
 
         public int GetCommandHistoryLimit()

@@ -34,6 +34,7 @@ namespace SecondBotEvents.Config
             settings.Add("OutputIMuuid");
             settings.Add("OutputHttpURL");
             settings.Add("OutputSecret");
+            settings.Add("HideStatusOutput");
         }
 
         public string GetOutputSecret()

@@ -36,17 +36,21 @@ namespace SecondBotEvents.Services
         {
             if (myConfig == null)
             {
-                return "Config broken";
+                return "No Config";
             }
-            if (myConfig.GetEnabled() == false)
+            else if (myConfig.GetHideStatusOutput() == true)
+            {
+                return "hidden";
+            }
+            else if (myConfig.GetEnabled() == false)
             {
                 return "- Not requested -";
             }
-            if (HTTPendpoint == null)
+            else if (HTTPendpoint == null)
             {
                 return "not online";
             }
-            if (acceptBotCommands == false)
+            else if (acceptBotCommands == false)
             {
                 return "Active ~ Service";
             }

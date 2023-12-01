@@ -17,6 +17,7 @@ namespace SecondBotEvents.Config
             settings.Add("JsonOutputEventsTarget");
             settings.Add("AcceptFriendRequests");
             settings.Add("Enabled");
+            settings.Add("HideStatusOutput");
         }
 
         public bool GetEnabled()

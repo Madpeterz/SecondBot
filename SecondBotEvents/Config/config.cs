@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime;
 using System.Text;
 
 
@@ -25,6 +26,11 @@ namespace SecondBotEvents.Config
         public void setEnabled(bool enabled)
         {
             mysettings["Enabled"] = enabled.ToString();
+        }
+
+        public bool GetHideStatusOutput()
+        {
+            return ReadSettingAsBool("HideStatusOutput", false);
         }
         public bool IsLoaded()
         {

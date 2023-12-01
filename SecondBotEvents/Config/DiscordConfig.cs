@@ -14,6 +14,7 @@ namespace SecondBotEvents.Config
             settings.Add("ServerID");
             settings.Add("ClientToken");
             settings.Add("AllowDiscordCommands");
+            settings.Add("HideStatusOutput");
         }
 
         public bool GetEnabled()

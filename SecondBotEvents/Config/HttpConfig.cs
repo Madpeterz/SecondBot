@@ -12,6 +12,7 @@ namespace SecondBotEvents.Config
             filename = "http";
             settings.Add("Enabled");
             settings.Add("Port");
+            settings.Add("HideStatusOutput");
         }
 
         public int GetPort()

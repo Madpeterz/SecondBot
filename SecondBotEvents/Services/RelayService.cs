@@ -27,9 +27,13 @@ namespace SecondBotEvents.Services
         {
             if (myConfig == null)
             {
-                return "Config broken";
+                return "No Config";
             }
-            if (botConnected == false)
+            else if (myConfig.GetHideStatusOutput() == true)
+            {
+                return "hidden";
+            }
+            else if (botConnected == false)
             {
                 return "Waiting for bot";
             }

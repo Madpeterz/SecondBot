@@ -80,6 +80,10 @@ namespace SecondBotEvents.Services
             {
                 return "DataStore Service [Config broken]";
             }
+            else if (myConfig.GetHideStatusOutput() == true)
+            {
+                return "hidden";
+            }
             long unixtime = SecondbotHelpers.UnixTimeNow();
             if (myConfig.GetAutoCleanKeyValueStore() == true)
             {

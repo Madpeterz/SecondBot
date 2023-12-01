@@ -147,15 +147,19 @@ namespace SecondBotEvents.Services
 
         public override string Status()
         {
-            if(myConfig == null)
+            if (myConfig == null)
             {
-                return simNickname + "Config broken";
+                return "No Config";
             }
-            if(botConnected == false)
+            else if (myConfig.GetHideStatusOutput() == true)
+            {
+                return "hidden";
+            }
+            else if (botConnected == false)
             {
                 return simNickname + "No bot";
             }
-            if(softDisable == false)
+            else if(softDisable == false)
             {
                 Tick();
                 if(evacWanted == true)
