@@ -578,7 +578,14 @@ namespace SecondBotEvents.Services
                     CleanChannel(channel);
                 }
                 WantedTextChannels.Remove(channel.Name);
+                if (ChannelMap.ContainsKey(channel.Name) == false)
+                {
+                    ChannelMap[channel.Name] = channel.Id;
+                    return;
+                }
                 ChannelMap.Add(channel.Name, channel.Id);
+                
+
             }
 
             List<string> WantedCategoryChannels = new List<string>
@@ -594,6 +601,11 @@ namespace SecondBotEvents.Services
                     continue;
                 }
                 WantedCategoryChannels.Remove(category.Name);
+                if (ChannelMap.ContainsKey(category.Name) == false)
+                {
+                    ChannelMap[category.Name] = category.Id;
+                    return;
+                }
                 CategoryMap.Add(category.Name, category.Id);
             }
             foreach(String a in WantedCategoryChannels)
