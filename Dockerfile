@@ -79,7 +79,15 @@ ENV basic_Username='' \
 	interaction_AcceptInventory='false' \
 	interaction_AcceptFriendRequests='false' \
 	interaction_EnableJsonOutputEvents='false' \
-	interaction_JsonOutputEventsTarget='none'
+	interaction_JsonOutputEventsTarget='none' \
+	commands_HideStatusOutput='false' \
+	datastore_HideStatusOutput='false' \
+	discord_HideStatusOutput='false' \
+	events_HideStatusOutput='false' \
+	homebound_HideStatusOutput='false' \
+	http_HideStatusOutput='false' \
+	interaction_HideStatusOutput='false'
+	
 
 EXPOSE 80
 ENV ASPNETCORE_URLS http://+:80
