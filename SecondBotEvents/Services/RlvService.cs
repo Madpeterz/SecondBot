@@ -1,11 +1,8 @@
 ﻿namespace SecondBotEvents.Services
 {
-    using Discord;
     using global::SecondBotEvents.Commands;
     using global::SecondBotEvents.Config;
     using OpenMetaverse;
-    using OpenMetaverse.ImportExport.Collada14;
-    using SecondBotEvents.Commands;
     using System;
     using System.Collections.Generic;
     using System.Data;
@@ -177,6 +174,89 @@
                             NotifyRules = RemoveRule(bits[0], bits[1],"*", NotifyRules);
                             break;
                         }
+                    case "sitground":
+                        {
+                            if (args != "force")
+                            {
+                                break;
+                            }
+                            Self A = new Self(master);
+                            A.Sit("ground");
+                            break;
+                        }
+                    case "sit":
+                        {
+                            if ((args == "add") || (args == "y") || (args == "rem") || (args == "n"))
+                            {
+                                RlvRules = RemoveRule(command, "*", "*", RlvRules);
+                                if ((args == "add") || (args == "y"))
+                                {
+                                    RlvRules = AddRule(Source, command, "*", "*", RlvRules);
+                                }
+                                break;
+                            }
+                            if (args != "force")
+                            {
+                                break;
+                            }
+                            Self A = new Self(master);
+                            A.Sit(subcommand);
+                            break;
+                        }
+                    case "unsit":
+                        {
+                            if ((args == "add") || (args == "y") || (args == "rem") || (args == "n"))
+                            {
+                                RlvRules = RemoveRule(command, "*", "*", RlvRules);
+                                if ((args == "add") || (args == "y"))
+                                {
+                                    RlvRules = AddRule(Source, command, "*", "*", RlvRules);
+                                }
+                                break;
+                            }
+                            if (args != "force")
+                            {
+                                break;
+                            }
+                            Self A = new Self(master);
+                            A.Stand();
+                            break;
+                        }
+                    case "detach":
+                        {
+                            if ((args == "add") || (args == "y") || (args == "rem") || (args == "n"))
+                            {
+                                RlvRules = RemoveRule(command, subcommand, "*", RlvRules);
+                                if ((args == "add") || (args == "y"))
+                                {
+                                    RlvRules = AddRule(Source, command, subcommand, "*", RlvRules);
+                                }
+                                break;
+                            }
+                            if (args != "force")
+                            {
+                                break;
+                            }
+                            InventoryCommands A = new InventoryCommands(master);
+                            A.Detach(subcommand);
+                            break;
+                        }
+                    case "getsitid":
+                        {
+                            uint index = GetClient().Self.SittingOn;
+                            if (index > 0)
+                            {
+                                if (!GetClient().Network.CurrentSim.ObjectsPrimitives.ContainsKey(index))
+                                {
+                                    ChatOutput("!", argAsInt);
+                                    break;
+                                }
+                                ChatOutput(GetClient().Network.CurrentSim.ObjectsPrimitives[index].ID.ToString(), argAsInt);
+                                break;
+                            }
+                            ChatOutput(UUID.Zero.ToString(), argAsInt);
+                            break;
+                        }
                     case "chatwhisper":
                     case "chatnormal":
                     case "chatshout":
@@ -194,6 +274,14 @@
                     case "tplm":
                     case "tploc":
                     case "tplure_sec":
+                    case "showinv":
+                    case "viewnote":
+                    case "viewscript":
+                    case "viewtexture":
+                    case "rez":
+                    case "editworld":
+                    case "editattach":
+                    case "share_sec":
                     case "permissive":
                         {
                             RlvRules = RemoveRule(command, "*", "*", RlvRules);
@@ -249,6 +337,7 @@
                             }
                             break;
                         }
+                    case "edit":
                     case "getcam_fov":
                     case "camtextures":
                     case "camavdist":
@@ -289,6 +378,8 @@
                     case "accepttp":
                     case "accepttprequest":
                     case "tprequest":
+                    case "editobj":
+                    case "share":
                     case "tplure":
                         {
                             RlvRules = RemoveRule(command, subcommand, "*", RlvRules);
