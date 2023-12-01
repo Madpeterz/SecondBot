@@ -31,7 +31,11 @@ namespace SecondBotEvents.Services
         {
             if (myConfig == null)
             {
-                return "Config broken";
+                return "No Config";
+            }
+            else if (myConfig.GetHideStatusOutput() == true)
+            {
+                return "hidden";
             }
             else if(myConfig.GetEnabled() == false)
             {
@@ -827,14 +831,14 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
+            long dif = SecondbotHelpers.UnixTimeNow() - LastUpdatedSystemStatus;
+            if (dif < 15)
+            {
+                return;
+            }
             ITextChannel statusChannel = GetChannel("status", StatusPrefill(), "bot");
             if ((e.changed == false) && (LastStatusMessageId != 0))
             {
-                long dif = SecondbotHelpers.UnixTimeNow() - LastUpdatedSystemStatus;
-                if (dif < 15)
-                {
-                    return;
-                }
                 LastUpdatedSystemStatus = SecondbotHelpers.UnixTimeNow();
 
                 if (messageHasEndDot == false)
