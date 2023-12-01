@@ -6,6 +6,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using SecondBotEvents.Commands;
 
 namespace SecondBotEvents.Services
 {
@@ -505,7 +506,6 @@ namespace SecondBotEvents.Services
          *  if not the bot will attempt to
          *  lookup the avatar
          */
-
         public bool KnownAvatar(string name)
         {
             return KnownAvatar(name, UUID.Zero);

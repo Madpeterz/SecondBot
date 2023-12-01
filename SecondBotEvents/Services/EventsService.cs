@@ -73,6 +73,7 @@ namespace SecondBotEvents.Services
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
             GetClient().Network.SimConnected += BotLoggedIn;
+            botConnected = false;
             LogFormater.Info("Events service [Bot commands disabled]");
             removeEvents();
         }

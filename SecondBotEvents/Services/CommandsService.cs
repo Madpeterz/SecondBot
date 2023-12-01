@@ -168,6 +168,22 @@ namespace SecondBotEvents.Services
             CommandInterfaceCaller(e.IM.Message, requireSigning);
         }
 
+        public bool AvatarUUIDIsMaster(UUID avatar)
+        {
+            foreach(string name in myConfig.GetMastersCSV())
+            {
+                string find = master.DataStoreService.GetAvatarUUID(name);
+                if (find != "lookup")
+                {
+                    if(avatar.ToString() == find)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public KeyValuePair<bool, string> CommandInterfaceCaller(string message, bool requireSigning=false, bool viaCustomCommand=false)
         {
             string source = "command interface";
