@@ -839,6 +839,10 @@ namespace SecondBotEvents.Services
             ITextChannel statusChannel = GetChannel("status", StatusPrefill(), "bot");
             if ((e.changed == false) && (LastStatusMessageId != 0))
             {
+                if (dif < 15)
+                {
+                    return;
+                }
                 LastUpdatedSystemStatus = SecondbotHelpers.UnixTimeNow();
                 if (messageHasEndDot == false)
                 {
@@ -850,6 +854,10 @@ namespace SecondBotEvents.Services
                 await statusChannel.
                     ModifyMessageAsync(LastStatusMessageId, m => m.Content = LastMessageContent);
                 messageHasEndDot = false;
+                return;
+            }
+            if (dif < 15)
+            {
                 return;
             }
             LastStatusMessageId = SendMessageToChannel(statusChannel, e.message);
