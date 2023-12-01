@@ -12,7 +12,7 @@ namespace SecondBotEvents.Services
     public class BotClientService : BotServices
     {
         public GridClient client = null;
-        protected BasicConfig basicCfg = null;
+        public BasicConfig basicCfg = null;
 
         protected bool ExitBot = false;
 

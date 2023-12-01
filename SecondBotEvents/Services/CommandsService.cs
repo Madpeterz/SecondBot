@@ -11,8 +11,31 @@ using System.Net.Http;
 
 namespace SecondBotEvents.Services
 {
+    public class BotCommandNotice
+    {
+        public string command;
+        public string args;
+        public string source;
+        public bool accepted;
+        public BotCommandNotice(string Setcommand, string Setargs, string Setsource, bool Setaccepted)
+        {
+            command = Setcommand; 
+            args = Setargs;
+            source = Setsource;
+            accepted = Setaccepted;
+        }
+    }
     public class CommandsService : BotServices
     {
+        private EventHandler<BotCommandNotice> BotclientCommandEventNotices;
+        public event EventHandler<BotCommandNotice> BotclientCommandEventNotice
+        {
+            add { lock (BotCommandNoticeLockable) { BotclientCommandEventNotices += value; } }
+            remove { lock (BotCommandNoticeLockable) { BotclientCommandEventNotices -= value; } }
+        }
+        private readonly object BotCommandNoticeLockable = new object();
+
+
         public CommandsConfig myConfig = null;
         public bool acceptNewCommands = false;
         public CommandsService(EventsSecondBot setMaster) : base(setMaster)
@@ -139,12 +162,12 @@ namespace SecondBotEvents.Services
 
         public KeyValuePair<bool, string> CommandInterfaceCaller(string message, bool requireSigning=false, bool viaCustomCommand=false)
         {
-            SignedCommand C = new SignedCommand(message,
-                requireSigning,
-                myConfig.GetEnforceTimeWindow(),
-                myConfig.GetTimeWindowSecs(),
-                myConfig.GetSharedSecret()
-            );
+            string source = "command interface";
+            if(viaCustomCommand == true)
+            {
+                source = "customcommand";
+            }
+            SignedCommand C = new SignedCommand(this,source,message,requireSigning,myConfig.GetEnforceTimeWindow(),myConfig.GetTimeWindowSecs(),myConfig.GetSharedSecret());
             if (C.accepted == false)
             {
                 return new KeyValuePair<bool, string>(false, "Not accepted via signing");
@@ -334,6 +357,17 @@ namespace SecondBotEvents.Services
             acceptNewCommands = true;
             LogFormater.Info("Commands service [accepting IM commands]");
         }
+
+        public void CommandNotice(string command,string source, string args,bool accepted)
+        {
+            BotCommandNotice e = new BotCommandNotice(command, source, args, accepted);
+            EventHandler<BotCommandNotice> handler = BotclientCommandEventNotices;
+            handler?.Invoke(this, e);
+            if(master.BotClient.basicCfg.GetLogCommands() == true)
+            {
+                LogFormater.Info("Command log:" + JsonConvert.SerializeObject(e));
+            }
+        }
     }
 
     public class SignedCommand
@@ -344,29 +378,39 @@ namespace SecondBotEvents.Services
         public string replyTarget = null;
         public bool accepted = false;
         public long unixtimeOfCommand = 0;
-        public SignedCommand(string input, bool requireSigning, bool requireTimewindow, int windowSize, string secret)
+        protected CommandsService master;
+        public SignedCommand(CommandsService setMaster, string source, string input, bool requireSigning, bool requireTimewindow, int windowSize, string secret)
         {
+            master = setMaster;
             UnpackInput(input);
             if (requireSigning == false)
             {
                 accepted = true; // just accept the command
+                master.CommandNotice(command, source, String.Join("@@@", args), accepted);
                 return;
             }
             Vaildate(requireTimewindow, windowSize, secret);
+            master.CommandNotice(command, source, String.Join("@@@", args), accepted);
         }
-        public SignedCommand(string setCommand, string setSigningCode, string[] setArgs, int setUnixtime, string setReplyTarget, bool requireTimewindow, int windowSize, string secret, bool requireSigning = true)
+
+        public SignedCommand(CommandsService setMaster, string source, string setCommand, string setSigningCode, string[] setArgs, 
+            int setUnixtime, string setReplyTarget, bool requireTimewindow, int windowSize, string secret, bool requireSigning = true)
         {
+            master = setMaster;
             command = setCommand;
             signingCode = setSigningCode;
             args = setArgs;
             unixtimeOfCommand = setUnixtime;
             replyTarget = setReplyTarget;
+            
             if (requireSigning == false)
             {
                 accepted = true; // just accept the command
+                master.CommandNotice(command, source, String.Join("@@@", args), accepted);
                 return;
             }
             Vaildate(requireTimewindow, windowSize, secret);
+            master.CommandNotice(command, source, String.Join("@@@", args), accepted);
         }
 
         protected void Vaildate(bool requireTimewindow, int windowSize, string secret)
@@ -388,12 +432,12 @@ namespace SecondBotEvents.Services
                 raw += unixtimeOfCommand.ToString();
             }
             raw += secret;
-            LogFormater.Info("raw="+raw);
             string cooked = SecondbotHelpers.GetSHA1(raw);
             if (cooked != signingCode)
             {
                 return; // invaild signing code
             }
+
             accepted = true;
         }
 

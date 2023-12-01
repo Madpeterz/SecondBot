@@ -224,7 +224,10 @@ namespace SecondBotEvents.Services
                     ReplyToMessage(message, "Notices require title and a message split with @@@!");
                     return;
                 }
-                SignedCommand C = new SignedCommand("Groupnotice", null, args.ToArray(), 0, "none", false, 0, "", false);
+                SignedCommand C = new SignedCommand(
+                    master.CommandsService,
+                    "discordapi",
+                    "Groupnotice", null, args.ToArray(), 0, "none", false, 0, "", false);
                 if (bits.Length == 3)
                 {
                     C.command = "GroupnoticeWithAttachment";
@@ -239,7 +242,8 @@ namespace SecondBotEvents.Services
                 List<string> args = new List<string>();
                 args.Add(groupuuid.ToString());
                 args.Add(cleaned);
-                RunCommandFromMessage(new SignedCommand("GroupEject", null, args.ToArray(), 0, "none", false, 0, "", false), message);
+                RunCommandFromMessage(new SignedCommand(master.CommandsService,
+                    "discordapi", "GroupEject", null, args.ToArray(), 0, "none", false, 0, "", false), message);
                 return;
             }
             else if(cleaned.StartsWith("!invite") == true)
@@ -250,7 +254,8 @@ namespace SecondBotEvents.Services
                 args.Add(groupuuid.ToString());
                 args.Add(cleaned);
                 args.Add("everyone");
-                RunCommandFromMessage(new SignedCommand("GroupInvite", null, args.ToArray(), 0, "none", false, 0, "", false), message);
+                RunCommandFromMessage(new SignedCommand(master.CommandsService,
+                    "discordapi", "GroupInvite", null, args.ToArray(), 0, "none", false, 0, "", false), message);
                 return;
             }
             else if(cleaned.StartsWith("!ban") == true)
@@ -261,7 +266,8 @@ namespace SecondBotEvents.Services
                 args.Add(groupuuid.ToString());
                 args.Add(cleaned);
                 args.Add("true");
-                RunCommandFromMessage(new SignedCommand("GroupBan", null, args.ToArray(), 0, "none", false, 0, "", false), message);
+                RunCommandFromMessage(new SignedCommand(master.CommandsService,
+                    "discordapi", "GroupBan", null, args.ToArray(), 0, "none", false, 0, "", false), message);
                 return;
             }
             GetClient().Self.InstantMessageGroup(groupuuid, message.Author.Username + ": " + message.CleanContent);
@@ -356,7 +362,8 @@ namespace SecondBotEvents.Services
                 if (message.Author.Id != DiscordClient.CurrentUser.Id)
                 {
                     // do command
-                    RunCommandFromMessage(new SignedCommand(message.Content, false, false, 0, ""), message);
+                    RunCommandFromMessage(new SignedCommand(master.CommandsService,
+                    "discordapi", message.Content, false, false, 0, ""), message);
                     return;
                 }
             }

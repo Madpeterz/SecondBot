@@ -13,8 +13,13 @@ namespace SecondBotEvents.Config
             settings.Add("Username");
             settings.Add("Password");
             settings.Add("LoginURI");
+            settings.Add("LogCommands");
         }
 
+        public bool GetLogCommands()
+        {
+            return ReadSettingAsBool("LogCommands");
+        }
         public string GetUsername()
         {
             return ReadSettingAsString("Username","Firstname Lastname");

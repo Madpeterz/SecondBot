@@ -298,7 +298,9 @@ namespace SecondBotEvents.Services
             {
                 return "No bot connected yet";
             }
-            SignedCommand C = new(commandName, signing, myArgs, cmdUnixtime, null, true, 5, master.CommandsService.myConfig.GetSharedSecret());
+            SignedCommand C = new(
+                master.CommandsService,"http",
+                commandName, signing, myArgs, cmdUnixtime, null, true, 5, master.CommandsService.myConfig.GetSharedSecret());
             if(C.accepted == false)
             {
                 return "Command request rejected";
