@@ -169,5 +169,15 @@ namespace SecondBotEvents.Config
             }
             return value;
         }
+
+        protected double ReadSettingAsDouble(string key, double defaultValue = 0)
+        {
+            bool result = double.TryParse(ReadSettingAsString(key, defaultValue.ToString()), out double value);
+            if (result == false)
+            {
+                return defaultValue;
+            }
+            return value;
+        }
     }
 }

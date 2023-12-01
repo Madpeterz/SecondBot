@@ -81,6 +81,17 @@ namespace SecondBotEvents
             }
             return false;
         }
+        public static bool inrange(double current, double min, double max)
+        {
+            if (current <= max)
+            {
+                if (current >= min)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public static bool inbox(float expected, float current, float drift)
         {
             return distance_check(expected, current, drift, true);

@@ -14,8 +14,13 @@ namespace SecondBotEvents.Config
             settings.Add("Password");
             settings.Add("LoginURI");
             settings.Add("LogCommands");
+            settings.Add("DefaultHoverHeight");
         }
 
+        public double GetDefaultHoverHeight()
+        {
+            return ReadSettingAsDouble("DefaultHoverHeight", 0.1);
+        }
         public bool GetLogCommands()
         {
             return ReadSettingAsBool("LogCommands");

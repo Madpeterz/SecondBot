@@ -13,6 +13,24 @@ namespace SecondBotEvents.Commands
         {
         }
 
+        [About("Adjusts Hover height")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("Convert to float has failed")]
+        [ReturnHintsFailure("value out of range (-2.0, 2.0)")]
+        [ArgHints("height", "what height to hover at from (-2.0, 2.0)")]
+        public object HoverHeight(string height)
+        {
+            if (double.TryParse(height, out double level) == false)
+            {
+                return Failure("Convert to float has failed", new[] { height });
+            }
+            if (SecondbotHelpers.inrange(level, -2.0, 2.0) == false)
+            {
+                return Failure("height value out of range(-2.0 to 2.0)", new[] { height });
+            }
+            GetClient().Self.SetHoverHeight(level);
+            return BasicReply("ok", new[] { height });
+        }
 
         [About("uses the AutoPilot to move to a location")]
         [ReturnHints("Error Unable to AutoPilot to location")]

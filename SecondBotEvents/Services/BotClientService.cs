@@ -1,4 +1,5 @@
-﻿using OpenMetaverse;
+﻿using log4net.Core;
+using OpenMetaverse;
 using OpenMetaverse.Assets;
 using SecondBotEvents.Config;
 using Swan;
@@ -61,6 +62,10 @@ namespace SecondBotEvents.Services
 
         protected void BotSimConnected(object o, SimConnectedEventArgs e)
         {
+            if(AutoRestartLoginTimer.Enabled == true)
+            {
+                GetClient().Self.SetHoverHeight(basicCfg.GetDefaultHoverHeight());
+            }
             AutoRestartLoginTimer.Stop();
             LogFormater.Info("Client service ~ Connected to sim: "+e.Simulator.Name);
         }
