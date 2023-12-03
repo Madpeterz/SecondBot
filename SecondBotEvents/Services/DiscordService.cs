@@ -836,32 +836,39 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            ITextChannel statusChannel = GetChannel("status", StatusPrefill(), "bot");
-            if ((e.changed == false) && (LastStatusMessageId != 0))
+            try
             {
+                ITextChannel statusChannel = GetChannel("status", StatusPrefill(), "bot");
+                if ((e.changed == false) && (LastStatusMessageId != 0))
+                {
+                    if (dif < 15)
+                    {
+                        return;
+                    }
+                    LastUpdatedSystemStatus = SecondbotHelpers.UnixTimeNow();
+                    if (messageHasEndDot == false)
+                    {
+                        await statusChannel.
+                            ModifyMessageAsync(LastStatusMessageId, m => m.Content = LastMessageContent + ".");
+                        messageHasEndDot = true;
+                        return;
+                    }
+                    await statusChannel.
+                        ModifyMessageAsync(LastStatusMessageId, m => m.Content = LastMessageContent);
+                    messageHasEndDot = false;
+                    return;
+                }
                 if (dif < 15)
                 {
                     return;
                 }
-                LastUpdatedSystemStatus = SecondbotHelpers.UnixTimeNow();
-                if (messageHasEndDot == false)
-                {
-                    await statusChannel.
-                        ModifyMessageAsync(LastStatusMessageId, m => m.Content = LastMessageContent + ".");
-                    messageHasEndDot = true;
-                    return;
-                }
-                await statusChannel.
-                    ModifyMessageAsync(LastStatusMessageId, m => m.Content = LastMessageContent);
-                messageHasEndDot = false;
-                return;
+                LastStatusMessageId = SendMessageToChannel(statusChannel, e.message);
+                LastMessageContent = e.message;
             }
-            if (dif < 15)
+            catch
             {
                 return;
             }
-            LastStatusMessageId = SendMessageToChannel(statusChannel, e.message);
-            LastMessageContent = e.message;
         }
 
         protected async void CleanChannel(ITextChannel channel)

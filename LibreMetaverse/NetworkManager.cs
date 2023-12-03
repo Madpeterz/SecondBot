@@ -1015,7 +1015,6 @@ namespace OpenMetaverse
                                 Helpers.LogLevel.Warning);
                             return;
                         }
-
                         // Fire the callback(s), if any
                         PacketEvents.RaiseEvent(packet.Type, packet, simulator);
                     }

@@ -76676,6 +76676,7 @@ namespace OpenMetaverse.Packets
             public byte[] MediaURL;
             public byte[] PSBlock;
             public byte[] ExtraParams;
+            public string A_TextDecoded;
             public UUID Sound;
             public UUID OwnerID;
             public float Gain;
@@ -76760,6 +76761,11 @@ namespace OpenMetaverse.Packets
                     length = bytes[i++];
                     Text = new byte[length];
                     Buffer.BlockCopy(bytes, i, Text, 0, length); i += length;
+                    A_TextDecoded = "";
+                    if (Text.Length > 0)
+                    {
+                        A_TextDecoded = Utils.BytesToString(Text);
+                    }
                     TextColor = new byte[4];
                     Buffer.BlockCopy(bytes, i, TextColor, 0, 4); i += 4;
                     length = bytes[i++];
