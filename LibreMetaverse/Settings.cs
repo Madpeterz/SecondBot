@@ -338,7 +338,7 @@ namespace OpenMetaverse
         /// You will get no output on the console. This behavior can be overriden by creating
         /// a logger configuration file for log4net
         /// </summary>
-        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.Debug;
+        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.None;
 
         /// <summary>Attach avatar names to log messages</summary>
         public bool LOG_NAMES = true;

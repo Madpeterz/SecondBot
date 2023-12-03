@@ -2403,6 +2403,10 @@ namespace OpenMetaverse
             KeyValuePair<string, List<InventoryBase>> reply = Client.Inventory.FolderContentsWithReply(folder, Client.Self.AgentID, true, true, InventorySortOrder.ByName, INVENTORY_TIMEOUT, false);
             foreach(InventoryBase entry in reply.Value)
             {
+                if(entry == null)
+                {
+                    continue;
+                }
                 if(entry is InventoryWearable wearable)
                 {
                     Logger.DebugLog("Adding wearable " + wearable.Name, Client);
