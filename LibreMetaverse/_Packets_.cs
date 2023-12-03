@@ -680,6 +680,58 @@ namespace OpenMetaverse.Packets
         {
             switch (frequency)
             {
+                case PacketFrequency.High:
+                    switch (id)
+                    {
+                        case 1: return PacketType.StartPingCheck;
+                        case 2: return PacketType.CompletePingCheck;
+                        case 4: return PacketType.AgentUpdate;
+                        case 5: return PacketType.AgentAnimation;
+                        case 6: return PacketType.AgentRequestSit;
+                        case 7: return PacketType.AgentSit;
+                        case 8: return PacketType.RequestImage;
+                        case 9: return PacketType.ImageData;
+                        case 10: return PacketType.ImagePacket;
+                        case 11: return PacketType.LayerData;
+                        case 12: return PacketType.ObjectUpdate;
+                        case 13: return PacketType.ObjectUpdateCompressed;
+                        case 14: return PacketType.ObjectUpdateCached;
+                        case 15: return PacketType.ImprovedTerseObjectUpdate;
+                        case 16: return PacketType.KillObject;
+                        case 17: return PacketType.TransferPacket;
+                        case 18: return PacketType.SendXferPacket;
+                        case 19: return PacketType.ConfirmXferPacket;
+                        case 20: return PacketType.AvatarAnimation;
+                        case 21: return PacketType.AvatarSitResponse;
+                        case 22: return PacketType.CameraConstraint;
+                        case 23: return PacketType.ParcelProperties;
+                        case 25: return PacketType.ChildAgentUpdate;
+                        case 26: return PacketType.ChildAgentAlive;
+                        case 27: return PacketType.ChildAgentPositionUpdate;
+                        case 29: return PacketType.SoundTrigger;
+                        case 30: return PacketType.ObjectAnimation;
+                    }
+                    break;
+                case PacketFrequency.Medium:
+                    switch (id)
+                    {
+                        case 1: return PacketType.ObjectAdd;
+                        case 2: return PacketType.MultipleObjectUpdate;
+                        case 3: return PacketType.RequestMultipleObjects;
+                        case 4: return PacketType.ObjectPosition;
+                        case 5: return PacketType.RequestObjectPropertiesFamily;
+                        case 6: return PacketType.CoarseLocationUpdate;
+                        case 7: return PacketType.CrossedRegion;
+                        case 8: return PacketType.ConfirmEnableSimulator;
+                        case 9: return PacketType.ObjectProperties;
+                        case 10: return PacketType.ObjectPropertiesFamily;
+                        case 11: return PacketType.ParcelPropertiesRequest;
+                        case 13: return PacketType.AttachedSound;
+                        case 14: return PacketType.AttachedSoundGainChange;
+                        case 15: return PacketType.PreloadSound;
+                        case 17: return PacketType.ViewerEffect;
+                    }
+                    break;
                 case PacketFrequency.Low:
                     switch (id)
                     {
@@ -1029,58 +1081,6 @@ namespace OpenMetaverse.Packets
                         case 65531: return PacketType.PacketAck;
                         case 65532: return PacketType.OpenCircuit;
                         case 65533: return PacketType.CloseCircuit;
-                    }
-                    break;
-                case PacketFrequency.Medium:
-                    switch (id)
-                    {
-                        case 1: return PacketType.ObjectAdd;
-                        case 2: return PacketType.MultipleObjectUpdate;
-                        case 3: return PacketType.RequestMultipleObjects;
-                        case 4: return PacketType.ObjectPosition;
-                        case 5: return PacketType.RequestObjectPropertiesFamily;
-                        case 6: return PacketType.CoarseLocationUpdate;
-                        case 7: return PacketType.CrossedRegion;
-                        case 8: return PacketType.ConfirmEnableSimulator;
-                        case 9: return PacketType.ObjectProperties;
-                        case 10: return PacketType.ObjectPropertiesFamily;
-                        case 11: return PacketType.ParcelPropertiesRequest;
-                        case 13: return PacketType.AttachedSound;
-                        case 14: return PacketType.AttachedSoundGainChange;
-                        case 15: return PacketType.PreloadSound;
-                        case 17: return PacketType.ViewerEffect;
-                    }
-                    break;
-                case PacketFrequency.High:
-                    switch (id)
-                    {
-                        case 1: return PacketType.StartPingCheck;
-                        case 2: return PacketType.CompletePingCheck;
-                        case 4: return PacketType.AgentUpdate;
-                        case 5: return PacketType.AgentAnimation;
-                        case 6: return PacketType.AgentRequestSit;
-                        case 7: return PacketType.AgentSit;
-                        case 8: return PacketType.RequestImage;
-                        case 9: return PacketType.ImageData;
-                        case 10: return PacketType.ImagePacket;
-                        case 11: return PacketType.LayerData;
-                        case 12: return PacketType.ObjectUpdate;
-                        case 13: return PacketType.ObjectUpdateCompressed;
-                        case 14: return PacketType.ObjectUpdateCached;
-                        case 15: return PacketType.ImprovedTerseObjectUpdate;
-                        case 16: return PacketType.KillObject;
-                        case 17: return PacketType.TransferPacket;
-                        case 18: return PacketType.SendXferPacket;
-                        case 19: return PacketType.ConfirmXferPacket;
-                        case 20: return PacketType.AvatarAnimation;
-                        case 21: return PacketType.AvatarSitResponse;
-                        case 22: return PacketType.CameraConstraint;
-                        case 23: return PacketType.ParcelProperties;
-                        case 25: return PacketType.ChildAgentUpdate;
-                        case 26: return PacketType.ChildAgentAlive;
-                        case 27: return PacketType.ChildAgentPositionUpdate;
-                        case 29: return PacketType.SoundTrigger;
-                        case 30: return PacketType.ObjectAnimation;
                     }
                     break;
             }
@@ -1500,6 +1500,60 @@ namespace OpenMetaverse.Packets
 
             switch (header.Frequency)
             {
+                case PacketFrequency.High:
+                    switch (header.ID)
+                    {
+                        case 1: return new StartPingCheckPacket(header, bytes, ref i);
+                        case 2: return new CompletePingCheckPacket(header, bytes, ref i);
+                        case 4: return new AgentUpdatePacket(header, bytes, ref i);
+                        case 5: return new AgentAnimationPacket(header, bytes, ref i);
+                        case 6: return new AgentRequestSitPacket(header, bytes, ref i);
+                        case 7: return new AgentSitPacket(header, bytes, ref i);
+                        case 8: return new RequestImagePacket(header, bytes, ref i);
+                        case 9: return new ImageDataPacket(header, bytes, ref i);
+                        case 10: return new ImagePacketPacket(header, bytes, ref i);
+                        case 11: return new LayerDataPacket(header, bytes, ref i);
+                        case 12: return new ObjectUpdatePacket(header, bytes, ref i);
+                        case 13: return new ObjectUpdateCompressedPacket(header, bytes, ref i);
+                        case 14: return new ObjectUpdateCachedPacket(header, bytes, ref i);
+                        case 15: return new ImprovedTerseObjectUpdatePacket(header, bytes, ref i);
+                        case 16: return new KillObjectPacket(header, bytes, ref i);
+                        case 17: return new TransferPacketPacket(header, bytes, ref i);
+                        case 18: return new SendXferPacketPacket(header, bytes, ref i);
+                        case 19: return new ConfirmXferPacketPacket(header, bytes, ref i);
+                        case 20: return new AvatarAnimationPacket(header, bytes, ref i);
+                        case 21: return new AvatarSitResponsePacket(header, bytes, ref i);
+                        case 22: return new CameraConstraintPacket(header, bytes, ref i);
+                        case 23: return new ParcelPropertiesPacket(header, bytes, ref i);
+                        case 25: return new ChildAgentUpdatePacket(header, bytes, ref i);
+                        case 26: return new ChildAgentAlivePacket(header, bytes, ref i);
+                        case 27: return new ChildAgentPositionUpdatePacket(header, bytes, ref i);
+                        case 29: return new SoundTriggerPacket(header, bytes, ref i);
+                        case 30: return new ObjectAnimationPacket(header, bytes, ref i);
+
+                    }
+                    break;
+                case PacketFrequency.Medium:
+                    switch (header.ID)
+                    {
+                        case 1: return new ObjectAddPacket(header, bytes, ref i);
+                        case 2: return new MultipleObjectUpdatePacket(header, bytes, ref i);
+                        case 3: return new RequestMultipleObjectsPacket(header, bytes, ref i);
+                        case 4: return new ObjectPositionPacket(header, bytes, ref i);
+                        case 5: return new RequestObjectPropertiesFamilyPacket(header, bytes, ref i);
+                        case 6: return new CoarseLocationUpdatePacket(header, bytes, ref i);
+                        case 7: return new CrossedRegionPacket(header, bytes, ref i);
+                        case 8: return new ConfirmEnableSimulatorPacket(header, bytes, ref i);
+                        case 9: return new ObjectPropertiesPacket(header, bytes, ref i);
+                        case 10: return new ObjectPropertiesFamilyPacket(header, bytes, ref i);
+                        case 11: return new ParcelPropertiesRequestPacket(header, bytes, ref i);
+                        case 13: return new AttachedSoundPacket(header, bytes, ref i);
+                        case 14: return new AttachedSoundGainChangePacket(header, bytes, ref i);
+                        case 15: return new PreloadSoundPacket(header, bytes, ref i);
+                        case 17: return new ViewerEffectPacket(header, bytes, ref i);
+
+                    }
+                    break;
                 case PacketFrequency.Low:
                     switch (header.ID)
                     {
@@ -1849,60 +1903,6 @@ namespace OpenMetaverse.Packets
                         case 65531: return new PacketAckPacket(header, bytes, ref i);
                         case 65532: return new OpenCircuitPacket(header, bytes, ref i);
                         case 65533: return new CloseCircuitPacket(header, bytes, ref i);
-
-                    }
-                    break;
-                case PacketFrequency.Medium:
-                    switch (header.ID)
-                    {
-                        case 1: return new ObjectAddPacket(header, bytes, ref i);
-                        case 2: return new MultipleObjectUpdatePacket(header, bytes, ref i);
-                        case 3: return new RequestMultipleObjectsPacket(header, bytes, ref i);
-                        case 4: return new ObjectPositionPacket(header, bytes, ref i);
-                        case 5: return new RequestObjectPropertiesFamilyPacket(header, bytes, ref i);
-                        case 6: return new CoarseLocationUpdatePacket(header, bytes, ref i);
-                        case 7: return new CrossedRegionPacket(header, bytes, ref i);
-                        case 8: return new ConfirmEnableSimulatorPacket(header, bytes, ref i);
-                        case 9: return new ObjectPropertiesPacket(header, bytes, ref i);
-                        case 10: return new ObjectPropertiesFamilyPacket(header, bytes, ref i);
-                        case 11: return new ParcelPropertiesRequestPacket(header, bytes, ref i);
-                        case 13: return new AttachedSoundPacket(header, bytes, ref i);
-                        case 14: return new AttachedSoundGainChangePacket(header, bytes, ref i);
-                        case 15: return new PreloadSoundPacket(header, bytes, ref i);
-                        case 17: return new ViewerEffectPacket(header, bytes, ref i);
-
-                    }
-                    break;
-                case PacketFrequency.High:
-                    switch (header.ID)
-                    {
-                        case 1: return new StartPingCheckPacket(header, bytes, ref i);
-                        case 2: return new CompletePingCheckPacket(header, bytes, ref i);
-                        case 4: return new AgentUpdatePacket(header, bytes, ref i);
-                        case 5: return new AgentAnimationPacket(header, bytes, ref i);
-                        case 6: return new AgentRequestSitPacket(header, bytes, ref i);
-                        case 7: return new AgentSitPacket(header, bytes, ref i);
-                        case 8: return new RequestImagePacket(header, bytes, ref i);
-                        case 9: return new ImageDataPacket(header, bytes, ref i);
-                        case 10: return new ImagePacketPacket(header, bytes, ref i);
-                        case 11: return new LayerDataPacket(header, bytes, ref i);
-                        case 12: return new ObjectUpdatePacket(header, bytes, ref i);
-                        case 13: return new ObjectUpdateCompressedPacket(header, bytes, ref i);
-                        case 14: return new ObjectUpdateCachedPacket(header, bytes, ref i);
-                        case 15: return new ImprovedTerseObjectUpdatePacket(header, bytes, ref i);
-                        case 16: return new KillObjectPacket(header, bytes, ref i);
-                        case 17: return new TransferPacketPacket(header, bytes, ref i);
-                        case 18: return new SendXferPacketPacket(header, bytes, ref i);
-                        case 19: return new ConfirmXferPacketPacket(header, bytes, ref i);
-                        case 20: return new AvatarAnimationPacket(header, bytes, ref i);
-                        case 21: return new AvatarSitResponsePacket(header, bytes, ref i);
-                        case 22: return new CameraConstraintPacket(header, bytes, ref i);
-                        case 23: return new ParcelPropertiesPacket(header, bytes, ref i);
-                        case 25: return new ChildAgentUpdatePacket(header, bytes, ref i);
-                        case 26: return new ChildAgentAlivePacket(header, bytes, ref i);
-                        case 27: return new ChildAgentPositionUpdatePacket(header, bytes, ref i);
-                        case 29: return new SoundTriggerPacket(header, bytes, ref i);
-                        case 30: return new ObjectAnimationPacket(header, bytes, ref i);
 
                     }
                     break;
@@ -76936,13 +76936,18 @@ namespace OpenMetaverse.Packets
             Header = header;
             RegionData.FromBytes(bytes, ref i);
             int count = (int)bytes[i++];
-            if(ObjectData == null || ObjectData.Length != count) {
+            if(ObjectData == null || ObjectData.Length != count) 
+            {
                 ObjectData = new ObjectDataBlock[count];
                 for(int j = 0; j < count; j++)
-                { ObjectData[j] = new ObjectDataBlock(); }
+                { 
+                    ObjectData[j] = new ObjectDataBlock(); 
+                }
             }
             for (int j = 0; j < count; j++)
-            { ObjectData[j].FromBytes(bytes, ref i); }
+            { 
+                ObjectData[j].FromBytes(bytes, ref i); 
+            }
         }
 
         public override byte[] ToBytes()
