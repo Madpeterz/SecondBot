@@ -1,4 +1,5 @@
 ﻿using BetterSecondBot.Static;
+using LibreMetaverse;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using SecondBotEvents.Services;
@@ -146,16 +147,35 @@ namespace SecondBotEvents.Commands
             return BasicReply("Ok", new [] { item });
         }
 
-        [About("Attempts to Remove the given inventory folder")]
+        [About("Attempts to Detach the given inventory item (or attachment point)")]
         [ReturnHints("ok")]
-        [ReturnHints("invaild item uuid")]
-        [ArgHints("item", "UUID of item")]
+        [ReturnHints("okMulti")]
+        [ReturnHints("invaild item uuid pr invaild attach point")]
+        [ArgHints("item", "UUID of item, or the attach point")]
         public object Detach(string item)
         {
             if (UUID.TryParse(item, out UUID itemuuid) == false)
             {
-                return Failure("invaild item uuid", new [] { item });
+                List<InventoryItem> toBeRemoved = new List<InventoryItem>();
+                foreach (KeyValuePair<UUID, AttachmentPoint> pair in GetClient().Appearance.GetAttachmentsByItemId())
+                {
+                    if(pair.Value.ToString() != item)
+                    {
+                        continue;
+                    }
+                    toBeRemoved.Add(HelperInventory.getItemByInventoryUUID(GetClient(), pair.Key));
+                }
+                if(toBeRemoved.Count == 0)
+                {
+                    return Failure("invaild item uuid pr invaild attach point", new[] { item });
+                }
+                foreach(InventoryItem A in toBeRemoved)
+                {
+                    GetClient().Appearance.RemoveFromOutfit(A);
+                }
+                return BasicReply("ok", new[] { item });
             }
+            
             InventoryItem realitem = HelperInventory.getItemByInventoryUUID(GetClient(), itemuuid);
             GetClient().Appearance.RemoveFromOutfit(realitem);
             return BasicReply("Ok", new [] { item });
