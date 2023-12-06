@@ -441,11 +441,14 @@ namespace SecondBotEvents.Services
         {
             accepted = false;
             long dif = SecondbotHelpers.UnixTimeNow() - unixtimeOfCommand;
-            if ((requireTimewindow == true) && ((unixtimeOfCommand == 0) || (dif > windowSize))) // bad time window
+            if(requireTimewindow == true)
             {
-                return;
+                if ((unixtimeOfCommand == 0) || (dif > windowSize))
+                {
+                    return;
+                }
             }
-            if ((signingCode == null)) // no signing code
+            if (signingCode == null) // no signing code
             {
                 return;
             }
@@ -484,13 +487,26 @@ namespace SecondBotEvents.Services
             {
                 unixtimeOfCommand = Convert.ToInt32(bits[1]);
             }
+            // command|||args~#~args~#~args#|#reply_target@@@sha1 [inc time if required]
+            // unixtime of command
+            bits = bits[0].Split("@@@");
+            if(bits.Length == 2)
+            {
+                signingCode = bits[1];
+            }
+            // command|||args~#~args~#~args#|#reply_target
+            // sha1 [inc time if required]
             bits = bits[0].Split("#|#");
             if(bits.Length == 2)
             {
                 replyTarget = bits[1];
             }
+            // command|||args~#~args~#~args
+            // reply_target
             bits = bits[0].Split("|||");
             command = bits[0];
+            // command
+            // args~#~args~#~args
             args = new string[] { };
             if(bits.Length == 2)
             {
