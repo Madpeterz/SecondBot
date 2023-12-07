@@ -164,6 +164,10 @@ namespace SecondBotEvents.Services
 
         protected void ReplyToMessage(IMessage message, string reply)
         {
+            if(reply.Length > 2000)
+            {
+                reply = reply.Substring(0, 1900)+"...";
+            }
             message.Channel.SendMessageAsync(reply, false, null, null, null, new MessageReference(message.Id));
         }
 
@@ -278,6 +282,18 @@ namespace SecondBotEvents.Services
             _ = message.DeleteAsync();
         }
 
+        protected void RunCommandFromChat(SocketMessage message)
+        {
+            KeyValuePair<bool, string> reply = master.CommandsService.CommandInterfaceCaller(message.Content, false, false, "DiscordAPI");
+            string replyEmote = "✅";
+            if (reply.Key == false)
+            {
+                replyEmote = "❌";
+            }
+            _ = MarkMessage((IUserMessage)message, replyEmote);
+            ReplyToMessage(message, reply.Value);
+        }
+
         protected void RunCommandFromMessage(SignedCommand C, SocketMessage message)
         {
             KeyValuePair<bool, string> reply = master.CommandsService.RunCommand(C);
@@ -366,8 +382,7 @@ namespace SecondBotEvents.Services
                 if (message.Author.Id != DiscordClient.CurrentUser.Id)
                 {
                     // do command
-                    RunCommandFromMessage(new SignedCommand(master.CommandsService,
-                    "discordapi", message.Content, false, false, 0, ""), message);
+                    RunCommandFromChat(message);
                     return;
                 }
             }
