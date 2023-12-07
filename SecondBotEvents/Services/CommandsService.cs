@@ -8,6 +8,7 @@ using System.Text;
 using System.Linq;
 using System.Reflection;
 using System.Net.Http;
+using OpenMetaverse.ImportExport.Collada14;
 
 namespace SecondBotEvents.Services
 {
@@ -197,6 +198,7 @@ namespace SecondBotEvents.Services
                 return new KeyValuePair<bool, string>(false, "Not accepted via signing");
             }
             KeyValuePair<bool, string> reply = RunCommand(C, viaCustomCommand);
+            CommandNotice(C.command, source, String.Join("@@@", C.args), reply.Key);
             return reply;
         }
 
@@ -385,7 +387,7 @@ namespace SecondBotEvents.Services
 
         public void CommandNotice(string command,string source, string args,bool accepted)
         {
-            BotCommandNotice e = new BotCommandNotice(command, source, args, accepted);
+            BotCommandNotice e = new BotCommandNotice(command, args, source, accepted);
             EventHandler<BotCommandNotice> handler = BotclientCommandEventNotices;
             handler?.Invoke(this, e);
             if(master.BotClient.basicCfg.GetLogCommands() == true)
@@ -431,11 +433,9 @@ namespace SecondBotEvents.Services
             if (requireSigning == false)
             {
                 accepted = true; // just accept the command
-                master.CommandNotice(command, source, String.Join("@@@", args), accepted);
                 return;
             }
             Vaildate(requireTimewindow, windowSize, secret);
-            master.CommandNotice(command, source, String.Join("@@@", args), accepted);
         }
 
         protected void Vaildate(bool requireTimewindow, int windowSize, string secret)
