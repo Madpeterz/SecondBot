@@ -18,7 +18,7 @@ namespace SecondBotEvents.Services
         {
             return commands.ContainsKey(C);
         }
-        public KeyValuePair<bool, string> RunCommand(SignedCommand C)
+        public KeyValuePair<bool, string> RunCommand(SignedCommand C, string source)
         {
             if(commands.ContainsKey(C.command) == false)
             {
@@ -39,7 +39,7 @@ namespace SecondBotEvents.Services
                     Av = Av.Replace("[C_ARG_"+ loop.ToString()+"]", C.args[loop - 1]);
                     loop++;
                 }
-                KeyValuePair<bool,string> reply = master.CommandsService.CommandInterfaceCaller(Av, false, true);
+                KeyValuePair<bool,string> reply = master.CommandsService.CommandInterfaceCaller(Av, false, true, source);
                 if(reply.Key == true)
                 {
                     commandsRun++;

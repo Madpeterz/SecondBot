@@ -197,8 +197,7 @@ namespace SecondBotEvents.Services
             {
                 return new KeyValuePair<bool, string>(false, "Not accepted via signing");
             }
-            KeyValuePair<bool, string> reply = RunCommand(C, viaCustomCommand);
-            CommandNotice(C.command, source, String.Join("@@@", C.args), reply.Key);
+            KeyValuePair<bool, string> reply = RunCommand(C, viaCustomCommand, source);
             return reply;
         }
 
@@ -263,7 +262,7 @@ namespace SecondBotEvents.Services
         }
         protected HttpClient HTTPclient = new HttpClient();
 
-        protected KeyValuePair<bool, string> RunBaseCommand(SignedCommand C)
+        protected KeyValuePair<bool, string> RunBaseCommand(SignedCommand C, string source)
         {
             try
             {
@@ -290,13 +289,16 @@ namespace SecondBotEvents.Services
                             {
                                 reply = JsonConvert.SerializeObject(processed);
                             }
+                            CommandNotice(C.command, source, String.Join("@@@", C.args), true);
                             return new KeyValuePair<bool, string>(status, reply);
                         }
                         catch (Exception e)
                         {
+                            CommandNotice(C.command, source+" ~~ Failure: "+e.Message, String.Join("@@@", C.args), false);
                             return new KeyValuePair<bool, string>(false, e.Message);
                         }
                     }
+                    CommandNotice(C.command, source + " ~~ Failure: incorrect number of args", String.Join("@@@", C.args), false);
                     return new KeyValuePair<bool, string>(status, reply);
                 }
                 return new KeyValuePair<bool, string>(false, "theMethod is null");
@@ -306,7 +308,7 @@ namespace SecondBotEvents.Services
                 return new KeyValuePair<bool, string>(false, e.Message);
             }
         }
-        public KeyValuePair<bool, string> RunCommand(SignedCommand C, bool inCustomCommand=false)
+        public KeyValuePair<bool, string> RunCommand(SignedCommand C, bool inCustomCommand=false, string source="?")
         {
             if(acceptNewCommands == false)
             {
@@ -326,9 +328,9 @@ namespace SecondBotEvents.Services
                     {
                         return new KeyValuePair<bool, string>(false, "Custom command chaining is not allowed");
                     }
-                    return master.CustomCommandsService.RunCommand(C);
+                    return master.CustomCommandsService.RunCommand(C, source);
                 }
-                KeyValuePair<bool,string> reply = RunBaseCommand(C);
+                KeyValuePair<bool,string> reply = RunBaseCommand(C, source);
                 if (C.replyTarget != null)
                 {
                     SmartCommandReply(C.replyTarget, reply.Value, C.command);
