@@ -184,9 +184,9 @@ namespace SecondBotEvents.Services
             return false;
         }
 
-        public KeyValuePair<bool, string> CommandInterfaceCaller(string message, bool requireSigning=false, bool viaCustomCommand=false)
+        public KeyValuePair<bool, string> CommandInterfaceCaller(string message, bool requireSigning=false, bool viaCustomCommand=false, string forceSetSource= "command interface")
         {
-            string source = "command interface";
+            string source = forceSetSource;
             if(viaCustomCommand == true)
             {
                 source = "customcommand";
@@ -197,10 +197,6 @@ namespace SecondBotEvents.Services
                 return new KeyValuePair<bool, string>(false, "Not accepted via signing");
             }
             KeyValuePair<bool, string> reply = RunCommand(C, viaCustomCommand);
-            if (C.replyTarget != null)
-            {
-                SmartCommandReply(C.replyTarget, reply.Value, C.command);
-            }
             return reply;
         }
 
@@ -330,7 +326,12 @@ namespace SecondBotEvents.Services
                     }
                     return master.CustomCommandsService.RunCommand(C);
                 }
-                return RunBaseCommand(C);
+                KeyValuePair<bool,string> reply = RunBaseCommand(C);
+                if (C.replyTarget != null)
+                {
+                    SmartCommandReply(C.replyTarget, reply.Value, C.command);
+                }
+                return reply;
 
             }
             catch (Exception e)
