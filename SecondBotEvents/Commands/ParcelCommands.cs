@@ -102,7 +102,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Timed out while doing land search")]
         [ArgHints("filterRegion", "Any,Auction,Mainland,Estate")]
         [ArgHints("filterPrice", "the max price to get results for: a number greater than or equal to zero")]
-        [ArgHints("filterArea", "the min area to get results for: a number greater than or equal to zero")]
+        [ArgHints("filterArea", "the max area to get results for: a number greater than or equal to zero")]
         [ArgHints("pageNum", "the page to load from (starting at zero): a number greater than or equal to zero")]
         [ArgHints("timeout", "how long to wait for results: a number greater in the range 2000 to 7000")]
 
@@ -145,13 +145,13 @@ namespace SecondBotEvents.Commands
                 return Failure("timeout must be >= 2000 and <= 7000");
             }
             AutoResetEvent landresultsTimeout = new AutoResetEvent(false);
-            Dictionary<string, string> collection = new Dictionary<string, string>();
+            List<string> collection = new List<string>();
             void LandSearchResultsReply(object sender, DirLandReplyEventArgs e)
             {
                 int counter = (100 * GetpageNum);
                 foreach(DirectoryParcel parcel in e.DirParcels)
                 {
-                    collection.Add(counter.ToString(), JsonConvert.SerializeObject(parcel));
+                    collection.Add(JsonConvert.SerializeObject(parcel));
                     counter++;
                 }
                 landresultsTimeout.Set();
