@@ -851,7 +851,8 @@ namespace OpenMetaverse
         /// each query.</remarks>
         public void StartLandSearch(SearchTypeFlags typeFlags)
         {
-            StartLandSearch(DirFindFlags.SortAsc | DirFindFlags.PerMeterSort, typeFlags, 0, 0, 0);
+            StartLandSearch(DirFindFlags.SortAsc | DirFindFlags.PerMeterSort | DirFindFlags.IncludePG
+                | DirFindFlags.IncludeMature | DirFindFlags.IncludeAdult, typeFlags, 0, 0, 0);
         }
 
         /// <summary>
@@ -874,7 +875,8 @@ namespace OpenMetaverse
         public void StartLandSearch(SearchTypeFlags typeFlags, int priceLimit, int areaLimit, int queryStart)
         {
             StartLandSearch(DirFindFlags.SortAsc | DirFindFlags.PerMeterSort | DirFindFlags.LimitByPrice |
-                DirFindFlags.LimitByArea, typeFlags, priceLimit, areaLimit, queryStart);
+                DirFindFlags.LimitByArea | DirFindFlags.IncludePG
+                | DirFindFlags.IncludeMature | DirFindFlags.IncludeAdult, typeFlags, priceLimit, areaLimit, queryStart);
         }
 
         /// <summary>
