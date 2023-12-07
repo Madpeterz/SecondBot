@@ -1712,6 +1712,10 @@ namespace OpenMetaverse
         {
             if (target != UUID.Zero)
             {
+                if(message.Length > 1023)
+                {
+                    message = message.Substring(0, 1000) + "...";
+                }
                 ImprovedInstantMessagePacket im = new ImprovedInstantMessagePacket();
 
                 if (imSessionID.Equals(UUID.Zero) || imSessionID.Equals(AgentID))
