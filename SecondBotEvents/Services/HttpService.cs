@@ -304,7 +304,8 @@ namespace SecondBotEvents.Services
             }
             SignedCommand C = new(
                 master.CommandsService,"http",
-                commandName, signing, myArgs, cmdUnixtime, null, true, 5, master.CommandsService.myConfig.GetSharedSecret());
+                commandName, signing, myArgs, cmdUnixtime, null,true, master.CommandsService.myConfig.GetTimeWindowSecs(),
+                master.CommandsService.myConfig.GetSharedSecret());
             if(C.accepted == false)
             {
                 return "Command request rejected";
