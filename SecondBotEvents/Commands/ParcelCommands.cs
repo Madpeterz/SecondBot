@@ -4,6 +4,7 @@ using SecondBotEvents.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using static OpenMetaverse.DirectoryManager;
 using static OpenMetaverse.ParcelManager;
 
 namespace SecondBotEvents.Commands
@@ -68,6 +69,108 @@ namespace SecondBotEvents.Commands
             }
             return BasicReply(targetparcel.Dwell.ToString());
         }
+
+        [About("Gets the current parcel sale amount and target for sale and returns it via the reply target")]
+        [ReturnHints("json object with sale amount and target for sale")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        public object GetParcelSaleDetails()
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
+            Dictionary<string, string> collection = new Dictionary<string, string>();
+            collection.Add("ForSale", targetparcel.Flags.HasFlag(ParcelFlags.ForSale).ToString());
+            collection.Add("Cost", targetparcel.SalePrice.ToString());
+            collection.Add("SaleTarget", targetparcel.AuthBuyerID.ToString());
+            return BasicReply(JsonConvert.SerializeObject(collection));
+        }
+
+        [About("Make a request to the landsale directory")]
+        [ReturnHints("json object with data of parcels for sale, max of 100 retults per page")]
+        [ReturnHintsFailure("Invaild filterRegion")]
+        [ReturnHintsFailure("Invaild filterPrice")]
+        [ReturnHintsFailure("filterPrice must be >= 0")]
+        [ReturnHintsFailure("Invaild filterArea")]
+        [ReturnHintsFailure("filterArea must be >= 0")]
+        [ReturnHintsFailure("Invaild pageNum")]
+        [ReturnHintsFailure("pageNum must be >= 0")]
+        [ReturnHintsFailure("Invaild timeout")]
+        [ReturnHintsFailure("timeout must be >= 2000 and <= 7000")]
+        [ReturnHintsFailure("Timed out while doing land search")]
+        [ArgHints("filterRegion", "Any,Auction,Mainland,Estate")]
+        [ArgHints("filterPrice", "the max price to get results for: a number greater than or equal to zero")]
+        [ArgHints("filterArea", "the min area to get results for: a number greater than or equal to zero")]
+        [ArgHints("pageNum", "the page to load from (starting at zero): a number greater than or equal to zero")]
+        [ArgHints("timeout", "how long to wait for results: a number greater in the range 2000 to 7000")]
+
+        public object QueryLandSaleData(string filterRegion,string filterPrice, string filterArea, string pageNum, string timeout)
+        {
+            if (Enum.TryParse<DirectoryManager.SearchTypeFlags>(filterRegion, out DirectoryManager.SearchTypeFlags filterRegionType) == false)
+            {
+                return Failure("Invaild filterRegion");
+            }
+            if(int.TryParse(filterPrice, out int filterMaxPrice) == false)
+            {
+                return Failure("Invaild filterPrice");
+            }
+            if(filterMaxPrice < 0)
+            {
+                return Failure("filterPrice must be >= 0");
+            }
+            if (int.TryParse(filterArea, out int filterMinArea) == false)
+            {
+                return Failure("Invaild filterArea");
+            }
+            if (filterMaxPrice < 0)
+            {
+                return Failure("filterArea must be >= 0");
+            }
+            if (int.TryParse(pageNum, out int GetpageNum) == false)
+            {
+                return Failure("Invaild pageNum");
+            }
+            if (GetpageNum < 0)
+            {
+                return Failure("GetpageNum must be >= 0");
+            }
+            if (int.TryParse(timeout, out int timeoutMS) == false)
+            {
+                return Failure("Invaild timeout");
+            }
+            if ((timeoutMS < 2000) || (timeoutMS > 7000))
+            {
+                return Failure("timeout must be >= 2000 and <= 7000");
+            }
+            AutoResetEvent landresultsTimeout = new AutoResetEvent(false);
+            Dictionary<string, string> collection = new Dictionary<string, string>();
+            void LandSearchResultsReply(object sender, DirLandReplyEventArgs e)
+            {
+                int counter = (100 * GetpageNum);
+                foreach(DirectoryParcel parcel in e.DirParcels)
+                {
+                    collection.Add(counter.ToString(), JsonConvert.SerializeObject(parcel));
+                    counter++;
+                }
+                landresultsTimeout.Set();
+            }
+            
+            GetClient().Directory.DirLandReply += LandSearchResultsReply;
+            GetClient().Directory.StartLandSearch(filterRegionType, filterMaxPrice, filterMinArea, GetpageNum);
+            bool haveResults = landresultsTimeout.WaitOne(timeoutMS, false);
+            if (haveResults == false)
+            {
+                GetClient().Directory.DirLandReply -= LandSearchResultsReply;
+                return Failure("Timed out while doing land search");
+            }
+            GetClient().Directory.DirLandReply -= LandSearchResultsReply;
+            string reply = JsonConvert.SerializeObject(collection);
+
+            return BasicReply(reply, new string[] { filterRegion, filterPrice, filterArea, pageNum, timeout });
+        }
+
 
         [About("Changes the parcel landing mode to point and sets the landing point")]
         [ReturnHints("ok")]
