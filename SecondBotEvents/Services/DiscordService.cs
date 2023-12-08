@@ -516,6 +516,7 @@ namespace SecondBotEvents.Services
             {
                 LogFormater.Info("Discord service [Avi link]");
                 AcceptEventsFromSL = false;
+                LoginEventsAttached = false;
                 GetClient().Network.LoggedOut += BotLoggedOut;
                 GetClient().Self.ChatFromSimulator -= LocalChat;
                 GetClient().Self.IM -= BotImMessage;
@@ -527,6 +528,7 @@ namespace SecondBotEvents.Services
 
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
+            LoginEventsAttached = false;
             GetClient().Network.SimConnected += BotLoggedIn;
             GetClient().Self.ChatFromSimulator -= LocalChat;
             GetClient().Self.IM -= BotImMessage;
@@ -916,13 +918,19 @@ namespace SecondBotEvents.Services
             if (DiscordIsReady == true)
             {
                 DiscordClient.SetGameAsync(e.Simulator.Name, null, ActivityType.Playing);
+                if(LoginEventsAttached == false)
+                {
+                    LoginEvents();
+                }
             }
         }
 
+        protected bool LoginEventsAttached = false;
         protected void LoginEvents()
         {
-            if((AcceptEventsFromSL == true) && (DiscordIsReady == true))
+            if((AcceptEventsFromSL == true) && (DiscordIsReady == true) && (LoginEventsAttached == false))
             {
+                LoginEventsAttached = true;
                 GetClient().Self.IM += BotImMessage;
                 GetClient().Network.SimConnected -= BotCurrentSim;
                 GetClient().Self.ChatFromSimulator += LocalChat;
