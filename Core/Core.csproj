@@ -10,7 +10,7 @@
     <PackageReference Include="Discord.Net.WebSocket" Version="3.8.1" />
     <PackageReference Include="EmbedIO" Version="3.4.3" />
     <PackageReference Include="RestSharp" Version="108.0.3" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
   </ItemGroup>
 
   <ItemGroup>
