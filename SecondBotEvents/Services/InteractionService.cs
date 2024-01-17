@@ -138,22 +138,29 @@ namespace SecondBotEvents.Services
 
         protected void BotInventoryOffer(object o, InventoryObjectOfferedEventArgs e)
         {
-            if(ProcessRequest(myConfig.GetAcceptInventory(),e.Offer.FromAgentName, "InventoryUpdate") == false)
+            if(ProcessRequest(myConfig.GetAcceptInventory(),e.Offer.FromAgentName, "InventoryOffer") == false)
             {
                 return;
             }
             e.Accept = true;
             Dictionary<string, string> details = new Dictionary<string, string>
             {
-                { "itemuuid", e.ObjectID.ToString() },
-                { "itemtype", e.AssetType.ToString() }
+                { "transactionid", e.Offer.IMSessionID.ToString() },
+                { "itemtype", e.AssetType.ToString() },
+                { "message", e.Offer.Message.ToString() },
+                { "fromscript", e.FromTask.ToString() }
             };
-            InventoryItem itm = GetClient().Inventory.FetchItem(e.ObjectID, GetClient().Self.AgentID, 2000);
-            if(itm != null)
+            if(e.FromTask == false)
             {
-                details.Add("itemname", itm.Name);
+                details.Add("itemuuid", e.ObjectID.ToString());
+                details.Add("itemname", "?");
+                InventoryItem itm = GetClient().Inventory.FetchItem(e.ObjectID, GetClient().Self.AgentID, 2000);
+                if(itm != null)
+                {
+                    details["itemname"] = itm.Name;
+                }
             }
-            JsonOuput(true, "InventoryUpdate", e.Offer.FromAgentName, "see misc", details);
+            JsonOuput(true, "InventoryOffer", e.Offer.FromAgentName, "see misc", details);
         }
 
         protected void BotFriendRequested(object o, FriendshipOfferedEventArgs e)
