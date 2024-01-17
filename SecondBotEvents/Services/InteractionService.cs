@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SecondBotEvents.Services
 {
@@ -89,6 +90,29 @@ namespace SecondBotEvents.Services
             );
         }
 
+        protected void JsonOuputCleaner(string misc, string source)
+        {
+            Dictionary<string, string> reply = new Dictionary<string, string>();
+            reply.Add("value", misc);
+            JsonOuputCleaner(reply, source);
+        }
+
+        protected void JsonOuputCleaner(Dictionary<string, string> misc, string source)
+        {
+            if (myConfig.GetEnableJsonOutputEvents() == false)
+            {
+                return;
+            }
+            misc.Add("eventsource", source);
+            master.CommandsService.SmartCommandReply(
+                myConfig.GetJsonOutputEventsTarget(),
+                JsonConvert.SerializeObject(misc),
+                "interactions"
+            );
+        }
+
+
+
         protected void BotTeleportOffer(object o, InstantMessageEventArgs e)
         {
             if((e.IM.Dialog != InstantMessageDialog.RequestTeleport) && (e.IM.Dialog != InstantMessageDialog.RequestLure))
@@ -116,7 +140,7 @@ namespace SecondBotEvents.Services
             {
                 master.HomeboundService.MarkTeleport();
             }
-            JsonOuput(true, mode, e.IM.FromAgentName);
+            JsonOuputCleaner(e.IM.FromAgentName, mode);
             if (e.IM.Dialog == InstantMessageDialog.RequestLure)
             {
                 GetClient().Self.SendTeleportLure(e.IM.FromAgentID);
@@ -133,7 +157,20 @@ namespace SecondBotEvents.Services
                 return;
             }
             e.Accept = true;
-            JsonOuput(true, "GroupInvite", e.FromName);
+            Dictionary<string,string> reply = new Dictionary<string,string>();
+            reply.Add("message", e.Message);
+            reply.Add("fromuuid", e.AgentID.ToString());
+            JsonOuputCleaner(reply, "GroupInvite");
+        }
+
+        protected void BotInventoryAdd(object o, InventoryObjectAddedEventArgs e)
+        {
+            Dictionary<string, string> details = new Dictionary<string, string>
+            {
+                { "itemname", e.Obj.Name },
+                { "itemuuid", e.Obj.UUID.ToString() },
+            };
+            JsonOuputCleaner(details, "InventoryAdd");
         }
 
         protected void BotInventoryOffer(object o, InventoryObjectOfferedEventArgs e)
@@ -148,7 +185,8 @@ namespace SecondBotEvents.Services
                 { "transactionid", e.Offer.IMSessionID.ToString() },
                 { "itemtype", e.AssetType.ToString() },
                 { "message", e.Offer.Message.ToString() },
-                { "fromscript", e.FromTask.ToString() }
+                { "fromscript", e.FromTask.ToString() },
+                { "targetfolder", e.FolderID.ToString() }
             };
             if(e.FromTask == false)
             {
@@ -160,7 +198,7 @@ namespace SecondBotEvents.Services
                     details["itemname"] = itm.Name;
                 }
             }
-            JsonOuput(true, "InventoryOffer", e.Offer.FromAgentName, "see misc", details);
+            JsonOuputCleaner(details, "InventoryOffer");
         }
 
         protected void BotFriendRequested(object o, FriendshipOfferedEventArgs e)
@@ -170,7 +208,7 @@ namespace SecondBotEvents.Services
                 return;
             }
             GetClient().Friends.AcceptFriendship(e.AgentID, e.SessionID);
-            JsonOuput(true, "FriendRequest", e.AgentName);
+            JsonOuputCleaner(e.AgentName, "FriendRequest");
             
         }
 
@@ -181,12 +219,19 @@ namespace SecondBotEvents.Services
             LogFormater.Info("Interaction Service [Standby]");
         }
 
-        protected void BotLoggedIn(object o, SimConnectedEventArgs e)
+        async Task awaitstable()
         {
+            await Task.Delay(3000);
+        }
+
+        protected async void BotLoggedIn(object o, SimConnectedEventArgs e)
+        {
+            await awaitstable();
             GetClient().Network.SimConnected -= BotLoggedIn;
             GetClient().Friends.FriendshipOffered += BotFriendRequested;
             GetClient().Inventory.InventoryObjectOffered += BotInventoryOffer;
             GetClient().Groups.GroupInvitation += BotGroupInviteOffer;
+            GetClient().Inventory.Store.InventoryObjectAdded += BotInventoryAdd;
             GetClient().Self.IM += BotTeleportOffer;
             botConnected = true;
             LogFormater.Info("Interaction Service [Active]");
@@ -223,6 +268,7 @@ namespace SecondBotEvents.Services
                 {
                     GetClient().Friends.FriendshipOffered -= BotFriendRequested;
                     GetClient().Inventory.InventoryObjectOffered -= BotInventoryOffer;
+                    GetClient().Inventory.Store.InventoryObjectAdded -= BotInventoryAdd;
                     GetClient().Groups.GroupInvitation -= BotGroupInviteOffer;
                 }
             }
