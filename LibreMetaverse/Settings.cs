@@ -116,7 +116,7 @@ namespace OpenMetaverse
 
         /// <summary>Milliseconds without receiving a packet before the 
         /// connection to a simulator is assumed lost</summary>
-        public int SIMULATOR_TIMEOUT = 30 * 1000;
+        public int SIMULATOR_TIMEOUT = 60 * 1000;
 
         /// <summary>Milliseconds to wait for a simulator info request through
         /// the grid interface</summary>
@@ -338,7 +338,7 @@ namespace OpenMetaverse
         /// You will get no output on the console. This behavior can be overriden by creating
         /// a logger configuration file for log4net
         /// </summary>
-        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.None;
+        public static Helpers.LogLevel LOG_LEVEL = Helpers.LogLevel.Debug;
 
         /// <summary>Attach avatar names to log messages</summary>
         public bool LOG_NAMES = true;
