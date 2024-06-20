@@ -198,6 +198,10 @@ namespace SecondBotEvents.Services
                     details["itemname"] = itm.Name;
                 }
             }
+            if(master.EventsService.isRunning() == true)
+            {
+                master.EventsService.InventoryUpdateEvent(details);
+            }
             JsonOuputCleaner(details, "InventoryOffer");
         }
 

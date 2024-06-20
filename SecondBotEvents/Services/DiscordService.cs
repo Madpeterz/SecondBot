@@ -6,6 +6,7 @@ using SecondBotEvents.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -94,6 +95,86 @@ namespace SecondBotEvents.Services
             remove { lock (m_discordEventChatLock) { m_discordChatEvent -= value; } }
         }
 
+        public KeyValuePair<bool, List<string>> DiscordMemerRoles(string givenserverid, string givenmemberid)
+        {
+            if (GetReadyForDiscordActions() == false)
+            {
+                // bot is not ready this message should not have got here yet.
+                return new KeyValuePair<bool, List<string>>(false,new List<string>() { "not ready"});
+            }
+            if (ulong.TryParse(givenserverid, out ulong serverid) == false)
+            {
+                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "invaild server"});
+            }
+            if (ulong.TryParse(givenmemberid, out ulong memberid) == false)
+            {
+                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "invaild member"});
+            }
+            SocketGuild server = DiscordClient.GetGuild(serverid);
+            if (server == null)
+            {
+                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "Cant get server"});
+            }
+            SocketGuildUser user = server.GetUser(memberid);
+            if(user == null)
+            {
+                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "Cant get user" });
+            }
+            List<string> roleids = new List<string>();
+            foreach(SocketRole role in user.Roles)
+            {
+                roleids.Add(role.Id.ToString());
+            }
+            return new KeyValuePair<bool, List<string>>(true, roleids);
+        }
+
+        protected HttpClient HTTPclient = new HttpClient();
+        protected bool MessageInteractionEvent(SocketMessage message, SocketChannel socketChannel)
+        {
+            if (myConfig.GetInteractionEnabled() != true)
+            {
+                return false;
+            }
+            if (myConfig.GetInteractionChannelNumber() != socketChannel.Id.ToString())
+            {
+                return false;
+            }
+            if(message.Content.StartsWith(myConfig.GetInteractionCommandName()) == false)
+            {
+                return false;
+            }
+            if(myConfig.GetInteractionHttpTarget().StartsWith("http") == false)
+            {
+                myConfig.SetInteractionEnabled(false);
+                return false;
+            }
+            string getmessage = message.Content.Replace(myConfig.GetInteractionCommandName(), "");
+            long unixtime = SecondbotHelpers.UnixTimeNow();
+            string hash = SecondbotHelpers.GetSHA1(unixtime.ToString()+getmessage + master.CommandsService.myConfig.GetSharedSecret());
+            Dictionary<string, string> values = new Dictionary<string, string>
+                    {
+                        { "message", getmessage },
+                        { "username", message.Author.Username },
+                        { "userid", message.Author.Id.ToString() },
+                        { "unixtime", unixtime.ToString() },
+                        { "hash", hash }
+                    };
+            var content = new FormUrlEncodedContent(values);
+            try
+            {
+                HTTPclient.PostAsync(myConfig.GetInteractionHttpTarget(), content);
+                _ = MarkMessage((IUserMessage)message, "✅");
+            }
+            catch (Exception e)
+            {
+                LogFormater.Crit("[MessageInteractionEvent] HTTP failed: " + e.Message + "");
+                _ = MarkMessage((IUserMessage)message, "❌");
+                return false;
+            }
+            return true;
+
+        }
+
         protected Task DiscordClientMessageReceived(SocketMessage message)
         {
             if(GetReadyForDiscordActions() == false)
@@ -102,6 +183,10 @@ namespace SecondBotEvents.Services
                 return Task.CompletedTask;
             }
             SocketChannel socketChannel = DiscordClient.GetChannel(message.Channel.Id);
+            if(MessageInteractionEvent(message, socketChannel) == true)
+            {
+                return Task.CompletedTask;
+            }
             if(socketChannel.GetChannelType() != Discord.ChannelType.Text)
             {
                 // bot only does stuff on text channels.
@@ -469,6 +554,20 @@ namespace SecondBotEvents.Services
             DiscordClient.MessageReceived += DiscordClientMessageReceived;
             DiscordClient.Disconnected += DiscordDisconnected;
             _ = DiscordClient.LoginAsync(TokenType.Bot, myConfig.GetClientToken()).ConfigureAwait(false);
+        }
+
+        protected Task DiscordInteraction(SocketMessageCommand msg)
+        {
+            if (myConfig.GetInteractionEnabled() == false)
+            {
+                return Task.CompletedTask;
+            }
+            if (msg.CommandName != myConfig.GetInteractionCommandName())
+            {
+                return Task.CompletedTask;
+            }
+
+            return Task.CompletedTask;
         }
 
         public override void Stop()

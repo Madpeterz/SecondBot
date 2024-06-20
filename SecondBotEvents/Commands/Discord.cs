@@ -1,4 +1,7 @@
-﻿using SecondBotEvents.Services;
+﻿using Newtonsoft.Json;
+using SecondBotEvents.Services;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SecondBotEvents.Commands
 {
@@ -40,6 +43,20 @@ namespace SecondBotEvents.Commands
                 return Failure("Why empty", new [] { serverid, memberid, why });
             }
             return BasicReply(master.DiscordService.BanMember(serverid, memberid, why).Result.ToString(), new [] { serverid, memberid, why });
+        }
+
+        public object Discord_GetMemberRoles(string serverid, string memberid)
+        {
+            if (master.DiscordService.DiscordReady() == false)
+            {
+                return Failure("Discord client not ready");
+            }
+            KeyValuePair<bool, List<string>> reply = master.DiscordService.DiscordMemerRoles(serverid, memberid);
+            if(reply.Key == false)
+            {
+                return Failure(reply.Value.First());
+            }
+            return BasicReply(JsonConvert.SerializeObject(reply.Value));
         }
 
         [About("Clears messages on the server sent by the member in the last 13 days, 22hours 59mins")]
