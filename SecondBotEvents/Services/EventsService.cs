@@ -261,7 +261,7 @@ namespace SecondBotEvents.Services
             if(myConfig.GetOutputHttpURL() != null)
             {
                 long unixtime = SecondbotHelpers.UnixTimeNow();
-                string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "EventService" + GetClient().Self.AgentID + output);
+                string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "EventService" + GetClient().Self.AgentID + output + master.CommandsService.myConfig.GetSharedSecret());
                 var client = new RestClient(myConfig.GetOutputHttpURL());
                 var request = new RestRequest("Event/Service", Method.Post);
                 request.AddParameter("token", token);
