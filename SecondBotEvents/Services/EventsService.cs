@@ -42,7 +42,7 @@ namespace SecondBotEvents.Services
                     else if (A.StartsWith("http") == true)
                     {
                         long unixtime = SecondbotHelpers.UnixTimeNow();
-                        string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "EventService" + GetClient().Self.AgentID + output);
+                        string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "EventService" + GetClient().Self.AgentID + output+master.CommandsService.myConfig.GetSharedSecret());
                         var client = new RestClient(A);
                         var request = new RestRequest("Inventory/Update", Method.Post);
                         request.AddParameter("token", token);
