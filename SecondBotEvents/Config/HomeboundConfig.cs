@@ -14,6 +14,7 @@ namespace SecondBotEvents.Config
             settings.Add("Enabled");
             settings.Add("HomeSimSlUrl");
             settings.Add("BackupSimSLUrl");
+            settings.Add("ReturnToHomeSimAfterMins");
             settings.Add("AtHomeSeekLocation");
             settings.Add("AtBackupSeekLocation");
             settings.Add("AtHomeAutoSitUuid");
@@ -23,6 +24,11 @@ namespace SecondBotEvents.Config
         public string GetAtHomeAutoSitUuid()
         {
             return ReadSettingAsString("AtHomeAutoSitUuid", UUID.Zero.ToString());
+        }
+
+        public int GetReturnToHomeSimAfterMins()
+        {
+            return ReadSettingAsInt("ReturnToHomeSimAfterMins", 1);
         }
 
         public bool GetAtHomeSeekLocation()

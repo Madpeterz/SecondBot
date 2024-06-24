@@ -73,6 +73,7 @@ ENV basic_Username='' \
 	homebound_AtHomeSeekLocation='false' \
 	homebound_AtBackupSeekLocation='false' \
 	homebound_AtHomeAutoSitUuid='00000000-0000-0000-0000-000000000000' \
+	homebound_ReturnToHomeSimAfterMins=5 \
 	http_Enabled='false' \
 	http_Port=80 \
 	interaction_Enabled='true' \

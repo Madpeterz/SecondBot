@@ -17,9 +17,11 @@ namespace SecondBotEvents.Services
         protected UUID sitTarget = UUID.Zero;
         protected long lastAlertTeleport = 0;
         protected bool evacWanted = false;
+        protected bool evacTeleport = false;
         protected bool gotoPosAttemptedTp = false;
         protected bool gotoPosAttemptedWalk = false;
         protected long lastGotoAction = 0;
+        protected long lastTeleportHomeAttempt = 0;
         protected bool softDisable = false;
         protected bool closeToHome = false;
         protected bool softDisableSit = false;
@@ -67,11 +69,13 @@ namespace SecondBotEvents.Services
         public bool GoHome()
         {
             attemptedTeleportHome = true;
+            lastTeleportHomeAttempt = SecondbotHelpers.UnixTimeNow();
             LogFormater.Info("Teleporting to home sim");
             return GetClient().Self.Teleport(home.name, new Vector3(home.x, home.y, home.z), new Vector3(0, 0, 0));
         }
         protected void Tick()
         {
+            long dif = 0;
             if (evacWanted == true)
             {
                 BotAlertMessage(null, new AlertMessageEventArgs("restart", "999", new OpenMetaverse.StructuredData.OSDMap()));
@@ -79,6 +83,7 @@ namespace SecondBotEvents.Services
             if (GetClient().Network.CurrentSim.Name == home.name)
             {
                 simNickname = "Home # ";
+                evacTeleport = false;
                 if (sitTarget != UUID.Zero)
                 {
                     if (GetClient().Self.SittingOn == 0)
@@ -102,6 +107,7 @@ namespace SecondBotEvents.Services
                 {
                     GetToPos(backup);
                 }
+                TryGoHome();
                 return;
             }
             if (simNickname == "")
@@ -115,26 +121,38 @@ namespace SecondBotEvents.Services
                     simNickname = "Someplace # ";
                 }
             }
+            TryGoHome();
+        }
+
+        protected void TryGoHome()
+        {
             long dif = SecondbotHelpers.UnixTimeNow() - teleportActionLockout;
-            if(dif < 30)
+            if (dif < 30)
             {
                 return;
             }
             teleportActionLockout = SecondbotHelpers.UnixTimeNow();
             if (attemptedTeleportHome == false)
             {
-                if(GoHome() == false)
+                dif = SecondbotHelpers.UnixTimeNow() - lastTeleportHomeAttempt;
+                if ((dif / 60) >= myConfig.GetReturnToHomeSimAfterMins())
                 {
-                    LogFormater.Warn("Unable to teleport to home sim");
+                    attemptedTeleportHome = false;
+                    evacTeleport = false;
+                    LogFormater.Info("trying to return to home sim");
+                    if (GoHome() == false)
+                    {
+                        LogFormater.Warn("Unable to teleport to home sim");
+                    }
                 }
                 return;
             }
-            else if(attemptedTeleportBackup == false)
+            else if (attemptedTeleportBackup == false)
             {
                 attemptedTeleportBackup = true;
                 LogFormater.Info("Teleporting to backup sim");
                 teleportActionLockout = SecondbotHelpers.UnixTimeNow();
-                if(GetClient().Self.Teleport(backup.name, new Vector3(backup.x, backup.y, backup.z), new Vector3(0, 0, 0)) == false)
+                if (GetClient().Self.Teleport(backup.name, new Vector3(backup.x, backup.y, backup.z), new Vector3(0, 0, 0)) == false)
                 {
                     LogFormater.Warn("Unable to teleport to backup sim");
                 }
@@ -169,6 +187,10 @@ namespace SecondBotEvents.Services
                 else if(GetClient().Self.SittingOn != 0)
                 {
                     return simNickname + "Sitting on a thing";
+                }
+                else if(evacTeleport == true)
+                {
+                    return simNickname + "Evac teleport";
                 }
                 else if(closeToHome == true)
                 {
@@ -258,6 +280,7 @@ namespace SecondBotEvents.Services
                 return;
             }
             evacWanted = false;
+            evacTeleport = true;
             if (GetClient().Network.CurrentSim.Name == home.name)
             {
                 LogFormater.Info("Teleporting to backup sim to avoid restart");
