@@ -203,7 +203,7 @@ namespace SecondBotEvents.Services
                 foreach(string url in DialogRelayHTTP)
                 {
                     long unixtime = SecondbotHelpers.UnixTimeNow();
-                    string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "DialogRelay"+GetClient().Self.AgentID+ eventMessage);
+                    string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "DialogRelay"+GetClient().Self.AgentID+ eventMessage + master.CommandsService.myConfig.GetSharedSecret());
                     var client = new RestClient(url);
                     var request = new RestRequest("Dialog/Relay", Method.Post);
                     request.AddParameter("token", token);

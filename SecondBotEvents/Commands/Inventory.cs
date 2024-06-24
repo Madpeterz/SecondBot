@@ -24,7 +24,12 @@ namespace SecondBotEvents.Commands
         [ArgHints("outputTarget", "HTTP url, channel, avatar UUID or clear to remove all events for the selected type")]
         public object SetInventoryUpdate(string inventoryType, string outputTarget)
         {
-            return Failure("@todo inventory update events");
+            if (master.EventsService.isRunning() == true)
+            {
+                master.EventsService.AddInventoryEvent(inventoryType, outputTarget);
+                return BasicReply("Ok");
+            }
+            return Failure("Events service is not running");
         }
 
         [About("Uploads a new sound file to inventory")]
@@ -151,7 +156,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHints("okMulti")]
         [ReturnHints("invaild item uuid pr invaild attach point")]
-        [ArgHints("item", "UUID of item, or the attach point")]
+        [ArgHints("item", "UUID of item, or the attach point, or * to remove everything")]
         public object Detach(string item)
         {
             if (UUID.TryParse(item, out UUID itemuuid) == false)
@@ -159,7 +164,7 @@ namespace SecondBotEvents.Commands
                 List<InventoryItem> toBeRemoved = new List<InventoryItem>();
                 foreach (KeyValuePair<UUID, AttachmentPoint> pair in GetClient().Appearance.GetAttachmentsByItemId())
                 {
-                    if(pair.Value.ToString() != item)
+                    if((pair.Value.ToString() != item) || (item == "*"))
                     {
                         continue;
                     }
@@ -425,6 +430,15 @@ namespace SecondBotEvents.Commands
             }
             if (RealObject.Value == null)
             {
+                GetClient().Objects.RequestObjectMedia(objectUUID, GetClient().Network.CurrentSim, null);
+                foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
+                {
+                    if (Obj.Value.ID == objectUUID)
+                    {
+                        RealObject = Obj;
+                        break;
+                    }
+                }
                 return Failure("Unable to find object", new [] { item, objectuuid, running });
             }
             bool scriptState = runscript;

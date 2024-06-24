@@ -298,7 +298,7 @@ namespace SecondBotEvents.Services
                             return new KeyValuePair<bool, string>(false, e.Message);
                         }
                     }
-                    CommandNotice(C.command, source + " ~~ Failure: incorrect number of args", String.Join("@@@", C.args), false);
+                    CommandNotice(C.command, source + " ~~ Failure: incorrect number of args expected: "+ theMethod.GetParameters().Count().ToString()+" but got "+ argsList.Count.ToString()+"", String.Join("@@@", C.args), false);
                     return new KeyValuePair<bool, string>(status, reply);
                 }
                 return new KeyValuePair<bool, string>(false, "theMethod is null");

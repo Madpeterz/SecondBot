@@ -165,11 +165,17 @@ namespace SecondBotEvents.Services
 
         protected void BotInventoryAdd(object o, InventoryObjectAddedEventArgs e)
         {
+            InventoryItem F = (InventoryItem)e.Obj;
             Dictionary<string, string> details = new Dictionary<string, string>
             {
                 { "itemname", e.Obj.Name },
                 { "itemuuid", e.Obj.UUID.ToString() },
+                { "itemtype", F.AssetType.ToString()    },
             };
+            if (master.EventsService.isRunning() == true)
+            {
+                master.EventsService.InventoryUpdateEvent(details);
+            }
             JsonOuputCleaner(details, "InventoryAdd");
         }
 

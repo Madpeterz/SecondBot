@@ -204,7 +204,7 @@ namespace SecondBotEvents.Services
                 else if(targetType == "http")
                 {
                     long unixtime = SecondbotHelpers.UnixTimeNow();
-                    string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "RelayService" + GetClient().Self.AgentID + eventMessage);
+                    string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "RelayService" + GetClient().Self.AgentID + eventMessage + master.CommandsService.myConfig.GetSharedSecret());
                     var client = new RestClient(targetOption);
                     var request = new RestRequest("Relay/Service", Method.Post);
                     request.AddParameter("token", token);

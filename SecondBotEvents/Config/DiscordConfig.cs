@@ -14,6 +14,10 @@ namespace SecondBotEvents.Config
             settings.Add("ServerID");
             settings.Add("ClientToken");
             settings.Add("AllowDiscordCommands");
+            settings.Add("InteractionEnabled");
+            settings.Add("InteractionCommandName");
+            settings.Add("InteractionHttpTarget");
+            settings.Add("InteractionChannelNumber");
             settings.Add("HideStatusOutput");
         }
 
@@ -35,6 +39,31 @@ namespace SecondBotEvents.Config
         public bool GetAllowDiscordCommands()
         {
             return ReadSettingAsBool("AllowDiscordCommands");
+        }
+
+        public bool GetInteractionEnabled()
+        {
+            return ReadSettingAsBool("InteractionEnabled");
+        }
+
+        public string GetInteractionHttpTarget()
+        {
+            return ReadSettingAsString("InteractionHttpTarget", "https://localhost/interaction.php");
+        }
+
+        public string GetInteractionCommandName()
+        {
+            return ReadSettingAsString("InteractionCommandName","Go");
+        }
+
+        public string GetInteractionChannelNumber()
+        {
+            return ReadSettingAsString("InteractionChannelNumber", "-1");
+        }
+
+        public void SetInteractionEnabled(bool enabled)
+        {
+            mysettings["InteractionEnabled"] = enabled.ToString();
         }
     }
 }
