@@ -11,17 +11,7 @@ namespace SecondBotEvents.Config
         {
             filename = "rlv";
             settings.Add("Enabled");
-            settings.Add("AllowRlvViaIm");
-            settings.Add("AllowRlvViaObjectOwnerSay");
             settings.Add("HideStatusOutput");
-        }
-        public bool GetAllowRlvViaIm()
-        {
-            return ReadSettingAsBool("AllowRlvViaIm", false);
-        }
-        public bool GetAllowRlvViaObjectOwnerSay()
-        {
-            return ReadSettingAsBool("AllowRlvViaObjectOwnerSay", false);
         }
 
         public bool GetEnabled()

@@ -27,7 +27,7 @@ namespace SecondBotEvents.Config
 
         public bool GetAcceptTeleports()
         {
-            return ReadSettingAsBool("AcceptTeleports", true);
+            return ReadSettingAsBool("AcceptTeleports", false);
         }
 
         public bool GetAcceptGroupInvites()

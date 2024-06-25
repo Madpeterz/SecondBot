@@ -39,6 +39,9 @@ namespace SecondBotEvents
         public EventsService EventsService { get { return (EventsService)GetService("EventsService"); } }
         public DialogService DialogService { get { return (DialogService)GetService("DialogService"); } }
 
+        public CurrentOutfitFolder CurrentOutfitFolder {  get { return (CurrentOutfitFolder)GetService("CurrentOutfitFolder"); } }
+        public RLVService RLV { get { return (RLVService)GetService("RLVService"); } }
+
         public CustomCommandsService CustomCommandsService { get { return (CustomCommandsService)GetService("CustomCommandsService"); } }
 
 
@@ -145,6 +148,8 @@ namespace SecondBotEvents
             lastStatus = new Dictionary<string, string>();
             RegisterService("BotClientService", false);
             RegisterService("DataStoreService");
+            RegisterService("RLVService");
+            RegisterService("CurrentOutfitFolder");
             RegisterService("HttpService");
             RegisterService("CommandsService");
             RegisterService("DiscordService");
