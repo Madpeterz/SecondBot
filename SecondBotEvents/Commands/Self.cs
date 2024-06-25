@@ -86,17 +86,17 @@ namespace SecondBotEvents.Commands
         [About("Makes the bot sit on the ground or on a object if it can see it")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild object UUID")]
-        [ArgHints("target", "ground or a object UUID")]
+        [ArgHints("target", "a object UUID anything or nothing will also work")]
         public object Sit(string target)
         {
-            if (target == "ground")
+            if ((target == "ground") || (target == UUID.Zero.ToString()))
             {
                 GetClient().Self.SitOnGround();
                 return BasicReply("ok", new [] { target });
             }
             if(UUID.TryParse(target,out UUID objectuuid) == false)
             {
-                return Failure("Invaild object UUID", new [] { target });
+                return Failure("Invaild object uuid and not ground");
             }
             GetClient().Self.RequestSit(objectuuid, Vector3.Zero);
             return BasicReply("ok", new [] { target });

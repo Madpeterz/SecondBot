@@ -89,7 +89,9 @@ ENV basic_Username='' \
 	events_HideStatusOutput='false' \
 	homebound_HideStatusOutput='false' \
 	http_HideStatusOutput='false' \
-	interaction_HideStatusOutput='false'
+	interaction_HideStatusOutput='false' \
+	rlv_Enabled='false' \
+	rlv_HideStatusOutput='false'
 	
 
 EXPOSE 80

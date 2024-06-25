@@ -75,7 +75,6 @@ namespace SecondBotEvents.Services
         }
         protected void Tick()
         {
-            long dif = 0;
             if (evacWanted == true)
             {
                 BotAlertMessage(null, new AlertMessageEventArgs("restart", "999", new OpenMetaverse.StructuredData.OSDMap()));
@@ -327,6 +326,12 @@ namespace SecondBotEvents.Services
                 return;
             }
             Stop();
+            if(master.RLV.Enabled == true)
+            {
+                myConfig.setEnabled(false);
+                LogFormater.Info("Homebound Service [Disabled RLV enabled]");
+                return;
+            }
             running = true;
             master.BotClientNoticeEvent += BotClientRestart;
             LogFormater.Info("Homebound Service [Starting]");
