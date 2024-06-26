@@ -9,6 +9,9 @@ using System.Text.RegularExpressions;
 using System.Text;
 using System;
 using SecondBotEvents.RLV;
+using SecondBotEvents.Commands;
+using Discord;
+using System.Threading;
 
 namespace SecondBotEvents.Services
 {
@@ -87,6 +90,31 @@ namespace SecondBotEvents.Services
                 if (pt.Equals(AttachmentPoint.Default) || ptstr.StartsWith("HUD")) continue;
                 RLVAttachments.Add(new RLVAttachment { Name = ptstr.ToLower(), Point = pt });
             }
+            // auto load the #RLV folder
+            var rootContent = GetClient().Inventory.Store.GetContents(GetClient().Inventory.Store.RootFolder.UUID);
+            UUID RLVfolder = UUID.Zero;
+            foreach (var baseItem in rootContent)
+            {
+                if (baseItem is InventoryFolder folder && folder.Name == "#RLV")
+                {
+                    RLVfolder = folder.UUID;
+                    break;
+                }
+            }
+            if(RLVfolder == UUID.Zero)
+            {
+                LogFormater.Info("RLV service [#RLV folder is not setup]");
+            }
+        }
+
+        protected UUID GetFolderFromPath(string path)
+        {
+            InventoryNode A = FindFolder(path);
+            if(A != null)
+            {
+                return A.Data.UUID;
+            }
+            return UUID.Zero;
         }
 
         protected void removeEvents()
@@ -284,6 +312,8 @@ namespace SecondBotEvents.Services
                     Sender = e.SourceID,
                     SenderName = e.FromName
                 };
+                //UUID AV = UUID.Parse("289c3e36-69b3-40c5-9229-0c6a5d230766");
+                //master.BotClient.SendIM(AV, "rule="+rule.Behaviour+" option="+rule.Option+" Param="+rule.Param);
 
                 Logger.DebugLog(rule.ToString());
 
@@ -716,6 +746,7 @@ namespace SecondBotEvents.Services
                                 InventoryNode folder = FindFolder(rule.Option);
                                 if (folder != null)
                                 {
+                                    UUID folderload = GetFolderFromPath(rule.Option);
                                     List<InventoryItem> outfit = new List<InventoryItem>();
                                     if (rule.Behaviour == "attachall" || rule.Behaviour == "attachallover")
                                     {
@@ -725,7 +756,6 @@ namespace SecondBotEvents.Services
                                     {
                                         GetAllItems(folder, false, ref outfit);
                                     }
-
                                     if (rule.Behaviour == "attachover" || rule.Behaviour == "attachallover")
                                     {
                                         master.CurrentOutfitFolder.AddToOutfit(outfit, false);
