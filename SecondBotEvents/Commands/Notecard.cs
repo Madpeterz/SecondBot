@@ -4,6 +4,7 @@ using SecondBotEvents.Services;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Why this is not a built in script command I will never know, but its due to needing this that the bot was made")]
     public class Notecard : CommandsAPI
     {
         public Notecard(EventsSecondBot setmaster) : base(setmaster)

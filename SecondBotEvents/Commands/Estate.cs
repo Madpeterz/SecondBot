@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Look after a sim as the estate manager")]
     public class Estate : CommandsAPI
     {
         public Estate(EventsSecondBot setmaster) : base(setmaster)
@@ -13,7 +14,7 @@ namespace SecondBotEvents.Commands
         [About("Sends the message to the current sim")]
         [ReturnHints("restarting")]
         [ReturnHintsFailure("Not an estate manager here")]
-        [ReturnHintsFailure("canceled")]
+        [ReturnHints("canceled")]
         [ArgHints("delay", "How long to delay the restart for (30 to 240 secs) - defaults to 240 if out of bounds \n" +
             "set to 0 if your canceling!")]
         [ArgHints("mode", "true to start a restart, false to cancel")]
@@ -44,7 +45,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Message empty")]
         [ReturnHints("ok")]
         [ArgHints("message", "What the message is")]
-        public object SimMessage(string message, string token)
+        public object SimMessage(string message)
         {
             if (SecondbotHelpers.notempty(message) == false)
             {

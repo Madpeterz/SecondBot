@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Control groups with ease")]
     public class GroupCommands : CommandsAPI
     {
         public GroupCommands(EventsSecondBot setmaster) : base(setmaster)

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("The power of friendship")]
     public class Friends : CommandsAPI
     {
         public Friends(EventsSecondBot setmaster) : base(setmaster)

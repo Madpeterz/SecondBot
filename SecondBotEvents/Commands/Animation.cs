@@ -3,8 +3,11 @@ using SecondBotEvents.Services;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Animations and Gestures")]
     internal class AnimationCommands : CommandsAPI
     {
+        
+
         public AnimationCommands(EventsSecondBot setmaster) : base(setmaster)
         {
         }

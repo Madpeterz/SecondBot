@@ -7,6 +7,7 @@ using System.Threading;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Dont like this place lets try somewhere else")]
     public class Movement : CommandsAPI
     {
         public Movement(EventsSecondBot setmaster) : base(setmaster)

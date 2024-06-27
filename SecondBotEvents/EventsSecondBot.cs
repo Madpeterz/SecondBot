@@ -11,20 +11,23 @@ namespace SecondBotEvents
     {
         static void Main(string[] args)
         {
-            LogFormater.Info("Welcome to Secondbot [Events build] version: " + AssemblyInfo.GetGitHash());
-            EventsSecondBot worker = new EventsSecondBot(args);
+#if (DEBUG)
+            new WikiMake();
+#endif
+                LogFormater.Info("Welcome to Secondbot [Events build] version: " + AssemblyInfo.GetGitHash());
+                EventsSecondBot worker = new EventsSecondBot(args);
 
-            while(worker.Exit() == false)
-            {
-                if(worker.Ready == true)
+                while (worker.Exit() == false)
                 {
-                    worker.Status();
+                    if (worker.Ready == true)
+                    {
+                        worker.Status();
+                    }
+                    Thread.Sleep(1000);
                 }
-                Thread.Sleep(1000);
+                LogFormater.Warn("Shutdown in 5 secs");
+                Thread.Sleep(5000);
             }
-            LogFormater.Warn("Shutdown in 5 secs");
-            Thread.Sleep(5000);
-        }
     }
 
     public class EventsSecondBot

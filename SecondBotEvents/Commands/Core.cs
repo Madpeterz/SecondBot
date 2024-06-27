@@ -2,6 +2,7 @@
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Used to test interaction with the bot... hello world for avartars")]
     public class Core : CommandsAPI
     {
         public Core(EventsSecondBot setmaster) : base(setmaster)

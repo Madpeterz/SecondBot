@@ -6,6 +6,7 @@ using System;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Interface for streamadmin to create notecards, you will prob never need this")]
     public class StreamAdmin : CommandsAPI
     {
         public StreamAdmin(EventsSecondBot setmaster) : base(setmaster)

@@ -4,6 +4,7 @@ using SecondBotEvents.Services;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Money makes the world go round")]
     public class Funds : CommandsAPI
     {
         public Funds(EventsSecondBot setmaster) : base(setmaster)
@@ -12,7 +13,7 @@ namespace SecondBotEvents.Commands
         [About("Requests the current balance and requests the balance to update.")]
         [ReturnHints("Current fund level")]
         [ReturnHintsFailure("Funds commands are disabled")]
-        public object Balance(string token)
+        public object Balance()
         {
             if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
             {

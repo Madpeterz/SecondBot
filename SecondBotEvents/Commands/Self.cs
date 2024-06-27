@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("The more we know about our self the better we are")]
     public class Self : CommandsAPI
     {
         public Self(EventsSecondBot setmaster) : base(setmaster)
@@ -150,7 +151,7 @@ namespace SecondBotEvents.Commands
 
         [About("Gets the last 5 commands issued to the bot")]
         [ReturnHints("list of commands")]
-        public object GetLastCommands(string token)
+        public object GetLastCommands()
         {
             List<string> reply = new List<string>();
             foreach(CommandHistory A in master.DataStoreService.GetCommandHistory())

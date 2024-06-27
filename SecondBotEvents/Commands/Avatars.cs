@@ -6,6 +6,7 @@ using SecondBotEvents.Services;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Avatars near me and Key2Name and Name2Key lookups")]
     public class Avatars : CommandsAPI
     {
         public Avatars(EventsSecondBot setmaster) : base(setmaster)

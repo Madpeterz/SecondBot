@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("What is going on with the bot")]
     public class Info : CommandsAPI
     {
         public Info(EventsSecondBot setmaster) : base(setmaster)

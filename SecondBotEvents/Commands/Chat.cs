@@ -4,6 +4,7 @@ using SecondBotEvents.Services;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Text based interaction,message status and history")]
     public class Chat : CommandsAPI
     {
         public Chat(EventsSecondBot setmaster) : base(setmaster)

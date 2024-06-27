@@ -9,6 +9,7 @@ using static OpenMetaverse.ParcelManager;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Control the land under our feet")]
     public partial class ParcelCommands : CommandsAPI
     {
         public ParcelCommands(EventsSecondBot setmaster) : base(setmaster)

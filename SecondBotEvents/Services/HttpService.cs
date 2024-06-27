@@ -231,6 +231,16 @@ namespace SecondBotEvents.Services
 
     }
 
+    [AttributeUsage(AttributeTargets.Class)]
+    public class ClassInfo : Attribute
+    {
+        public string classinfo = "";
+        public ClassInfo(string classinfo)
+        {
+            this.classinfo = classinfo;
+        }
+    }
+
 
     [AttributeUsage(AttributeTargets.Method)]
     public class About : Attribute
@@ -246,7 +256,6 @@ namespace SecondBotEvents.Services
     public class ReturnHints : Attribute
     {
         public string hint = "";
-        public bool good = true;
         public ReturnHints(string hint)
         {
             this.hint = hint;
@@ -254,11 +263,12 @@ namespace SecondBotEvents.Services
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class ReturnHintsFailure : ReturnHints
+    public class ReturnHintsFailure : Attribute
     {
-        public ReturnHintsFailure(string hint) : base(hint)
+        public string hint = "";
+        public ReturnHintsFailure(string hint)
         {
-            this.good = false;
+            this.hint = hint;
         }
     }
 

@@ -11,6 +11,7 @@ using System.Linq;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Inventory controls for sending items and so on")]
     public class InventoryCommands : CommandsAPI
     {
         public InventoryCommands(EventsSecondBot setmaster) : base(setmaster)

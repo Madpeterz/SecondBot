@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Control discord from the grid")]
     public class DiscordCommands : CommandsAPI
     {
         public DiscordCommands(EventsSecondBot setmaster) : base(setmaster)

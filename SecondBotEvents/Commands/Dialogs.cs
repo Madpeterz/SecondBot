@@ -4,6 +4,7 @@ using SecondBotEvents.Services;
 
 namespace SecondBotEvents.Commands
 {
+    [ClassInfo("Script dialog box interaction / events when displayed")]
     public class Dialogs : CommandsAPI
     {
         public Dialogs(EventsSecondBot setmaster) : base(setmaster)
