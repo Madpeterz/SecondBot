@@ -1,14 +1,18 @@
 ﻿using EmbedIO;
 using EmbedIO.Actions;
 using EmbedIO.Routing;
+using EmbedIO.Utilities;
 using EmbedIO.WebApi;
-using Newtonsoft.Json;
 using OpenMetaverse;
+using RestSharp.Serializers;
 using SecondBotEvents.Config;
 using Swan.Logging;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SecondBotEvents.Services
 {
@@ -118,11 +122,17 @@ namespace SecondBotEvents.Services
                 .WithUrlPrefix("http://*:" + myConfig.GetPort().ToString())
                 .WithMode(HttpListenerMode.EmbedIO))
                 .WithCors()
-                .WithWebApi("/api", m => m.WithController(() => new HttpWebBot(master)))
+                .WithWebApi("/api", SerializationCallback, m => m.WithController(() => new HttpWebBot(master)))
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" }))
             );
             HTTPendpoint.RunAsync();
             LogFormater.Info("HTTP service [Enabled] on port "+ myConfig.GetPort().ToString());
+        }
+        public static async Task SerializationCallback(IHttpContext context, object? data)
+        {
+            Validate.NotNull(nameof(context), context).Response.ContentType = MimeType.Json;
+            using var text = context.OpenResponseText(new UTF8Encoding(false));
+            await text.WriteAsync(data.ToString()).ConfigureAwait(false);
         }
     }
 
@@ -310,7 +320,7 @@ namespace SecondBotEvents.Services
             {
                 return "Command request rejected";
             }
-            return JsonConvert.SerializeObject(master.CommandsService.RunCommand(C));
+            return JsonSerializer.Serialize(master.CommandsService.RunCommand(C));
         }
     }
 }
