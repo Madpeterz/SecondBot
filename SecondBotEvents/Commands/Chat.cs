@@ -37,6 +37,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild channel", new [] { channel, message });
             }
+            master.DataStoreService.BotRecordLocalchatReply(message);
             GetClient().Self.Chat(message, channelnum, ChatType.Normal);
             return BasicReply("ok");
             
@@ -59,6 +60,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Message empty", new [] { avatar, message });
             }
+            master.DataStoreService.OpenChatWindow(false, avataruuid, avataruuid);
             master.BotClient.SendIM(avataruuid, message);
             return BasicReply("ok",  new [] { avatar, message });
         }

@@ -325,6 +325,14 @@ namespace SecondBotEvents.Commands
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroups()));
         }
 
+        [About("Forces the bot to reload the groups list")]
+        [ReturnHints("Working on it")]
+        public object ForceLoadGroups()
+        {
+            master.BotClient.client.Groups.RequestCurrentGroups();
+            return BasicReply("Working on it");
+        }
+
         [About("Requests the roles for the selected group")]
         [ReturnHints("GroupRoleDetails object")]
         [ReturnHintsFailure("Group is not currently known")]
@@ -419,6 +427,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Unknown group", new[] { group });
             }
             GetClient().Self.InstantMessageGroup(groupUUID, message);
+            master.DataStoreService.BotRecordReplyIM(groupUUID, message);
             return BasicReply("Sending");
         }
     }

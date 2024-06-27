@@ -93,7 +93,7 @@ namespace SecondBotEvents.Services
         }
         public void SendIM(UUID avatar, string message)
         {
-            // @todo add message to IM chat
+            master.DataStoreService.BotRecordReplyIM(avatar,message);
             client.Self.InstantMessage(avatar, message);
         }
 

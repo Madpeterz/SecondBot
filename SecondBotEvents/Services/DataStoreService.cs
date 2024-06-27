@@ -7,6 +7,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using SecondBotEvents.Commands;
+using OpenMetaverse.ImportExport.Collada14;
+using System.Threading.Tasks;
 
 namespace SecondBotEvents.Services
 {
@@ -281,6 +283,7 @@ namespace SecondBotEvents.Services
             {
                 return new List<string>();
             }
+            chatWindowsUnread[group] = false;
             return chatWindows[group];
         }
 
@@ -385,6 +388,23 @@ namespace SecondBotEvents.Services
             return groupMembers[Group];
         }
 
+        public void BotRecordReplyIM(UUID sessionid,string message)
+        {
+            RecordChat(sessionid, "Bot", message);
+        }
+        public void BotRecordLocalchatReply(string message)
+        {
+            lock (localChatHistory)
+            {
+                localChatHistory.Add("{BOT} " + GetClient().Self.Name + ": " + message);
+                if (localChatHistory.Count <= myConfig.GetLocalChatHistoryLimit())
+                {
+                    return;
+                }
+                localChatHistory.RemoveAt(0);
+            }
+        }
+
         protected void RecordChat(UUID sessionID, string fromname, string message)
         {
             lock (chatWindows)
@@ -438,7 +458,7 @@ namespace SecondBotEvents.Services
 
         }
 
-        protected void OpenChatWindow(bool group, UUID sessionID, UUID ownerID)
+        public void OpenChatWindow(bool group, UUID sessionID, UUID ownerID)
         {
             lock (chatWindows)
             {
@@ -490,15 +510,6 @@ namespace SecondBotEvents.Services
                 return groupsKey2Name.ContainsKey(groupId);
             }
             return groupsKey2Name.ContainsValue(name);
-        }
-
-        public List<string> GetGroupChat(UUID groupId)
-        {
-            if(chatWindows.ContainsKey(groupId) == false)
-            {
-                return new List<string>();
-            }
-            return chatWindows[groupId];
         }
 
         /*
@@ -645,28 +656,6 @@ namespace SecondBotEvents.Services
             return avatarsName2Key[name].ToString();
         }
 
-        public List<string> GetAvatarIms(UUID avatarId)
-        {
-            if(chatWindowsOwner.ContainsValue(avatarId) == false)
-            {
-                return new List<string>();
-            }
-            UUID sessionID = UUID.Zero;
-            foreach(KeyValuePair<UUID, UUID> links in chatWindowsOwner)
-            {
-                if(links.Value == avatarId)
-                {
-                    sessionID = links.Key;
-                    break;
-                }
-            }
-            if (sessionID == UUID.Zero)
-            {
-                return new List<string>();
-            }
-            return chatWindows[sessionID];
-        }
-
         public Dictionary<UUID,string> GetAvatarImWindows()
         {
             Dictionary<UUID, string> windows = new();
@@ -704,6 +693,7 @@ namespace SecondBotEvents.Services
             {
                 return new List<string>();
             }
+            chatWindowsUnread[sessionID] = false;
             return chatWindows[sessionID];
 
         }
@@ -869,6 +859,19 @@ namespace SecondBotEvents.Services
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
             GetClient().Network.SimConnected -= BotLoggedIn;
+            botConnected = true;
+            LogFormater.Info("DataStore Service [Attaching]");
+            GetAvatarName(GetClient().Self.AgentID);
+            Task.Factory.StartNew(() =>
+            {
+                Thread.Sleep(2000);
+                attachEventsAfterDelay();
+            });
+            
+        }
+
+        protected void attachEventsAfterDelay()
+        {
             GetClient().Groups.CurrentGroups += GroupCurrent;
             GetClient().Groups.GroupJoinedReply += GroupJoin;
             GetClient().Groups.GroupLeaveReply += GroupLeave;
@@ -881,9 +884,6 @@ namespace SecondBotEvents.Services
             GetClient().Groups.GroupRoleDataReply += GroupRoles;
             GetClient().Estate.EstateBansReply += EstateBans;
             GetClient().Groups.RequestCurrentGroups();
-            botConnected = true;
-            LogFormater.Info("DataStore Service [Active]");
-            GetAvatarName(GetClient().Self.AgentID);
         }
         readonly string[] hard_blocked_agents = new[] { "secondlife", "second life" };
         protected void ChatFromSim(object o, ChatEventArgs e)
@@ -898,7 +898,11 @@ namespace SecondBotEvents.Services
                         {
                             break;
                         }
-                        string source = "{Av}";
+                        if (e.SourceID == GetClient().Self.AgentID)
+                        {
+                            break;
+                        }
+                            string source = "{Av}";
                         if (e.SourceType == ChatSourceType.Object)
                         {
                             source = "{Obj}";
@@ -1035,7 +1039,10 @@ namespace SecondBotEvents.Services
                         }
                         AddAvatar(e.IM.FromAgentID, e.IM.FromAgentName);
                         OpenChatWindow(false, e.IM.IMSessionID, e.IM.FromAgentID);
-                        RecordChat(e.IM.IMSessionID, e.IM.FromAgentName, e.IM.Message);
+                        if (e.IM.FromAgentID != GetClient().Self.AgentID)
+                        {
+                            RecordChat(e.IM.IMSessionID, e.IM.FromAgentName, e.IM.Message);
+                        }
                         break;
                     }
                 default:

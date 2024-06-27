@@ -67,7 +67,7 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok", new [] { x, y, z });
         }
 
-        [About("Attempt to teleport to a new region")]
+        [About("Stop the auto pilot system from walking")]
         [ReturnHints("ok")]
         public object AutoPilotStop()
         {

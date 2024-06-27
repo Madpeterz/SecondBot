@@ -1,4 +1,5 @@
 ﻿using BetterSecondBot.Static;
+using Discord;
 using LibreMetaverse;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
@@ -184,6 +185,38 @@ namespace SecondBotEvents.Commands
             InventoryItem realitem = HelperInventory.getItemByInventoryUUID(GetClient(), itemuuid);
             GetClient().Appearance.RemoveFromOutfit(realitem);
             return BasicReply("Ok", new [] { item });
+        }
+
+
+        [About("Replaces the current avatar outfit with the contents of the given folder")]
+        [ReturnHints("ok")]
+        [ReturnHints("Named folder value is empty")]
+        [ReturnHints("Cant find target folder")]
+        [ReturnHints("invaild folder uuid")]
+        [ReturnHints("target folder is empty or so full I cant get it in 5 secs...")]
+        [ArgHints("folder", "UUID of the folder")]
+        public object SwapOutfit(string folder)
+        {
+            UUID folderUUID = UUID.Zero;
+            if(UUID.TryParse(folder, out folderUUID) == false)
+            {
+                return Failure("invaild folder uuid", new[] { folder });
+            }
+            List<InventoryBase> contents = GetClient().Inventory.FolderContents(folderUUID, GetClient().Self.AgentID, true, true, InventorySortOrder.ByName, 5 * 1000);
+            List<InventoryItem> wareables = new();
+            if (contents == null)
+            {
+                return Failure("target folder is empty or so full I cant get it in 5 secs...", new[] { folder });
+            }
+            foreach (InventoryBase item in contents)
+            {
+                if ((item is InventoryWearable) || (item is InventoryObject))
+                {
+                    wareables.Add((InventoryItem)item);
+                }
+            }
+            master.CurrentOutfitFolder.ReplaceOutfit(wareables);
+            return BasicReply("ok", new[] { folder });
         }
 
         [About("Replaces the current avatar outfit with the Clothing/[NAME] folder<br/>Please note: This does not use the outfits folder!<br/>Please do not use links in the folder!")]
