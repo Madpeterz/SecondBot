@@ -1,7 +1,7 @@
 ﻿using OpenMetaverse;
 using SecondBotEvents.Services;
 using Newtonsoft.Json;
-
+using System.Collections.Generic;
 
 namespace SecondBotEvents.Commands
 {
@@ -12,10 +12,22 @@ namespace SecondBotEvents.Commands
         }
 
         [About("Gets the friendslist")]
-        [ReturnHints("array UUID = friendreplyobject")]
+        [ReturnHints("array of FriendListEntry")]
         public object Friendslist()
         {
-            return BasicReply(JsonConvert.SerializeObject(GetClient().Friends.FriendList));
+            Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.Copy();
+            List< FriendListEntry > CleanedFriendsList = new List< FriendListEntry >();
+            int index = 0;
+            foreach (FriendInfo A in FriendListCopy.Values)
+            {
+                FriendListEntry entry = new FriendListEntry();
+                entry.id = A.UUID.ToString();
+                entry.name = A.Name;
+                entry.online = A.IsOnline;
+                CleanedFriendsList.Add(entry);
+                index++;
+            }
+            return BasicReply(JsonConvert.SerializeObject(CleanedFriendsList));
         }
 
         [About("Updates the friend perms for avatar avatar to State \n if true grants (Online/Map/Modify) perms")]
@@ -88,5 +100,12 @@ namespace SecondBotEvents.Commands
             return BasicReply("Request sent", new [] { avatar, state });
             
         }
+    }
+
+    class FriendListEntry
+    {
+        public string name;
+        public string id;
+        public bool online = false;
     }
 }
