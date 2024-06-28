@@ -175,6 +175,7 @@ namespace SecondBotEvents.Services
             client.Network.SimDisconnected += BotSimDisconnected;
             client.Network.LoginProgress += BotLoginStatus;
         }
+
         public void Login()
         {
             ResetClient();

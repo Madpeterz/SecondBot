@@ -884,6 +884,7 @@ namespace SecondBotEvents.Services
             GetClient().Groups.GroupRoleDataReply += GroupRoles;
             GetClient().Estate.EstateBansReply += EstateBans;
             GetClient().Groups.RequestCurrentGroups();
+            GetClient().Self.RetrieveInstantMessages();
         }
         readonly string[] hard_blocked_agents = new[] { "secondlife", "second life" };
         protected void ChatFromSim(object o, ChatEventArgs e)
@@ -1015,6 +1016,7 @@ namespace SecondBotEvents.Services
 
         protected void ImEvent(object o, InstantMessageEventArgs e)
         {
+            
             switch(e.IM.Dialog)
             {
                 case InstantMessageDialog.GroupNotice:
@@ -1030,6 +1032,7 @@ namespace SecondBotEvents.Services
                 case InstantMessageDialog.SessionSend:
                 case InstantMessageDialog.MessageFromAgent:
                     {
+                        AddAvatar(e.IM.FromAgentID, e.IM.FromAgentName);
                         if (groupsKey2Name.ContainsKey(e.IM.IMSessionID) == true)
                         {
                             // group IM
@@ -1037,11 +1040,17 @@ namespace SecondBotEvents.Services
                             RecordChat(e.IM.IMSessionID, e.IM.FromAgentName, e.IM.Message);
                             break;
                         }
-                        AddAvatar(e.IM.FromAgentID, e.IM.FromAgentName);
-                        OpenChatWindow(false, e.IM.IMSessionID, e.IM.FromAgentID);
+                        UUID SessionID = e.IM.IMSessionID;
+                        string message = e.IM.Message;
+                        if (e.IM.Offline == InstantMessageOnline.Offline)
+                        {
+                            SessionID  = UUID.Random();
+                            message = "{AV offline} " + message;
+                        }
+                        OpenChatWindow(false, SessionID, e.IM.FromAgentID);
                         if (e.IM.FromAgentID != GetClient().Self.AgentID)
                         {
-                            RecordChat(e.IM.IMSessionID, e.IM.FromAgentName, e.IM.Message);
+                            RecordChat(SessionID, e.IM.FromAgentName, e.IM.Message);
                         }
                         break;
                     }
