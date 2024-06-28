@@ -278,7 +278,6 @@ namespace SecondBotEvents.Services
                     GetClient().Groups.GroupInvitation -= BotGroupInviteOffer;
                 }
             }
-            
         }
     }
 
