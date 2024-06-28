@@ -1,8 +1,11 @@
 ﻿using OpenMetaverse;
+using OpenMetaverse.Rendering;
 using SecondBotEvents.Config;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 namespace SecondBotEvents.Services
 {
@@ -128,6 +131,7 @@ namespace SecondBotEvents.Services
                 if (GetClient() != null)
                 {
                     GetClient().Self.IM -= BotImMessage;
+                    GetClient().Groups.GroupMembersReply -= BotGroupMembers;
                 }
             }
         }
@@ -135,6 +139,125 @@ namespace SecondBotEvents.Services
         protected void AttachEvents()
         {
             GetClient().Self.IM += BotImMessage;
+            GetClient().Groups.GroupMembersReply += BotGroupMembers;
+            GetClient().Groups.CurrentGroups += BotGroupsCurrent;
+            GetClient().Groups.RequestCurrentGroups();
+        }
+
+        protected void BotGroupsCurrent(object o, CurrentGroupsEventArgs e)
+        {
+            lock (GroupMembership) lock (GroupMembershipUpdated) lock(GroupNames)
+            {
+                foreach(Group G in e.Groups.Values)
+                {
+                    if (GroupNames.ContainsKey(G.ID) == true)
+                    {
+                        continue;
+                    }
+                    GroupNames.Add(G.ID, G.Name);
+                    GroupMembership.Add(G.ID, new List<UUID>());
+                    GroupMembershipUpdated.Add(G.ID, 0);
+                }
+            }
+        }
+
+        protected Dictionary<UUID, List<UUID>> GroupMembership = new Dictionary<UUID, List<UUID>>();
+        protected Dictionary<UUID, string> GroupNames = new Dictionary<UUID, string>();
+        protected Dictionary<UUID, long> GroupMembershipUpdated = new Dictionary<UUID, long>();
+        protected long lastGroupMembershipUpdate = 0; 
+        // request group membership updates max of once per 60 secs
+        // request membership update for group once every 15 mins
+        protected void GroupMembershipUpkeep()
+        {
+            lock (GroupMembershipUpdated)
+            {
+                long dif = SecondbotHelpers.UnixTimeNow() - lastGroupMembershipUpdate;
+                if (dif < 60)
+                {
+                    return;
+                }
+                UUID updateGroup = UUID.Zero;
+                foreach (KeyValuePair<UUID, long> entry in GroupMembershipUpdated)
+                {
+                    dif = SecondbotHelpers.UnixTimeNow() - entry.Value;
+                    if (dif > (15 * 60))
+                    {
+                        updateGroup = entry.Key;
+                        break;
+                    }
+                }
+                if (updateGroup != UUID.Zero)
+                {
+                    lastGroupMembershipUpdate = SecondbotHelpers.UnixTimeNow();
+                    GroupMembershipUpdated[updateGroup] = SecondbotHelpers.UnixTimeNow();
+                    GetClient().Groups.RequestGroupMembers(updateGroup);
+                }
+            }
+        }
+
+        protected void BotGroupMembers(object sender, GroupMembersReplyEventArgs e)
+        {
+            lock (GroupMembership) lock(GroupMembershipUpdated)
+            {
+                bool GroupLoaded = false;
+                if (GroupMembership.ContainsKey(e.GroupID) == true)
+                {
+                    if (GroupMembership[e.GroupID].Count > 0)
+                    {
+                        GroupLoaded = true;
+                    }
+                }
+                if (GroupLoaded == false)
+                {
+                    foreach (GroupMember a in e.Members.Values)
+                    {
+                        GroupMembership[e.GroupID].Add(a.ID);
+                    }
+                    return;
+                }
+                List<UUID> joined = new List<UUID>();
+                List<UUID> tracked = new List<UUID>();
+                foreach (UUID a in GroupMembership[e.GroupID])
+                {
+                    tracked.Add(a);
+                }
+                master.DataStoreService.GetAvatarNames(tracked);
+                foreach (UUID a in e.Members.Keys)
+                {
+                    if (tracked.Contains(a) == true)
+                    {
+                        tracked.Remove(a);
+                        continue;
+                    }
+                    joined.Add(a);
+
+                }
+                string groupname = "none";
+                if(GroupNames.ContainsKey(e.GroupID) == true)
+                {
+                    groupname = GroupNames[e.GroupID];
+                }
+                foreach (UUID a in tracked)
+                {
+                    // leave
+                    GroupMembership[e.GroupID].Remove(a);
+                    TriggerEvent("GroupMemberLeave", new Dictionary<string, string>() { 
+                        { "groupuuid", e.GroupID.ToString()},
+                        { "groupname", groupname },
+                        { "avataruuid", a.ToString() } 
+                    });
+                }
+                foreach (UUID a in joined)
+                {
+                    // join
+                    GroupMembership[e.GroupID].Add(a);
+                    TriggerEvent("GroupMemberJoin", new Dictionary<string, string>() {
+                        { "groupuuid", e.GroupID.ToString()},
+                        { "groupname", groupname },
+                        { "avataruuid", a.ToString() }
+                    });
+                    }
+            }
         }
 
         protected string GetAvName(string avataruuid)
@@ -224,26 +347,40 @@ namespace SecondBotEvents.Services
             {
                 avataruuid = args["avataruuid"];
             }
-            Dictionary<string, string> values = new Dictionary<string, string>();
-            values.Add("eventype", eventName);
-            values.Add("avatarname", GetAvName(avataruuid));
-            values.Add("avatarparcel", GetAvParcel(avataruuid));
-            values.Add("botsim", GetClient().Network.CurrentSim.Name);
-            values.Add("botparcel", GetBotParcel());
+            string groupuuid = "none";
+            string groupname = "none";
+            if (args.ContainsKey("groupuuid") == true)
+            {
+                groupuuid = args["groupuuid"];
+            }
+            if (args.ContainsKey("groupname") == true)
+            {
+                groupname = args["groupname"];
+            }
             List<int> AvPos = GetAvPos(avataruuid);
-            values.Add("avatarx", AvPos[0].ToString());
-            values.Add("avatary", AvPos[1].ToString());
-            values.Add("avatarz", AvPos[2].ToString());
-            values.Add("avatardistance", AvPos[3].ToString());
             Vector3 A = GetClient().Self.SimPosition;
             List<int> BotPos = new List<int>() { (int)Math.Round(A.X), (int)Math.Round(A.Y), (int)Math.Round(A.Z) };
-            values.Add("botx", AvPos[0].ToString());
-            values.Add("boty", AvPos[1].ToString());
-            values.Add("botz", AvPos[2].ToString());
-            values.Add("clockhour", DateTime.Now.ToString("HH"));
-            values.Add("clockmin", DateTime.Now.ToString("mm"));
-            values.Add("dayofweek", ((int)DateTime.Now.DayOfWeek).ToString());
-            
+            Dictionary<string, string> values = new Dictionary<string, string>
+            {
+                { "eventype", eventName },
+                { "groupuuid", groupuuid },
+                { "groupname", groupname },
+                { "avatarname", GetAvName(avataruuid) },
+                { "avatarparcel", GetAvParcel(avataruuid) },
+                { "botsim", GetClient().Network.CurrentSim.Name },
+                { "botparcel", GetBotParcel() },
+                { "avatarx", AvPos[0].ToString() },
+                { "avatary", AvPos[1].ToString() },
+                { "avatarz", AvPos[2].ToString() },
+                { "avatardistance", AvPos[3].ToString() },
+                { "botx", AvPos[0].ToString() },
+                { "boty", AvPos[1].ToString() },
+                { "botz", AvPos[2].ToString() },
+                { "clockhour", DateTime.Now.ToString("HH") },
+                { "clockmin", DateTime.Now.ToString("mm") },
+                { "dayofweek", ((int)DateTime.Now.DayOfWeek).ToString() }
+            };
+
 
             if (avataruuid == null)
             {
@@ -474,6 +611,7 @@ namespace SecondBotEvents.Services
             TrackAvatarsOnParcel();
             CleanLockouts();
             ClockEvent();
+            GroupMembershipUpkeep();
         }
 
         public override string Status()
