@@ -1,6 +1,7 @@
 ﻿using OpenMetaverse;
 using OpenMetaverse.Rendering;
 using SecondBotEvents.Config;
+using Swan.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,24 +16,31 @@ namespace SecondBotEvents.Services
         protected bool botConnected = false;
         Dictionary<string,List<CustomOnEvent>> MyCustomEvents = new Dictionary<string, List<CustomOnEvent>>();
         Dictionary<string, long> lockouts = new Dictionary<string, long>();
+        List<UUID> trackEventGroups = new List<UUID>();
         public TriggerOnEventService(EventsSecondBot setMaster) : base(setMaster)
         {
             myConfig = new OnEventConfig(master.fromEnv, master.fromFolder);
             int loop = 1;
             string[] delimiterChars = new string[] { "{IS}", "{NOT}", "{IS_UUD}", "{MISSING}", "{CONTAINS}", "{IN_GROUP}", "{NOT_IN_GROUP}", "{LESSTHAN}", "{MORETHAN}", "{LOCKOUT}" };
-            while (loop < myConfig.GetCount())
+            if(myConfig.GetCount() == 0)
+            {
+                myConfig.setEnabled(false);
+                LogFormater.Info("OnEvent Service - No events enabled stopping");
+            }
+            while (loop <= myConfig.GetCount())
             {
                 if(myConfig.GetEventEnabled(loop) == false)
                 {
+                    LogFormater.Info("OnEvent Service - Event "+loop.ToString()+" is not enabled");
                     loop++;
                     continue;
                 }
                 CustomOnEvent Event = new CustomOnEvent();
                 Event.Source = myConfig.GetSource(loop);
-                Event.MonitorFlags = myConfig.GetSourceMonitor(loop).Split(',').ToList();
+                Event.MonitorFlags = myConfig.GetSourceMonitor(loop).Split("=#=").ToList();
                 bool eventWhereOk = true;
                 int loop2 = 1;
-                while(loop2 < myConfig.GetWhereCount(loop))
+                while(loop2 <= myConfig.GetWhereCount(loop))
                 {
                     string check = myConfig.GetWhereCheck(loop, loop2);
                     foreach (string delimiterChar in delimiterChars)
@@ -59,15 +67,71 @@ namespace SecondBotEvents.Services
                     }
                     loop2++;
                 }
-                if(eventWhereOk == false)
+                if (eventWhereOk == false)
                 {
+                    LogFormater.Info("OnEvent Service - Event " + loop.ToString() + " failed where config checks");
+                    loop++;
                     continue;
                 }
+                Event.Source = myConfig.GetSource(loop);
+                Event.MonitorFlags = myConfig.GetSourceMonitor(loop).Split("=#=").ToList();
+                if ((Event.Source == "GroupMemberJoin") || (Event.Source == "GroupMemberLeave"))
+                {
+                    UUID groupUUID = UUID.Zero;
+                    if (Event.MonitorFlags.Count != 1)
+                    {
+                        LogFormater.Info("OnEvent Service - Event " + loop.ToString() + " GroupMember monitor flags not vaild");
+                        loop++;
+                        continue;
+                    }
+                    if (UUID.TryParse(Event.MonitorFlags[0], out groupUUID) == false)
+                    {
+                        LogFormater.Info("OnEvent Service - Event " + loop.ToString() + " GroupMember monitor flags not vaild");
+                        loop++;
+                        continue;
+                    }
+                    if (trackEventGroups.Contains(groupUUID) == false)
+                    {
+                        trackEventGroups.Add(groupUUID);
+                    }
+                }
+                else if ((Event.Source == "GuestJoins") || (Event.Source == "GuestLeaves"))
+                {
+                    if(Event.MonitorFlags.Count != 2)
+                    {
+                        LogFormater.Info("OnEvent Service - Event " + loop.ToString() + " Guest monitor flags not vaild");
+                        loop++;
+                        continue;
+                    }
+                }
+                else if (Event.Source == "AvatarIm")
+                {
+                    if (Event.MonitorFlags.Count != 1)
+                    {
+                        LogFormater.Info("OnEvent Service - Event " + loop.ToString() + " AvatarIm monitor flags not vaild");
+                        loop++;
+                        continue;
+                    }
+                    UUID testUUID = UUID.Zero;
+                    UUID.TryParse(Event.MonitorFlags[0],out testUUID);
+                    if ((Event.MonitorFlags[0] != "Any") && (testUUID != UUID.Zero))
+                    {
+                        LogFormater.Info("OnEvent Service - Event " + loop.ToString() + " AvatarIm monitor flags not vaild");
+                        loop++;
+                        continue;
+                    }
+                }
                 loop2 = 1;
-                while (loop2 < myConfig.GetActionCount(loop))
+                while (loop2 <= myConfig.GetActionCount(loop))
                 {
                     Event.Actions.Add(myConfig.GetActionStep(loop, loop2));
                     loop2++;
+                }
+                if(Event.Actions.Count == 0)
+                {
+                    LogFormater.Info("OnEvent Service - Event " + loop.ToString() + " Actions are not setup");
+                    loop++;
+                    continue;
                 }
                 if(MyCustomEvents.ContainsKey(Event.Source) == false)
                 {
@@ -77,7 +141,13 @@ namespace SecondBotEvents.Services
                 loop++;
             }
             myConfig.unloadEvents(); // remove unneeded copy of events from the config as we wont be using it
+            if (MyCustomEvents.Count == 0)
+            {
+                myConfig.setEnabled(false);
+                LogFormater.Info("OnEvent Service - failed to load any events stopping");
+            }
         }
+
 
         protected void BotClientRestart(object o, BotClientNotice e)
         {
@@ -132,6 +202,10 @@ namespace SecondBotEvents.Services
                 {
                     GetClient().Self.IM -= BotImMessage;
                     GetClient().Groups.GroupMembersReply -= BotGroupMembers;
+                    GetClient().Groups.CurrentGroups -= BotGroupsCurrent;
+                    GetClient().Network.SimChanged -= BotChangedSim;
+                    GetClient().Self.MoneyBalance -= BotFundsEvent;
+                    GetClient().Self.AlertMessage -= BotAlertMessage;
                 }
             }
         }
@@ -141,7 +215,25 @@ namespace SecondBotEvents.Services
             GetClient().Self.IM += BotImMessage;
             GetClient().Groups.GroupMembersReply += BotGroupMembers;
             GetClient().Groups.CurrentGroups += BotGroupsCurrent;
+            GetClient().Network.SimChanged += BotChangedSim;
+            GetClient().Self.MoneyBalance += BotFundsEvent;
+            GetClient().Self.AlertMessage += BotAlertMessage;
             GetClient().Groups.RequestCurrentGroups();
+            GetClient().Self.RequestBalance();
+        }
+
+        protected void BotAlertMessage(object o, AlertMessageEventArgs e)
+        {
+            TriggerEvent("SimAlert", new Dictionary<string, string>() {
+                        { "alertmessage", e.Message},
+                    });
+        }
+
+        protected void BotFundsEvent(object o, BalanceEventArgs e)
+        {
+            TriggerEvent("BalanceUpdate", new Dictionary<string, string>() {
+                        { "funds", e.Balance.ToString()},
+                    });
         }
 
         protected void BotGroupsCurrent(object o, CurrentGroupsEventArgs e)
@@ -150,6 +242,10 @@ namespace SecondBotEvents.Services
             {
                 foreach(Group G in e.Groups.Values)
                 {
+                    if (trackEventGroups.Contains(G.ID) == false)
+                    {
+                        return;
+                    }
                     if (GroupNames.ContainsKey(G.ID) == true)
                     {
                         continue;
@@ -197,6 +293,10 @@ namespace SecondBotEvents.Services
 
         protected void BotGroupMembers(object sender, GroupMembersReplyEventArgs e)
         {
+            if(trackEventGroups.Contains(e.GroupID) == false)
+            {
+                return;
+            }
             lock (GroupMembership) lock(GroupMembershipUpdated)
             {
                 bool GroupLoaded = false;
@@ -335,36 +435,49 @@ namespace SecondBotEvents.Services
                 }
             }
         }
+        protected void BotChangedSim(object sender, SimChangedEventArgs e)
+        {
+            TriggerEvent("ChangeSim", new Dictionary<string, string>()
+            {
+                { "oldsimname", e.PreviousSimulator.Name },
+                { "newsimname", GetClient().Network.CurrentSim.Name },
+            });
+        }
 
+        protected string inArgsOrDefault(string arg, Dictionary<string, string> args, string defaultvalue)
+        {
+            if (args.ContainsKey(arg) == true)
+            {
+                return args[arg];
+            }
+            return defaultvalue;
+        }
         protected void TriggerEvent(string eventName, Dictionary<string,string> args)
         {
             if (MyCustomEvents.ContainsKey(eventName) == false)
             {
                 return;
             }
-            string avataruuid = null;
-            if (args.ContainsKey("avataruuid") == true)
-            {
-                avataruuid = args["avataruuid"];
-            }
-            string groupuuid = "none";
-            string groupname = "none";
-            if (args.ContainsKey("groupuuid") == true)
-            {
-                groupuuid = args["groupuuid"];
-            }
-            if (args.ContainsKey("groupname") == true)
-            {
-                groupname = args["groupname"];
-            }
+            string avataruuid = inArgsOrDefault("avataruuid", args, null);
+            string groupuuid = inArgsOrDefault("groupuuid", args, "none");
+            string groupname = inArgsOrDefault("groupname", args, "none");
+            string funds = inArgsOrDefault("funds", args, "-1");
+            string alertmessage = inArgsOrDefault("alertmessage", args, "none");
+            string oldsimname = inArgsOrDefault("oldsimname", args, "none");
+            string newsimname = inArgsOrDefault("newsimname", args, "none");
+
             List<int> AvPos = GetAvPos(avataruuid);
             Vector3 A = GetClient().Self.SimPosition;
             List<int> BotPos = new List<int>() { (int)Math.Round(A.X), (int)Math.Round(A.Y), (int)Math.Round(A.Z) };
             Dictionary<string, string> values = new Dictionary<string, string>
             {
+                { "alertmessage", alertmessage },
+                { "funds", funds },
                 { "eventype", eventName },
                 { "groupuuid", groupuuid },
                 { "groupname", groupname },
+                { "oldsimname", oldsimname },
+                { "newsimname", newsimname },
                 { "avatarname", GetAvName(avataruuid) },
                 { "avatarparcel", GetAvParcel(avataruuid) },
                 { "botsim", GetClient().Network.CurrentSim.Name },
@@ -394,6 +507,24 @@ namespace SecondBotEvents.Services
             foreach (CustomOnEvent E in MyCustomEvents[eventName])
             {
                 bool canFireEvent = true;
+                if ((E.Source == "GroupMemberJoin") || (E.Source == "GroupMemberLeave"))
+                {
+                    if (E.MonitorFlags[0] != values["groupuuid"])
+                    {
+                        continue;
+                    }
+                }
+                else if ((E.Source == "GuestJoins") || (E.Source == "GuestLeaves"))
+                {
+                    if (
+                        (E.MonitorFlags[0] != values["botsim"]) || 
+                        (E.MonitorFlags[1] != values["botparcel"]) || 
+                        (E.MonitorFlags[1] != values["avatarparcel"])
+                    )
+                    {
+                        continue;
+                    }
+                }
                 int loop = 0;
                 while(loop < E.WhereChecksLeft.Count())
                 {
@@ -415,8 +546,16 @@ namespace SecondBotEvents.Services
                     bool rightIsUUID = UUID.TryParse(right, out rightAsUUID);
                     bool leftIsInGroup = false;
                     bool leftIsLockedout = IsLockedout(left);
-                    bool leftIsEven = (leftAsInt % 2 == 0);
-                    bool leftIsDivs = (leftAsInt % rightAsInt == 0);
+                    bool leftIsEven = true;
+                    bool leftIsDivs = true;
+                    if (leftAsInt != 0)
+                    {
+                        leftIsEven = ((leftAsInt % 2) == 0);
+                        if(rightAsInt != 0)
+                        {
+                            leftIsDivs = ((leftAsInt % rightAsInt) == 0);
+                        }
+                    }
                     if ((leftIsUUID == true) && (rightIsUUID == true))
                     {
                         leftIsInGroup = master.DataStoreService.IsGroupMember(rightAsUUID, leftAsUUID);
