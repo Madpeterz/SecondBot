@@ -460,25 +460,21 @@ namespace SecondBotEvents.Services
                 return;
             }
             string avataruuid = inArgsOrDefault("avataruuid", args, null);
-            string groupuuid = inArgsOrDefault("groupuuid", args, "none");
-            string groupname = inArgsOrDefault("groupname", args, "none");
-            string funds = inArgsOrDefault("funds", args, "-1");
-            string alertmessage = inArgsOrDefault("alertmessage", args, "none");
-            string oldsimname = inArgsOrDefault("oldsimname", args, "none");
-            string newsimname = inArgsOrDefault("newsimname", args, "none");
 
             List<int> AvPos = GetAvPos(avataruuid);
             Vector3 A = GetClient().Self.SimPosition;
             List<int> BotPos = new List<int>() { (int)Math.Round(A.X), (int)Math.Round(A.Y), (int)Math.Round(A.Z) };
             Dictionary<string, string> values = new Dictionary<string, string>
             {
-                { "alertmessage", alertmessage },
-                { "funds", funds },
+                { "alertmessage", inArgsOrDefault("alertmessage", args, "none") },
+                { "message",  inArgsOrDefault("message", args, "none") },
+                { "funds", inArgsOrDefault("funds", args, "-1") },
                 { "eventype", eventName },
-                { "groupuuid", groupuuid },
-                { "groupname", groupname },
-                { "oldsimname", oldsimname },
-                { "newsimname", newsimname },
+                { "groupuuid", inArgsOrDefault("groupuuid", args, "none") },
+                { "groupname", inArgsOrDefault("groupname", args, "none") },
+                { "oldsimname", inArgsOrDefault("oldsimname", args, "none") },
+                { "newsimname", inArgsOrDefault("newsimname", args, "none") },
+                { "avataruuid", avataruuid },
                 { "avatarname", GetAvName(avataruuid) },
                 { "avatarparcel", GetAvParcel(avataruuid) },
                 { "botsim", GetClient().Network.CurrentSim.Name },
@@ -495,16 +491,6 @@ namespace SecondBotEvents.Services
                 { "dayofweek", ((int)DateTime.Now.DayOfWeek).ToString() }
             };
 
-
-            if (avataruuid == null)
-            {
-                avataruuid = "none";
-            }
-            if(args.ContainsKey("message") == false)
-            {
-                args["message"] = "none";
-            }
-            values.Add("avataruuid", avataruuid);
             foreach (CustomOnEvent E in MyCustomEvents[eventName])
             {
                 bool canFireEvent = true;
@@ -527,7 +513,7 @@ namespace SecondBotEvents.Services
                     }
                 }
                 int loop = 0;
-                while(loop < E.WhereChecksLeft.Count())
+                while(loop < E.WhereChecksLeft.Count)
                 {
                     string left = swapvalues(E.WhereChecksLeft[loop],values);
                     string center = E.WhereChecksCenter[loop];
