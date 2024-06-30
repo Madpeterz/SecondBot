@@ -14,35 +14,7 @@ namespace SecondBotEvents.Config
             filename = "onevent";
             settings.Add("Enabled");
             settings.Add("Count");
-            int loop = 1;
-            while (loop <= GetCount())
-            {
-                settings.Add("Event" + loop.ToString() + "Enabled");
-                if(GetEventEnabled(loop) == false)
-                {
-                    loop++;
-                    continue;
-                }
-                settings.Add("Event" + loop.ToString() + "Source");
-                settings.Add("Event" + loop.ToString() + "Monitor");
-                settings.Add("Event" + loop.ToString() + "WhereCount");
-                int loop2 = 1;
-                while (loop2 <= GetWhereCount(loop))
-                {
-                    settings.Add("Event" + loop.ToString() + "Where" + loop2.ToString());
-                    loop2++;
-                }
-                settings.Add("Event" + loop.ToString() + "ActionCount");
-                loop2 = 1;
-                while (loop2 <= GetActionCount(loop))
-                {
-                    settings.Add("Event" + loop.ToString() + "Action" + loop2.ToString());
-                    loop2++;
-                }
-                loop++;
-            }
             settings.Add("HideStatusOutput");
-            return;
         }
 
         public void unloadEvents()
