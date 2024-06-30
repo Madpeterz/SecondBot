@@ -179,6 +179,7 @@ namespace SecondBotEvents.Services
                         {
                             break;
                         }
+                        master.DataStoreService.AddAvatar(e.IM.FromAgentID, e.IM.FromAgentName);
                         // trigger avatar IM
                         TriggerEvent("AvatarIm", new Dictionary<string, string>() {
                             { "message", e.IM.Message} , 
@@ -683,6 +684,7 @@ namespace SecondBotEvents.Services
             foreach (Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.Copy().Values)
             {
                 avs.Add(A.ID);
+                master.DataStoreService.AddAvatar(A.ID, A.Name);
                 hashstring = hashstring + A.ID.ToString();
             }
             string hash = SecondbotHelpers.GetSHA1(hashstring);

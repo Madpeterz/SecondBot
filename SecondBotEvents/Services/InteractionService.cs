@@ -196,6 +196,7 @@ namespace SecondBotEvents.Services
             };
             if(e.FromTask == false)
             {
+                master.DataStoreService.AddAvatar(e.Offer.FromAgentID, e.Offer.FromAgentName);
                 details.Add("itemuuid", e.ObjectID.ToString());
                 details.Add("itemname", "?");
                 InventoryItem itm = GetClient().Inventory.FetchItem(e.ObjectID, GetClient().Self.AgentID, 2000);
@@ -213,6 +214,7 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
+            master.DataStoreService.AddAvatar(e.AgentID, e.AgentName);
             GetClient().Friends.AcceptFriendship(e.AgentID, e.SessionID);
             JsonOuputCleaner(e.AgentName, "FriendRequest");
             

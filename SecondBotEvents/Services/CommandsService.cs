@@ -153,6 +153,7 @@ namespace SecondBotEvents.Services
                         {
                             break;
                         }
+                        master.DataStoreService.AddAvatar(e.IM.FromAgentID, e.IM.FromAgentName);
                         requireSigning = false;
                         acceptMessage = myConfig.GetMastersCSV().Contains(e.IM.FromAgentName);
                         break;
