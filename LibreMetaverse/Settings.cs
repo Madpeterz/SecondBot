@@ -106,27 +106,27 @@ namespace OpenMetaverse
         /// <summary>Number of milliseconds before a CAPS call will time out</summary>
         /// <remarks>Setting this too low will cause web requests time out and
         /// possibly retry repeatedly</remarks>
-        public int CAPS_TIMEOUT = 60 * 1000;
+        public int CAPS_TIMEOUT = 63 * 1000;
 
         /// <summary>Number of milliseconds for xml-rpc to timeout</summary>
-        public int LOGIN_TIMEOUT = 60 * 1000;
+        public int LOGIN_TIMEOUT = 63 * 1000;
 
         /// <summary>Milliseconds before a packet is assumed lost and resent</summary>
         public int RESEND_TIMEOUT = 4000;
 
         /// <summary>Milliseconds without receiving a packet before the 
         /// connection to a simulator is assumed lost</summary>
-        public int SIMULATOR_TIMEOUT = 60 * 1000;
+        public int SIMULATOR_TIMEOUT = 75 * 1000;
 
         /// <summary>Milliseconds to wait for a simulator info request through
         /// the grid interface</summary>
         public int MAP_REQUEST_TIMEOUT = 5 * 1000;
 
         /// <summary>Number of milliseconds between sending pings to each sim</summary>
-        public const int PING_INTERVAL = 2200;
+        public const int PING_INTERVAL = 3000;
 
         /// <summary>Number of milliseconds between sending camera updates</summary>
-        public const int DEFAULT_AGENT_UPDATE_INTERVAL = 500;
+        public const int DEFAULT_AGENT_UPDATE_INTERVAL = 1000;
 
         /// <summary>Number of milliseconds between updating the current
         /// positions of moving, non-accelerating and non-colliding objects</summary>
@@ -134,7 +134,7 @@ namespace OpenMetaverse
 
         /// <summary>Millisecond interval between ticks, where all ACKs are 
         /// sent out and the age of unACKed packets is checked</summary>
-        public const int NETWORK_TICK_INTERVAL = 500;
+        public const int NETWORK_TICK_INTERVAL = 650;
 
         #endregion
         #region Sizes
