@@ -178,7 +178,10 @@ namespace SecondBotEvents.Services
             bool isRestart = false;
             if (client != null)
             {
-                client.Network.Logout();
+                if (client.Network != null)
+                {
+                    client.Network.Logout();
+                }
                 isRestart = true;
             }
             client = null;
