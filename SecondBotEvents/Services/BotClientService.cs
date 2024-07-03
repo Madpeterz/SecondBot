@@ -15,6 +15,12 @@ namespace SecondBotEvents.Services
         public GridClient client = null;
         public BasicConfig basicCfg = null;
 
+        protected bool LogoutExpected = false;
+        public void flagLogoutExpected()
+        {
+            LogoutExpected = true;
+        }
+
         protected bool ExitBot = false;
 
         protected Timer AutoRestartLoginTimer;
@@ -78,6 +84,15 @@ namespace SecondBotEvents.Services
         protected void BotDisconnected(object o, DisconnectedEventArgs e)
         {
             LogFormater.Info("Client service ~ Network disconnected: " + e.Message);
+            if (LogoutExpected == false)
+            {
+                AutoRestartLoginTimer = new Timer();
+                AutoRestartLoginTimer.Interval = 75 * 1000;
+                AutoRestartLoginTimer.AutoReset = false;
+                AutoRestartLoginTimer.Elapsed += RestartTimer;
+                LogFormater.Info("Client service ~ Unexpected disconnect (starting reconnect timer for 75s)");
+                return;
+            }
         }
 
         protected void BotLoginStatus(object o, LoginProgressEventArgs e)

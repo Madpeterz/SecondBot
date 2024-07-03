@@ -145,6 +145,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         public object Logoff()
         {
+            master.BotClient.flagLogoutExpected();
             GetClient().Network.BeginLogout();
             return BasicReply("ok");
         }
