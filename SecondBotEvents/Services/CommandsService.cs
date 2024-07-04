@@ -416,11 +416,9 @@ namespace SecondBotEvents.Services
             if (requireSigning == false)
             {
                 accepted = true; // just accept the command
-                master.CommandNotice(command, source, String.Join("@@@", args), accepted);
                 return;
             }
             Vaildate(requireTimewindow, windowSize, secret);
-            master.CommandNotice(command, source, String.Join("@@@", args), accepted);
         }
 
         public SignedCommand(CommandsService setMaster, string source, string setCommand, string setSigningCode, string[] setArgs, 
