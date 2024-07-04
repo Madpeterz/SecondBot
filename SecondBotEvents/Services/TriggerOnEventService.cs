@@ -700,10 +700,17 @@ namespace SecondBotEvents.Services
                 }
                 if ((tracked.Count > 0) || (joined.Count > 0))
                 {
+                    List<UUID> seen = new List<UUID>();
                     if (tracked.Count > 0)
                     {
+                        
                         foreach (UUID a in tracked)
                         {
+                            if(seen.Contains(a) == true)
+                            {
+                                continue;
+                            }
+                            seen.Add(a);
                             TriggerEvent("GuestLeaves", new Dictionary<string, string>() { { "avataruuid", a.ToString() } });
                         }
                     }
@@ -711,6 +718,11 @@ namespace SecondBotEvents.Services
                     {
                         foreach (UUID a in joined)
                         {
+                            if (seen.Contains(a) == true)
+                            {
+                                continue;
+                            }
+                            seen.Add(a);
                             TriggerEvent("GuestJoins", new Dictionary<string, string>() { { "avataruuid", a.ToString() } });
                         }
                     }
