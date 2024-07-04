@@ -14,7 +14,9 @@ Secondbot is a CommandLine based bot for SecondLife based on libremetaverse reta
 [madpeter/secondbot on dockerhub](https://hub.docker.com/r/madpeter/secondbot)
 
 Current tags
+
 events - the most upto date stable version of the bot
+
 debug - used for feature tested
 
 
