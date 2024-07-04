@@ -1056,7 +1056,12 @@ namespace OpenMetaverse
                     if (error != null) { return; }
 
                     OSD result = OSDParser.Deserialize(data);
-                    GroupMembersHandlerCaps(requestID, result);
+                    if (result != null)
+                    {
+                        GroupMembersHandlerCaps(requestID, result);
+                        return;
+                    }
+                    Logger.Log("Failed to json decode data from uri "+cap.AbsoluteUri+": ", Helpers.LogLevel.Error, Client);
                 });
             }
             else

@@ -2091,30 +2091,37 @@ namespace OpenMetaverse
                 // TODO: create Current Outfit Folder
             }
 
-            OSDMap request = new OSDMap(1) { ["cof_version"] = currentoutfitfolder.Version };
-
-            string msg = "Server side baking failed";
-
-            OSD res = null;
-
-            await Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, request, cancellationToken,
-                (response, data, error) => res = OSDParser.Deserialize(data));
-
-            if (res is OSDMap result)
+            try
             {
-                if (result["success"])
-                {
-                    Logger.Log("Successfully set appearance", Helpers.LogLevel.Info, Client);
-                    // TODO: Set local visual params and baked textures based on the result here
-                    return true;
-                }
-                if (result.ContainsKey("error"))
-                {
-                    msg += ": " + result["error"].AsString();
-                }
-            }
+                OSDMap request = new OSDMap(1) { ["cof_version"] = currentoutfitfolder.Version };
 
-            Logger.Log(msg, Helpers.LogLevel.Error, Client);
+                string msg = "Server side baking failed";
+
+                OSD res = null;
+
+                await Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, request, cancellationToken,
+                    (response, data, error) => res = OSDParser.Deserialize(data));
+
+                if (res is OSDMap result)
+                {
+                    if (result["success"])
+                    {
+                        Logger.Log("Successfully set appearance", Helpers.LogLevel.Info, Client);
+                        // TODO: Set local visual params and baked textures based on the result here
+                        return true;
+                    }
+                    if (result.ContainsKey("error"))
+                    {
+                        msg += ": " + result["error"].AsString();
+                    }
+                }
+
+                Logger.Log(msg, Helpers.LogLevel.Error, Client);
+            }
+            catch (Exception e)
+            {
+                Logger.Log("UpdateAvatarAppearanceAsync has failed to unpack data: "+e.Message, Helpers.LogLevel.Error, Client);
+            }
 
             return false;
         }
