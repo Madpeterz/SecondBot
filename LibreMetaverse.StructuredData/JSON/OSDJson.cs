@@ -20,7 +20,16 @@ namespace OpenMetaverse.StructuredData
 
         public static OSD DeserializeJson(string json)
         {
-            return DeserializeJson(JsonMapper.ToObject(json));
+            try
+            {
+                JsonData A = JsonMapper.ToObject(json);
+                return DeserializeJson(A);
+            }
+            catch
+            {
+                return null; // something fucky happened to the input
+            }
+            
         }
 
         public static OSD DeserializeJson(JsonData json)
