@@ -607,14 +607,17 @@ namespace OpenMetaverse
                     try
                     {
                         OSD result = OSDParser.Deserialize(data);
-                        OSDMap res = (OSDMap)result;
-                        OSDArray itemsOSD = (OSDArray)res["items"];
-
-                        foreach (var it in itemsOSD)
+                        if (result != null)
                         {
-                            InventoryItem item = InventoryItem.FromOSD(it);
-                            _Store[item.UUID] = item;
-                            OnItemReceived(new ItemReceivedEventArgs(item));
+                            OSDMap res = (OSDMap)result;
+                            OSDArray itemsOSD = (OSDArray)res["items"];
+
+                            foreach (var it in itemsOSD)
+                            {
+                                InventoryItem item = InventoryItem.FromOSD(it);
+                                _Store[item.UUID] = item;
+                                OnItemReceived(new ItemReceivedEventArgs(item));
+                            }
                         }
                     }
                     catch (Exception ex)
