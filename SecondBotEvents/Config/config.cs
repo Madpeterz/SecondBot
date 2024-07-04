@@ -79,22 +79,26 @@ namespace SecondBotEvents.Config
                 MakeSettingsFile(fromFolder);
                 return;
             }
-            JObject result = JObject.Parse(IO.ReadFile(readfile));
-            foreach (string setting in settings)
+            try
             {
-                if(result.ContainsKey(setting) == false)
+                JObject result = JObject.Parse(IO.ReadFile(readfile));
+                foreach (var x in result)
                 {
-                    continue;
+                    settings.Add(x.Key);
+                    string value = x.Value.ToString();
+                    if (SecondbotHelpers.notempty(value) == false)
+                    {
+                        mysettings.Add(x.Key, "");
+                        continue;
+                    }
+                    mysettings.Add(x.Key, value);
                 }
-                string value = result[setting].ToString();
-                if (SecondbotHelpers.notempty(value) == false)
-                {
-                    mysettings.Add(setting, "");
-                    continue;
-                }
-                mysettings.Add(setting, value);
+                loaded = true;
             }
-            loaded = true;
+            catch (Exception ex)
+            {
+                LogFormater.Warn("Json format for " + readfile + " is broken: " + ex.Message);
+            }
         }
 
         protected void LoadSettingsFromEnv()
@@ -152,7 +156,8 @@ namespace SecondBotEvents.Config
 
         protected int ReadSettingAsInt(string key, int defaultValue = 30)
         {
-            bool result = int.TryParse(ReadSettingAsString(key, defaultValue.ToString()), out int value);
+            string read = ReadSettingAsString(key, defaultValue.ToString());
+            bool result = int.TryParse(read, out int value);
             if (result == false)
             {
                 return defaultValue;

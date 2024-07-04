@@ -153,6 +153,7 @@ namespace SecondBotEvents.Services
                         {
                             break;
                         }
+                        master.DataStoreService.AddAvatar(e.IM.FromAgentID, e.IM.FromAgentName);
                         requireSigning = false;
                         acceptMessage = myConfig.GetMastersCSV().Contains(e.IM.FromAgentName);
                         break;
@@ -415,11 +416,9 @@ namespace SecondBotEvents.Services
             if (requireSigning == false)
             {
                 accepted = true; // just accept the command
-                master.CommandNotice(command, source, String.Join("@@@", args), accepted);
                 return;
             }
             Vaildate(requireTimewindow, windowSize, secret);
-            master.CommandNotice(command, source, String.Join("@@@", args), accepted);
         }
 
         public SignedCommand(CommandsService setMaster, string source, string setCommand, string setSigningCode, string[] setArgs, 

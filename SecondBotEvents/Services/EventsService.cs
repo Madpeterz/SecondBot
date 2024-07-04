@@ -25,6 +25,7 @@ namespace SecondBotEvents.Services
         protected UUID OutputAvatar = UUID.Zero;
         protected long lastGroupMembershipUpdate = 0;
 
+
         public void InventoryUpdateEvent(Dictionary<string, string> detail)
         {
             if (InventoryEvents.ContainsKey(detail["itemtype"]) == true)
@@ -143,6 +144,7 @@ namespace SecondBotEvents.Services
             GetClient().Self.AlertMessage += BotAlertMessage;
         }
 
+        protected long lastAvUpdate = 0;
         protected string avatarhash = "";
         protected void TrackAvatarsOnParcel()
         {
@@ -152,6 +154,13 @@ namespace SecondBotEvents.Services
                 GuestListLoaded = false;
                 return;
             }
+            long dif = SecondbotHelpers.UnixTimeNow() - lastAvUpdate;
+            if(dif < 30)
+            {
+                // only check for changes every 30 secs
+                return;
+            }
+            lastAvUpdate = SecondbotHelpers.UnixTimeNow();
 
             string hashstring = "";
             List<UUID> avs = new List<UUID>();
@@ -470,5 +479,14 @@ namespace SecondBotEvents.Services
             raw = raw + Unixtime.ToString() + Secret;
             Hash = SecondbotHelpers.GetSHA1(raw);
         }
+    }
+
+    public class GuestUpdateEvent
+    {
+        public string parcelName = "";
+        public string regionName = "";
+        public string avatarName = "";
+        public UUID avatarUUID = UUID.Zero;
+        public bool entered = false;
     }
 }

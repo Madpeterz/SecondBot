@@ -976,7 +976,7 @@ namespace SecondBotEvents.Services
             GetClient().Groups.RequestCurrentGroups();
         }
 
-        protected void AddAvatar(UUID id, string name)
+        public void AddAvatar(UUID id, string name)
         {
             lock (avatarsName2Key) lock (avatarLastUsed)
             {

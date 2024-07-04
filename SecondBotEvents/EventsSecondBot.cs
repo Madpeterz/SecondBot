@@ -42,6 +42,8 @@ namespace SecondBotEvents
         public EventsService EventsService { get { return (EventsService)GetService("EventsService"); } }
         public DialogService DialogService { get { return (DialogService)GetService("DialogService"); } }
 
+        public TriggerOnEventService TriggerOnEventService { get { return (TriggerOnEventService)GetService("TriggerOnEventService"); } }
+
         public CurrentOutfitFolder CurrentOutfitFolder {  get { return (CurrentOutfitFolder)GetService("CurrentOutfitFolder"); } }
         public RLVService RLV { get { return (RLVService)GetService("RLVService"); } }
 
@@ -161,6 +163,7 @@ namespace SecondBotEvents
             RegisterService("EventsService");
             RegisterService("DialogService");
             RegisterService("CustomCommandsService");
+            RegisterService("TriggerOnEventService");
             if (BotClient.IsLoaded() == false)
             {
                 LogFormater.Info("Config is not loaded :(");
