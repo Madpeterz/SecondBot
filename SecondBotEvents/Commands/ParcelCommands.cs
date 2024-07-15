@@ -1,19 +1,86 @@
 ﻿using Newtonsoft.Json;
 using OpenMetaverse;
 using SecondBotEvents.Services;
+using Swan;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using static OpenMetaverse.DirectoryManager;
 using static OpenMetaverse.ParcelManager;
 
 namespace SecondBotEvents.Commands
 {
+    public class parcelPacketReply
+    {
+        public List<string> groupuuids = new List<string>();
+        public List<parcelPacketData> parcels = new List<parcelPacketData>();
+    }
+    public class parcelPacketData
+    {
+        public int area;
+        public int groupindex;
+        public string name;
+        public int maxprims;
+        public int currentprims;
+        public string startbox;
+        public string endbox;
+        public byte[] bitmap;
+    }
+
     [ClassInfo("Control the land under our feet")]
     public partial class ParcelCommands : CommandsAPI
     {
         public ParcelCommands(EventsSecondBot setmaster) : base(setmaster)
         {
+        }
+
+        [About("Requests the bot update its list of parcels ready for other commands")]
+        [ReturnHints("ok")]
+        public object UpdateListOfParcels()
+        {
+            GetClient().Parcels.RequestAllSimParcels(GetClient().Network.CurrentSim);
+            return BasicReply("ok");
+        }
+        [About("Requests a packet blob for the parcels snapshot data")]
+        [ReturnHints("json encoded object")]
+        public object GetParcelListSnapshots()
+        {
+            Dictionary<string, string> reply = new Dictionary<string, string>();
+            List<Parcel> Parcels = GetClient().Network.CurrentSim.Parcels.Copy().Values.ToList();
+            foreach (Parcel A in Parcels)
+            {
+                reply.Add(A.Name, A.SnapshotID.ToString());
+            }
+            return BasicReply(JsonConvert.SerializeObject(reply));
+        }
+
+        [About("Requests a packet blob for the parcels in the current sim\n call UpdateListOfParcels first to update list before calling")]
+        [ReturnHints("json encoded object")]
+        public object GetListOfParcels()
+        {
+            parcelPacketReply reply = new parcelPacketReply();
+            List<Parcel> Parcels = GetClient().Network.CurrentSim.Parcels.Copy().Values.ToList();
+            foreach (Parcel A in Parcels)
+            {
+                int index = reply.groupuuids.IndexOf(A.GroupID.ToString());
+                if (index == -1)
+                {
+                    reply.groupuuids.Add(A.GroupID.ToString());
+                    index = reply.groupuuids.IndexOf(A.GroupID.ToString());
+                }
+                parcelPacketData R = new parcelPacketData();
+                R.groupindex = index;
+                R.area = A.Area;
+                R.startbox = A.AABBMin.ToString();
+                R.endbox = A.AABBMax.ToString();
+                R.currentprims = A.TotalPrims;
+                R.maxprims = A.MaxPrims;
+                R.name = A.Name;
+                R.bitmap = A.Bitmap;
+                reply.parcels.Add(R);
+            }
+            return BasicReply(JsonConvert.SerializeObject(reply));
         }
 
         [About("Sets the current parcel for sale Also marks the parcel for sale")]
