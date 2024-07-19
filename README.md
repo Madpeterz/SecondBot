@@ -22,19 +22,19 @@ debug - used for feature tested
 
 Archived tags
 ====
-classic - the older pre events update version of the bot
+classic - the older pre events update version of the bot (if you can please use a current tag)
 
 
 
 ### Status
 ---
-
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3765/badge)](https://bestpractices.coreinfrastructure.org/projects/3765)
 
 
 ### Getting started guides
 ---
 Wiki /  [Docker-with-Portainer](https://github.com/Madpeterz/SecondBot/wiki/Setting-up-(Docker-with-Portainer))
+
 
 ### Running on a pi?
 ---
