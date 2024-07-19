@@ -90,6 +90,7 @@ namespace SecondBotEvents.Services
                 AutoRestartLoginTimer.Interval = 75 * 1000;
                 AutoRestartLoginTimer.AutoReset = false;
                 AutoRestartLoginTimer.Elapsed += RestartTimer;
+                AutoRestartLoginTimer.Start();
                 LogFormater.Info("Client service ~ Unexpected disconnect (starting reconnect timer for 75s)");
                 return;
             }
