@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OpenMetaverse;
+using OpenMetaverse.ImportExport.Collada14;
 using SecondBotEvents.Services;
 using Swan;
 using System;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using static OpenMetaverse.DirectoryManager;
 using static OpenMetaverse.ParcelManager;
+using static OpenMetaverse.Stats.UtilizationStatistics;
 
 namespace SecondBotEvents.Commands
 {
@@ -25,7 +27,6 @@ namespace SecondBotEvents.Commands
         public int currentprims;
         public string startbox;
         public string endbox;
-        public byte[] bitmap;
     }
 
     [ClassInfo("Control the land under our feet")]
@@ -55,6 +56,95 @@ namespace SecondBotEvents.Commands
             return BasicReply(JsonConvert.SerializeObject(reply));
         }
 
+        [About("requests the parcel layout as a SVG\n call UpdateListOfParcels first to update list before calling")]
+        [ReturnHints("json encoded svg")]
+        public object GetSimParcelLayers()
+        {
+            Dictionary<int, Parcel> data = GetClient().Network.CurrentSim.Parcels.Copy();
+            Dictionary<string, Vector4> parcelbox = new Dictionary<string, Vector4>();
+            uint SimWidth = GetClient().Network.CurrentSim.SizeX;
+            uint SimHeight = GetClient().Network.CurrentSim.SizeY;
+            Dictionary<int,string> maps = new Dictionary<int,string>();
+
+
+            int lastparcelid = 0;
+            uint lowX = 0;
+            uint lowY = 0;
+            Random rnd = new Random();
+            uint startX = 4;
+            string svg = "<svg width=\"" + SimWidth + "\" height=\"" + SimHeight + "\" xmlns=\"http://www.w3.org/2000/svg\">";
+            uint boxheight = 0;
+            var color = "";
+            Parcel P = null;
+            string parcelname = "?";
+            int checkparcel = GetClient().Parcels.GetParcelLocalID(GetClient().Network.CurrentSim, new Vector3(startX, 4, 20));
+            while (startX < SimWidth)
+            {
+                uint startY = 4;
+                while (startY < SimHeight)
+                {
+                    checkparcel = GetClient().Parcels.GetParcelLocalID(GetClient().Network.CurrentSim, new Vector3(startX, startY, 20));
+                    if ((checkparcel != lastparcelid) || (startY >= SimHeight))
+                    {
+                        if(lastparcelid == 0)
+                        {
+                            lastparcelid = checkparcel;
+                            lowX = startX - 4;
+                            lowY = startY - 4;
+                        }
+                        else
+                        {
+                            boxheight = (startY-4) - lowY;
+                            color = "";
+                            if (maps.ContainsKey(lastparcelid) == false)
+                            {
+                                color = "rgb(" + rnd.Next(0, 256) + "," + rnd.Next(0, 256) + ",125)";
+                                maps.Add(lastparcelid, color);
+                            }
+                            else
+                            {
+                                color = maps[lastparcelid];
+                            }
+                            parcelname = "?";
+                            if (data.ContainsKey(lastparcelid) == true)
+                            {
+                                P = GetClient().Network.CurrentSim.Parcels[lastparcelid];
+                                parcelname = P.Name;
+                            }
+                            svg = svg + "<rect data-parcel=\"" + parcelname + "\" width=\"4\" height=\"" + boxheight + "\" x=\"" + lowX + "\" y=\"" + lowY + "\" fill=\"" + color + "\" />";
+                            lastparcelid = checkparcel;
+                            lowX = startX - 4;
+                            lowY = startY - 4;
+                        }
+                    }
+                    startY += 4;
+                }
+                boxheight = (startY - 8) - lowY;
+                color = "";
+                if (maps.ContainsKey(lastparcelid) == false)
+                {
+                    color = "rgb(" + rnd.Next(0, 256) + "," + rnd.Next(0, 256) + ",125)";
+                    maps.Add(lastparcelid, color);
+                }
+                else
+                {
+                    color = maps[lastparcelid];
+                }
+                parcelname = "?";
+                if (data.ContainsKey(lastparcelid) == true)
+                {
+                    P = GetClient().Network.CurrentSim.Parcels[lastparcelid];
+                    parcelname = P.Name;
+                }
+                svg = svg + "<rect data-parcel=\"" + parcelname + "\" width=\"4\" height=\"" + boxheight + "\" x=\"" + lowX + "\" y=\"" + lowY + "\" fill=\"" + color + "\" />";
+                lastparcelid = 0;
+                startX += 4;
+            }
+            svg = svg + "</svg>";
+            return BasicReply(svg);
+        }
+
+
         [About("Requests a packet blob for the parcels in the current sim\n call UpdateListOfParcels first to update list before calling")]
         [ReturnHints("json encoded object")]
         public object GetListOfParcels()
@@ -77,7 +167,6 @@ namespace SecondBotEvents.Commands
                 R.currentprims = A.TotalPrims;
                 R.maxprims = A.MaxPrims;
                 R.name = A.Name;
-                R.bitmap = A.Bitmap;
                 reply.parcels.Add(R);
             }
             return BasicReply(JsonConvert.SerializeObject(reply));

@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		.dockerignore = .dockerignore
 		.gitignore = .gitignore
 		SecondBotEvents\Dockerfile = SecondBotEvents\Dockerfile
+		github.autobuild.yml = github.autobuild.yml
 		NuGet.Config = NuGet.Config
 		oldDockerfile = oldDockerfile
 		README.md = README.md
