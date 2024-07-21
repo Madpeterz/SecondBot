@@ -19,12 +19,18 @@ namespace SecondBotEvents.Config
             settings.Add("EnforceTimeWindow");
             settings.Add("TimeWindowSecs");
             settings.Add("Enabled");
+            settings.Add("ObjectMasterOptout");
             settings.Add("HideStatusOutput");
         }
 
         public bool GetEnabled()
         {
             return ReadSettingAsBool("Enabled", true);
+        }
+
+        public bool GetObjectMasterOptout()
+        {
+            return ReadSettingAsBool("ObjectMasterOptout", false);
         }
 
         public string[] GetMastersCSV()

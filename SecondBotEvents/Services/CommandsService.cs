@@ -140,6 +140,11 @@ namespace SecondBotEvents.Services
                 case InstantMessageDialog.MessageFromObject:
                     {
                         acceptMessage = true;
+                        if(myConfig.GetObjectMasterOptout() == true)
+                        {
+                            string ownername = master.DataStoreService.GetAvatarName(e.IM.FromAgentID);
+                            requireSigning = !myConfig.GetMastersCSV().Contains(ownername);
+                        }
                         break;
                     }
                 case InstantMessageDialog.MessageFromAgent: // shared with SessionSend

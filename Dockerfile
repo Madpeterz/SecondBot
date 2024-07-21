@@ -35,6 +35,7 @@ ENV basic_Username='' \
 	commands_EnforceTimeWindow='false' \
 	commands_TimeWindowSecs=35 \
 	commands_Enabled='true' \
+	commands_ObjectMasterOptout='false' \
 	datastore_AutoCleanAvatars='true' \
 	datastore_AvatarsCleanAfterMins=10 \
 	datastore_LocalChatHistoryLimit=120 \
