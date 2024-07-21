@@ -13,6 +13,7 @@ using System.Text.Json;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace SecondBotEvents.Services
 {
@@ -330,7 +331,7 @@ namespace SecondBotEvents.Services
             {
                 return "Command request rejected";
             }
-            return JsonSerializer.Serialize(master.CommandsService.RunCommand(C));
+            return JsonConvert.SerializeObject(master.CommandsService.RunCommand(C));
         }
     }
 }
