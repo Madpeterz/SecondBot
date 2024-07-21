@@ -183,6 +183,10 @@ namespace SecondBotEvents.Services
                     {
                         continue;
                     }
+                    if(target < 0)
+                    {
+                        continue;
+                    }
                     GetClient().Self.Chat(eventMessage, target, ChatType.Normal);
                 }
                 else if(targetType == "group")
