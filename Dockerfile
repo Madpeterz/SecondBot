@@ -91,7 +91,10 @@ ENV basic_Username='' \
 	http_HideStatusOutput='false' \
 	interaction_HideStatusOutput='false' \
 	rlv_Enabled='false' \
-	rlv_HideStatusOutput='false'
+	rlv_HideStatusOutput='false' \
+	relay_count='0' \
+	relay_HideStatusOutput='false' \
+	relay_UseShortEncoder='false'
 	
 
 EXPOSE 80
