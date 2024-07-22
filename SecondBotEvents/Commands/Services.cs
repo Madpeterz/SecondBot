@@ -16,7 +16,7 @@ namespace SecondBotEvents.Commands
         "HomeboundService<br/>" +
         "EventsService<br/>" +
         "DialogService<br/>" +
-        "TriggerOnEventService" +
+        "TriggerOnEventService<br/>" +
         "RelayService")]
     public class Services : CommandsAPI
     {
