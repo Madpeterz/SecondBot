@@ -55,7 +55,7 @@ namespace SecondBotEvents
                 string card = "<div class=\"card mt-2 mx-2\" style=\"width: 18rem;\">"
                         + "<div class=\"card-body\">"
                         + "<h5 class=\"card-title\">" + namespaceworker.FirstCharToUpper() + "</h5>"
-                        + "<p class=\"card-text\">" + about + "</p>"
+                        + "<p class=\"card-text\">" + about.Split("<br")[0] + "</p>"
                         + "<a href = \"" + url + "\" class=\"btn btn-primary\">View " + commandcount.ToString() + " commands</a>"
                         + "</div>"
                         + "</div>";

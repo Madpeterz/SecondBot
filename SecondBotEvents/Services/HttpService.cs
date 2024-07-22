@@ -20,7 +20,7 @@ namespace SecondBotEvents.Services
     public class HttpService : BotServices
     {
         protected WebServer HTTPendpoint = null;
-        protected HttpConfig myConfig;
+        protected new HttpConfig myConfig;
         protected bool acceptBotCommands = false;
         public HttpService(EventsSecondBot setMaster) : base(setMaster)
         {

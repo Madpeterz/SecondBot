@@ -8,7 +8,7 @@ namespace SecondBotEvents.Services
 {
     public class HomeboundService : BotServices
     {
-        protected HomeboundConfig myConfig;
+        protected new HomeboundConfig myConfig;
         protected bool botConnected = false;
 
 

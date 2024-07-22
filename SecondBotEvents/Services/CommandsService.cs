@@ -49,6 +49,11 @@ namespace SecondBotEvents.Services
             LoadCommands();
         }
 
+        public bool GetAllowServiceCommands()
+        {
+            return myConfig.GetAllowServiceControl();
+        }
+
         protected void LoadCommands()
         {
             Dictionary<string, Type> commandmodules = http_commands_helper.getCommandModules();

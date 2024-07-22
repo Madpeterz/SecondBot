@@ -164,6 +164,7 @@ namespace SecondBotEvents
             RegisterService("DialogService");
             RegisterService("CustomCommandsService");
             RegisterService("TriggerOnEventService");
+            RegisterService("RelayService");
             if (BotClient.IsLoaded() == false)
             {
                 LogFormater.Info("Config is not loaded :(");

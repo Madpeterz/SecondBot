@@ -17,7 +17,7 @@ namespace SecondBotEvents.Services
     public class DialogService : BotServices
     {
         protected bool botConnected = false;
-        protected DialogRelayConfig myConfig;
+        protected new DialogRelayConfig myConfig;
         public DialogService(EventsSecondBot setMaster) : base(setMaster)
         {
             myConfig = new DialogRelayConfig(master.fromEnv, master.fromFolder);

@@ -2,16 +2,29 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SecondBotEvents.Config;
 
 namespace SecondBotEvents.Services
 {
     public abstract class BotServices
     {
         public EventsSecondBot master;
+        protected Config.Config myConfig;
         protected bool running = false;
         public BotServices(EventsSecondBot setMaster)
         {
             master = setMaster;
+        }
+
+        public void enableAndStart()
+        {
+            myConfig.setEnabled(true);
+            Restart();
+        }
+
+        public void changeConfig(string configKey, string configValue)
+        {
+            myConfig.updateKey(configKey, configValue);
         }
 
         public bool isRunning() { return running; }

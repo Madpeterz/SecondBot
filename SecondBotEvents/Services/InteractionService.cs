@@ -11,7 +11,7 @@ namespace SecondBotEvents.Services
 {
     public class InteractionService : BotServices
     {
-        protected InteractionConfig myConfig;
+        protected new InteractionConfig myConfig;
         protected bool botConnected = false;
         public InteractionService(EventsSecondBot setMaster) : base(setMaster)
         {

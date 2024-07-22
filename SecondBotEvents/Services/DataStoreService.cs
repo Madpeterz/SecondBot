@@ -14,7 +14,7 @@ namespace SecondBotEvents.Services
 {
     public class DataStoreService : BotServices
     {
-        protected DataStoreConfig myConfig;
+        protected new DataStoreConfig myConfig;
         protected bool botConnected = false;
         public DataStoreService(EventsSecondBot setMaster) : base(setMaster)
         {

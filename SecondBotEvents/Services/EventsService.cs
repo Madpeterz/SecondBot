@@ -13,7 +13,7 @@ namespace SecondBotEvents.Services
 {
     public class EventsService : BotServices
     {
-        protected EventsConfig myConfig;
+        protected new EventsConfig myConfig;
         protected bool botConnected = false;
         protected string lastSimName = "";
         protected UUID TrackGroupUUID = UUID.Zero;

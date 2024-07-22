@@ -16,7 +16,7 @@ namespace SecondBotEvents.Services
 {
     public class RelayService : BotServices
     {
-        protected RelayConfig myConfig;
+        protected new RelayConfig myConfig;
         protected bool botConnected = false;
         public RelayService(EventsSecondBot setMaster) : base(setMaster)
         {

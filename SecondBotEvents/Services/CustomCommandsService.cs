@@ -11,7 +11,7 @@ namespace SecondBotEvents.Services
 {
     public class CustomCommandsService: BotServices
     {
-        protected CustomCommandsConfig myConfig;
+        protected new CustomCommandsConfig myConfig;
         protected bool botConnected = false;
         protected Dictionary<string, CustomCommand> commands = new Dictionary<string, CustomCommand>();
         public bool HasCommand(string C)

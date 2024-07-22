@@ -23,6 +23,16 @@ namespace SecondBotEvents.Config
             MakeSettings();
             LoadSettings(fromENV, fromFolder);
         }
+
+        public void updateKey(string key, string value)
+        {
+            if(mysettings.ContainsKey(key))
+            {
+                mysettings[key] = value;
+                return;
+            }
+            mysettings.Add(key, value);
+        }
         public void setEnabled(bool enabled)
         {
             mysettings["Enabled"] = enabled.ToString();

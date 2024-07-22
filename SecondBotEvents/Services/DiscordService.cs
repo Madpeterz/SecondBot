@@ -15,7 +15,7 @@ namespace SecondBotEvents.Services
 {
     public class DiscordService : BotServices
     {
-        protected Config.DiscordConfig myConfig = null;
+        protected new Config.DiscordConfig myConfig = null;
         protected bool AcceptEventsFromSL = false;
         protected bool DiscordIsReady = false;
         protected bool DiscordDisconnectExpected = false;

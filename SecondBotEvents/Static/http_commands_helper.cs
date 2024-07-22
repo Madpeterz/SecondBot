@@ -27,6 +27,7 @@ namespace SecondBotEvents
             reply.Add("parcel", typeof(ParcelCommands));
             reply.Add("self", typeof(Self));
             reply.Add("streamadmin", typeof(StreamAdmin));
+            reply.Add("services", typeof(SecondBotEvents.Commands.Services));
             return reply;
         }
     }

@@ -20,9 +20,13 @@ namespace SecondBotEvents.Config
             settings.Add("TimeWindowSecs");
             settings.Add("Enabled");
             settings.Add("ObjectMasterOptout");
+            settings.Add("AllowServiceControl");
             settings.Add("HideStatusOutput");
         }
-
+        public bool GetAllowServiceControl()
+        {
+            return ReadSettingAsBool("AllowServiceControl", false);
+        }
         public bool GetEnabled()
         {
             return ReadSettingAsBool("Enabled", true);
