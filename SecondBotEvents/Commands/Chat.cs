@@ -18,12 +18,11 @@ namespace SecondBotEvents.Commands
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetLocalChat()));
         }
 
-        [About("sends a message to localchat")]
-        [ArgHints("channel", "the channel to output on (>=0)")]
+        [About("sends a message to localchat (Normal chat)")]
+        [ArgHints("channel", "the channel to output on")]
         [ArgHints("message", "the message to send")]
         [ReturnHints("array string")]
         [ReturnHintsFailure("Message empty")]
-        [ReturnHintsFailure("Invaild channel")]
         public object Say(string channel, string message)
         {
             if (SecondbotHelpers.isempty(message) == true)
@@ -34,15 +33,52 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild channel", new [] { channel, message });
             }
-            if(channelnum < 0)
-            {
-                return Failure("Invaild channel", new [] { channel, message });
-            }
             master.DataStoreService.BotRecordLocalchatReply(message);
             GetClient().Self.Chat(message, channelnum, ChatType.Normal);
             return BasicReply("ok");
-            
         }
+
+        [About("sends a message to localchat (as a Shout)")]
+        [ArgHints("channel", "the channel to output on")]
+        [ArgHints("message", "the message to send")]
+        [ReturnHints("array string")]
+        [ReturnHintsFailure("Message empty")]
+        public object Shout(string channel, string message)
+        {
+            if (SecondbotHelpers.isempty(message) == true)
+            {
+                return Failure("Message empty", new[] { channel, message });
+            }
+            if (int.TryParse(channel, out int channelnum) == false)
+            {
+                return Failure("Invaild channel", new[] { channel, message });
+            }
+            master.DataStoreService.BotRecordLocalchatReply(message);
+            GetClient().Self.Chat(message, channelnum, ChatType.Shout);
+            return BasicReply("ok");
+        }
+
+        [About("sends a message to localchat (as a Whisper)")]
+        [ArgHints("channel", "the channel to output on")]
+        [ArgHints("message", "the message to send")]
+        [ReturnHints("array string")]
+        [ReturnHintsFailure("Message empty")]
+        public object Whisper(string channel, string message)
+        {
+            if (SecondbotHelpers.isempty(message) == true)
+            {
+                return Failure("Message empty", new[] { channel, message });
+            }
+            if (int.TryParse(channel, out int channelnum) == false)
+            {
+                return Failure("Invaild channel", new[] { channel, message });
+            }
+            master.DataStoreService.BotRecordLocalchatReply(message);
+            GetClient().Self.Chat(message, channelnum, ChatType.Whisper);
+            return BasicReply("ok");
+        }
+
+
 
         [About("sends a im to the selected avatar")]
         [ArgHints("avatar", "a UUID or Firstname Lastname")]
