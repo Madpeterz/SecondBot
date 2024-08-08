@@ -1125,6 +1125,7 @@ namespace SecondBotEvents.Services
                     GetClient().Groups.GroupMembersReply -= GroupMembers;
                     GetClient().Groups.GroupRoleDataReply -= GroupRoles;
                     GetClient().Estate.EstateBansReply -= EstateBans;
+                    GetClient().Friends.FriendFoundReply -= FindFriendReply;
                 }
             }
             
