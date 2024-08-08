@@ -18,7 +18,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("not in friends list")]
         [ReturnHintsFailure("no map access or updating")]
         [ArgHints("avatar", "A avatar uuid or Firstname Lastname")]
-        public object FieldGetLocation(string avatar)
+        public object FriendsGetLocation(string avatar)
         {
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
