@@ -41,6 +41,8 @@ namespace SecondBotEvents.Services
 
         protected List<CommandHistory> commandHistories = new();
 
+
+
         protected long lastCleanupKeyValueStore = 0;
         protected long lastCleanupAvatarStore = 0;
 
@@ -847,6 +849,35 @@ namespace SecondBotEvents.Services
         }
 
         List<UUID> estateBanlist = null;
+        Dictionary<UUID, FriendLocations> FriendMapLocations = new Dictionary<UUID, FriendLocations>();
+
+        public FriendLocations GetFriendMap(UUID id)
+        {
+            if(FriendMapLocations.ContainsKey(id) == false)
+            {
+                return null;
+            }
+            return FriendMapLocations[id];
+        }
+
+        protected void FindFriendReply(object o, FriendFoundReplyEventArgs e)
+        {
+            uint x, y;
+            Utils.LongToUInts(e.RegionHandle, out x, out y);
+            x /= 256;
+            y /= 256;
+            Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.Copy();
+            if (FriendListCopy.ContainsKey(e.AgentID) == false)
+            {
+                return;
+            }
+            FriendLocations NewEntry = new FriendLocations(FriendListCopy[e.AgentID].Name, e.Location, new Vector3(x,y,10));
+            if(FriendMapLocations.ContainsKey(e.AgentID) == false)
+            {
+                FriendMapLocations.Add(e.AgentID, NewEntry);
+            }
+            FriendMapLocations[e.AgentID] = NewEntry;
+        }
 
         protected void EstateBans(object o, EstateBansReplyEventArgs e)
         {
@@ -883,6 +914,7 @@ namespace SecondBotEvents.Services
             GetClient().Groups.GroupMembersReply += GroupMembers;
             GetClient().Groups.GroupRoleDataReply += GroupRoles;
             GetClient().Estate.EstateBansReply += EstateBans;
+            GetClient().Friends.FriendFoundReply += FindFriendReply;
             GetClient().Groups.RequestCurrentGroups();
             GetClient().Self.RetrieveInstantMessages();
         }
@@ -1112,6 +1144,21 @@ namespace SecondBotEvents.Services
             Command = setCommand;
             Args = setArgs;
             Unixtime = setUnixtime;
+        }
+    }
+
+    public class FriendLocations
+    {
+        public string Name;
+        public Vector3 Pos;
+        public Vector3 RegionPos;
+        public long time;
+        public FriendLocations(string SetName, Vector3 setPos, Vector3 setRegionPos)
+        {
+            time = SecondbotHelpers.UnixTimeNow();
+            Name = SetName;
+            Pos = setPos;
+            RegionPos = setRegionPos;
         }
     }
 }

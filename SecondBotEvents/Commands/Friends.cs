@@ -12,6 +12,33 @@ namespace SecondBotEvents.Commands
         {
         }
 
+        [About("Gets the location of a friend if map access was given \n also requests a update")]
+        [ReturnHints("a json object of global region X,Y  sim X,Y,Z and time it was updated")]
+        [ReturnHintsFailure("avatar lookup")]
+        [ReturnHintsFailure("not in friends list")]
+        [ReturnHintsFailure("no map access or updating")]
+        [ArgHints("avatar", "A avatar uuid or Firstname Lastname")]
+        public object FieldGetLocation(string avatar)
+        {
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("avatar lookup", new[] { avatar });
+            }
+            Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.Copy();
+            if(FriendListCopy.ContainsKey(avataruuid) == false)
+            {
+                return Failure("not in friends list (updating)", new[] { avatar });
+            }
+            GetClient().Friends.MapFriend(avataruuid);
+            FriendLocations loc = master.DataStoreService.GetFriendMap(avataruuid);
+            if(loc == null)
+            {
+                return Failure("no map access or updating", new[] { avatar });
+            }
+            return BasicReply(JsonConvert.SerializeObject(loc), new[] { avatar });
+        }
+
         [About("Gets the friendslist")]
         [ReturnHints("array of FriendListEntry")]
         public object Friendslist()
