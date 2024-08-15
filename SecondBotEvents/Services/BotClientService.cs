@@ -1,13 +1,10 @@
-﻿using log4net.Core;
-using OpenMetaverse;
+﻿using OpenMetaverse;
 using OpenMetaverse.Assets;
 using SecondBotEvents.Config;
-using Swan;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace SecondBotEvents.Services
 {
