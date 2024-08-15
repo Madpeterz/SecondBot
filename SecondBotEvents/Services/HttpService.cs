@@ -84,8 +84,12 @@ namespace SecondBotEvents.Services
             CreateWebServer();
         }
 
-        public override void Start()
+        public override void Start(bool updateEnabled = false, bool setEnabledTo = false)
         {
+            if (updateEnabled)
+            {
+                myConfig.setEnabled(setEnabledTo);
+            }
             if (myConfig.GetEnabled() == false)
             {
                 LogFormater.Info("HTTP service [Disabled]");

@@ -1093,8 +1093,12 @@ namespace SecondBotEvents.Services
             }
         }
 
-        public override void Start()
+        public override void Start(bool updateEnabled = false, bool setEnabledTo = false)
         {
+            if (updateEnabled)
+            {
+                myConfig.setEnabled(setEnabledTo);
+            }
             Stop();
             running = true;
             master.BotClientNoticeEvent += BotClientRestart;

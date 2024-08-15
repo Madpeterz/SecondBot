@@ -100,6 +100,8 @@ namespace SecondBotEvents
             {
                 fromFolder = args[0];
             }
+            LogFormater.Info("Giving SL a chance - waiting 4 secs");
+            Thread.Sleep(4000);
             StartServices();
         }
 

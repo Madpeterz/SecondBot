@@ -109,6 +109,7 @@ namespace SecondBotEvents.Commands
         {
             master.HomeboundService.MarkStandup();
             GetClient().Self.Stand();
+            master.CommandsService.CommandInterfaceCaller("ResetAnimations", false, false, "Stand command");
             return BasicReply("ok");
         }
 

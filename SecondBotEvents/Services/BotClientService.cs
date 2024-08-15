@@ -40,7 +40,7 @@ namespace SecondBotEvents.Services
             return basicCfg.IsLoaded();
         }
 
-        public override void Start()
+        public override void Start(bool updateEnabled = false, bool setEnabledTo = false)
         {
             running = true;
             LogFormater.Info("Client service [Starting]");

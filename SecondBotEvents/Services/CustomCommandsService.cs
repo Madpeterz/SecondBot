@@ -106,7 +106,7 @@ namespace SecondBotEvents.Services
             botConnected = true;
         }
 
-        public override void Start()
+        public override void Start(bool updateEnabled = false, bool setEnabledTo = false)
         {
             running = true;
             master.BotClientNoticeEvent += BotClientRestart;

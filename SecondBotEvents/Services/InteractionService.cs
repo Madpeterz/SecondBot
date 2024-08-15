@@ -245,8 +245,12 @@ namespace SecondBotEvents.Services
             LogFormater.Info("Interaction Service [Active]");
         }
 
-        public override void Start()
+        public override void Start(bool updateEnabled = false, bool setEnabledTo = false)
         {
+            if (updateEnabled)
+            {
+                myConfig.setEnabled(setEnabledTo);
+            }
             if (myConfig.GetEnabled() == false)
             {
                 LogFormater.Info("Interaction Service [- Not requested -]");

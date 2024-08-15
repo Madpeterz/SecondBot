@@ -13,6 +13,7 @@ namespace SecondBotEvents.Commands
         {
         }
 
+
         [About("an improved version of near me with extra details<br/>NearMeDetails is a object formated as follows<br/><ul><li>id</li><li>name</li><li>x</li><li>y</li><li>z</li><li>range</li></ul>")]
         [ReturnHints("array NearMeDetails")]
         [ReturnHintsFailure("Error not in a sim")]

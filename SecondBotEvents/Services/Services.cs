@@ -18,8 +18,7 @@ namespace SecondBotEvents.Services
 
         public void enableAndStart()
         {
-            myConfig.setEnabled(true);
-            Restart();
+            Restart(true, true);
         }
 
         public void changeConfig(string configKey, string configValue)
@@ -46,7 +45,7 @@ namespace SecondBotEvents.Services
             return "";
         }
 
-        public virtual void Start()
+        public virtual void Start(bool updateEnabled = false, bool setEnabledTo = false)
         {
             running = true;
         }
@@ -54,13 +53,13 @@ namespace SecondBotEvents.Services
         {
             running = false;
         }
-        public void Restart()
+        public void Restart(bool updateEnabled=false, bool setEnabledTo=false)
         {
             if (running == true)
             {
                 Stop();
             }
-            Start();
+            Start(updateEnabled, setEnabledTo);
         }
     }
 }

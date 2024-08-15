@@ -1,5 +1,7 @@
 ﻿using OpenMetaverse;
 using SecondBotEvents.Services;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SecondBotEvents.Commands
 {
@@ -44,11 +46,15 @@ namespace SecondBotEvents.Commands
         }
 
         [About("Resets the animation stack for the bot")]
-        [ReturnHints("Accepted")]
+        [ReturnHints("Accepted - X stopped animations")]
         public object ResetAnimations()
         {
-            // @todo Reset animations function from old version
-            return Failure("@todo");
+            List<UUID> animations = GetClient().Self.SignaledAnimations.Copy().Keys.ToList();
+            foreach (UUID anim in animations)
+            {
+                GetClient().Self.AnimationStop(anim, true);
+            }
+            return BasicReply("Accepted - "+animations.Count.ToString()+" stopped animations");
         }
 
     }

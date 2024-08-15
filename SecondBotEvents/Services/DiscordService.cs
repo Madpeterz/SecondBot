@@ -524,8 +524,12 @@ namespace SecondBotEvents.Services
             return true;
         }
 
-        public override void Start()
+        public override void Start(bool updateEnabled = false, bool setEnabledTo = false)
         {
+            if (updateEnabled)
+            {
+                myConfig.setEnabled(setEnabledTo);
+            }
             running = true;
             if (myConfig.GetEnabled() == false)
             {

@@ -319,9 +319,13 @@ namespace SecondBotEvents.Services
             LogFormater.Info("Homebound Service [Active]");
         }
 
-        public override void Start()
+        public override void Start(bool updateEnabled = false, bool setEnabledTo = false)
         {
-            if(myConfig.GetEnabled() == false)
+            if (updateEnabled)
+            {
+                myConfig.setEnabled(setEnabledTo);
+            }
+            if (myConfig.GetEnabled() == false)
             {
                 return;
             }

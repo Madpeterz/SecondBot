@@ -39,7 +39,7 @@ namespace SecondBotEvents.Services
             return "Active";
         }
 
-        public override void Start()
+        public override void Start(bool updateEnabled = false, bool setEnabledTo = false)
         {
             Stop();
             running = true;
