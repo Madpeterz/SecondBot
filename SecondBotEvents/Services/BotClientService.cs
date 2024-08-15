@@ -6,6 +6,7 @@ using Swan;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Timers;
 
 namespace SecondBotEvents.Services
@@ -32,6 +33,8 @@ namespace SecondBotEvents.Services
         protected void RestartTimer(object o, ElapsedEventArgs e)
         {
             AutoRestartLoginTimer.Stop();
+            LogFormater.Info("Recovery underway - waiting 4 secs then restarting bot");
+            Thread.Sleep(4000);
             Restart();
         }
 
