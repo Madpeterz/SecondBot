@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OpenMetaverse;
+using OpenMetaverse.ImportExport.Collada14;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -33,6 +34,61 @@ namespace BetterSecondBot.Static
                 return A.AssetUUID;
             }
             return UUID.Zero;
+        }
+
+        public static InventoryFolder FindFolderByPath(GridClient bot, string path)
+        {
+            return DigFolderForPath(bot, path, 0, bot.Inventory.Store.RootFolder.UUID);
+        }
+
+        private static InventoryFolder DigFolderForPath(GridClient bot, string path, int level, UUID folder)
+        {
+            string[] bits = path.Split('/');
+            List<InventoryBase> T = bot.Inventory.Store.GetContents(folder);
+            InventoryFolder foundFolder = null;
+            bool found = false;
+            foreach (InventoryBase t in T)
+            {
+                if (t.GetType() == typeof(InventoryFolder))
+                {
+                    if (t.Name == bits[level])
+                    {
+                        folder = t.UUID;
+                        if (bits.Length > (level+1))
+                        {
+                            // need to go deeper
+                            foundFolder = DigFolderForPath(bot, path, level + 1, folder);
+                            if (foundFolder != null)
+                            {
+                                found = true;
+                            }
+                        }
+                        else
+                        {
+                            // we are here
+                            foundFolder = (InventoryFolder)t;
+                            found = true;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            if(found == true)
+            { 
+                return foundFolder;
+            }
+            else
+            {
+                return null;
+            }
         }
         public static InventoryBase FindFolder(GridClient bot, InventoryFolder current,UUID target)
         {

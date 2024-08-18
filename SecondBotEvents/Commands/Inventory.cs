@@ -392,6 +392,28 @@ namespace SecondBotEvents.Commands
             GetClient().Inventory.GiveItem(itm.UUID, itm.Name, itm.AssetType, avataruuid, false);
             return BasicReply("ok", new [] { item, avatar });
         }
+        [About("Sends a folder to an avatar")]
+        [ReturnHints("ok")]
+        [ReturnHints("Invaild avatar uuid")]
+        [ReturnHints("Unable to find folder")]
+        [ArgHints("path", "path to the folder from root")]
+        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        public object SendFolderByPath(string path, string avatar)
+        {
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("Invaild avatar uuid", new[] { path, avatar });
+            }
+            InventoryFolder FindFolderHelper = HelperInventory.FindFolderByPath(GetClient(), path);
+            if (FindFolderHelper == null)
+            {
+                return Failure("Unable to find folder", new[] { path, avatar });
+            }
+            GetClient().Inventory.GiveFolder(FindFolderHelper.UUID, FindFolderHelper.Name, avataruuid, false);
+            return BasicReply("ok", new[] { path, avatar });
+        }
+
 
         [About("Sends a folder to an avatar")]
         [ReturnHints("ok")]
