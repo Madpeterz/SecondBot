@@ -43,6 +43,7 @@ namespace SecondBotEvents.Services
 
 
 
+
         protected long lastCleanupKeyValueStore = 0;
         protected long lastCleanupAvatarStore = 0;
 
@@ -153,7 +154,7 @@ namespace SecondBotEvents.Services
             int sum = commandHistories.Count + KeyValueStoreLastUsed.Count + KeyValueStore.Count +
                 chatWindowsOwner.Count + chatWindowsIsGroup.Count + chatWindowsUnread.Count +
                 chatWindows.Count + localChatHistory.Count + groupRoles.Count +
-                groupMembers.Count + groupsKey2Name.Count + avatarsName2Key.Count;
+                groupMembers.Count + groupsKey2Name.Count + avatarsName2Key.Count + avprops.Count;
             return sum.ToString();
         }
 
@@ -901,6 +902,26 @@ namespace SecondBotEvents.Services
             
         }
 
+        Dictionary<UUID, Avatar.AvatarProperties> avprops = new Dictionary<UUID, Avatar.AvatarProperties>();
+        public KeyValuePair<bool,Avatar.AvatarProperties> GetAvatarAvatarProperties(UUID agentID)
+        {
+            if (avprops.ContainsKey(agentID) == false)
+            {
+                GetClient().Avatars.RequestAvatarProperties(agentID);
+                return new KeyValuePair<bool, Avatar.AvatarProperties>(false, new Avatar.AvatarProperties());
+            }
+            return new KeyValuePair<bool, Avatar.AvatarProperties>(true, avprops[agentID]);
+        }
+
+        protected void AvatarDetailsReply(object sender, AvatarPropertiesReplyEventArgs e)
+        {
+            if(avprops.ContainsKey(e.AvatarID) == false)
+            {
+                avprops.Add(e.AvatarID,new Avatar.AvatarProperties());
+            }
+            avprops[e.AvatarID] = e.Properties;
+        }
+
         protected void attachEventsAfterDelay()
         {
             GetClient().Groups.CurrentGroups += GroupCurrent;
@@ -915,6 +936,7 @@ namespace SecondBotEvents.Services
             GetClient().Groups.GroupRoleDataReply += GroupRoles;
             GetClient().Estate.EstateBansReply += EstateBans;
             GetClient().Friends.FriendFoundReply += FindFriendReply;
+            GetClient().Avatars.AvatarPropertiesReply += AvatarDetailsReply;
             GetClient().Groups.RequestCurrentGroups();
             GetClient().Self.RetrieveInstantMessages();
         }
@@ -1130,6 +1152,7 @@ namespace SecondBotEvents.Services
                     GetClient().Groups.GroupRoleDataReply -= GroupRoles;
                     GetClient().Estate.EstateBansReply -= EstateBans;
                     GetClient().Friends.FriendFoundReply -= FindFriendReply;
+                    GetClient().Avatars.AvatarPropertiesReply -= AvatarDetailsReply;
                 }
             }
             

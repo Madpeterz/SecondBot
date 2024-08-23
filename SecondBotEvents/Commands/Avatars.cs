@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenMetaverse;
 using Newtonsoft.Json;
 using SecondBotEvents.Services;
+using System.Threading.Tasks;
 
 namespace SecondBotEvents.Commands
 {
@@ -41,6 +42,97 @@ namespace SecondBotEvents.Commands
             }
             return BasicReply(JsonConvert.SerializeObject(BetterNearMe));
         }
+
+        [About("Requests the given avatars profile image")]
+        [ReturnHints("profile UUID")]
+        [ReturnHintsFailure("Invaild avatar uuid")]
+        [ReturnHints("Requesting avatar details  [Retry later]")]
+        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        public object GetProfileImage(string avatar)
+        {
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("Invaild avatar uuid", new[] { avatar });
+            }
+            KeyValuePair<bool, Avatar.AvatarProperties> reply = master.DataStoreService.GetAvatarAvatarProperties(avataruuid);
+            if(reply.Key == false)
+            {
+                return Failure("Requesting avatar details  [Retry later]", new[] { avatar });
+            }
+            return BasicReply(reply.Value.ProfileImage.ToString());
+        }
+
+        [About("Requests the bot updates its profile image")]
+        [ReturnHints("ok")]
+        [ReturnHints("Requesting avatar details [Retry later]")]
+        [ReturnHintsFailure("Invaild texture uuid")]
+        [ArgHints("texture", "a UUID of a texture to use")]
+        public object SetProfileImage(string texture)
+        {
+            if (UUID.TryParse(texture, out UUID textureUUID) == false)
+            {
+                return Failure("Invaild texture uuid\"", new[] { texture });
+            }
+            KeyValuePair<bool, Avatar.AvatarProperties> reply = master.DataStoreService.GetAvatarAvatarProperties(GetClient().Self.AgentID);
+            if (reply.Key == false)
+            {
+                return Failure("Requesting avatar details  [Retry later]", new[] { texture });
+            }
+            Avatar.AvatarProperties props = reply.Value;
+            props.ProfileImage = textureUUID;
+            GetClient().Self.UpdateProfile(props);
+            return BasicReply("ok");
+        }
+
+        [About("Requests the given avatars profile about me")]
+        [ReturnHints("profile UUID")]
+        [ReturnHintsFailure("Invaild avatar uuid")]
+        [ReturnHints("Requesting avatar details  [Retry later]")]
+        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        public object GetProfileAbout(string avatar)
+        {
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("Invaild avatar uuid", new[] { avatar });
+            }
+            KeyValuePair<bool, Avatar.AvatarProperties> reply = master.DataStoreService.GetAvatarAvatarProperties(avataruuid);
+            if (reply.Key == false)
+            {
+                return Failure("Requesting avatar details  [Retry later]", new[] { avatar });
+            }
+            return BasicReply(reply.Value.AboutText.ToString());
+        }
+
+        [About("Requests the bot updates its about me")]
+        [ReturnHints("ok")]
+        [ReturnHints("Requesting avatar details [Retry later]")]
+        [ReturnHintsFailure("about text to short")]
+        [ReturnHintsFailure("about text to long")]
+        [ArgHints("abouttext", "text to use in the about me area, length 10 to 300")]
+        public object SetProfileAbout(string abouttext)
+        {
+            if(abouttext.Length < 10)
+            {
+                return Failure("About text to short", new string[] { abouttext });
+            }
+            else if (abouttext.Length > 300)
+            {
+                return Failure("About text to long", new string[] { abouttext });
+            }
+            KeyValuePair<bool, Avatar.AvatarProperties> reply = master.DataStoreService.GetAvatarAvatarProperties(GetClient().Self.AgentID);
+            if (reply.Key == false)
+            {
+                return Failure("Requesting avatar details  [Retry later]", new[] { abouttext });
+            }
+            Avatar.AvatarProperties props = reply.Value;
+            props.AboutText = abouttext;
+            GetClient().Self.UpdateProfile(props);
+            return BasicReply("ok");
+        }
+
+
 
         [About("returns a list of all known avatars nearby")]
         [ReturnHints("array UUID = Name")]

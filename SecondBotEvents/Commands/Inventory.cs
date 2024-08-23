@@ -394,8 +394,8 @@ namespace SecondBotEvents.Commands
         }
         [About("Sends a folder to an avatar")]
         [ReturnHints("ok")]
-        [ReturnHints("Invaild avatar uuid")]
-        [ReturnHints("Unable to find folder")]
+        [ReturnHintsFailure("Invaild avatar uuid")]
+        [ReturnHintsFailure("Unable to find folder")]
         [ArgHints("path", "path to the folder from root")]
         [ArgHints("avatar", "a UUID or Firstname Lastname")]
         public object SendFolderByPath(string path, string avatar)
