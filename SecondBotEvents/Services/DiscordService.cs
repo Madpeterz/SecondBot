@@ -363,7 +363,14 @@ namespace SecondBotEvents.Services
                     "discordapi", "GroupBan", null, args.ToArray(), 0, "none", false, 0, "", false), message);
                 return;
             }
-            GetClient().Self.InstantMessageGroup(groupuuid, message.Author.Username + ": " + message.CleanContent);
+            if (myConfig.GethideChatterName() == false)
+            {
+                GetClient().Self.InstantMessageGroup(groupuuid, message.Author.Username + ": " + message.CleanContent);
+            }
+            else
+            {
+                GetClient().Self.InstantMessageGroup(groupuuid, message.CleanContent);
+            }
             _ = message.DeleteAsync();
         }
 
@@ -419,7 +426,7 @@ namespace SecondBotEvents.Services
                 _ = TextChannel.DeleteAsync();
                 return;
             }
-            if(UUID.TryParse(bits[1], out UUID avataruuid) == false)
+            if (UUID.TryParse(bits[1], out UUID avataruuid) == false)
             {
                 _ = TextChannel.DeleteAsync();
                 return;
@@ -436,14 +443,21 @@ namespace SecondBotEvents.Services
                 CleanChannel(TextChannel);
                 return;
             }
-            else if(cleaned == "!offertp")
+            else if (cleaned == "!offertp")
             {
                 _ = MarkMessage((IUserMessage)message, "✅");
                 GetClient().Self.SendTeleportLure(avataruuid);
                 return;
             }
-            master.DataStoreService.GetAvatarName(avataruuid); // add avatar to lookup service just in case.
-            GetClient().Self.InstantMessage(avataruuid, message.Author.Username + ": " + message.CleanContent);
+            if (myConfig.GethideChatterName() == false)
+            {
+                master.DataStoreService.GetAvatarName(avataruuid); // add avatar to lookup service just in case.
+                GetClient().Self.InstantMessage(avataruuid, message.Author.Username + ": " + message.CleanContent);
+            }
+            else
+            {
+                GetClient().Self.InstantMessage(avataruuid, message.CleanContent);
+            }
             _ = MarkMessage((IUserMessage)message, "✅");
         }
 
@@ -1035,7 +1049,6 @@ namespace SecondBotEvents.Services
             {
                 LoginEventsAttached = true;
                 GetClient().Self.IM += BotImMessage;
-                GetClient().Network.SimConnected -= BotCurrentSim;
                 GetClient().Self.ChatFromSimulator += LocalChat;
                 GetClient().Groups.CurrentGroups += GroupCurrent;
                 GetClient().Groups.RequestCurrentGroups();

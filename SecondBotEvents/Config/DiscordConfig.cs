@@ -18,12 +18,18 @@ namespace SecondBotEvents.Config
             settings.Add("InteractionCommandName");
             settings.Add("InteractionHttpTarget");
             settings.Add("InteractionChannelNumber");
+            settings.Add("hideChatterName");
             settings.Add("HideStatusOutput");
         }
 
         public bool GetEnabled()
         {
             return ReadSettingAsBool("Enabled");
+        }
+
+        public bool GethideChatterName()
+        {
+            return ReadSettingAsBool("hideChatterName", false);
         }
 
         public ulong GetServerID()
