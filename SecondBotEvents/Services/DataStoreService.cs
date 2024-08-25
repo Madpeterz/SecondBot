@@ -47,6 +47,60 @@ namespace SecondBotEvents.Services
         protected long lastCleanupKeyValueStore = 0;
         protected long lastCleanupAvatarStore = 0;
 
+        protected List<string> acceptedStores = new List<string>() { "FriendRequest", "InventoryOffer", "GroupInvite", "Teleport" };
+        protected Dictionary<string, List<UUID>> AcceptNextStore = new Dictionary<string, List<UUID>>();
+        public bool KnownStoreType(string storeType)
+        {
+            return acceptedStores.Contains(storeType);
+        }
+        public bool GetNextAccept(string store,UUID avatar)
+        {
+            if(AcceptNextStore.ContainsKey(store) == false)
+            {
+                return false;
+            }
+            else if (AcceptNextStore[store].Contains(avatar) == false)
+            {
+                return false;
+            }
+            AcceptNextStore[store].Remove(avatar);
+            return true;
+        }
+        public bool IsInAcceptNext(string store,UUID avatar)
+        {
+            if (AcceptNextStore.ContainsKey(store) == false)
+            {
+                return false;
+            }
+            return AcceptNextStore[store].Contains(avatar);
+        }
+        public bool AddToAcceptNext(string store,UUID avatar, bool remove)
+        {
+            if(acceptedStores.Contains(store) == false)
+            {
+                return false;
+            }
+            if(AcceptNextStore.ContainsKey(store) == false)
+            {
+                AcceptNextStore.Add(store, new List<UUID>());
+            }
+            if(AcceptNextStore[store].Contains(avatar) == true)
+            {
+                if(remove == true)
+                {
+                    AcceptNextStore[store].Remove(avatar);
+                    return true;
+                }
+                return true; // already in the store
+            }
+            if(remove == true)
+            {
+                return true; // already removed from the store
+            }
+            AcceptNextStore[store].Add(avatar);
+            return true;
+        }
+
         public bool GetIsGroup(UUID MaybeGroupUUID)
         {
             return groupsKey2Name.ContainsKey(MaybeGroupUUID);

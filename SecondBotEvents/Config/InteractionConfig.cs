@@ -16,8 +16,29 @@ namespace SecondBotEvents.Config
             settings.Add("EnableJsonOutputEvents");
             settings.Add("JsonOutputEventsTarget");
             settings.Add("AcceptFriendRequests");
+            settings.Add("FriendRequestLevel");
+            settings.Add("InventoryTransferLevel");
+            settings.Add("GroupInviteLevel");
+            settings.Add("TeleportRequestLevel");
             settings.Add("Enabled");
             settings.Add("HideStatusOutput");
+        }
+
+        public string GetFriendRequestLevel()
+        {
+            return ReadSettingAsString("FriendRequestLevel", "Owner");
+        }
+        public string GetInventoryTransferLevel()
+        {
+            return ReadSettingAsString("InventoryTransferLevel", "Owner");
+        }
+        public string GetGroupInviteLevel()
+        {
+            return ReadSettingAsString("GroupInviteLevel", "Owner");
+        }
+        public string GetTeleportRequestLevel()
+        {
+            return ReadSettingAsString("TeleportRequestLevel", "Owner");
         }
 
         public bool GetEnabled()

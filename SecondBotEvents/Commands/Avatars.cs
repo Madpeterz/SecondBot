@@ -15,6 +15,62 @@ namespace SecondBotEvents.Commands
         }
 
 
+        [About("Adds avatars to the one time accept list for interactions")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("Invaild avatar uuid")]
+        [ReturnHintsFailure("Unknown store type")]
+        [ReturnHintsFailure("Unable to process request store")]
+        [ArgHints("store", "What type of request to accept: \"FriendRequest\", \"InventoryOffer\", \"GroupInvite\", \"Teleport\"")]
+        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        [ArgHints("remove", "set to \"true\" or \"True\" to remove that avatar from the accept next for that store type")]
+        public Object AcceptNext(string store, string avatar, string remove)
+        {
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("Invaild avatar uuid", new[] { store, avatar, remove });
+            }
+            bool toberemoved = false;
+            if((remove == "true") || (remove == "True"))
+            {
+                toberemoved = true;
+            }
+            if(master.DataStoreService.KnownStoreType(store) == false)
+            {
+                return Failure("Unknown store type", new[] { store, avatar, remove });
+            }
+            if (master.DataStoreService.AddToAcceptNext(store, avataruuid, toberemoved) == false)
+            {
+                return Failure("Unable to process request store", new[] { store, avatar, remove });
+            }
+            return BasicReply("ok", new[] { store, avatar, remove });
+        }
+        [About("Checks if the avatar is on the accept next list (without using the token) for the given store")]
+        [ReturnHints("true")]
+        [ReturnHints("false")]
+        [ReturnHintsFailure("Invaild avatar uuid")]
+        [ReturnHintsFailure("Unknown store type")]
+        [ArgHints("store", "What type of request to check: \"FriendRequest\", \"InventoryOffer\", \"GroupInvite\", \"Teleport\"")]
+        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        public Object IsOnAcceptNext(string store, string avatar)
+        {
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("Invaild avatar uuid", new[] { store, avatar });
+            }
+            if (master.DataStoreService.KnownStoreType(store) == false)
+            {
+                return Failure("Unknown store type", new[] { store, avatar });
+            }
+            if(master.DataStoreService.IsInAcceptNext(store,avataruuid) == false)
+            {
+                return BasicReply("false", new[] { store, avatar });
+            }
+            return BasicReply("true", new[] { store, avatar });
+        }
+
+
         [About("an improved version of near me with extra details<br/>NearMeDetails is a object formated as follows<br/><ul><li>id</li><li>name</li><li>x</li><li>y</li><li>z</li><li>range</li></ul>")]
         [ReturnHints("array NearMeDetails")]
         [ReturnHintsFailure("Error not in a sim")]

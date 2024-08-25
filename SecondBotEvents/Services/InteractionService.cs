@@ -44,11 +44,16 @@ namespace SecondBotEvents.Services
             return "Active";
         }
 
-        protected bool ProcessRequest(bool enabledByConfig, string avatarName, string sourceName)
+        protected bool ProcessRequest(bool enabledByConfig, string ConfigAcceptLevel, string avatarName, string sourceName, UUID avataruuid)
         {
             if(myConfig.GetEnabled() == false)
             {
                 JsonOuput(false, sourceName, avatarName, "Interactions hooks disabled");
+                return false;
+            }
+            if(enabledByConfig == false)
+            {
+                JsonOuput(false, sourceName, avatarName, "disabled by config");
                 return false;
             }
             if (master.CommandsService.myConfig.GetEnableMasterControls() == false)
@@ -57,17 +62,37 @@ namespace SecondBotEvents.Services
                 JsonOuput(false, sourceName, avatarName, "masters AV list is disabled: Please set EnableMasterControls in Commands service to true");
                 return false;
             }
-            if(enabledByConfig == true)
-            {
-                return true;
-            }
+            bool accepted = false;
+            string whyAccepted = "rejected request";
             if (master.CommandsService.myConfig.GetMastersCSV().Contains(avatarName) == true)
             {
+                whyAccepted = "on owners list";
                 return true;
             }
-            JsonOuput(false, sourceName, avatarName, "disabled by config");
-            return false;
+            else if (ConfigAcceptLevel == "Anyone")
+            {
+                whyAccepted = "Accepting from anyone";
+                accepted = true;
+            }
+            else if((ConfigAcceptLevel == "Friends") && (sourceName != "FriendRequest"))
+            {
+                whyAccepted = "on friends list";
+                accepted = GetClient().Friends.FriendList.ContainsKey(avataruuid);
+            }
+            if (accepted == false)
+            {
+                // check the one time accept list
+                accepted = master.DataStoreService.GetNextAccept(sourceName, avataruuid);
+                if(accepted == true)
+                {
+                    whyAccepted = "was on NextAccept list";
+                }
+            }
+            JsonOuput(accepted, sourceName, avatarName, whyAccepted);
+            return accepted;
         }
+
+
 
         protected void BotClientRestart(object o, BotClientNotice e)
         {
@@ -126,7 +151,7 @@ namespace SecondBotEvents.Services
                 mode = "Teleport Av to Bot";
                 markTeleport = false;
             }
-            if (ProcessRequest(myConfig.GetAcceptTeleports(), e.IM.FromAgentName, mode) == false)
+            if (ProcessRequest(myConfig.GetAcceptTeleports(),myConfig.GetTeleportRequestLevel(), e.IM.FromAgentName, "Teleport", e.IM.FromAgentID) == false)
             {
                 // rejected requests
                 if (e.IM.Dialog != InstantMessageDialog.RequestLure)
@@ -152,7 +177,7 @@ namespace SecondBotEvents.Services
 
         protected void BotGroupInviteOffer(object o, GroupInvitationEventArgs e)
         {
-            if (ProcessRequest(myConfig.GetAcceptGroupInvites(), e.FromName, "GroupInvite") == false)
+            if (ProcessRequest(myConfig.GetAcceptGroupInvites(),myConfig.GetGroupInviteLevel(), e.FromName, "GroupInvite", e.AgentID) == false)
             {
                 return;
             }
@@ -181,8 +206,9 @@ namespace SecondBotEvents.Services
 
         protected void BotInventoryOffer(object o, InventoryObjectOfferedEventArgs e)
         {
-            if(ProcessRequest(myConfig.GetAcceptInventory(),e.Offer.FromAgentName, "InventoryOffer") == false)
+            if(ProcessRequest(myConfig.GetAcceptInventory(),myConfig.GetInventoryTransferLevel(),e.Offer.FromAgentName, "InventoryOffer", e.Offer.FromAgentID) == false)
             {
+                e.Accept = false;
                 return;
             }
             e.Accept = true;
@@ -210,7 +236,7 @@ namespace SecondBotEvents.Services
 
         protected void BotFriendRequested(object o, FriendshipOfferedEventArgs e)
         {
-            if (ProcessRequest(myConfig.GetAcceptGroupInvites(), e.AgentName, "FriendRequest") == false)
+            if (ProcessRequest(myConfig.GetAcceptFriendRequests(),myConfig.GetFriendRequestLevel(), e.AgentName, "FriendRequest", e.AgentID) == false)
             {
                 return;
             }
