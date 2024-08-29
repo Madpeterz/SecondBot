@@ -19,6 +19,16 @@ namespace SecondBotEvents.Services
             LogoutExpected = true;
         }
 
+        public bool IsConnected()
+        {
+            if (client == null) { return false; }
+            else if (client.Network == null) { return false; }
+            else if (client.Network.Connected == false) { return false; }
+            else if (client.Network.CurrentSim == null) { return false; }
+            else if (client.Network.CurrentSim.Connected == false) { return false; }
+            return true;
+        }
+
         protected bool ExitBot = false;
 
         protected Timer AutoRestartLoginTimer;

@@ -561,6 +561,11 @@ namespace SecondBotEvents.Services
             LogFormater.Info("Discord service [Starting]");
             master.SystemStatusMessagesEvent += SystemStatusEvent;
             master.BotClientNoticeEvent += BotClientRestart;
+            if(master.BotClient.IsConnected() == true)
+            {
+                BotLoggedIn(this, new SimConnectedEventArgs(GetClient().Network.CurrentSim));
+            }
+
             var config = new DiscordSocketConfig()
             {
                 GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildIntegrations | GatewayIntents.MessageContent
@@ -595,11 +600,11 @@ namespace SecondBotEvents.Services
                 LogFormater.Info("Discord service [Stopping]");
             }
             running = false;
-            
             master.BotClientNoticeEvent -= BotClientRestart;
             master.SystemStatusMessagesEvent -= SystemStatusEvent;
             AcceptEventsFromSL = false;
-            if(DiscordClient != null)
+            BotLoggedOut(this, new LoggedOutEventArgs(new List<UUID>());
+            if (DiscordClient != null)
             {
                 DiscordClient.Dispose();
                 DiscordClient = null;
@@ -631,7 +636,7 @@ namespace SecondBotEvents.Services
         {
             if (e.isRestart == false)
             {
-                LogFormater.Info("Discord service [Avi link]");
+                LogFormater.Info("Discord service [Avi link - waiting]");
                 AcceptEventsFromSL = false;
                 LoginEventsAttached = false;
                 GetClient().Network.LoggedOut += BotLoggedOut;
@@ -646,12 +651,15 @@ namespace SecondBotEvents.Services
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
             LoginEventsAttached = false;
-            GetClient().Network.SimConnected += BotLoggedIn;
-            GetClient().Self.ChatFromSimulator -= LocalChat;
-            GetClient().Self.IM -= BotImMessage;
-            GetClient().Groups.CurrentGroups -= GroupCurrent;
+            if (GetClient() != null)
+            {
+                GetClient().Network.SimConnected += BotLoggedIn;
+                GetClient().Self.ChatFromSimulator -= LocalChat;
+                GetClient().Self.IM -= BotImMessage;
+                GetClient().Groups.CurrentGroups -= GroupCurrent;
+            }
             AcceptEventsFromSL = false;
-            LogFormater.Info("Discord service [Avi link - standby]");
+            LogFormater.Info("Discord service [Avi link - lost connection to SL]");
         }
 
         protected void BotImMessage(object o, InstantMessageEventArgs e)
