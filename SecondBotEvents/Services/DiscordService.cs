@@ -613,6 +613,7 @@ namespace SecondBotEvents.Services
             if (DiscordClient != null)
             {
                 LogFormater.Info("Discord service [Discord client cleanup]");
+                DiscordClient.Dispose();
                 DiscordClient = null;
             }
             LogFormater.Info("Discord service [Stop done]");
