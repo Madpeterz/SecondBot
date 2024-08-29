@@ -603,7 +603,7 @@ namespace SecondBotEvents.Services
             master.BotClientNoticeEvent -= BotClientRestart;
             master.SystemStatusMessagesEvent -= SystemStatusEvent;
             AcceptEventsFromSL = false;
-            BotLoggedOut(this, new LoggedOutEventArgs(new List<UUID>());
+            BotLoggedOut(this, new LoggedOutEventArgs(new List<UUID>()));
             if (DiscordClient != null)
             {
                 DiscordClient.Dispose();
