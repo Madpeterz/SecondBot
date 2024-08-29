@@ -38,19 +38,19 @@ namespace SecondBotEvents.Services
             {
                 return "hidden";
             }
-            else if(myConfig.GetEnabled() == false)
+            else if (myConfig.GetEnabled() == false)
             {
                 return "Disabled";
             }
-            else if(DiscordServerChannelsSetup == false)
+            else if (DiscordServerChannelsSetup == false)
             {
                 return "Setting up channel";
             }
-            else if(DiscordDoingLogin == true)
+            else if (DiscordDoingLogin == true)
             {
                 return "Logging in";
             }
-            else if(DiscordIsReady == false)
+            else if (DiscordIsReady == false)
             {
                 return "Disconnected";
             }
@@ -74,7 +74,7 @@ namespace SecondBotEvents.Services
             LogFormater.Info("Discord service [Logged in]");
             DiscordDoingLogin = false;
             _ = DiscordClient.StartAsync();
-            return Task.CompletedTask;   
+            return Task.CompletedTask;
         }
 
         protected Task DiscordClientReady()
@@ -82,6 +82,10 @@ namespace SecondBotEvents.Services
             LogFormater.Info("Discord service [Ready]");
             DiscordIsReady = true;
             DoServerChannelSetup();
+            if (master.BotClient.IsConnected() == true)
+            {
+                BotLoggedIn(this, new SimConnectedEventArgs(GetClient().Network.CurrentSim));
+            }
             return Task.CompletedTask;
         }
 
@@ -100,28 +104,28 @@ namespace SecondBotEvents.Services
             if (GetReadyForDiscordActions() == false)
             {
                 // bot is not ready this message should not have got here yet.
-                return new KeyValuePair<bool, List<string>>(false,new List<string>() { "not ready"});
+                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "not ready" });
             }
             if (ulong.TryParse(givenserverid, out ulong serverid) == false)
             {
-                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "invaild server"});
+                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "invaild server" });
             }
             if (ulong.TryParse(givenmemberid, out ulong memberid) == false)
             {
-                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "invaild member"});
+                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "invaild member" });
             }
             SocketGuild server = DiscordClient.GetGuild(serverid);
             if (server == null)
             {
-                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "Cant get server"});
+                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "Cant get server" });
             }
             SocketGuildUser user = server.GetUser(memberid);
-            if(user == null)
+            if (user == null)
             {
                 return new KeyValuePair<bool, List<string>>(false, new List<string>() { "Cant get user" });
             }
             List<string> roleids = new List<string>();
-            foreach(SocketRole role in user.Roles)
+            foreach (SocketRole role in user.Roles)
             {
                 roleids.Add(role.Id.ToString());
             }
@@ -139,18 +143,18 @@ namespace SecondBotEvents.Services
             {
                 return false;
             }
-            if(message.Content.StartsWith(myConfig.GetInteractionCommandName()) == false)
+            if (message.Content.StartsWith(myConfig.GetInteractionCommandName()) == false)
             {
                 return false;
             }
-            if(myConfig.GetInteractionHttpTarget().StartsWith("http") == false)
+            if (myConfig.GetInteractionHttpTarget().StartsWith("http") == false)
             {
                 myConfig.SetInteractionEnabled(false);
                 return false;
             }
             string getmessage = message.Content.Replace(myConfig.GetInteractionCommandName(), "");
             long unixtime = SecondbotHelpers.UnixTimeNow();
-            string hash = SecondbotHelpers.GetSHA1(unixtime.ToString()+getmessage + master.CommandsService.myConfig.GetSharedSecret());
+            string hash = SecondbotHelpers.GetSHA1(unixtime.ToString() + getmessage + master.CommandsService.myConfig.GetSharedSecret());
             Dictionary<string, string> values = new Dictionary<string, string>
                     {
                         { "message", getmessage },
@@ -177,28 +181,28 @@ namespace SecondBotEvents.Services
 
         protected Task DiscordClientMessageReceived(SocketMessage message)
         {
-            if(GetReadyForDiscordActions() == false)
+            if (GetReadyForDiscordActions() == false)
             {
                 // bot is not ready this message should not have got here yet.
                 return Task.CompletedTask;
             }
             SocketChannel socketChannel = DiscordClient.GetChannel(message.Channel.Id);
-            if(MessageInteractionEvent(message, socketChannel) == true)
+            if (MessageInteractionEvent(message, socketChannel) == true)
             {
                 return Task.CompletedTask;
             }
-            if(socketChannel.GetChannelType() != Discord.ChannelType.Text)
+            if (socketChannel.GetChannelType() != Discord.ChannelType.Text)
             {
                 // bot only does stuff on text channels.
                 return Task.CompletedTask;
             }
             ITextChannel TextChannel = (ITextChannel)socketChannel;
-            if(TextChannel.CategoryId == null)
+            if (TextChannel.CategoryId == null)
             {
                 // bot only does stuff on text channels that are in a category
                 return Task.CompletedTask;
             }
-            if(ulong.TryParse(TextChannel.CategoryId.ToString(), out ulong CategoryId) == false)
+            if (ulong.TryParse(TextChannel.CategoryId.ToString(), out ulong CategoryId) == false)
             {
                 // a value that is null or ulong, that was not null is some how not a ulong I have no idea
                 // whats going on anymore :/ this should be dead code.
@@ -561,11 +565,6 @@ namespace SecondBotEvents.Services
             LogFormater.Info("Discord service [Starting]");
             master.SystemStatusMessagesEvent += SystemStatusEvent;
             master.BotClientNoticeEvent += BotClientRestart;
-            if(master.BotClient.IsConnected() == true)
-            {
-                BotLoggedIn(this, new SimConnectedEventArgs(GetClient().Network.CurrentSim));
-            }
-
             var config = new DiscordSocketConfig()
             {
                 GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildIntegrations | GatewayIntents.MessageContent
@@ -595,20 +594,28 @@ namespace SecondBotEvents.Services
 
         public override void Stop()
         {
-            if(running == true)
+            if(running == false)
             {
-                LogFormater.Info("Discord service [Stopping]");
+                return;
             }
+            LogFormater.Info("Discord service [Stopping]");
             running = false;
-            master.BotClientNoticeEvent -= BotClientRestart;
-            master.SystemStatusMessagesEvent -= SystemStatusEvent;
+            if (master == null)
+            {
+                LogFormater.Info("Discord service [lost connection to master]");
+            }
+            else
+            {
+                master.BotClientNoticeEvent -= BotClientRestart;
+                master.SystemStatusMessagesEvent -= SystemStatusEvent;
+            }
             AcceptEventsFromSL = false;
-            BotLoggedOut(this, new LoggedOutEventArgs(new List<UUID>()));
             if (DiscordClient != null)
             {
-                DiscordClient.Dispose();
+                LogFormater.Info("Discord service [Discord client cleanup]");
                 DiscordClient = null;
             }
+            LogFormater.Info("Discord service [Stop done]");
         }
 
         protected void GroupCurrent(object o, CurrentGroupsEventArgs e)
@@ -711,6 +718,7 @@ namespace SecondBotEvents.Services
                 { "commands", "Send a command to the bot as if you are a master" },
                 { "localchat", LocalChatPrefill() }
             };
+            ChannelMap = new Dictionary<string, ulong>();
 
             SocketGuild server = DiscordClient.GetGuild(myConfig.GetServerID());
             foreach (ITextChannel channel in server.TextChannels)
@@ -727,7 +735,7 @@ namespace SecondBotEvents.Services
                 if (ChannelMap.ContainsKey(channel.Name) == true)
                 {
                     ChannelMap[channel.Name] = channel.Id;
-                    return;
+                    continue;
                 }
                 ChannelMap.Add(channel.Name, channel.Id);
                 
@@ -750,7 +758,7 @@ namespace SecondBotEvents.Services
                 if (CategoryMap.ContainsKey(category.Name) == true)
                 {
                     CategoryMap[category.Name] = category.Id;
-                    return;
+                    continue;
                 }
                 CategoryMap.Add(category.Name, category.Id);
             }
