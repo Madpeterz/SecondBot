@@ -197,7 +197,34 @@ namespace SecondBotEvents.Services
             }
             lastUpkeep = SecondbotHelpers.UnixTimeNow();
             // check for expired chat windows (longer than 2 mins from last message)
-
+            lock (ChatHistoryLastAccessed) lock (chatHistoryAI) lock (ChatRateLimiter)
+                    {
+                        List<UUID> needcleaning = new List<UUID>();
+                        long now = SecondbotHelpers.UnixTimeNow();
+                        foreach (KeyValuePair<UUID, long> entry in ChatHistoryLastAccessed)
+                        {
+                            dif = now - entry.Value;
+                            if(dif > (7*60))
+                            {
+                                needcleaning.Add(entry.Key);
+                            }
+                        }
+                        foreach(UUID a in needcleaning)
+                        {
+                            if(chatHistoryAI.ContainsKey(a))
+                            {
+                                chatHistoryAI.Remove(a);
+                            }
+                            if(ChatHistoryLastAccessed.ContainsKey(a))
+                            {
+                                ChatHistoryLastAccessed.Remove(a);
+                            }
+                            if (ChatRateLimiter.ContainsKey(a))
+                            {
+                                ChatRateLimiter.Remove(a);
+                            }
+                        }
+                    }
         }
 
         protected async void GetAiReply(int ratelimiter, UUID replyTo, UUID user, string name, string message, bool avatarchat = false, bool groupchat = false)
