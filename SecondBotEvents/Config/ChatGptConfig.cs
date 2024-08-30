@@ -23,6 +23,12 @@ namespace SecondBotEvents.Config
             settings.Add("LocalchatRateLimiter");
             settings.Add("UseModel");
             settings.Add("ChatHistoryMessages");
+            settings.Add("ChatPrompt");
+        }
+
+        public string GetChatPrompt()
+        {
+            return ReadSettingAsString("ChatPrompt", "respond as if you are a horse that knows its going to the glue factory and you are upset about this fact");
         }
 
         public int GetImReplyRateLimiter()

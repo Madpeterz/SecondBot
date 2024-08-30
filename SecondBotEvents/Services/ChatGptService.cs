@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenAI.ObjectModels.RequestModels;
 using OpenAI.ObjectModels;
 using OpenAI.ObjectModels.ResponseModels;
+using System.Threading.Tasks;
 
 namespace SecondBotEvents.Services
 {
@@ -119,7 +120,7 @@ namespace SecondBotEvents.Services
                             break;
                         }
                         // trigger localchat
-                        GetAiReply(localchatRateLimit, UUID.Zero, e.SourceID, e.FromName, e.Message, false, false);
+                        GetAiReply(localchatRateLimit, UUID.Zero, UUID.Zero, e.FromName, e.Message, false, false);
                         break;
                     }
                 default:
@@ -267,15 +268,15 @@ namespace SecondBotEvents.Services
                     {
                         if (avatarchat == true)
                         {
-                            history.Add(new KeyValuePair<string, string>("system", "You are " + GetClient().Self.FirstName + ", A secondlife assistant. you are talking to " + name + "."));
+                            history.Add(new KeyValuePair<string, string>("system", "You are " + GetClient().Self.FirstName + ", "+myConfig.GetChatPrompt()+" you are talking to " + name + "."));
                         }
                         else if (groupchat == true)
                         {
-                            history.Add(new KeyValuePair<string, string>("system", "You are " + GetClient().Self.FirstName + ", A secondlife assistant. you are talking to a group of people."));
+                            history.Add(new KeyValuePair<string, string>("system", "You are " + GetClient().Self.FirstName + ", "+myConfig.GetChatPrompt()+" you are talking to a group of people."));
                         }
                         else
                         {
-                            history.Add(new KeyValuePair<string, string>("system", "You are " + GetClient().Self.FirstName + ", A secondlife assistant. you are talking to people in a public place."));
+                            history.Add(new KeyValuePair<string, string>("system", "You are " + GetClient().Self.FirstName + ", "+myConfig.GetChatPrompt()+" you are talking to people in a public place."));
                         }
                     }
                     history.Add(new KeyValuePair<string, string>("user", "" + name + " says " + message));
@@ -381,6 +382,23 @@ namespace SecondBotEvents.Services
                             chatHistoryAI[user] = history;
                             ChatHistoryLastAccessed[user] = SecondbotHelpers.UnixTimeNow();
                         }
+                    if((avatarchat==false) && (groupchat == false))
+                    {
+                        GetClient().Self.AnimationStart(Animations.TYPE, true);
+                    }
+
+
+                    double timespanwait = EstimateTypingTime(replyMessage, 0.4);
+
+                    if(timespanwait > 3)
+                    {
+                        timespanwait = 3;
+                    }
+                    else if(timespanwait < 1)
+                    {
+                        timespanwait = 1;
+                    }
+                    await Task.Delay(TimeSpan.FromSeconds(timespanwait));
                     if (avatarchat == true)
                     {
                         GetClient().Self.InstantMessage(replyTo, replyMessage);
@@ -392,6 +410,7 @@ namespace SecondBotEvents.Services
                     else
                     {
                         GetClient().Self.Chat(replyMessage, 0, ChatType.Normal);
+                        GetClient().Self.AnimationStop(Animations.TYPE, true);
                     }
                 }
             }
@@ -400,6 +419,39 @@ namespace SecondBotEvents.Services
                 // Handle other potential errors
                 Console.WriteLine("An error occurred: " + ex.Message);
             }
+        }
+
+        private static readonly Random _random = new Random();
+
+        public static double EstimateTypingTime(string input, double randomizationFactor)
+        {
+            // Average typing speed in characters per minute
+            double typingSpeedCPM = 200.0;
+
+            // Calculate the length of the input string
+            int length = input.Length;
+
+            // Calculate the base time in minutes
+            double baseTimeInMinutes = length / typingSpeedCPM;
+
+            // Convert minutes to seconds
+            double baseTimeInSeconds = baseTimeInMinutes * 60;
+
+            if(baseTimeInSeconds > 3)
+            {
+                baseTimeInSeconds = 3;
+            }
+
+            // Calculate the randomized adjustment
+            // randomizationFactor of 0 results in no change
+            // randomizationFactor of 1 results in instant typing (0 seconds)
+            double adjustment = _random.NextDouble() * randomizationFactor * baseTimeInSeconds;
+
+            // Apply the randomization factor
+            double estimatedTimeInSeconds = baseTimeInSeconds - adjustment;
+
+            // Ensure the time is not negative
+            return Math.Max(estimatedTimeInSeconds, 0);
         }
 
         protected void BotClientRestart(object o, BotClientNotice e)

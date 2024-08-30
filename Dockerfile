@@ -114,7 +114,8 @@ ENV basic_Username='' \
         chatgpt_LocalchatReply='false' \
         chatgpt_LocalchatRateLimiter='3' \
         chatgpt_UseModel='gpt3' \
-        chatgpt_ChatHistoryMessages='5'
+        chatgpt_ChatHistoryMessages='5' \
+	chatgpt_ChatPrompt='respond as if you are a horse that knows its going to the glue factory and you are upset about this fact'
 	
 
 EXPOSE 80
