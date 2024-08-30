@@ -101,7 +101,20 @@ ENV basic_Username='' \
 	rlv_HideStatusOutput='false' \
 	relay_count='0' \
 	relay_HideStatusOutput='false' \
-	relay_UseShortEncoder='false'
+	relay_UseShortEncoder='false' \
+	chatgpt_Enabled='false' \
+        chatgpt_ApiKey='none' \
+        chatgpt_OrganizationId='none' \
+        chatgpt_AllowImReplys='false' \
+        chatgpt_ImReplyFriendsOnly='true' \
+        chatgpt_ImReplyRateLimiter='3' \
+        chatgpt_AllowGroupReplys='false' \
+        chatgpt_GroupReplyForGroup='false' \
+        chatgpt_GroupReplyRateLimiter='3' \
+        chatgpt_LocalchatReply='false' \
+        chatgpt_LocalchatRateLimiter='3' \
+        chatgpt_UseModel='gpt3' \
+        chatgpt_ChatHistoryMessages='5'
 	
 
 EXPOSE 80
