@@ -470,17 +470,17 @@ namespace SecondBotEvents.Services
         {
             if (myConfig.GetDebugMe() == true)
             {
-                StringBuilder A = new StringBuilder();
-                string addon = "";
+                StringBuilder debugoutme = new StringBuilder();
+                string debugoutmeaddon = "";
                 foreach(KeyValuePair<string,string> Ar in args)
                 {
-                    A.Append(Ar.Key);
-                    A.Append("=");
-                    A.Append(Ar.Value);
-                    A.Append(addon);
-                    addon = ",";
+                    debugoutme.Append(Ar.Key);
+                    debugoutme.Append("=");
+                    debugoutme.Append(Ar.Value);
+                    debugoutme.Append(debugoutmeaddon);
+                    debugoutmeaddon = ",";
                 }
-                LogFormater.Info("OnEvent Service (DebugMe) TriggerEvent "+eventName+" args: "+A.ToString());
+                LogFormater.Info("OnEvent Service (DebugMe) TriggerEvent "+eventName+" args: "+ debugoutme.ToString());
             }
             if (MyCustomEvents.ContainsKey(eventName) == false)
             {
