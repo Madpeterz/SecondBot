@@ -1,4 +1,5 @@
-﻿using OpenMetaverse;
+﻿using Microsoft.Extensions.Logging;
+using OpenMetaverse;
 using OpenMetaverse.Rendering;
 using SecondBotEvents.Config;
 using Swan.Logging;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Text;
 
 namespace SecondBotEvents.Services
 {
@@ -200,6 +202,10 @@ namespace SecondBotEvents.Services
 
         protected void RemoveEvents()
         {
+            if (myConfig.GetDebugMe() == true)
+            {
+                LogFormater.Info("OnEvent Service (DebugMe) RemoveEvents");
+            }
             if (master.BotClient != null)
             {
                 if (GetClient() != null)
@@ -216,6 +222,10 @@ namespace SecondBotEvents.Services
 
         protected void AttachEvents()
         {
+            if(myConfig.GetDebugMe() == true)
+            {
+                LogFormater.Info("OnEvent Service (DebugMe) AttachEvents");
+            }
             GetClient().Self.IM += BotImMessage;
             GetClient().Groups.GroupMembersReply += BotGroupMembers;
             GetClient().Groups.CurrentGroups += BotGroupsCurrent;
@@ -458,8 +468,26 @@ namespace SecondBotEvents.Services
         }
         protected void TriggerEvent(string eventName, Dictionary<string,string> args)
         {
+            if (myConfig.GetDebugMe() == true)
+            {
+                StringBuilder A = new StringBuilder();
+                string addon = "";
+                foreach(KeyValuePair<string,string> Ar in args)
+                {
+                    A.Append(Ar.Key);
+                    A.Append("=");
+                    A.Append(Ar.Value);
+                    A.Append(addon);
+                    addon = ",";
+                }
+                LogFormater.Info("OnEvent Service (DebugMe) TriggerEvent "+eventName+" args: "+A.ToString());
+            }
             if (MyCustomEvents.ContainsKey(eventName) == false)
             {
+                if (myConfig.GetDebugMe() == true)
+                {
+                    LogFormater.Info("OnEvent Service (DebugMe) Not a tracked event");
+                }
                 return;
             }
             string avataruuid = inArgsOrDefault("avataruuid", args, null);
@@ -493,14 +521,23 @@ namespace SecondBotEvents.Services
                 { "clockmin", DateTime.Now.ToString("mm") },
                 { "dayofweek", ((int)DateTime.Now.DayOfWeek).ToString() }
             };
-
+            if (myConfig.GetDebugMe() == true)
+            {
+                LogFormater.Info("OnEvent Service (DebugMe) There are "+ MyCustomEvents[eventName].Count.ToString()+" events to trigger");
+            }
+            int eventid = -1;
             foreach (CustomOnEvent E in MyCustomEvents[eventName])
             {
+                eventid++;
                 bool canFireEvent = true;
                 if ((E.Source == "GroupMemberJoin") || (E.Source == "GroupMemberLeave"))
                 {
                     if (E.MonitorFlags[0] != values["groupuuid"])
                     {
+                        if (myConfig.GetDebugMe() == true)
+                        {
+                            LogFormater.Info("OnEvent Service (DebugMe) Failed checks on " + eventName + " id " + (eventid + 1).ToString() + " failed Group checks");
+                        }
                         continue;
                     }
                 }
@@ -512,6 +549,10 @@ namespace SecondBotEvents.Services
                         (E.MonitorFlags[1] != values["avatarparcel"])
                     )
                     {
+                        if (myConfig.GetDebugMe() == true)
+                        {
+                            LogFormater.Info("OnEvent Service (DebugMe) Failed checks on " + eventName + " id " + (eventid + 1).ToString() + " failed Guest checks");
+                        }
                         continue;
                     }
                 }
@@ -564,6 +605,10 @@ namespace SecondBotEvents.Services
                     else if ((center == "DIVISIBLE") && (leftIsDivs == false)) { canFireEvent = false; }
                     if (canFireEvent == false)
                     {
+                        if (myConfig.GetDebugMe() == true)
+                        {
+                            LogFormater.Info("OnEvent Service (DebugMe) Failed checks on " + eventName + " id " + (eventid + 1).ToString()+" rule id "+(loop+1).ToString()+" #"+center);
+                        }
                         break;
                     }
                     loop++;
@@ -572,7 +617,12 @@ namespace SecondBotEvents.Services
                 {
                     continue;
                 }
-                foreach(string action in E.Actions)
+                if (myConfig.GetDebugMe() == true)
+                {
+                    LogFormater.Info("OnEvent Service (DebugMe) Triggering "+E.Actions.Count().ToString()+ " actions for event id "+(eventid+1).ToString());
+                }
+                int loop2 = 1;
+                foreach (string action in E.Actions)
                 {
                     string useaction = swapvalues(action, values);
                     string[] bits = useaction.Split('=');
@@ -591,6 +641,11 @@ namespace SecondBotEvents.Services
                             continue;
                         }
                     }
+                    if (myConfig.GetDebugMe() == true)
+                    {
+                        LogFormater.Info("OnEvent Service (DebugMe) Triggering " + useaction + " actions for event id " + (loop2).ToString());
+                    }
+                    loop2++;
                     master.CommandsService.CommandInterfaceCaller(useaction, false, false, "OnEvents");
                 }
             }

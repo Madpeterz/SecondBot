@@ -15,6 +15,7 @@ namespace SecondBotEvents.Config
             settings.Add("Enabled");
             settings.Add("Count");
             settings.Add("HideStatusOutput");
+            settings.Add("DebugMe");
         }
 
         public void unloadEvents()
@@ -54,6 +55,10 @@ namespace SecondBotEvents.Config
             settings.Remove(name);
         }
 
+        public bool GetDebugMe()
+        {
+            return ReadSettingAsBool("DebugMe", false);
+        }
         public bool GetEnabled()
         {
             return ReadSettingAsBool("Enabled", false);
