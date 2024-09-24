@@ -63,10 +63,16 @@ namespace SecondBotEvents.Services
                 return false;
             }
             bool accepted = false;
+            string ObjectOwnerName = master.DataStoreService.GetAvatarName(avataruuid);
             string whyAccepted = "rejected request";
             if (master.CommandsService.myConfig.GetMastersCSV().Contains(avatarName) == true)
             {
                 whyAccepted = "on owners list";
+                return true;
+            }
+            else if (master.CommandsService.myConfig.GetMastersCSV().Contains(ObjectOwnerName) == true)
+            {
+                whyAccepted = "Object Owner is on master list";
                 return true;
             }
             else if (ConfigAcceptLevel == "Anyone")
