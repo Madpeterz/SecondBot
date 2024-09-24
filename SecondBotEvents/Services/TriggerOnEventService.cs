@@ -138,6 +138,7 @@ namespace SecondBotEvents.Services
                     MyCustomEvents.Add(Event.Source, new List<CustomOnEvent>());
                 }
                 MyCustomEvents[Event.Source].Add(Event);
+                LogFormater.Info("OnEvent Service - Event " + loop.ToString() + " is being tracked");
                 loop++;
             }
             myConfig.unloadEvents(); // remove unneeded copy of events from the config as we wont be using it
@@ -145,7 +146,9 @@ namespace SecondBotEvents.Services
             {
                 myConfig.setEnabled(false);
                 LogFormater.Info("OnEvent Service - failed to load any events stopping");
+                return;
             }
+            LogFormater.Info("OnEvent Service - loaded "+MyCustomEvents.Count.ToString()+" events");
         }
 
 
