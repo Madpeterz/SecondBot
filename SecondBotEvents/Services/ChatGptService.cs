@@ -322,7 +322,6 @@ namespace SecondBotEvents.Services
             }
             try
             {
-                LogFormater.Debug(JsonConvert.SerializeObject(messages));
                 string replyMessage = "";
                 var openAiService = new OpenAIService(new OpenAiOptions()
                 {
@@ -363,7 +362,6 @@ namespace SecondBotEvents.Services
                     });
 
                 }
-                LogFormater.Debug(JsonConvert.SerializeObject(completionResult));
                 if (completionResult == null)
                 {
                     return;
@@ -415,15 +413,7 @@ namespace SecondBotEvents.Services
             }
             catch (Exception ex)
             {
-                // Handle other potential errors
-                // Get stack trace for the exception with source file information
-                var st = new StackTrace(ex, true);
-                // Get the top stack frame
-                var frame = st.GetFrame(0);
-                // Get the line number from the stack frame
-                var line = frame.GetFileLineNumber();
-                LogFormater.Warn("An error occurred: " + ex.Message + " on line "+ line.ToString());
-                LogFormater.Debug(ex.ToJson());
+                LogFormater.Warn("An error occurred: " + ex.Message);
             }
         }
 
