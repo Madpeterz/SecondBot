@@ -18,6 +18,8 @@ using OpenAI.ObjectModels;
 using OpenAI.ObjectModels.ResponseModels;
 using System.Threading.Tasks;
 using OpenAI.Interfaces;
+using System.Diagnostics;
+using Swan;
 
 namespace SecondBotEvents.Services
 {
@@ -412,7 +414,14 @@ namespace SecondBotEvents.Services
             catch (Exception ex)
             {
                 // Handle other potential errors
-                Console.WriteLine("An error occurred: " + ex.Message);
+                // Get stack trace for the exception with source file information
+                var st = new StackTrace(ex, true);
+                // Get the top stack frame
+                var frame = st.GetFrame(0);
+                // Get the line number from the stack frame
+                var line = frame.GetFileLineNumber();
+                LogFormater.Warn("An error occurred: " + ex.Message + " on line "+ line.ToString());
+                LogFormater.Debug(ex.ToJson());
             }
         }
 
