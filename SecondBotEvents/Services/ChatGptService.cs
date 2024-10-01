@@ -309,9 +309,9 @@ namespace SecondBotEvents.Services
                             else if (role == "assistant") messages.Add(ChatMessage.FromAssistant(thismessage));
                         }
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        LogFormater.Warn("error building AI request:" + ex.Message);
+                        //LogFormater.Warn("error building AI request:" + ex.Message);
                         return;
                     }
                 }
