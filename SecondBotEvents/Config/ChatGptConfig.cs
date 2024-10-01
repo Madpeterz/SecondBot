@@ -24,6 +24,12 @@ namespace SecondBotEvents.Config
             settings.Add("UseModel");
             settings.Add("ChatHistoryMessages");
             settings.Add("ChatPrompt");
+            settings.Add("Provider");
+        }
+
+        public string GetProvider()
+        {
+            return ReadSettingAsString("Provider", "openai");
         }
 
         public string GetChatPrompt()
@@ -49,7 +55,7 @@ namespace SecondBotEvents.Config
         }
         public string GetUseModel()
         {
-            return ReadSettingAsString("UseModel", "gpt3");
+            return ReadSettingAsString("UseModel", "gpt-3.5-turbo");
         }
         public bool GetEnabled()
         {

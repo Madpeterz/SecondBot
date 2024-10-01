@@ -17,6 +17,7 @@ using OpenAI.ObjectModels.RequestModels;
 using OpenAI.ObjectModels;
 using OpenAI.ObjectModels.ResponseModels;
 using System.Threading.Tasks;
+using OpenAI.Interfaces;
 
 namespace SecondBotEvents.Services
 {
@@ -332,38 +333,32 @@ namespace SecondBotEvents.Services
                         Organization = myConfig.GetOrganizationId(),
                     });
                 }
+                if(myConfig.GetProvider() != "openai")
+                {
+                    openAiService = new OpenAIService(new OpenAiOptions()
+                    {
+                        ApiKey = myConfig.GetApiKey(),
+                        Organization = myConfig.GetOrganizationId(),
+                        BaseDomain= myConfig.GetProvider(),
+                    });
+                }
                 ChatCompletionCreateResponse completionResult = null;
-                if (myConfig.GetUseModel() == "gpt3")
+                if (myConfig.GetProvider() != "openai")
                 {
                     completionResult = await openAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
                     {
                         Messages = messages,
-                        Model = Models.Gpt_3_5_Turbo
+                        Model = myConfig.GetUseModel(),
                     });
                 }
-                else if (myConfig.GetUseModel() == "gpt-3.5-turbo")
+                else
                 {
                     completionResult = await openAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
                     {
                         Messages = messages,
-                        Model = Models.Gpt_3_5_Turbo
+                        Model = openAI_Models.GetModel(myConfig.GetUseModel())
                     });
-                }
-                else if(myConfig.GetUseModel() == "gpt-4-mini")
-                {
-                    completionResult = await openAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
-                    {
-                        Messages = messages,
-                        Model = Models.Gpt_4o_mini
-                    });
-                }
-                else if (myConfig.GetUseModel() == "gpt-4-turbo")
-                {
-                    completionResult = await openAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
-                    {
-                        Messages = messages,
-                        Model = Models.Gpt_4_turbo
-                    });
+
                 }
                 if(completionResult == null)
                 {
@@ -473,6 +468,26 @@ namespace SecondBotEvents.Services
             GetClient().Self.IM += BotImMessage;
             GetClient().Self.ChatFromSimulator += BotLocalchat;
             LogFormater.Info("ChatGpt [accepting chat input]");
+        }
+    }
+
+    public class openAI_Models
+    {
+        public static string GetModel(string input)
+        {
+            if (input == "gpt-3.5-turbo")
+            {
+                return Models.Gpt_3_5_Turbo;
+            }
+            else if (input == "gpt-4-mini")
+            {
+                return Models.Gpt_4o_mini;
+            }
+            else if (input == "gpt-4-turbo")
+            {
+                return Models.Gpt_4_turbo;
+            }
+            return input;
         }
     }
 }
