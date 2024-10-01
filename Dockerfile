@@ -26,31 +26,7 @@ ENV basic_Username='' \
 	basic_Password='' \
 	commands_AllowFundsCommands='false' \
 	commands_SharedSecret='examplecode' \
-	commands_MastersCSV='Madpeter Zond' \
-	homebound_Enabled='false' \
-	homebound_HomeSimSlUrl='' \
-	homebound_BackupSimSLUrl='' \
-	homebound_AtHomeAutoSitUuid='00000000-0000-0000-0000-000000000000' \
-	interaction_FriendRequestLevel='Owner' \
-	interaction_InventoryTransferLevel='Owner' \
-	interaction_GroupInviteLevel=Owner'' \
-	interaction_TeleportRequestLevel='Owner' \
-	chatgpt_Enabled='false' \
-        chatgpt_ApiKey='none' \
-        chatgpt_OrganizationId='none' \
-        chatgpt_AllowImReplys='false' \
-        chatgpt_ImReplyFriendsOnly='true' \
-        chatgpt_ImReplyRateLimiter='3' \
-        chatgpt_AllowGroupReplys='false' \
-        chatgpt_GroupReplyForGroup='none' \
-        chatgpt_GroupReplyRateLimiter='3' \
-        chatgpt_LocalchatReply='false' \
-        chatgpt_LocalchatRateLimiter='3' \
-        chatgpt_UseModel='gpt-3.5-turbo' \
-        chatgpt_ChatHistoryMessages='5' \
-	chatgpt_ChatPrompt='respond as if you are a horse that knows its going to the glue factory and you are upset about this fact' \
-	chatgpt_Provider='openai' \
-	chatgpt_ChatHistoryTimeout='15'
+	commands_MastersCSV='Madpeter Zond'
 	
 
 EXPOSE 80
