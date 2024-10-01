@@ -22,8 +22,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-ENV 
-	basic_Username='' \
+ENV basic_Username='' \
 	basic_Password='' \
 	commands_AllowFundsCommands='false' \
 	commands_SharedSecret='examplecode' \
@@ -51,7 +50,7 @@ ENV
         chatgpt_ChatHistoryMessages='5' \
 	chatgpt_ChatPrompt='respond as if you are a horse that knows its going to the glue factory and you are upset about this fact' \
 	chatgpt_Provider='openai' \
-	chatgpt_ChatHistoryTimeout='15' \
+	chatgpt_ChatHistoryTimeout='15'
 	
 
 EXPOSE 80
