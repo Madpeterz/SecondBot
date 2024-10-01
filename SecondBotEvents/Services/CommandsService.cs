@@ -241,7 +241,7 @@ namespace SecondBotEvents.Services
             }
             if (mode == "CHAT")
             {
-                if (target_channel <= 0)
+                if (target_channel < 0)
                 {
                     LogFormater.Crit("[SmartReply] output Channel must be zero or higher - using 99");
                     target_channel = 999;
