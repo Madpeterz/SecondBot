@@ -24,6 +24,7 @@ COPY --from=publish /app/publish .
 
 ENV basic_Username='' \
 	basic_Password='' \
+	commands_AllowFundsCommands='false' \
 	commands_SharedSecret='examplecode' \
 	commands_MastersCSV='Madpeter Zond'
 	
