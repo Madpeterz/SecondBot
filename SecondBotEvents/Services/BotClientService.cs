@@ -78,16 +78,14 @@ namespace SecondBotEvents.Services
 
         protected void BotSimConnected(object o, SimConnectedEventArgs e)
         {
-            if(AutoRestartLoginTimer.Enabled == true)
-            {
-                GetClient().Self.SetHoverHeight(basicCfg.GetDefaultHoverHeight());
-            }
             AutoRestartLoginTimer.Stop();
+            goodticks = 0;
             LogFormater.Info("Client service ~ Connected to sim: "+e.Simulator.Name);
         }
 
         protected void BotSimDisconnected(object o, SimDisconnectedEventArgs e)
         {
+            goodticks = 0;
             LogFormater.Info("Client service ~ Disconnected from sim: " + e.Simulator.Name);
         }
 
@@ -208,6 +206,7 @@ namespace SecondBotEvents.Services
         public void Login()
         {
             ResetClient();
+            goodticks = 0;
             LoginParams loginParams = new LoginParams(
                 client,
                 basicCfg.GetFirstName(),
@@ -224,6 +223,7 @@ namespace SecondBotEvents.Services
             client.Network.BeginLogin(loginParams);
         }
 
+        protected int goodticks = 0;
         public override string Status()
         {
             if (client == null)
@@ -241,6 +241,16 @@ namespace SecondBotEvents.Services
             else if (client.Network.CurrentSim == null)
             {
                 return "No sim";
+            }
+            
+            if(goodticks == 6)
+            {
+                double G = basicCfg.GetDefaultHoverHeight();
+                GetClient().Self.SetHoverHeight(G);
+            }
+            else if(goodticks < 6)
+            {
+                goodticks++;
             }
             Vector3 pos = client.Self.SimPosition;
             string loc = "" + Math.Round(pos.X).ToString() + "," + Math.Round(pos.Y).ToString() + "," + Math.Round(pos.Z).ToString();
