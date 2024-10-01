@@ -124,14 +124,14 @@ namespace SecondBotEvents.Services
         {
             Swan.Logging.Logger.UnregisterLogger<ConsoleLogger>();
             HTTPendpoint = new WebServer(o => o
-                .WithUrlPrefix("http://*:" + myConfig.GetPort().ToString())
+                .WithUrlPrefix("http://*:80")
                 .WithMode(HttpListenerMode.EmbedIO))
                 .WithCors()
                 .WithWebApi("/api", SerializationCallback, m => m.WithController(() => new HttpWebBot(master)))
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" }))
             );
             HTTPendpoint.RunAsync();
-            LogFormater.Info("HTTP service [Enabled] on port "+ myConfig.GetPort().ToString());
+            LogFormater.Info("HTTP service [Enabled] on port 80");
         }
         public static async Task SerializationCallback(IHttpContext context, object? data)
         {
