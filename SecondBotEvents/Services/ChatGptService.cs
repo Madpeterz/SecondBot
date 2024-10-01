@@ -47,6 +47,7 @@ namespace SecondBotEvents.Services
             }
             if (myConfig.GetEnabled() == false)
             {
+                Stop();
                 return;
             }
             chatHistorySize = inrange(3,10,myConfig.GetChatHistoryMessages());
@@ -66,7 +67,27 @@ namespace SecondBotEvents.Services
 
         public override void Stop()
         {
-            running = false;
+            if (running == true)
+            {
+                running = false;
+                LogFormater.Info("ChatGpt [Stopping]");
+                if (master != null)
+                {
+                    master.BotClientNoticeEvent -= BotClientRestart;
+                }
+                if (GetClient() != null)
+                {
+                    if (GetClient().Network != null)
+                    {
+                        GetClient().Network.SimConnected -= BotLoggedIn;
+                    }
+                    if (GetClient().Self != null)
+                    {
+                        GetClient().Self.IM -= BotImMessage;
+                        GetClient().Self.ChatFromSimulator -= BotLocalchat;
+                    }
+                }
+            }
         }
 
         public override string Status()
