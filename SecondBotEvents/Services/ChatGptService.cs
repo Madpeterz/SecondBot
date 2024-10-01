@@ -309,9 +309,12 @@ namespace SecondBotEvents.Services
                             else if (role == "assistant") messages.Add(ChatMessage.FromAssistant(thismessage));
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        //LogFormater.Warn("error building AI request:" + ex.Message);
+                        if (myConfig.GetShowDebug() == true)
+                        {
+                            LogFormater.Warn("error building AI request:" + ex.Message);
+                        }
                         return;
                     }
                 }
@@ -413,7 +416,10 @@ namespace SecondBotEvents.Services
             }
             catch (Exception ex)
             {
-                LogFormater.Warn("An error occurred: " + ex.Message);
+                if (myConfig.GetShowDebug() == true)
+                {
+                    LogFormater.Warn("An error occurred:" + ex.Message);
+                }
             }
         }
 

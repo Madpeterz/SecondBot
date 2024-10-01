@@ -25,7 +25,13 @@ namespace SecondBotEvents.Config
             settings.Add("ChatHistoryMessages");
             settings.Add("ChatPrompt");
             settings.Add("ChatHistoryTimeout");
+            settings.Add("ShowDebug");
             settings.Add("Provider");
+        }
+
+        public bool GetShowDebug()
+        {
+            return ReadSettingAsBool("ShowDebug", false);
         }
 
         public int GetChatHistoryTimeout()

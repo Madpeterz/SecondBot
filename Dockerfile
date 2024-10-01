@@ -117,6 +117,7 @@ ENV basic_Username='' \
         chatgpt_ChatHistoryMessages='5' \
 	chatgpt_ChatPrompt='respond as if you are a horse that knows its going to the glue factory and you are upset about this fact' \
 	chatgpt_Provider='openai' \
+	chatgtp_ShowDebug='false' \
 	onevent_Enabled='false' \
 	onevent_Count=0 \
 	chatgpt_ChatHistoryTimeout='15' \
