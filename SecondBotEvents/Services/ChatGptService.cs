@@ -322,7 +322,7 @@ namespace SecondBotEvents.Services
             }
             try
             {
-                LogFormater.Debug(JsonConvert.ToString(messages));
+                LogFormater.Debug(JsonConvert.SerializeObject(messages));
                 string replyMessage = "";
                 var openAiService = new OpenAIService(new OpenAiOptions()
                 {
@@ -363,7 +363,7 @@ namespace SecondBotEvents.Services
                     });
 
                 }
-                LogFormater.Debug(JsonConvert.ToString(completionResult));
+                LogFormater.Debug(JsonConvert.SerializeObject(completionResult));
                 if (completionResult == null)
                 {
                     return;
