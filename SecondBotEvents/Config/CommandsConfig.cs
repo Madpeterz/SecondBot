@@ -54,7 +54,7 @@ namespace SecondBotEvents.Config
 
         public bool GetEnableMasterControls()
         {
-            return ReadSettingAsBool("EnableMasterControls", false);
+            return ReadSettingAsBool("EnableMasterControls", true);
         }
 
 
@@ -65,7 +65,7 @@ namespace SecondBotEvents.Config
 
         public bool GetAllowIMcontrol()
         {
-            return ReadSettingAsBool("AllowIMcontrol", false);
+            return ReadSettingAsBool("AllowIMcontrol", true);
         }
 
         public string GetSharedSecret()

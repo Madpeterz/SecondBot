@@ -48,7 +48,7 @@ namespace SecondBotEvents.Config
 
         public bool GetAcceptTeleports()
         {
-            return ReadSettingAsBool("AcceptTeleports", false);
+            return ReadSettingAsBool("AcceptTeleports", true);
         }
 
         public bool GetAcceptGroupInvites()
@@ -73,7 +73,7 @@ namespace SecondBotEvents.Config
 
         public bool GetEnableJsonOutputEvents()
         {
-            return ReadSettingAsBool("EnableJsonOutputEvents", true);
+            return ReadSettingAsBool("EnableJsonOutputEvents", false);
         }
     }
 

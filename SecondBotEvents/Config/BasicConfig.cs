@@ -23,7 +23,7 @@ namespace SecondBotEvents.Config
         }
         public bool GetLogCommands()
         {
-            return ReadSettingAsBool("LogCommands");
+            return ReadSettingAsBool("LogCommands", true);
         }
         public string GetUsername()
         {

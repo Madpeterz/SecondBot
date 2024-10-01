@@ -24,7 +24,13 @@ namespace SecondBotEvents.Config
             settings.Add("UseModel");
             settings.Add("ChatHistoryMessages");
             settings.Add("ChatPrompt");
+            settings.Add("ChatHistoryTimeout");
             settings.Add("Provider");
+        }
+
+        public int GetChatHistoryTimeout()
+        {
+            return ReadSettingAsInt("ChatHistoryTimeout", 15);
         }
 
         public string GetProvider()
@@ -59,7 +65,7 @@ namespace SecondBotEvents.Config
         }
         public bool GetEnabled()
         {
-            return ReadSettingAsBool("Enabled");
+            return ReadSettingAsBool("Enabled", false);
         }
         public string GetApiKey()
         {

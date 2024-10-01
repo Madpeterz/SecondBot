@@ -208,7 +208,7 @@ namespace SecondBotEvents.Services
                         foreach (KeyValuePair<UUID, long> entry in ChatHistoryLastAccessed)
                         {
                             dif = now - entry.Value;
-                            if(dif > (7*60))
+                            if(dif > (myConfig.GetChatHistoryTimeout()*60))
                             {
                                 needcleaning.Add(entry.Key);
                             }

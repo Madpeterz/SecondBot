@@ -11,18 +11,12 @@ namespace SecondBotEvents.Config
         {
             filename = "http";
             settings.Add("Enabled");
-            settings.Add("Port");
             settings.Add("HideStatusOutput");
-        }
-
-        public int GetPort()
-        {
-            return ReadSettingAsInt("Port", 80);
         }
 
         public bool GetEnabled()
         {
-            return ReadSettingAsBool("Enabled", false);
+            return ReadSettingAsBool("Enabled", true);
         }
     }
 
