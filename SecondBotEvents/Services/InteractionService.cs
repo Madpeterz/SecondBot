@@ -102,6 +102,10 @@ namespace SecondBotEvents.Services
 
         protected void BotClientRestart(object o, BotClientNotice e)
         {
+            if (e.isStart == false)
+            {
+                return;
+            }
             botConnected = false;
             LogFormater.Info("Interaction Service [Attached to new client]");
             GetClient().Network.LoggedOut += BotLoggedOut;

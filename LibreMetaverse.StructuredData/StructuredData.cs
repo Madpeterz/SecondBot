@@ -1213,6 +1213,10 @@ namespace OpenMetaverse.StructuredData
 
         public static OSD Deserialize(byte[] data)
         {
+            if(data == null)
+            {
+                return null;
+            }
             string header = Encoding.ASCII.GetString(data, 0, data.Length >= 17 ? 17 : data.Length);
 
             try

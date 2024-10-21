@@ -639,20 +639,21 @@ namespace SecondBotEvents.Services
             }
         }
 
-        
+
         protected void BotClientRestart(object o, BotClientNotice e)
         {
-            if (e.isRestart == false)
+            if (e.isStart == false)
             {
-                LogFormater.Info("Discord service [Avi link - waiting]");
-                AcceptEventsFromSL = false;
-                LoginEventsAttached = false;
-                GetClient().Network.LoggedOut += BotLoggedOut;
-                GetClient().Self.ChatFromSimulator -= LocalChat;
-                GetClient().Self.IM -= BotImMessage;
-                GetClient().Groups.CurrentGroups -= GroupCurrent;
-                GetClient().Network.SimConnected += BotLoggedIn;
+                return;
             }
+            LogFormater.Info("Discord service [Avi link - waiting]");
+            AcceptEventsFromSL = false;
+            LoginEventsAttached = false;
+            GetClient().Network.LoggedOut += BotLoggedOut;
+            GetClient().Self.ChatFromSimulator -= LocalChat;
+            GetClient().Self.IM -= BotImMessage;
+            GetClient().Groups.CurrentGroups -= GroupCurrent;
+            GetClient().Network.SimConnected += BotLoggedIn;
 
         }
 

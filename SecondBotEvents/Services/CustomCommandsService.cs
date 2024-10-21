@@ -89,6 +89,10 @@ namespace SecondBotEvents.Services
 
         protected void BotClientRestart(object o, BotClientNotice e)
         {
+            if (e.isStart == false)
+            {
+                return;
+            }
             LogFormater.Info("CustomCommands service [Attached to new client]");
             GetClient().Network.LoggedOut += BotLoggedOut;
             GetClient().Network.SimConnected += BotLoggedIn;

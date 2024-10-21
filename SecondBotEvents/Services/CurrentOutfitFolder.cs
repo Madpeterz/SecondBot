@@ -49,15 +49,30 @@ namespace SecondBotEvents.Services
 
         public override void Stop()
         {
+            if (running == false)
+            {
+                return;
+            }
             if (running == true)
             {
                 LogFormater.Info("COF inventor [Stopping]");
             }
             running = false;
+            try
+            {
+                master.BotClientNoticeEvent -= BotClientRestart;
+                GetClient().Network.LoggedOut -= BotLoggedOut;
+                GetClient().Network.SimConnected -= BotLoggedIn;
+            }
+            catch { }
         }
 
         protected void BotClientRestart(object o, BotClientNotice e)
         {
+            if (e.isStart == false)
+            {
+                return;
+            }
             LogFormater.Info("COF inventory [Attached to new client]");
             GetClient().Network.LoggedOut += BotLoggedOut;
             GetClient().Network.SimConnected += BotLoggedIn;

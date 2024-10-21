@@ -64,6 +64,10 @@ namespace SecondBotEvents.Services
 
         protected void BotClientRestart(object o, BotClientNotice e)
         {
+            if (e.isStart == false)
+            {
+                return;
+            }
             acceptBotCommands = false;
             LogFormater.Info("HTTP service [Attached to new client]");
             GetClient().Network.LoggedOut += BotLoggedOut;

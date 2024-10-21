@@ -19,6 +19,11 @@ namespace SecondBotEvents.Services
             LogoutExpected = true;
         }
 
+        public bool getLogoutExpected()
+        {
+            return LogoutExpected;
+        }
+
         public bool IsConnected()
         {
             if (client == null) { return false; }
@@ -40,6 +45,7 @@ namespace SecondBotEvents.Services
         protected void RestartTimer(object o, ElapsedEventArgs e)
         {
             AutoRestartLoginTimer.Stop();
+            AutoRestartLoginTimer = null;
             LogFormater.Info("Recovery underway - waiting 4 secs then restarting bot");
             Thread.Sleep(4000);
             Restart();
@@ -74,6 +80,7 @@ namespace SecondBotEvents.Services
         protected void BotLoggedOut(object o, LoggedOutEventArgs e)
         {
             LogFormater.Info("Client service ~ Logged out");
+            master.TriggerBotClientEvent(true,!getLogoutExpected());
         }
 
         protected void BotSimConnected(object o, SimConnectedEventArgs e)
@@ -92,16 +99,6 @@ namespace SecondBotEvents.Services
         protected void BotDisconnected(object o, DisconnectedEventArgs e)
         {
             LogFormater.Info("Client service ~ Network disconnected: " + e.Message);
-            if (LogoutExpected == false)
-            {
-                AutoRestartLoginTimer = new Timer();
-                AutoRestartLoginTimer.Interval = 75 * 1000;
-                AutoRestartLoginTimer.AutoReset = false;
-                AutoRestartLoginTimer.Elapsed += RestartTimer;
-                AutoRestartLoginTimer.Start();
-                LogFormater.Info("Client service ~ Unexpected disconnect (starting reconnect timer for 75s)");
-                return;
-            }
         }
 
         protected void BotLoginStatus(object o, LoginProgressEventArgs e)
@@ -114,6 +111,10 @@ namespace SecondBotEvents.Services
                 return;
             }
             LogFormater.Info("Client service ~ Login status: " + e.Status.ToString());
+            if (e.Status == LoginStatus.Success)
+            {
+                master.TriggerBotClientEvent(true, false);
+            }
         }
         public void SendIM(UUID avatar, string message)
         {
@@ -184,18 +185,8 @@ namespace SecondBotEvents.Services
 
         protected void ResetClient()
         {
-            bool isRestart = false;
-            if (client != null)
-            {
-                if (client.Network != null)
-                {
-                    client.Network.Logout();
-                }
-                isRestart = true;
-            }
             client = null;
             client = new GridClient();
-            master.TriggerBotClientEvent(isRestart);
             client.Network.SimConnected += BotSimConnected;
             client.Network.LoggedOut += BotLoggedOut;
             client.Network.Disconnected += BotDisconnected;

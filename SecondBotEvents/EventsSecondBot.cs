@@ -47,6 +47,7 @@ namespace SecondBotEvents
         public TriggerOnEventService TriggerOnEventService { get { return (TriggerOnEventService)GetService("TriggerOnEventService"); } }
 
         public CurrentOutfitFolder CurrentOutfitFolder {  get { return (CurrentOutfitFolder)GetService("CurrentOutfitFolder"); } }
+        public RecoveryService RecoveryService { get { return (RecoveryService)GetService("RecoveryService"); } }
         public RLVService RLV { get { return (RLVService)GetService("RLVService"); } }
 
         public CustomCommandsService CustomCommandsService { get { return (CustomCommandsService)GetService("CustomCommandsService"); } }
@@ -75,10 +76,10 @@ namespace SecondBotEvents
         }
         private readonly object BotclientEventNoticesLockable = new object();
 
-        public void TriggerBotClientEvent(bool asRestart)
+        public void TriggerBotClientEvent(bool asRestart,bool asDC)
         {
             EventHandler<BotClientNotice> handler = BotclientEventNotices;
-            handler?.Invoke(this, new BotClientNotice(asRestart));
+            handler?.Invoke(this, new BotClientNotice(asRestart, asDC));
         }
 
 
@@ -151,10 +152,12 @@ namespace SecondBotEvents
             return null;
         }
 
-        protected void StartServices()
+        public void StartServices()
         {
+            Ready = false;
             services = new Dictionary<string, BotServices>();
             lastStatus = new Dictionary<string, string>();
+            StopService("RecoveryService"); // kill the recovery service if its still running
             RegisterService("BotClientService", false);
             RegisterService("DataStoreService");
             RegisterService("RLVService");
@@ -170,6 +173,7 @@ namespace SecondBotEvents
             RegisterService("TriggerOnEventService");
             RegisterService("RelayService");
             RegisterService("ChatGptService");
+            RegisterService("RecoveryService");
             if (BotClient.IsLoaded() == false)
             {
                 LogFormater.Info("Config is not loaded :(");
@@ -178,7 +182,6 @@ namespace SecondBotEvents
             }
             BotClient.Start();
             Ready = true;
-
         }
 
         Dictionary<string, string> lastStatus = new Dictionary<string, string>();
@@ -205,21 +208,35 @@ namespace SecondBotEvents
             TriggerSystemStatusMessageEvent(false, "");
         }
 
-        protected void StopServices()
+        public void StopService(string service)
+        {
+            if (services.ContainsKey(service) == false)
+            {
+                return;
+            }
+            services[service].Stop();
+            services.Remove(service);
+        }
+
+
+        public void StopServices(string skip="")
         {
             Ready = false;
             Dictionary<string, BotServices> copy = services;
             foreach (KeyValuePair<string, BotServices> A in copy)
             {
-                if(A.Key == "BotClientService")
+                if((A.Key == "BotClientService") || (A.Key == skip))
                 {
                     continue;
                 }
                 A.Value.Stop();
                 services.Remove(A.Key);
             }
-            services["BotClientService"].Stop();
-            services.Remove("BotClientService");
+            if (skip == "")
+            {
+                services["BotClientService"].Stop();
+                services.Remove("BotClientService");
+            }
         }
 
         public bool Exit()
@@ -244,9 +261,16 @@ namespace SecondBotEvents
     public class BotClientNotice
     {
         public bool isRestart = false;
-        public BotClientNotice(bool asRestart=false)
+        public bool isDC = false;
+        public bool isStart = false;
+        public BotClientNotice(bool asRestart=false, bool asDC=false)
         {
             isRestart = asRestart;
+            isDC = asDC;
+            if((isRestart == false) && (isDC == false))
+            {
+                isStart = true;
+            }
         }
     }
 
