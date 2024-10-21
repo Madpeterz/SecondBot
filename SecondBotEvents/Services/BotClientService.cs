@@ -111,10 +111,6 @@ namespace SecondBotEvents.Services
                 return;
             }
             LogFormater.Info("Client service ~ Login status: " + e.Status.ToString());
-            if (e.Status == LoginStatus.Success)
-            {
-                master.TriggerBotClientEvent(false, false);
-            }
         }
         public void SendIM(UUID avatar, string message)
         {
@@ -198,6 +194,7 @@ namespace SecondBotEvents.Services
         {
             ResetClient();
             goodticks = 0;
+            master.TriggerBotClientEvent(false, false);
             LoginParams loginParams = new LoginParams(
                 client,
                 basicCfg.GetFirstName(),
