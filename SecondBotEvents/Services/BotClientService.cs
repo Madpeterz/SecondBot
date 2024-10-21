@@ -113,7 +113,7 @@ namespace SecondBotEvents.Services
             LogFormater.Info("Client service ~ Login status: " + e.Status.ToString());
             if (e.Status == LoginStatus.Success)
             {
-                master.TriggerBotClientEvent(true, false);
+                master.TriggerBotClientEvent(false, false);
             }
         }
         public void SendIM(UUID avatar, string message)
