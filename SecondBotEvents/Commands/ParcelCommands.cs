@@ -172,6 +172,23 @@ namespace SecondBotEvents.Commands
             return BasicReply(JsonConvert.SerializeObject(reply));
         }
 
+        [About("Cancels the current parcel the bot is in sale")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        public object CancelParcelSale()
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
+            ParcelStatic.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, false);
+            ParcelStatic.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
+            targetparcel.Update(GetClient());
+            return BasicReply("ok");
+        }
+
         [About("Sets the current parcel for sale Also marks the parcel for sale")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Error not in a sim")]
@@ -210,8 +227,10 @@ namespace SecondBotEvents.Commands
             ParcelStatic.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
             ParcelStatic.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
             targetparcel.Update(GetClient());
-            return Failure("ok", new [] { amount, avatar });
+            return BasicReply("ok", new [] { amount, avatar });
         }
+
+
 
         [About("Gets the parcel Dwell (Traffic) value and returns it via the reply target")]
         [ReturnHints("traffic value")]
