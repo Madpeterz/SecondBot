@@ -16,6 +16,7 @@ namespace SecondBotEvents.Config
             settings.Add("SharedSecret");
             settings.Add("EnableMasterControls");
             settings.Add("MastersCSV");
+            settings.Add("CheckDotNames");
             settings.Add("EnforceTimeWindow");
             settings.Add("TimeWindowSecs");
             settings.Add("Enabled");
@@ -30,6 +31,11 @@ namespace SecondBotEvents.Config
         public bool GetEnabled()
         {
             return ReadSettingAsBool("Enabled", true);
+        }
+
+        public bool GetCheckDotNames()
+        {
+            return ReadSettingAsBool("CheckDotNames", false);
         }
 
         public bool GetObjectMasterOptout()

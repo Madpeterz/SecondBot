@@ -32,6 +32,7 @@ ENV basic_Username='' \
 	commands_SharedSecret='examplecode' \
 	commands_EnableMasterControls='true' \
 	commands_MastersCSV='Madpeter Zond' \
+	commands_CheckDotNames='false' \
 	commands_EnforceTimeWindow='false' \
 	commands_TimeWindowSecs=35 \
 	commands_Enabled='true' \

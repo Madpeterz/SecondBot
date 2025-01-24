@@ -149,6 +149,14 @@ namespace SecondBotEvents.Services
                         {
                             string ownername = master.DataStoreService.GetAvatarName(e.IM.FromAgentID);
                             requireSigning = !myConfig.GetMastersCSV().Contains(ownername);
+                            if ((requireSigning == false) && (myConfig.GetCheckDotNames() == true))
+                            {
+                                string[] bits = e.IM.FromAgentName.ToLower().Split('.');
+                                if (bits.Length == 2)
+                                {
+                                    requireSigning = myConfig.GetMastersCSV().Contains(bits[0].FirstCharToUpper() + " " + bits[1].FirstCharToUpper());
+                                }
+                            }
                         }
                         break;
                     }
@@ -166,6 +174,14 @@ namespace SecondBotEvents.Services
                         master.DataStoreService.AddAvatar(e.IM.FromAgentID, e.IM.FromAgentName);
                         requireSigning = false;
                         acceptMessage = myConfig.GetMastersCSV().Contains(e.IM.FromAgentName);
+                        if ((acceptMessage == false) && (myConfig.GetCheckDotNames() == true))
+                        {
+                            string[] bits = e.IM.FromAgentName.ToLower().Split('.');
+                            if (bits.Length == 2)
+                            {
+                                acceptMessage = myConfig.GetMastersCSV().Contains(bits[0].FirstCharToUpper()+" " + bits[1].FirstCharToUpper());
+                            }
+                        }
                         break;
                     }
                 default:
@@ -193,6 +209,7 @@ namespace SecondBotEvents.Services
                     }
                 }
             }
+
             return false;
         }
 
