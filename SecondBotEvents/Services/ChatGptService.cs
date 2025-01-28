@@ -288,19 +288,24 @@ namespace SecondBotEvents.Services
                     }
                     // trim history
                     List<KeyValuePair<string, string>> history = chatHistoryAI[user];
+                    string yourname = GetClient().Self.FirstName;
+                    if(myConfig.GetCustomName() != "<!FIRSTNAME!>")
+                    {
+                        yourname = myConfig.GetCustomName();
+                    }
                     if (history.Count() == 0)
                     {
                         if (avatarchat == true)
                         {
-                            history.Add(new KeyValuePair<string, string>("system", "You are " + GetClient().Self.FirstName + ", "+myConfig.GetChatPrompt()+", you are talking to " + name + "."));
+                            history.Add(new KeyValuePair<string, string>("system", "You are " + yourname + ", "+myConfig.GetChatPrompt()+", you are talking to " + name + "."));
                         }
                         else if (groupchat == true)
                         {
-                            history.Add(new KeyValuePair<string, string>("system", "You are " + GetClient().Self.FirstName + ", "+myConfig.GetChatPrompt()+", you are talking to a group of people."));
+                            history.Add(new KeyValuePair<string, string>("system", "You are " + yourname + ", "+myConfig.GetChatPrompt()+", you are talking to a group of people."));
                         }
                         else
                         {
-                            history.Add(new KeyValuePair<string, string>("system", "You are " + GetClient().Self.FirstName + ", "+myConfig.GetChatPrompt()+", you are talking to people in a public place."));
+                            history.Add(new KeyValuePair<string, string>("system", "You are " + yourname + ", "+myConfig.GetChatPrompt()+", you are talking to people in a public place."));
                         }
                     }
                     history.Add(new KeyValuePair<string, string>("user", "" + name + " says " + message));

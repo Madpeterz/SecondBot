@@ -27,6 +27,12 @@ namespace SecondBotEvents.Config
             settings.Add("ChatHistoryTimeout");
             settings.Add("ShowDebug");
             settings.Add("Provider");
+            settings.Add("CustomName");
+        }
+
+        public string GetCustomName()
+        {
+            return ReadSettingAsString("CustomName", "<!FIRSTNAME!>");
         }
 
         public bool GetShowDebug()
