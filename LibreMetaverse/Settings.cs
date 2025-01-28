@@ -106,35 +106,35 @@ namespace OpenMetaverse
         /// <summary>Number of milliseconds before a CAPS call will time out</summary>
         /// <remarks>Setting this too low will cause web requests time out and
         /// possibly retry repeatedly</remarks>
-        public int CAPS_TIMEOUT = 63 * 1000;
+        public int CAPS_TIMEOUT = 60 * 1000;
 
         /// <summary>Number of milliseconds for xml-rpc to timeout</summary>
-        public int LOGIN_TIMEOUT = 63 * 1000;
+        public int LOGIN_TIMEOUT = 60 * 1000;
 
         /// <summary>Milliseconds before a packet is assumed lost and resent</summary>
         public int RESEND_TIMEOUT = 4000;
 
         /// <summary>Milliseconds without receiving a packet before the 
         /// connection to a simulator is assumed lost</summary>
-        public int SIMULATOR_TIMEOUT = 75 * 1000;
+        public int SIMULATOR_TIMEOUT = 30 * 1000;
 
         /// <summary>Milliseconds to wait for a simulator info request through
         /// the grid interface</summary>
         public int MAP_REQUEST_TIMEOUT = 5 * 1000;
 
         /// <summary>Number of milliseconds between sending pings to each sim</summary>
-        public const int PING_INTERVAL = 3000;
+        public const int PING_INTERVAL = 2200;
 
         /// <summary>Number of milliseconds between sending camera updates</summary>
-        public const int DEFAULT_AGENT_UPDATE_INTERVAL = 1000;
+        public int DEFAULT_AGENT_UPDATE_INTERVAL = 500;
 
         /// <summary>Number of milliseconds between updating the current
         /// positions of moving, non-accelerating and non-colliding objects</summary>
-        public const int INTERPOLATION_INTERVAL = 250;
+        public int INTERPOLATION_INTERVAL = 250;
 
         /// <summary>Millisecond interval between ticks, where all ACKs are 
         /// sent out and the age of unACKed packets is checked</summary>
-        public const int NETWORK_TICK_INTERVAL = 650;
+        public const int NETWORK_TICK_INTERVAL = 500;
 
         #endregion
         #region Sizes
@@ -182,8 +182,11 @@ namespace OpenMetaverse
         /// TerrainManager</summary>
         public bool STORE_LAND_PATCHES = false;
 
-        /// <summary>Enable/disable sending periodic camera updates</summary>
+        /// <summary>Enable/disable sending agent updates</summary>
         public bool SEND_AGENT_UPDATES = true;
+
+        /// <summary>Enable/disable sending periodic agent updates</summary>
+        public bool SEND_AGENT_UPDATES_REGULARLY = true;
 
         /// <summary>Enable/disable automatically setting agent appearance at
         /// login and after sim crossing</summary>
@@ -225,19 +228,19 @@ namespace OpenMetaverse
         /// re-establish a connection. Set this to true to log those 502 errors</summary>
         public bool LOG_ALL_CAPS_ERRORS = false;
 
-        /// <summary>If true, and <code>SEND_AGENT_UPDATES</code> is true,
+        /// <summary>If true, and <see cref="SEND_AGENT_UPDATES"/> is true,
         /// AgentUpdate packets will continuously be sent out to give the bot
         /// smoother movement and autopiloting</summary>
         public bool DISABLE_AGENT_UPDATE_DUPLICATE_CHECK = true;
 
         /// <summary>If true, currently visible avatars will be stored
-        /// in dictionaries inside <code>Simulator.ObjectAvatars</code>.
+        /// in dictionaries inside <see cref="Simulator.ObjectAvatars"/>.
         /// If false, a new Avatar or Primitive object will be created
         /// each time an object update packet is received</summary>
         public bool AVATAR_TRACKING = true;
 
         /// <summary>If true, currently visible avatars will be stored
-        /// in dictionaries inside <code>Simulator.ObjectPrimitives</code>.
+        /// in dictionaries inside <see cref="Simulator.ObjectPrimitives"/>.
         /// If false, a new Avatar or Primitive object will be created
         /// each time an object update packet is received</summary>
         public bool OBJECT_TRACKING = true;
@@ -258,7 +261,7 @@ namespace OpenMetaverse
         #region Parcel Tracking
 
         /// <summary>If true, parcel details will be stored in the 
-        /// <code>Simulator.Parcels</code> dictionary as they are received</summary>
+        /// <see cref="Simulator.Parcels" /> dictionary as they are received</summary>
         public bool PARCEL_TRACKING = true;
 
         /// <summary>
@@ -306,6 +309,11 @@ namespace OpenMetaverse
 
         #endregion
         #region Texture Pipeline
+
+        /// <summary>
+        /// Enable texture pipeline, will use a thread.
+        /// </summary>
+        public bool USE_TEXTURE_PIPELINE = true;
 
         /// <summary>
         /// Download textures using GetTexture capability when available

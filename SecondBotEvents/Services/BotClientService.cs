@@ -235,10 +235,15 @@ namespace SecondBotEvents.Services
             {
                 double G = basicCfg.GetDefaultHoverHeight();
                 GetClient().Self.SetHoverHeight(G);
+                goodticks++;
             }
-            else if(goodticks < 6)
+            else
             {
                 goodticks++;
+                if(goodticks == 120)
+                {
+                    goodticks = 0;
+                }
             }
             Vector3 pos = client.Self.SimPosition;
             string loc = "" + Math.Round(pos.X).ToString() + "," + Math.Round(pos.Y).ToString() + "," + Math.Round(pos.Z).ToString();

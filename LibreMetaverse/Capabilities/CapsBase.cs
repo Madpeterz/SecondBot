@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
- * Copyright (c) 2019-2022, Sjofn LLC.
+ * Copyright (c) 2019-2024, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without 
@@ -95,7 +95,7 @@ namespace OpenMetaverse.Http
                 request.ContentType = contentType;
             request.Method = POST;
 
-            // Create an object to hold all of the state for this request
+            // Create an object to hold all state for this request
             var state = new RequestState(request, data, millisecondsTimeout, openWriteCallback,
                 downloadProgressCallback, completedCallback);
 
@@ -117,7 +117,7 @@ namespace OpenMetaverse.Http
                 request.ContentType = contentType;
             request.Method = PUT;
 
-            // Create an object to hold all of the state for this request
+            // Create an object to hold all state for this request
             var state = new RequestState(request, data, millisecondsTimeout, openWriteCallback,
                 downloadProgressCallback, completedCallback);
 
@@ -140,7 +140,7 @@ namespace OpenMetaverse.Http
                 request.ContentType = contentType;
             request.Method = DELETE;
 
-            // Create an object to hold all of the state for this request
+            // Create an object to hold all state for this request
             var state = new RequestState(request, data, millisecondsTimeout, openWriteCallback,
                 downloadProgressCallback, completedCallback);
 
@@ -163,7 +163,7 @@ namespace OpenMetaverse.Http
                 request.ContentType = contentType;
             request.Method = PATCH;
 
-            // Create an object to hold all of the state for this request
+            // Create an object to hold all state for this request
             var state = new RequestState(request, data, millisecondsTimeout, openWriteCallback,
                 downloadProgressCallback, completedCallback);
 
@@ -178,7 +178,7 @@ namespace OpenMetaverse.Http
         public static void DownloadDataAsync(HttpWebRequest request, int millisecondsTimeout,
             DownloadProgressEventHandler downloadProgressCallback, RequestCompletedEventHandler completedCallback)
         {
-            // Create an object to hold all of the state for this request
+            // Create an object to hold all state for this request
             RequestState state = new RequestState(request, null, millisecondsTimeout, null, downloadProgressCallback,
                 completedCallback);
 

@@ -498,6 +498,12 @@ namespace SecondBotEvents.Services
                 }
                 if (message.Author.Id != DiscordClient.CurrentUser.Id)
                 {
+                    string cleaned = message.Content.Trim();
+                    if (cleaned == "!clear")
+                    {
+                        CleanChannel(TextChannel);
+                        return;
+                    }
                     GetClient().Self.Chat(message.CleanContent, 0, ChatType.Normal);
                     _ = message.DeleteAsync();
                 }
@@ -859,6 +865,10 @@ namespace SecondBotEvents.Services
                         else if (e.Type == ChatType.RegionSayTo)
                         {
                             source = ":dart:";
+                        }
+                        else if(e.FromName == GetClient().Self.Name)
+                        {
+                            source = ":disguised_face:";
                         }
                         SendMessageToChannel("localchat", LocalChatPrefill(), source + "" + e.FromName + ": " + e.Message, "bot");
                         break;

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
+ * Copyright (c) 2021-2024, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -26,14 +27,23 @@
 
 using System;
 using System.Collections.Generic;
+#if NET7_0_OR_GREATER
+using MemoryPack;
+#endif
 
 namespace OpenMetaverse
 {
-    public class InventoryNodeDictionary: IComparer<UUID>
+#if NET7_0_OR_GREATER
+    [MemoryPackable]
+#endif
+    public partial class InventoryNodeDictionary: IComparer<UUID>
     {
         protected readonly SortedDictionary<UUID, InventoryNode> SDictionary;
         protected readonly Dictionary<UUID, InventoryNode> Dictionary = new Dictionary<UUID, InventoryNode>();
         protected InventoryNode parent;
+#if NET7_0_OR_GREATER
+        [MemoryPackIgnore]
+#endif
         protected readonly object syncRoot = new object();
         public int Compare(UUID x, UUID y)
         {
@@ -57,7 +67,7 @@ namespace OpenMetaverse
                 if (d1.Name != null)
                 {
                     // both are not null.. due to NullCompare code
-                    diff = String.Compare(d1.Name, d2.Name, StringComparison.Ordinal);
+                    diff = string.Compare(d1.Name, d2.Name, StringComparison.Ordinal);
                     if (diff != 0) return diff;
                 }
             }
@@ -67,11 +77,7 @@ namespace OpenMetaverse
         private InventoryNode Get(UUID uuid)
         {
             InventoryNode val;
-            if (Dictionary.TryGetValue(uuid, out val))
-            {
-                return val;
-            }
-            return null;
+            return Dictionary.TryGetValue(uuid, out val) ? val : null;
         }
 
         static int NullCompare(object o1, object o2)
@@ -85,14 +91,17 @@ namespace OpenMetaverse
             set => parent = value;
         }
 
+#if NET7_0_OR_GREATER
+        [MemoryPackIgnore]
+#endif
         public object SyncRoot => syncRoot;
 
         public int Count => Dictionary.Count;
 
-        public InventoryNodeDictionary(InventoryNode parentNode)
+        public InventoryNodeDictionary(InventoryNode parent)
         {
             if (Settings.SORT_INVENTORY) SDictionary = new SortedDictionary<UUID, InventoryNode>(this);
-            parent = parentNode;
+            this.parent = parent;
         }
 
         public InventoryNode this[UUID key]

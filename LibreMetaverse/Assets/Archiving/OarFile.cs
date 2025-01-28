@@ -102,7 +102,7 @@ namespace OpenMetaverse.Assets
             }
 
             if (failedAssetRestores > 0)
-                Logger.Log(String.Format("[OarFile]: Failed to load {0} assets", failedAssetRestores), Helpers.LogLevel.Warning);
+                Logger.Log($"[OarFile]: Failed to load {failedAssetRestores} assets", Helpers.LogLevel.Warning);
         }
 
         private static bool LoadAsset(string assetPath, byte[] data, AssetLoadedCallback assetCallback, long bytesRead, long totalBytes)
@@ -372,7 +372,7 @@ namespace OpenMetaverse.Assets
             Thread.Sleep(100);
             Directory.CreateDirectory(parcelPath);
             Thread.Sleep(100);
-            sim.Parcels.ForEach((Parcel parcel) =>
+            sim.Parcels.ForEach(parcel =>
                 {
                     UUID globalID = UUID.Random();
                     SerializeParcel(parcel, globalID, Path.Combine(parcelPath, globalID + ".xml"));
@@ -493,7 +493,7 @@ namespace OpenMetaverse.Assets
         {
             Dictionary<UUID, UUID> textureList = new Dictionary<UUID, UUID>();
 
-            // Delete all of the old linkset files
+            // Delete all old linkset files
             try { Directory.Delete(primsPath, true); }
             catch (Exception) { }
 
@@ -531,7 +531,7 @@ namespace OpenMetaverse.Assets
         {
             if (prim.Textures != null)
             {
-                // Add all of the textures on this prim to the save list
+                // Add all textures on this prim to the save list
                 if (prim.Textures.DefaultTexture != null)
                     textureList[prim.Textures.DefaultTexture.TextureID] = prim.Textures.DefaultTexture.TextureID;
 
@@ -676,9 +676,9 @@ namespace OpenMetaverse.Assets
 
         public static void SOGToXml2(XmlTextWriter writer, AssetPrim prim)
         {
-            writer.WriteStartElement(String.Empty, "SceneObjectGroup", String.Empty);
+            writer.WriteStartElement(string.Empty, "SceneObjectGroup", string.Empty);
             SOPToXml(writer, prim.Parent, null);
-            writer.WriteStartElement(String.Empty, "OtherParts", String.Empty);
+            writer.WriteStartElement(string.Empty, "OtherParts", string.Empty);
 
             foreach (PrimObject child in prim.Children)
                 SOPToXml(writer, child, prim.Parent);

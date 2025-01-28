@@ -40,8 +40,8 @@ namespace OpenMetaverse.Assets
         /// <summary>The assets unique ID</summary>
         public UUID AssetID
         {
-            get { return _AssetID; }
-            internal set { _AssetID = value; }
+            get => _AssetID;
+            internal set => _AssetID = value;
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace OpenMetaverse.Assets
         }
 
         /// <summary>
-        /// Regenerates the <code>AssetData</code> byte array from the properties 
+        /// Regenerates the <see cref="AssetData"/>> byte array from the properties 
         /// of the derived class.
         /// </summary>
         public abstract void Encode();

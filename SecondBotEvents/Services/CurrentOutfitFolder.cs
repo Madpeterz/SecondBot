@@ -185,7 +185,10 @@ namespace SecondBotEvents.Services
 
                     if (items.Count > 0)
                     {
-                        GetClient().Inventory.RequestFetchInventory(items, owners);
+                        foreach (UUID itm in items)
+                        {
+                            GetClient().Inventory.RequestFetchInventory(itm, GetClient().Self.AgentID);
+                        }
                     }
                 }
             }
@@ -248,13 +251,21 @@ namespace SecondBotEvents.Services
         private void CreateCOF()
         {
             UUID cofID = GetClient().Inventory.CreateFolder(GetClient().Inventory.Store.RootFolder.UUID, "Current Outfit", FolderType.CurrentOutfit);
-            if (GetClient().Inventory.Store.Items.ContainsKey(cofID) && GetClient().Inventory.Store.Items[cofID].Data is InventoryFolder folder)
+            List<InventoryBase> folders = GetClient().Inventory.Store.GetContents(GetClient().Inventory.Store.RootFolder);
+            foreach(InventoryBase A in folders)
             {
-                COF = folder;
-                COFReady = true;
-                if (AppearanceSent)
+                if(A.UUID == cofID)
                 {
-                    InitialUpdate();
+                    if (A is InventoryFolder)
+                    {
+                        COF = (InventoryFolder)A;
+                        COFReady = true;
+                        if (AppearanceSent)
+                        {
+                            InitialUpdate();
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -389,8 +400,7 @@ namespace SecondBotEvents.Services
 
             if (!linkExists)
             {
-                GetClient().Inventory.CreateLink(COF.UUID, item.UUID, item.Name, newDescription,
-                    AssetType.Link, item.InventoryType, UUID.Random(),
+                GetClient().Inventory.CreateLink(COF.UUID, item,
                     (success, newItem) =>
                     {
                         if (success)

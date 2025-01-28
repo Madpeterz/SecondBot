@@ -1,5 +1,6 @@
 ﻿using OpenMetaverse;
 using SecondBotEvents.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -40,7 +41,7 @@ namespace SecondBotEvents.Commands
             {
                 return BasicReply("Error with gesture", new [] { gesture });
             }
-            InventoryItem itm = GetClient().Inventory.FetchItem(gestureUUID, GetClient().Self.AgentID, (3 * 1000));
+            InventoryItem itm = GetClient().Inventory.FetchItem(gestureUUID, GetClient().Self.AgentID, new TimeSpan(0, 0, 3));
             GetClient().Self.PlayGesture(itm.AssetUUID);
             return BasicReply("Accepted", new [] { gesture });
         }

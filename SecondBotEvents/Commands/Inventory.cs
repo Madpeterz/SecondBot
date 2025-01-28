@@ -74,7 +74,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild item UUID: "+ item, new [] { item });
             }
-            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, (5 * 1000));
+            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, new TimeSpan(0, 0, 5));
             if (itm == null)
             {
                 return Failure("Unable to find item: " + item, new [] { item });
@@ -203,7 +203,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("invaild folder uuid", new[] { folder });
             }
-            List<InventoryBase> contents = GetClient().Inventory.FolderContents(folderUUID, GetClient().Self.AgentID, true, true, InventorySortOrder.ByName, 5 * 1000);
+            List<InventoryBase> contents = GetClient().Inventory.FolderContents(folderUUID, GetClient().Self.AgentID, true, true, InventorySortOrder.ByName, new TimeSpan(0,0,5));
             List<InventoryItem> wareables = new();
             if (contents == null)
             {
@@ -264,7 +264,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Cant find target folder", new [] { name });
             }
-            List<InventoryBase> contents = GetClient().Inventory.FolderContents(AA.UUID, GetClient().Self.AgentID, true, true, InventorySortOrder.ByName, 5 * 1000);
+            List<InventoryBase> contents = GetClient().Inventory.FolderContents(AA.UUID, GetClient().Self.AgentID, true, true, InventorySortOrder.ByName, new TimeSpan(0, 0, 5));
             List<InventoryItem> wareables = new();
             if (contents == null)
             {
@@ -303,7 +303,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Unable to find notecard folder");
             }
             List<UUID> purge_notecards = new();
-            List<InventoryBase> contents = GetClient().Inventory.FolderContents(NotecardFolder.UUID, GetClient().Self.AgentID, true, true, InventorySortOrder.ByDate, 40 * 1000);
+            List<InventoryBase> contents = GetClient().Inventory.FolderContents(NotecardFolder.UUID, GetClient().Self.AgentID, true, true, InventorySortOrder.ByDate, new TimeSpan(0, 0, 5));
             foreach (InventoryBase C in contents)
             {
                 InventoryItem A = (InventoryItem)C;
@@ -351,12 +351,12 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar uuid", new[] { path, avatar });
             }
-            UUID targetitem = GetClient().Inventory.FindObjectByPath(GetClient().Inventory.Store.RootFolder.UUID, GetClient().Self.AgentID, path, (3 * 1000));
+            UUID targetitem = GetClient().Inventory.FindObjectByPath(GetClient().Inventory.Store.RootFolder.UUID, GetClient().Self.AgentID, path, new TimeSpan(0, 0, 3));
             if(targetitem == UUID.Zero)
             {
                 return Failure("Unable to find item via path", new[] { path, avatar });
             }
-            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, (3 * 1000));
+            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, new TimeSpan(0, 0, 3));
             if (itm == null)
             {
                 return Failure("Unable to find item with found uuid", new[] { path, avatar });
@@ -384,7 +384,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild item uuid", new [] { item, avatar });
             }
-            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, (3 * 1000));
+            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, new TimeSpan(0, 0, 3));
             if (itm == null)
             {
                 return Failure("Unable to find item", new [] { item, avatar });
@@ -469,7 +469,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Invaild running", new [] { item, objectuuid, running });
             }
 
-            InventoryItem itm = GetClient().Inventory.FetchItem(itemuuid, GetClient().Self.AgentID, (3 * 1000));
+            InventoryItem itm = GetClient().Inventory.FetchItem(itemuuid, GetClient().Self.AgentID, new TimeSpan(0, 0, 3));
             if (itm == null)
             {
                 return Failure("Unable to find inventory", new [] { item, objectuuid, running });
