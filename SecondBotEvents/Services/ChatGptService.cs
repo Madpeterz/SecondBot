@@ -20,12 +20,14 @@ using System.Threading.Tasks;
 using OpenAI.Interfaces;
 using System.Diagnostics;
 using Swan;
+using StackExchange.Redis;
+using Discord.Rest;
 
 namespace SecondBotEvents.Services
 {
     public class ChatGptService : BotServices
     {
-        public ChatGptConfig myConfig = null;
+        public new ChatGptConfig myConfig = null;
         public ChatGptService(EventsSecondBot setMaster) : base(setMaster)
         {
             myConfig = new ChatGptConfig(master.fromEnv, master.fromFolder);
@@ -39,6 +41,9 @@ namespace SecondBotEvents.Services
         protected int localchatRateLimit = 3;
         protected int groupchatRateLimit = 3;
         protected int imchatRateLimit = 3;
+
+        protected ConnectionMultiplexer redis = null;
+        protected IDatabase redisDb = null;
         public override void Start(bool updateEnabled = false, bool setEnabledTo = false)
         {
             if (updateEnabled == true)
@@ -49,6 +54,23 @@ namespace SecondBotEvents.Services
             {
                 Stop();
                 return;
+            }
+            if(myConfig.GetUseRedis() == true)
+            {
+                try
+                {
+                    ConfigurationOptions configRedis = new ConfigurationOptions()
+                    {
+                        EndPoints = { myConfig.GetRedisSource() }
+                    };
+                    redis = ConnectionMultiplexer.Connect(configRedis);
+                    redisDb = redis.GetDatabase();
+                }
+                catch (Exception ex)
+                {
+                    LogFormater.Warn("Redis failed to connect:" + ex.Message);
+                }
+
             }
             chatHistorySize = inrange(3,10,myConfig.GetChatHistoryMessages());
             localchatRateLimit = inrange(1, 10, myConfig.GetLocalchatRateLimiter());
@@ -252,6 +274,221 @@ namespace SecondBotEvents.Services
                     }
         }
 
+        protected bool RedisLive()
+        {
+            // are we using redis?
+            if (myConfig.GetUseRedis() == false)
+            {
+                return false; // not using redis no need to do any more checks
+            }
+            else if (redis == null)
+            {
+                return false; // redis is dead
+            }
+            else if (redisDb == null)
+            {
+                return false; // no connection to DB
+            }
+            else if (redis.IsConnected == false)
+            {
+                // redis is down, use local storage
+                return false;
+            }
+            return true;
+        }
+
+        protected List<KeyValuePair<string, string>> GetHistoryFromStorage(UUID store,bool avatarchat,bool groupchat)
+        {
+            // are we using redis?
+            if (RedisLive() == false)
+            {
+                return null;
+            }
+            // is redis enabled for this message type?
+            if ((myConfig.GetRedisImchat() == true) && (avatarchat == true))
+            {
+                // we need to read from redis for this IM chat window
+                return ReadChatFromRedis(store);
+            }
+            else if ((myConfig.GetRedisGroupchat() == true) && (groupchat == true))
+            {
+                // we need to read from redis for this group chat window
+                return ReadChatFromRedis(store);
+            }
+            else if(myConfig.GetRedisLocalchat() == true) 
+            {
+                // we need to read from redis for this local chat window
+                return ReadChatFromRedis(store);
+            }
+            // Redis is not enabled for this message type, use local storage
+            return null;
+
+        }
+
+        protected List<KeyValuePair<string, string>> ReadChatFromRedis(UUID store)
+        {
+            try
+            {
+                RedisKey readkey = new RedisKey(myConfig.GetRedisPrefix() + store.Guid.ToString());
+                if (redisDb.KeyExists(readkey) == false)
+                {
+                    string rawstring = redisDb.StringGet(readkey);
+                    if (rawstring == null)
+                    {
+                        return chatHistoryAI[store]; // nothing in memory use the default store
+                    }
+                    redisDb.KeyExpire(readkey, new TimeSpan(0, myConfig.GetRedisMaxageMins(), 0)); // update the expire value
+                    return JsonConvert.DeserializeObject<List<KeyValuePair<string, string>>>(rawstring);
+                }
+                return NoRedisStoreFound(store);
+            }
+            catch (Exception ex)
+            {
+                LogFormater.Warn("Redis failed to unpack json using default store:" + ex.Message);
+                return NoRedisStoreFound(store);
+            }
+        }
+
+        protected List<KeyValuePair<string, string>> NoRedisStoreFound(UUID store)
+        {
+            if (chatHistoryAI.ContainsKey(store) == false)
+            {
+                return new List<KeyValuePair<string, string>>();
+            }
+            return chatHistoryAI[store];
+        }
+
+        protected List<KeyValuePair<string, string>> GetHistory(UUID store, bool avatarchat, bool groupchat, string talkingto)
+        {
+            // update access markers
+            if (ChatHistoryLastAccessed.ContainsKey(store) == false)
+            {
+                ChatHistoryLastAccessed.Add(store, 0);
+            }
+            ChatHistoryLastAccessed[store] = SecondbotHelpers.UnixTimeNow();
+            List<KeyValuePair<string, string>> history = GetHistoryFromStorage(store, avatarchat, groupchat);
+            if(history.Count == 0)
+            {
+                // no history loaded from redis, check in memory
+                if (chatHistoryAI.ContainsKey(store) == false)
+                {
+                    // totaly new chat build it out
+                    chatHistoryAI.Add(store, new List<KeyValuePair<string, string>>());
+                    string yourname = GetClient().Self.FirstName;
+                    if (myConfig.GetCustomName() != "<!FIRSTNAME!>")
+                    {
+                        yourname = myConfig.GetCustomName();
+                    }
+                    if (avatarchat == true)
+                    {
+                        history.Add(new KeyValuePair<string, string>("system", "You are " + yourname + ", " + myConfig.GetChatPrompt() + ", you are talking to " + talkingto + "."));
+                    }
+                    else if (groupchat == true)
+                    {
+                        history.Add(new KeyValuePair<string, string>("system", "You are " + yourname + ", " + myConfig.GetChatPrompt() + ", you are talking to a group of people."));
+                    }
+                    else
+                    {
+                        history.Add(new KeyValuePair<string, string>("system", "You are " + yourname + ", " + myConfig.GetChatPrompt() + ", you are talking to people in a public place."));
+                    }
+                    // history ready, save to redis if in use
+                    if(StoreHistory(store, history, avatarchat, groupchat) == false)
+                    {
+                        // unable to save to redis, use local storage
+                        chatHistoryAI[store] = history;
+                        return history;
+                    }
+                }
+                return history;
+            }
+            return history;
+        }
+
+        protected bool StoreHistory(UUID store, List<KeyValuePair<string, string>> history, bool avatarchat, bool groupchat)
+        {
+            if (RedisLive() == false)
+            {
+                return false;
+            }
+            bool allowStore = false;
+            if ((myConfig.GetRedisImchat() == true) && (avatarchat == true))
+            {
+                allowStore = true;
+            }
+            else if ((myConfig.GetRedisGroupchat() == true) && (groupchat == true))
+            {
+                // we need to read from redis for this group chat window
+                allowStore = true;
+            }
+            else if (myConfig.GetRedisLocalchat() == true)
+            {
+                // we need to read from redis for this local chat window
+                allowStore = true;
+            }
+            if(allowStore == false)
+            {
+                return false;
+            }
+            int maxsize = inrange(1, 9999, myConfig.GetRedisCountLocal());
+            if(avatarchat == true)
+            {
+                maxsize = inrange(1, 9999, myConfig.GetRedisCountIm());
+            }
+            else if(groupchat == true)
+            {
+                maxsize = inrange(1, 9999, myConfig.GetRedisCountGroup());
+            }
+            // trim the history using targeted max values
+            while (history.Count() > maxsize + 1)
+            {
+                history.RemoveAt(1);
+            }
+            RedisKey writekey = new RedisKey(myConfig.GetRedisPrefix() + store.Guid.ToString());
+            try
+            {
+                string savestring = JsonConvert.SerializeObject(history);
+                if (savestring == null)
+                {
+                    LogFormater.Warn("Redis failed to convert history into savable format");
+                    return false;
+                }
+                RedisValue storeme = new RedisValue(savestring);
+                if(redisDb.StringSet(writekey, storeme) == true)
+                {
+                    return redisDb.KeyExpire(writekey, new TimeSpan(0, myConfig.GetRedisMaxageMins(), 0));
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                LogFormater.Warn("Redis failed to save into store:" + ex.Message);
+                return false;
+            }
+        }
+
+        protected List<KeyValuePair<string, string>> AddHistory(UUID store, bool avatarchat, bool groupchat, string talkingto, string role, string message)
+        {
+            List<KeyValuePair<string, string>> history = GetHistory(store, avatarchat, groupchat, talkingto);
+            history.Add(new KeyValuePair<string, string>(role, message));
+            if(StoreHistory(store, history, avatarchat, groupchat) == false) // try and save using redis
+            {
+                // unable to save to redis, write to local storage
+                return BasicSaveHistory(store, history);
+            }
+            return history;
+        }
+
+        protected List<KeyValuePair<string, string>> BasicSaveHistory(UUID store, List<KeyValuePair<string, string>> history)
+        {
+            // trim the history using basic config
+            while (history.Count() > chatHistorySize + 1)
+            {
+                history.RemoveAt(1);
+            }
+            chatHistoryAI[store] = history;
+            return history;
+        }
+
         protected async void GetAiReply(int ratelimiter, UUID replyTo, UUID user, string name, string message, bool avatarchat = false, bool groupchat = false)
         {
             bool allowedChat = true;
@@ -278,47 +515,10 @@ namespace SecondBotEvents.Services
                 List<ChatMessage> messages = new List<ChatMessage>();
             lock (chatHistoryAI) lock (ChatHistoryLastAccessed)
                 {
-                    if (chatHistoryAI.ContainsKey(user) == false)
-                    {
-                        chatHistoryAI.Add(user, new List<KeyValuePair<string, string>>());
-                    }
-                    if (ChatHistoryLastAccessed.ContainsKey(user) == false)
-                    {
-                        ChatHistoryLastAccessed.Add(user, SecondbotHelpers.UnixTimeNow());
-                    }
-                    // trim history
-                    List<KeyValuePair<string, string>> history = chatHistoryAI[user];
-                    string yourname = GetClient().Self.FirstName;
-                    if(myConfig.GetCustomName() != "<!FIRSTNAME!>")
-                    {
-                        yourname = myConfig.GetCustomName();
-                    }
-                    if (history.Count() == 0)
-                    {
-                        if (avatarchat == true)
-                        {
-                            history.Add(new KeyValuePair<string, string>("system", "You are " + yourname + ", "+myConfig.GetChatPrompt()+", you are talking to " + name + "."));
-                        }
-                        else if (groupchat == true)
-                        {
-                            history.Add(new KeyValuePair<string, string>("system", "You are " + yourname + ", "+myConfig.GetChatPrompt()+", you are talking to a group of people."));
-                        }
-                        else
-                        {
-                            history.Add(new KeyValuePair<string, string>("system", "You are " + yourname + ", "+myConfig.GetChatPrompt()+", you are talking to people in a public place."));
-                        }
-                    }
-                    history.Add(new KeyValuePair<string, string>("user", "" + name + " says " + message));
-                    while (history.Count() > chatHistorySize + 1)
-                    {
-                        history.RemoveAt(1);
-                    }
-                    chatHistoryAI[user] = history;
-                    ChatHistoryLastAccessed[user] = SecondbotHelpers.UnixTimeNow();
-                    
+                    // convert history into the AI format while adding the new message
                     try
                     {
-                        foreach (KeyValuePair<string, string> entry in history)
+                        foreach (KeyValuePair<string, string> entry in AddHistory(user, avatarchat, groupchat, name, "user", "" + name + " says " + message))
                         {
                             string role = entry.Key.ToLower();
                             if (role != "system" && role != "user" && role != "assistant")
@@ -403,28 +603,28 @@ namespace SecondBotEvents.Services
                 {
                     lock (chatHistoryAI) lock (ChatHistoryLastAccessed)
                         {
-                            List<KeyValuePair<string, string>> history = chatHistoryAI[user];
-                            history.Add(new KeyValuePair<string, string>("assistant", replyMessage));
-                            chatHistoryAI[user] = history;
-                            ChatHistoryLastAccessed[user] = SecondbotHelpers.UnixTimeNow();
+                            AddHistory(user, avatarchat, groupchat, name, "assistant", replyMessage);
                         }
-                    if((avatarchat==false) && (groupchat == false))
+                    if (myConfig.GetFakeTypeDelay() == true)
                     {
-                        GetClient().Self.AnimationStart(Animations.TYPE, true);
-                    }
+                        if ((avatarchat == false) && (groupchat == false))
+                        {
+                            GetClient().Self.AnimationStart(Animations.TYPE, true);
+                        }
 
 
-                    double timespanwait = EstimateTypingTime(replyMessage, 0.4);
+                        double timespanwait = EstimateTypingTime(replyMessage, 0.4);
 
-                    if(timespanwait > 3)
-                    {
-                        timespanwait = 3;
+                        if (timespanwait > 3)
+                        {
+                            timespanwait = 3;
+                        }
+                        else if (timespanwait < 1)
+                        {
+                            timespanwait = 1;
+                        }
+                        await Task.Delay(TimeSpan.FromSeconds(timespanwait));
                     }
-                    else if(timespanwait < 1)
-                    {
-                        timespanwait = 1;
-                    }
-                    await Task.Delay(TimeSpan.FromSeconds(timespanwait));
                     if (avatarchat == true)
                     {
                         GetClient().Self.InstantMessage(replyTo, replyMessage);
@@ -436,7 +636,10 @@ namespace SecondBotEvents.Services
                     else
                     {
                         GetClient().Self.Chat(replyMessage, 0, ChatType.Normal);
-                        GetClient().Self.AnimationStop(Animations.TYPE, true);
+                        if (myConfig.GetFakeTypeDelay() == true)
+                        {
+                            GetClient().Self.AnimationStop(Animations.TYPE, true);
+                        }
                     }
                 }
             }
