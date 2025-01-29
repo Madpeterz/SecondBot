@@ -344,13 +344,13 @@ namespace SecondBotEvents.Services
             }
             try
             {
+
                 string lowerName = C.command.ToLower();
-                if(commandnameLowerToReal.ContainsKey(lowerName) == false)
+                if(commandnameLowerToReal.ContainsKey(lowerName) == true)
                 {
-                    return new KeyValuePair<bool, string>(false, "Unknown command");
+                    C.command = commandnameLowerToReal[lowerName];
                 }
-                C.command = commandnameLowerToReal[lowerName];
-                if(master.CustomCommandsService.HasCommand(C.command) == true)
+                else if(master.CustomCommandsService.HasCommand(C.command) == true)
                 {
                     if(inCustomCommand == true)
                     {
@@ -358,6 +358,11 @@ namespace SecondBotEvents.Services
                     }
                     return master.CustomCommandsService.RunCommand(C, source);
                 }
+                else
+                {
+                    return new KeyValuePair<bool, string>(false, "Unknown command");
+                }
+
                 KeyValuePair<bool,string> reply = RunBaseCommand(C, source);
                 if (C.replyTarget != null)
                 {
