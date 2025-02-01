@@ -114,6 +114,10 @@ namespace SecondBotEvents.Services
 
         protected void JsonOuput(bool status, string eventype, string from, string why="", Dictionary<string, string> setMisc = null)
         {
+            if(myConfig.GetEnableDebug() == true)
+            {
+                LogFormater.Warn("Interaction debug:" + JsonConvert.SerializeObject(new InteractionEvent(from, eventype, status, why, setMisc)));
+            }
             if (myConfig.GetEnableJsonOutputEvents() == false)
             {
                 return;
@@ -134,6 +138,10 @@ namespace SecondBotEvents.Services
 
         protected void JsonOuputCleaner(Dictionary<string, string> misc, string source)
         {
+            if (myConfig.GetEnableDebug() == true)
+            {
+                LogFormater.Warn("Interaction debug:" + JsonConvert.SerializeObject(misc));
+            }
             if (myConfig.GetEnableJsonOutputEvents() == false)
             {
                 return;

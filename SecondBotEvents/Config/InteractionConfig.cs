@@ -22,6 +22,12 @@ namespace SecondBotEvents.Config
             settings.Add("TeleportRequestLevel");
             settings.Add("Enabled");
             settings.Add("HideStatusOutput");
+            settings.Add("EnableDebug");
+        }
+
+        public bool GetEnableDebug()
+        {
+            return ReadSettingAsBool("EnableDebug", false);
         }
 
         public string GetFriendRequestLevel()

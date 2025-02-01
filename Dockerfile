@@ -91,6 +91,7 @@ ENV basic_Username='' \
 	interaction_InventoryTransferLevel='Owner' \
 	interaction_GroupInviteLevel='Owner' \
 	interaction_TeleportRequestLevel='Owner' \
+	interaction_EnableDebug='false' \
 	commands_HideStatusOutput='false' \
 	datastore_HideStatusOutput='false' \
 	discord_HideStatusOutput='false' \
