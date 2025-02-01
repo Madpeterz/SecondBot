@@ -302,7 +302,7 @@ namespace SecondBotEvents.Services
             // are we using redis?
             if (RedisLive() == false)
             {
-                return null;
+                return new List<KeyValuePair<string, string>>();
             }
             // is redis enabled for this message type?
             if ((myConfig.GetRedisImchat() == true) && (avatarchat == true))
@@ -321,7 +321,7 @@ namespace SecondBotEvents.Services
                 return ReadChatFromRedis(store);
             }
             // Redis is not enabled for this message type, use local storage
-            return null;
+            return new List<KeyValuePair<string, string>>();
 
         }
 
@@ -398,6 +398,10 @@ namespace SecondBotEvents.Services
                         chatHistoryAI[store] = history;
                         return history;
                     }
+                }
+                else
+                {
+                    history = chatHistoryAI[store];
                 }
                 return history;
             }
