@@ -85,6 +85,14 @@ namespace SecondBotEvents.Services
                 whyAccepted = "on friends list";
                 accepted = GetClient().Friends.FriendList.ContainsKey(avataruuid);
             }
+            if ((accepted == false) && (master.CommandsService.myConfig.GetCheckDotNames() == true))
+            {
+                string[] bits = avatarName.ToLower().Split('.');
+                if (bits.Length == 2)
+                {
+                    accepted = master.CommandsService.myConfig.GetMastersCSV().Contains(bits[0].FirstCharToUpper() + " " + bits[1].FirstCharToUpper());
+                }
+            }
             if (accepted == false)
             {
                 // check the one time accept list
