@@ -337,7 +337,7 @@ namespace SecondBotEvents.Services
                     {
                         return chatHistoryAI[store]; // nothing in memory use the default store
                     }
-                    redisDb.KeyExpire(readkey, new TimeSpan(0, myConfig.GetRedisMaxageMins(), 0)); // update the expire value
+                    redisDb.KeyExpire(readkey, TimeSpan.FromMinutes(myConfig.GetRedisMaxageMins())); // update the expire value
                     return JsonConvert.DeserializeObject<List<KeyValuePair<string, string>>>(rawstring);
                 }
                 return NoRedisStoreFound(store);
@@ -459,7 +459,7 @@ namespace SecondBotEvents.Services
                 RedisValue storeme = new RedisValue(savestring);
                 if(redisDb.StringSet(writekey, storeme) == true)
                 {
-                    return redisDb.KeyExpire(writekey, new TimeSpan(0, myConfig.GetRedisMaxageMins(), 0));
+                    return redisDb.KeyExpire(writekey, TimeSpan.FromMinutes(myConfig.GetRedisMaxageMins()));
                 }
                 return false;
             }

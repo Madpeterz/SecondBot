@@ -251,7 +251,7 @@ namespace SecondBotEvents.Services
                 master.DataStoreService.AddAvatar(e.Offer.FromAgentID, e.Offer.FromAgentName);
                 details.Add("itemuuid", e.ObjectID.ToString());
                 details.Add("itemname", "?");
-                InventoryItem itm = GetClient().Inventory.FetchItem(e.ObjectID, GetClient().Self.AgentID, new TimeSpan(0, 0, 2));
+                InventoryItem itm = GetClient().Inventory.FetchItem(e.ObjectID, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
                 if(itm != null)
                 {
                     details["itemname"] = itm.Name;

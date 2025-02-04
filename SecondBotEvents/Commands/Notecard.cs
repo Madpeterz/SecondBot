@@ -1,5 +1,8 @@
-﻿using OpenMetaverse;
+﻿using Newtonsoft.Json;
+using OpenMetaverse;
+using OpenMetaverse.Assets;
 using SecondBotEvents.Services;
+using static OpenAI.ObjectModels.StaticValues.AssistantsStatics.MessageStatics;
 
 
 namespace SecondBotEvents.Commands
@@ -9,6 +12,78 @@ namespace SecondBotEvents.Commands
     {
         public Notecard(EventsSecondBot setmaster) : base(setmaster)
         {
+        }
+
+        [About("Reads the notecards content, if it is able to read the notecard will give a json reply of notecarduuid name and contents")]
+        [ReturnHintsFailure("Not a vaild UUID")]
+        [ReturnHintsFailure("Unable to find inventory item")]
+        [ReturnHintsFailure("Inventory item is not a notecard")]
+        [ReturnHintsFailure("replytarget not set")]
+        [ReturnHints("Making request to get data from notecard")]
+        [ArgHints("notecardInventoryUUID", "The inventory UUID of the notecard to read")]
+        [ArgHints("replytarget", "where to send the results to (smartreply target Avatar UUID, HTTP url, chat channel")]
+        public object NotecardRead(string notecardInventoryUUID, string replytarget)
+        {
+            if(SecondbotHelpers.isempty(replytarget) == true)
+            {
+                return Failure("replytarget not set");
+            }
+            NotecardReadReply reply = new NotecardReadReply();
+            reply.uuid = notecardInventoryUUID;
+            reply.name = "?";
+            reply.status = false;
+            reply.content = "Not a vaild UUID";
+            if (UUID.TryParse(notecardInventoryUUID, out var uuid) == false)
+            {
+                master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
+                return Failure(reply.content, new[] { notecardInventoryUUID });
+            }
+            reply.content = "Unable to find inventory item";
+            InventoryItem item = GetClient().Inventory.FetchItem(uuid, GetClient().Self.AgentID, new System.TimeSpan(0, 1, 30));
+            if (item == null)
+            {
+                master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
+                return Failure(reply.content, new[] { notecardInventoryUUID });
+            }
+            reply.content = "Inventory item is not a notecard";
+            if (item.InventoryType != InventoryType.Notecard)
+            {
+                master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
+                return Failure(reply.content, new[] { notecardInventoryUUID }); ;
+            }
+            InventoryNotecard notecard = (InventoryNotecard)item;
+            GetClient().Assets.RequestInventoryAsset(notecard, true, UUID.Random(), (AssetDownload transfer, Asset asset) =>
+            {
+                if (transfer.Success == false)
+                {
+                    reply.content = "!ERROR! - unable to read notecard";
+                    master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
+                }
+                else
+                {
+                    AssetNotecard note = (AssetNotecard)asset;
+                    note.Decode();
+                    string contents = "";
+                    for (int index = 0; index < note.BodyText.Length; index++)
+                    {
+                        char c = note.BodyText[index];
+                        if ((int)c == 0xdbc0)
+                        {
+                            contents = "[ATTACHMENT]";
+                        }
+                        else
+                        {
+                            contents += c;
+                        }
+                    }
+                    reply.content = contents;
+                    reply.name = notecard.Name;
+                    reply.status = true;
+                    master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
+                }
+            }
+            );
+            return BasicReply("Making request to get data from notecard");
         }
 
         [About("Adds content to the Collection<br/> Also creates the Collection if it does not exist")]
@@ -113,5 +188,13 @@ namespace SecondBotEvents.Commands
             }
             return BasicReply("ok");
         }
+    }
+
+    public class NotecardReadReply
+    {
+        public string uuid;
+        public string name;
+        public string content;
+        public bool status;
     }
 }

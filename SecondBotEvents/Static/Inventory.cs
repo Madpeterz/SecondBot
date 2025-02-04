@@ -24,7 +24,7 @@ namespace BetterSecondBot.Static
     {
         public static InventoryItem getItemByInventoryUUID(GridClient bot, UUID target)
         {
-            return bot.Inventory.FetchItem(target, bot.Self.AgentID, new TimeSpan(0, 0, 3));
+            return bot.Inventory.FetchItem(target, bot.Self.AgentID, TimeSpan.FromSeconds(15));
         }
         public static UUID GetAssetUUID(GridClient bot, UUID target)
         {
@@ -123,7 +123,7 @@ namespace BetterSecondBot.Static
             mapitem.id = node.Data.UUID.ToString();
             mapitem.typename = "Folder";
             entrys.Add(mapitem);
-            List<InventoryBase> contents = bot.Inventory.FolderContents(folder, bot.Self.AgentID, true, true, InventorySortOrder.ByDate, new TimeSpan(0, 0, 45), true);
+            List<InventoryBase> contents = bot.Inventory.FolderContents(folder, bot.Self.AgentID, true, true, InventorySortOrder.ByDate, TimeSpan.FromSeconds(45), true);
             if (contents != null)
             {
                 if (contents.Count > 0)

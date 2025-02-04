@@ -41,7 +41,7 @@ namespace SecondBotEvents.Commands
             {
                 return BasicReply("Error with gesture", new [] { gesture });
             }
-            InventoryItem itm = GetClient().Inventory.FetchItem(gestureUUID, GetClient().Self.AgentID, new TimeSpan(0, 0, 3));
+            InventoryItem itm = GetClient().Inventory.FetchItem(gestureUUID, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
             GetClient().Self.PlayGesture(itm.AssetUUID);
             return BasicReply("Accepted", new [] { gesture });
         }
