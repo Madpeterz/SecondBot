@@ -524,7 +524,7 @@ namespace SecondBotEvents.Services
                             }
                             string[] args = { sitTarget.ToString() };
                             SignedCommand C = new SignedCommand(master.CommandsService, "rlv", "Sit", null, args, 0, "", false, 0, "", false);
-                            master.CommandsService.RunCommand(C);
+                            master.CommandsService.RunCommand("RLV",C);
                         }
                         break;
 
@@ -533,7 +533,7 @@ namespace SecondBotEvents.Services
                         {
                             // stand
                             SignedCommand C = new SignedCommand(master.CommandsService, "rlv", "Stand", null, new string[] { }, 0, "", false, 0, "", false);
-                            master.CommandsService.RunCommand(C);
+                            master.CommandsService.RunCommand("RLV", C);
                         }
                         break;
 

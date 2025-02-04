@@ -339,7 +339,7 @@ namespace SecondBotEvents.Services
             {
                 return "Command request rejected";
             }
-            return JsonConvert.SerializeObject(master.CommandsService.RunCommand(C));
+            return JsonConvert.SerializeObject(master.CommandsService.RunCommand("HTTP",C));
         }
     }
 }

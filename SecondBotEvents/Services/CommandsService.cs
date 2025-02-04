@@ -225,7 +225,7 @@ namespace SecondBotEvents.Services
             {
                 return new KeyValuePair<bool, string>(false, "Not accepted via signing");
             }
-            KeyValuePair<bool, string> reply = RunCommand(C, viaCustomCommand, source);
+            KeyValuePair<bool, string> reply = RunCommand(source, C, viaCustomCommand);
             return reply;
         }
 
@@ -336,7 +336,7 @@ namespace SecondBotEvents.Services
                 return new KeyValuePair<bool, string>(false, e.Message);
             }
         }
-        public KeyValuePair<bool, string> RunCommand(SignedCommand C, bool inCustomCommand=false, string source="?")
+        public KeyValuePair<bool, string> RunCommand(string source, SignedCommand C, bool inCustomCommand=false)
         {
             if(acceptNewCommands == false)
             {

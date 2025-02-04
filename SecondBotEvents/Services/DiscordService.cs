@@ -392,7 +392,7 @@ namespace SecondBotEvents.Services
 
         protected void RunCommandFromMessage(SignedCommand C, SocketMessage message)
         {
-            KeyValuePair<bool, string> reply = master.CommandsService.RunCommand(C);
+            KeyValuePair<bool, string> reply = master.CommandsService.RunCommand("Discord",C);
             string replyEmote = "✅";
             if (reply.Key == false)
             {
