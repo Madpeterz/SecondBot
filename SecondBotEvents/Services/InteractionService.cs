@@ -44,9 +44,13 @@ namespace SecondBotEvents.Services
             return "Active";
         }
 
-        protected bool ProcessRequest(bool enabledByConfig, string ConfigAcceptLevel, string avatarName, string sourceName, UUID avataruuid)
+        protected bool ProcessRequest(bool enabledByConfig, string ConfigAcceptLevel, string avatarName, string sourceName, UUID avataruuid, Dictionary<string,string> misc = null)
         {
-            if(myConfig.GetEnabled() == false)
+            if (misc == null)
+            {
+                misc = new Dictionary<string, string>();
+            }
+            if (myConfig.GetEnabled() == false)
             {
                 JsonOuput(false, sourceName, avatarName, "Interactions hooks disabled");
                 return false;
@@ -65,15 +69,16 @@ namespace SecondBotEvents.Services
             bool accepted = false;
             string ObjectOwnerName = master.DataStoreService.GetAvatarName(avataruuid);
             string whyAccepted = "rejected request";
+            misc.Add("ObjectOwner", ObjectOwnerName);
             if (master.CommandsService.myConfig.GetMastersCSV().Contains(avatarName) == true)
             {
                 whyAccepted = "on owners list";
-                return true;
+                accepted = true;
             }
             else if (master.CommandsService.myConfig.GetMastersCSV().Contains(ObjectOwnerName) == true)
             {
                 whyAccepted = "Object Owner is on master list";
-                return true;
+                accepted = true;
             }
             else if (ConfigAcceptLevel == "Anyone")
             {
@@ -91,6 +96,22 @@ namespace SecondBotEvents.Services
                 if (bits.Length == 2)
                 {
                     accepted = master.CommandsService.myConfig.GetMastersCSV().Contains(bits[0].FirstCharToUpper() + " " + bits[1].FirstCharToUpper());
+                    if (accepted == true)
+                    {
+                        whyAccepted = "on owners list [dot check]";
+                    }
+                }
+                if (accepted == false)
+                {
+                    bits = ObjectOwnerName.ToLower().Split('.');
+                    if (bits.Length == 2)
+                    {
+                        accepted = master.CommandsService.myConfig.GetMastersCSV().Contains(bits[0].FirstCharToUpper() + " " + bits[1].FirstCharToUpper());
+                        if (accepted == true)
+                        {
+                            whyAccepted = "Object Owner is on master list [dot check]";
+                        }
+                    }
                 }
             }
             if (accepted == false)
@@ -102,7 +123,7 @@ namespace SecondBotEvents.Services
                     whyAccepted = "was on NextAccept list";
                 }
             }
-            JsonOuput(accepted, sourceName, avatarName, whyAccepted);
+            JsonOuput(accepted, sourceName, avatarName, whyAccepted, misc);
             return accepted;
         }
 
@@ -177,7 +198,9 @@ namespace SecondBotEvents.Services
                 mode = "Teleport Av to Bot";
                 markTeleport = false;
             }
-            if (ProcessRequest(myConfig.GetAcceptTeleports(),myConfig.GetTeleportRequestLevel(), e.IM.FromAgentName, "Teleport", e.IM.FromAgentID) == false)
+            Dictionary<string,string> misc = new Dictionary<string, string>();
+            misc.Add("mode", mode);
+            if (ProcessRequest(myConfig.GetAcceptTeleports(),myConfig.GetTeleportRequestLevel(), e.IM.FromAgentName, "Teleport", e.IM.FromAgentID, misc) == false)
             {
                 // rejected requests
                 if (e.IM.Dialog != InstantMessageDialog.RequestLure)
@@ -203,14 +226,14 @@ namespace SecondBotEvents.Services
 
         protected void BotGroupInviteOffer(object o, GroupInvitationEventArgs e)
         {
-            if (ProcessRequest(myConfig.GetAcceptGroupInvites(),myConfig.GetGroupInviteLevel(), e.FromName, "GroupInvite", e.AgentID) == false)
+            Dictionary<string, string> reply = new Dictionary<string, string>();
+            reply.Add("message", e.Message);
+            reply.Add("fromuuid", e.AgentID.ToString());
+            if (ProcessRequest(myConfig.GetAcceptGroupInvites(),myConfig.GetGroupInviteLevel(), e.FromName, "GroupInvite", e.AgentID, reply) == false)
             {
                 return;
             }
             e.Accept = true;
-            Dictionary<string,string> reply = new Dictionary<string,string>();
-            reply.Add("message", e.Message);
-            reply.Add("fromuuid", e.AgentID.ToString());
             JsonOuputCleaner(reply, "GroupInvite");
         }
 
@@ -232,12 +255,6 @@ namespace SecondBotEvents.Services
 
         protected void BotInventoryOffer(object o, InventoryObjectOfferedEventArgs e)
         {
-            if(ProcessRequest(myConfig.GetAcceptInventory(),myConfig.GetInventoryTransferLevel(),e.Offer.FromAgentName, "InventoryOffer", e.Offer.FromAgentID) == false)
-            {
-                e.Accept = false;
-                return;
-            }
-            e.Accept = true;
             Dictionary<string, string> details = new Dictionary<string, string>
             {
                 { "transactionid", e.Offer.IMSessionID.ToString() },
@@ -246,6 +263,12 @@ namespace SecondBotEvents.Services
                 { "fromscript", e.FromTask.ToString() },
                 { "targetfolder", e.FolderID.ToString() }
             };
+            if (ProcessRequest(myConfig.GetAcceptInventory(),myConfig.GetInventoryTransferLevel(),e.Offer.FromAgentName, "InventoryOffer", e.Offer.FromAgentID, details) == false)
+            {
+                e.Accept = false;
+                return;
+            }
+            e.Accept = true;
             if(e.FromTask == false)
             {
                 master.DataStoreService.AddAvatar(e.Offer.FromAgentID, e.Offer.FromAgentName);
@@ -262,7 +285,9 @@ namespace SecondBotEvents.Services
 
         protected void BotFriendRequested(object o, FriendshipOfferedEventArgs e)
         {
-            if (ProcessRequest(myConfig.GetAcceptFriendRequests(),myConfig.GetFriendRequestLevel(), e.AgentName, "FriendRequest", e.AgentID) == false)
+            Dictionary<string, string> misc = new Dictionary<string, string>();
+            misc.Add("fromName", e.AgentName);
+            if (ProcessRequest(myConfig.GetAcceptFriendRequests(),myConfig.GetFriendRequestLevel(), e.AgentName, "FriendRequest", e.AgentID, misc) == false)
             {
                 return;
             }
