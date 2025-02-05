@@ -1,27 +1,17 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using OpenMetaverse;
 using SecondBotEvents.Config;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using System.Reflection;
-using System.Net.Http;
-using OpenMetaverse.ImportExport.Collada14;
-using OpenMetaverse.Packets;
-using OpenAI.Managers;
-using OpenAI;
-using Microsoft.Extensions.DependencyInjection;
-using OpenAI.ObjectModels.RequestModels;
-using OpenAI.ObjectModels;
-using OpenAI.ObjectModels.ResponseModels;
 using System.Threading.Tasks;
-using OpenAI.Interfaces;
-using System.Diagnostics;
 using Swan;
 using StackExchange.Redis;
-using Discord.Rest;
+using Betalgo.Ranul.OpenAI.Managers;
+using Betalgo.Ranul.OpenAI;
+using Betalgo.Ranul.OpenAI.ObjectModels.ResponseModels;
+using Betalgo.Ranul.OpenAI.ObjectModels.RequestModels;
+using Betalgo.Ranul.OpenAI.ObjectModels;
 
 namespace SecondBotEvents.Services
 {
@@ -556,13 +546,13 @@ namespace SecondBotEvents.Services
             try
             {
                 string replyMessage = "";
-                var openAiService = new OpenAIService(new OpenAiOptions()
+                var openAiService = new OpenAIService(new OpenAIOptions()
                 {
                     ApiKey = myConfig.GetApiKey(),
                 });
                 if((myConfig.GetOrganizationId() != null) && (myConfig.GetOrganizationId() != "none"))
                 {
-                    openAiService = new OpenAIService(new OpenAiOptions()
+                    openAiService = new OpenAIService(new OpenAIOptions()
                     {
                         ApiKey = myConfig.GetApiKey(),
                         Organization = myConfig.GetOrganizationId(),
@@ -570,7 +560,7 @@ namespace SecondBotEvents.Services
                 }
                 if(myConfig.GetProvider() != "openai")
                 {
-                    openAiService = new OpenAIService(new OpenAiOptions()
+                    openAiService = new OpenAIService(new OpenAIOptions()
                     {
                         ApiKey = myConfig.GetApiKey(),
                         Organization = myConfig.GetOrganizationId(),

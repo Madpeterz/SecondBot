@@ -2,7 +2,6 @@
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using SecondBotEvents.Services;
-using static OpenAI.ObjectModels.StaticValues.AssistantsStatics.MessageStatics;
 
 
 namespace SecondBotEvents.Commands
