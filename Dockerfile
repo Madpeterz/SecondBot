@@ -135,8 +135,22 @@ ENV basic_Username='' \
 	chatgpt_RedisCountIm='60' \
 	onevent_Enabled='false' \
 	onevent_Count=0 \
-	onevent_HideStatusOutput='false'
-	
+	onevent_HideStatusOutput='false' \
+	smtp_Enabled='false' \
+	smtp_AllowEmailAsReplyTarget='false' \
+	smtp_AllowCommandSendMail='false' \
+	smtp_UseAllowedRecivers='false' \
+	smtp_AllowedReciversCSV='none' \
+	smtp_AllowSendAlertStatus='false' \
+	smtp_AllowSendLoginNotice='false' \
+	smtp_MailReplyAddress='me@myemail.tld' \
+	smtp_Port='587' \
+	smtp_Host='smtp.mail.example' \
+	smtp_useSSL='false' \
+	smtp_User='me@email.addr.tld' \
+	smtp_Token='none' \
+	smtp_SendAlertsAndLoginsTo='me@somewhere.tld' \
+	smtp_HideStatusOutput='false'
 
 EXPOSE 80
 ENV ASPNETCORE_URLS http://+:80

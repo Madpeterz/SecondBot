@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Net.Http;
 using OpenMetaverse.ImportExport.Collada14;
+using System.ComponentModel.DataAnnotations;
 
 namespace SecondBotEvents.Services
 {
@@ -252,6 +253,10 @@ namespace SecondBotEvents.Services
                 mode = "IM";
                 UUID.TryParse(UUIDfetch, out target_avatar);
             }
+            else if (new EmailAddressAttribute().IsValid(target) == true)
+            {
+                mode = "EMAIL";
+            }
             else if (int.TryParse(target, out target_channel) == false)
             {
                 return;
@@ -285,6 +290,14 @@ namespace SecondBotEvents.Services
                 catch (Exception e)
                 {
                     LogFormater.Crit("[SmartReply] HTTP failed: " + e.Message + "");
+                }
+            }
+            else if(mode == "EMAIL")
+            {
+                KeyValuePair<bool,string> reply = master.SmtpService.sendReplyTarget(target,command,output);
+                if(reply.Key == false)
+                {
+                    LogFormater.Crit("[SmartReply] EMAIL failed: " + reply.Value);
                 }
             }
         }

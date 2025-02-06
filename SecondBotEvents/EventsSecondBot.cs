@@ -41,7 +41,9 @@ namespace SecondBotEvents
         public HomeboundService HomeboundService { get { return (HomeboundService)GetService("HomeboundService"); } }
         public EventsService EventsService { get { return (EventsService)GetService("EventsService"); } }
         public DialogService DialogService { get { return (DialogService)GetService("DialogService"); } }
-        
+
+        public SmtpService SmtpService { get { return (SmtpService)GetService("SmtpService"); } }
+
         public ChatGptService ChatGptService { get { return (ChatGptService)GetService("ChatGptService"); } }
 
         public TriggerOnEventService TriggerOnEventService { get { return (TriggerOnEventService)GetService("TriggerOnEventService"); } }
@@ -174,6 +176,7 @@ namespace SecondBotEvents
             RegisterService("RelayService");
             RegisterService("ChatGptService");
             RegisterService("RecoveryService");
+            RegisterService("SmtpService");
             if (BotClient.IsLoaded() == false)
             {
                 LogFormater.Info("Config is not loaded :(");

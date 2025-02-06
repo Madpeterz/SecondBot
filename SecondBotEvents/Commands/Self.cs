@@ -13,6 +13,34 @@ namespace SecondBotEvents.Commands
         {
         }
 
+        [About("use the SMTP service to send a email (requires AllowCommandSendMail to be true)")]
+        [ReturnHints("sending")]
+        [ReturnHintsFailure("Send was rejected because: X")]
+        [ReturnHintsFailure("ARG is empty")]
+        [ArgHints("to", "the email addres to send to")]
+        [ArgHints("subject", "the subject of the email")]
+        [ArgHints("body", "the contents of the email")]
+        public object SendEmail(string to, string subject, string body)
+        {
+            if (SecondbotHelpers.isempty(to) == true) {
+                return Failure("to is empty");
+            }
+            else if (SecondbotHelpers.isempty(subject) == true)
+            {
+                return Failure("subject is empty", [ to ]);
+            }
+            else if (SecondbotHelpers.isempty(body) == true)
+            {
+                return Failure("body is empty", [to, subject]);
+            }
+            KeyValuePair<bool, string> reply = master.SmtpService.commandEmail(to, subject, body);
+            if(reply.Key == false)
+            {
+                return Failure("Send was rejected because: "+reply.Value, [ to, subject, body ]);
+            }
+            return BasicReply("sending",[to,subject,body]);
+        }
+
         [About("Makes the bot teleport to its home region")]
         [ReturnHints("ok")]
         public object GoHome()
