@@ -14,7 +14,7 @@ namespace SecondBotEvents.Services
 {
     public class TriggerOnEventService : BotServices
     {
-        protected OnEventConfig myConfig;
+        protected new OnEventConfig myConfig;
         protected bool botConnected = false;
         Dictionary<string,List<CustomOnEvent>> MyCustomEvents = new Dictionary<string, List<CustomOnEvent>>();
         Dictionary<string, long> lockouts = new Dictionary<string, long>();
@@ -472,6 +472,10 @@ namespace SecondBotEvents.Services
         }
         protected void TriggerEvent(string eventName, Dictionary<string,string> args)
         {
+            if (waitingForTimer == true)
+            {
+                return;
+            }
             if (myConfig.GetDebugMe() == true)
             {
                 StringBuilder debugoutme = new StringBuilder();
@@ -809,6 +813,10 @@ namespace SecondBotEvents.Services
         long lastAvUpdate = 0;
         protected void TimedEvents()
         {
+            if(waitingForTimer == true)
+            {
+                return;
+            }
             TrackAvatarsOnParcel();
             CleanLockouts();
             ClockEvent();
@@ -837,14 +845,27 @@ namespace SecondBotEvents.Services
             {
                 return "Waiting for bot";
             }
+            else if(waitingForTimer == true)
+            {
+                if(SecondbotHelpers.UnixTimeNow() >= waitUntil)
+                {
+                    waitingForTimer = false;
+                    return "Ready for on events";
+                }
+                return "Waiting for timer";
+            }
             return "Active";
         }
+        protected bool waitingForTimer = false;
+        protected long waitUntil = 0;
 
         protected void BotLoggedIn(object o, SimConnectedEventArgs e)
         {
             GetClient().Network.SimConnected -= BotLoggedIn;
             botConnected = true;
             LogFormater.Info("OnEvent Service [Active]");
+            waitingForTimer = true;
+            waitUntil = SecondbotHelpers.UnixTimeNow() + myConfig.GetWaitSecsToStart();
             AttachEvents();
         }
 
@@ -861,6 +882,8 @@ namespace SecondBotEvents.Services
             }
             Stop();
             running = true;
+            waitingForTimer = true;
+            waitUntil = SecondbotHelpers.UnixTimeNow() + 9999;
             master.BotClientNoticeEvent += BotClientRestart;
             LogFormater.Info("OnEvent Service [Starting]");
         }
@@ -878,6 +901,8 @@ namespace SecondBotEvents.Services
             }
             master.BotClientNoticeEvent -= BotClientRestart;
             RemoveEvents();
+            waitingForTimer = true;
+            waitUntil = SecondbotHelpers.UnixTimeNow() + 9999;
         }
     }
 

@@ -14,8 +14,14 @@ namespace SecondBotEvents.Config
             filename = "onevent";
             settings.Add("Enabled");
             settings.Add("Count");
+            settings.Add("WaitSecsToStart");
             settings.Add("HideStatusOutput");
             settings.Add("DebugMe");
+        }
+
+        public int GetWaitSecsToStart()
+        {
+            return ReadSettingAsInt("WaitSecsToStart", 10);
         }
 
         public void unloadEvents()

@@ -135,6 +135,7 @@ ENV basic_Username='' \
 	chatgpt_RedisCountIm='60' \
 	onevent_Enabled='false' \
 	onevent_Count=0 \
+	onevent_WaitSecsToStart=10 \
 	onevent_HideStatusOutput='false' \
 	smtp_Enabled='false' \
 	smtp_AllowEmailAsReplyTarget='false' \
