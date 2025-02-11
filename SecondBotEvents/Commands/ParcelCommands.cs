@@ -705,7 +705,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Parcel sale locked to other avatars")]
         [ReturnHintsFailure("Parcel sale price and amount do not match")]
         [ReturnHintsFailure("Invaild amount")]
-        [ArgHints("amount", "amount to pay for the parcel (min 1)")]
+        [ArgHints("amount", "amount to pay for the parcel (min 1, unless the land is set to the bot as the locked buyer then its 0)")]
         public object ParcelBuy(string amount)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
