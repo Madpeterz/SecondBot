@@ -689,6 +689,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Not in group", new [] { group });
             }
+            ParcelStatic.ParcelSetFlag(ParcelFlags.AllowDeedToGroup, targetparcel, true);
             targetparcel.GroupID = groupuuid;
             targetparcel.Update(GetClient());
             Thread.Sleep(500);
