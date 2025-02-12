@@ -32,7 +32,7 @@ namespace SecondBotEvents
                 string[] files = targetenv.GetManifestResourceNames();
                 string resourceName = files.Single(str => str.EndsWith(filename));
                 using (Stream stream = targetenv.GetManifestResourceStream(resourceName))
-                using (BinaryReader br = new BinaryReader(stream))
+                using (BinaryReader br = new(stream))
                 {
                     const int bufferSize = 4096;
                     using (var ms = new MemoryStream())
@@ -59,7 +59,7 @@ namespace SecondBotEvents
                 string resourceName = files.Single(str => str.EndsWith(filename));
                 string result = "";
                 using (Stream stream = targetenv.GetManifestResourceStream(resourceName))
-                using (StreamReader reader = new StreamReader(stream))
+                using (StreamReader reader = new(stream))
                 {
                     result = reader.ReadToEnd();
                 }

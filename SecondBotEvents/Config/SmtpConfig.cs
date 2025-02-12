@@ -4,9 +4,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class SmtpConfig : Config
+    public class SmtpConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public SmtpConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
         protected override void MakeSettings()
         {
             filename = "smtp";

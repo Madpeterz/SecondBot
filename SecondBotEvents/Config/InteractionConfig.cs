@@ -4,9 +4,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class InteractionConfig : Config
+    public class InteractionConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public InteractionConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
         protected override void MakeSettings()
         {
             filename = "interaction";

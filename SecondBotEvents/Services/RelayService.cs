@@ -74,7 +74,7 @@ namespace SecondBotEvents.Services
             triggerRelayEvent("discord", e.Source.ToString(), e.Channel.ToString(), e.Author.Username, e.CleanContent);
         }
 
-        readonly string[] hard_blocked_agents = new[] { "secondlife", "second life" };
+        readonly string[] hard_blocked_agents = ["secondlife", "second life"];
 
         protected void LocalChat(object o, ChatEventArgs e)
         {
@@ -157,11 +157,13 @@ namespace SecondBotEvents.Services
                 return;
             }
             message = "{Relay} " + message;
-            relayEvent a = new relayEvent();
-            a.message = message;
-            a.name = name;
-            a.sourcetype = source;
-            a.sourceoption = filter;
+            relayEvent a = new()
+            {
+                message = message,
+                name = name,
+                sourcetype = source,
+                sourceoption = filter
+            };
             string eventMessage = JsonConvert.SerializeObject(a);
             while (loop <= myConfig.GetRelayCount())
             {

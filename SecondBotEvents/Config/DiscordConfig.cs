@@ -4,9 +4,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class DiscordConfig : Config
+    public class DiscordConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public DiscordConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
         protected override void MakeSettings()
         {
             filename = "discord";

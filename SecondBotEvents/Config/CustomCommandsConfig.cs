@@ -4,10 +4,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class CustomCommandsConfig : Config
+    public class CustomCommandsConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public CustomCommandsConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
-
         protected override void MakeSettings()
         {
             filename = "customcommands";

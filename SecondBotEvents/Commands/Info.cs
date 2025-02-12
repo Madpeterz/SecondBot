@@ -7,20 +7,16 @@ using System.Collections.Generic;
 namespace SecondBotEvents.Commands
 {
     [ClassInfo("What is going on with the bot")]
-    public class Info : CommandsAPI
+    public class Info(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public Info(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
-
         [About("Lists objects that are sculpty type in the current sim that the bot can see")]
         [ReturnHints("A json object")]
         public object ListSculptys()
         {
             Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
 
-            Dictionary<uint, uint> mapLocalID = new Dictionary<uint, uint>();
-            Dictionary<uint, Primitive> sculpts = new Dictionary<uint, Primitive>();
+            Dictionary<uint, uint> mapLocalID = [];
+            Dictionary<uint, Primitive> sculpts = [];
             foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
             {
                 mapLocalID.Add(Obj.Value.LocalID, Obj.Key);
@@ -29,7 +25,7 @@ namespace SecondBotEvents.Commands
                     sculpts.Add(Obj.Key, Obj.Value);
                 }
             }
-            List<SculptysInfo> reply = new List<SculptysInfo>();
+            List<SculptysInfo> reply = [];
             foreach (KeyValuePair<uint, Primitive> Obj in sculpts)
             {
                 Vector3 pos = Obj.Value.Position;
@@ -56,12 +52,14 @@ namespace SecondBotEvents.Commands
                         key = wip.ID;
                     }
                 }
-                SculptysInfo A = new SculptysInfo();
-                A.isLinked = asLink.ToString();
-                A.name = name.ToString();
-                A.owner = owner.ToString();
-                A.uuid = key.ToString();
-                A.pos = pos.ToString();
+                SculptysInfo A = new()
+                {
+                    isLinked = asLink.ToString(),
+                    name = name.ToString(),
+                    owner = owner.ToString(),
+                    uuid = key.ToString(),
+                    pos = pos.ToString()
+                };
                 reply.Add(A);
             }
             if (reply.Count == 0)
@@ -132,10 +130,12 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Error not in a sim");
             }
-            Dictionary<string, int> pos = new Dictionary<string, int>();
-            pos.Add("x", (int)Math.Round(GetClient().Self.SimPosition.X));
-            pos.Add("y", (int)Math.Round(GetClient().Self.SimPosition.Y));
-            pos.Add("z", (int)Math.Round(GetClient().Self.SimPosition.Z));
+            Dictionary<string, int> pos = new()
+            {
+                { "x", (int)Math.Round(GetClient().Self.SimPosition.X) },
+                { "y", (int)Math.Round(GetClient().Self.SimPosition.Y) },
+                { "z", (int)Math.Round(GetClient().Self.SimPosition.Z) }
+            };
             return BasicReply(JsonConvert.SerializeObject(pos));
         }
     }

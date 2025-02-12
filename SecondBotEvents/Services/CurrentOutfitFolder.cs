@@ -12,23 +12,19 @@ using static SecondBotEvents.Services.RLVService;
 
 namespace SecondBotEvents.Services
 {
-    public class CurrentOutfitFolder : BotServices
+    public class CurrentOutfitFolder(EventsSecondBot setMaster) : BotServices(setMaster)
     {
         #region Fields
         private bool InitiCOF = false;
         private bool AppearanceSent = false;
         private bool COFReady = false;
         private bool InitialUpdateDone = false;
-        public Dictionary<UUID, InventoryItem> Content = new Dictionary<UUID, InventoryItem>();
+        public Dictionary<UUID, InventoryItem> Content = [];
         public InventoryFolder COF;
         protected bool botConnected = false;
 
         #endregion Fields
-
         #region Construction and disposal
-        public CurrentOutfitFolder(EventsSecondBot setMaster) : base(setMaster)
-        {
-        }
 
         public override string Status()
         {
@@ -156,7 +152,7 @@ namespace SecondBotEvents.Services
             }
         }
 
-        private readonly object FolderSync = new object();
+        private readonly object FolderSync = new();
 
         private void Inventory_FolderUpdated(object sender, FolderUpdatedEventArgs e)
         {
@@ -170,8 +166,8 @@ namespace SecondBotEvents.Services
                     lock (Content) Content.Clear();
 
 
-                    List<UUID> items = new List<UUID>();
-                    List<UUID> owners = new List<UUID>();
+                    List<UUID> items = [];
+                    List<UUID> owners = [];
 
                     foreach (var link in ContentLinks())
                     {
@@ -198,8 +194,7 @@ namespace SecondBotEvents.Services
         {
             if (GetClient().Network.CurrentSim != e.Simulator) return;
 
-            Primitive prim = null;
-            if (GetClient().Network.CurrentSim.ObjectsPrimitives.TryGetValue(e.ObjectLocalID, out prim))
+            if (GetClient().Network.CurrentSim.ObjectsPrimitives.TryGetValue(e.ObjectLocalID, out Primitive prim))
             {
                 UUID invItem = GetAttachmentItem(prim);
                 if (invItem != UUID.Zero)
@@ -417,7 +412,7 @@ namespace SecondBotEvents.Services
         /// <param name="itemID">ID of the target inventory item for which we want link to be removed</param>
         public void RemoveLink(UUID itemID)
         {
-            RemoveLink(new List<UUID>(1) { itemID });
+            RemoveLink([itemID]);
         }
 
         /// <summary>
@@ -539,7 +534,7 @@ namespace SecondBotEvents.Services
         /// <param name="replace">Should existing wearable of the same type be removed</param>
         public void AddToOutfit(InventoryItem item, bool replace)
         {
-            AddToOutfit(new List<InventoryItem>(1) { item }, replace);
+            AddToOutfit([item], replace);
         }
 
         /// <summary>
@@ -607,7 +602,7 @@ namespace SecondBotEvents.Services
         /// <param name="item">Item to remove</param>
         public void RemoveFromOutfit(InventoryItem item)
         {
-            RemoveFromOutfit(new List<InventoryItem>(1) { item });
+            RemoveFromOutfit([item]);
         }
 
         /// <summary>

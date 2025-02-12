@@ -138,7 +138,7 @@ namespace SecondBotEvents.Services
                 lock(DialogWindows)
                 {
                     long unixtime = SecondbotHelpers.UnixTimeNow();
-                    List<int> removeids = new List<int>();
+                    List<int> removeids = [];
                     foreach(KeyValuePair<int,long> a in DialogWindowsExpire)
                     {
                         if(a.Value > unixtime)
@@ -157,12 +157,12 @@ namespace SecondBotEvents.Services
 
 
 
-        protected Dictionary<int, ScriptDialogEventArgs> DialogWindows = new Dictionary<int, ScriptDialogEventArgs>();
-        protected Dictionary<int, long> DialogWindowsExpire = new Dictionary<int, long>();
+        protected Dictionary<int, ScriptDialogEventArgs> DialogWindows = [];
+        protected Dictionary<int, long> DialogWindowsExpire = [];
         protected int nextDialogWindow = 1;
-        protected List<int> DialogRelayChannels = new List<int>();
-        protected List<UUID> DialogRelayAvatars = new List<UUID>();
-        protected List<string> DialogRelayHTTP = new List<string>();
+        protected List<int> DialogRelayChannels = [];
+        protected List<UUID> DialogRelayAvatars = [];
+        protected List<string> DialogRelayHTTP = [];
         protected UUID objectOwnerOnly = UUID.Zero;
 
         protected void DialogWindowEvent(object sender, ScriptDialogEventArgs e)
@@ -182,12 +182,14 @@ namespace SecondBotEvents.Services
                 DialogWindows.Add(windowid, e);
                 long expiresAt = SecondbotHelpers.UnixTimeNow() + 440;
                 DialogWindowsExpire.Add(windowid, expiresAt);
-                DialogWindow window = new DialogWindow();
-                window.buttons = e.ButtonLabels.ToArray<string>();
-                window.dialogid = windowid;
-                window.message = e.Message;
-                window.objectname = e.ObjectName;
-                window.expires = expiresAt;
+                DialogWindow window = new()
+                {
+                    buttons = [.. e.ButtonLabels],
+                    dialogid = windowid,
+                    message = e.Message,
+                    objectname = e.ObjectName,
+                    expires = expiresAt
+                };
                 string eventMessage = JsonConvert.SerializeObject(window);
                 foreach(int a in DialogRelayChannels)
                 {

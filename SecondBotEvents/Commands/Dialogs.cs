@@ -5,12 +5,8 @@ using SecondBotEvents.Services;
 namespace SecondBotEvents.Commands
 {
     [ClassInfo("Script dialog box interaction / events when displayed")]
-    public class Dialogs : CommandsAPI
+    public class Dialogs(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public Dialogs(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
-
         [About("adds a avatar dialog relay target [or removes if it exists]")]
         [ReturnHints("added")]
         [ReturnHints("removed")]
@@ -79,7 +75,7 @@ namespace SecondBotEvents.Commands
         {
             if (int.TryParse(dialogid, out int dialogidnum) == false)
             {
-                return Failure("bad dialog id", new [] { dialogid, buttontext });
+                return Failure("bad dialog id", [dialogid, buttontext]);
             }
             return BasicReply(master.DialogService.DialogAction(dialogidnum, buttontext));
         }

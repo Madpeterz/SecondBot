@@ -5,10 +5,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class RelayConfig : Config
+    public class RelayConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public RelayConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
-
         protected override void MakeSettings()
         {
             filename = "relay";
@@ -100,13 +98,13 @@ namespace SecondBotEvents.Config
             }
             // config not unpacked from string lets unpack it
             string config = ReadSettingAsString(relayID.ToString() + "_RelayConfig", "");
-            UnpackedConfigs.Add(relayID, new Dictionary<string, string>());
+            UnpackedConfigs.Add(relayID, []);
             if (config == "")
             {
                 return UnpackedConfigs[relayID];
             }
             string[] bits = config.Split("{}", StringSplitOptions.RemoveEmptyEntries);
-            Dictionary<string,string> data = new Dictionary<string,string>();
+            Dictionary<string,string> data = [];
             foreach(string A in bits)
             {
                 string[] B = A.Split("::", StringSplitOptions.RemoveEmptyEntries);
@@ -122,7 +120,7 @@ namespace SecondBotEvents.Config
             {
                 return UnpackedConfigs[relayID];
             }
-            List<string> checks = new List<string>() { "sType", "sFilter", "tType", "tConfig" };
+            List<string> checks = ["sType", "sFilter", "tType", "tConfig"];
             bool allfound = true;
             foreach (string A in checks)
             {
@@ -139,7 +137,7 @@ namespace SecondBotEvents.Config
             return UnpackedConfigs[relayID];
         }
 
-        protected Dictionary<int, Dictionary<string, string>> UnpackedConfigs = new Dictionary<int, Dictionary<string, string>>();
+        protected Dictionary<int, Dictionary<string, string>> UnpackedConfigs = [];
 
     }
 

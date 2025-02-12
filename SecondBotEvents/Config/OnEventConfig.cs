@@ -6,9 +6,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class OnEventConfig : Config
+    public class OnEventConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public OnEventConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
         protected override void MakeSettings()
         {
             filename = "onevent";

@@ -7,12 +7,8 @@ using System.Linq;
 namespace SecondBotEvents.Commands
 {
     [ClassInfo("The more we know about our self the better we are")]
-    public class Self : CommandsAPI
+    public class Self(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public Self(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
-
         [About("use the SMTP service to send a email (requires AllowCommandSendMail to be true)")]
         [ReturnHints("sending")]
         [ReturnHintsFailure("Send was rejected because: X")]
@@ -57,7 +53,7 @@ namespace SecondBotEvents.Commands
         {
             if (GetClient().Network.CurrentSim.AvatarPositions.ContainsKey(avataruuid) == false)
             {
-                return Failure("Cant find UUID in sim", new [] { targetUUID });
+                return Failure("Cant find UUID in sim", [targetUUID]);
             }
             ProcessAvatar(targetUUID);
             GetClient().Self.Stand();
@@ -66,7 +62,7 @@ namespace SecondBotEvents.Commands
             GetClient().Self.AnimationStart(Animations.POINT_YOU, true);
             GetClient().Self.PointAtEffect(GetClient().Self.AgentID, avataruuid, new Vector3d(0, 0, 0), PointAtType.Select, UUID.Random());
             GetClient().Self.BeamEffect(GetClient().Self.AgentID, avataruuid, new Vector3d(0, 0, 2), new Color4(255, 255, 255, 1), (float)3.0, UUID.Random());
-            return BasicReply("ok", new [] { targetUUID });
+            return BasicReply("ok", [targetUUID]);
         }
 
         [About("Reads a value from the KeyValue storage (temp unless SQL is enabled)")]
@@ -88,11 +84,11 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.isempty(Key) == false)
             {
-                return Failure("Key is empty", new[] { Key, Value });
+                return Failure("Key is empty", [Key, Value]);
             }
             if (SecondbotHelpers.isempty(Value) == false)
             {
-                return Failure("Value is empty", new[] { Key, Value });
+                return Failure("Value is empty", [Key, Value]);
             }
             master.DataStoreService.SetKeyValue(Key, Value);
             return BasicReply("ok");
@@ -106,7 +102,7 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.isempty(Key) == false)
             {
-                return Failure("Key is empty", new[] { Key });
+                return Failure("Key is empty", [Key]);
             }
             master.DataStoreService.ClearKeyValue(Key);
             return BasicReply("ok");
@@ -121,14 +117,14 @@ namespace SecondBotEvents.Commands
             if ((target == "ground") || (target == UUID.Zero.ToString()))
             {
                 GetClient().Self.SitOnGround();
-                return BasicReply("ok", new [] { target });
+                return BasicReply("ok", [target]);
             }
             if(UUID.TryParse(target,out UUID objectuuid) == false)
             {
                 return Failure("Invaild object uuid and not ground");
             }
             GetClient().Self.RequestSit(objectuuid, Vector3.Zero);
-            return BasicReply("ok", new [] { target });
+            return BasicReply("ok", [target]);
         }
 
         [About("Makes the bot stand up if sitting (also resets animations)")]
@@ -150,7 +146,7 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(target, out UUID objectuuid) == false)
             {
-                return Failure("Invaild object UUID", new [] { target });
+                return Failure("Invaild object UUID", [target]);
             }
 
             GetClient().Self.PointAtEffect(GetClient().Self.AgentID, objectuuid, new Vector3d(0, 0, 0), PointAtType.Select, new UUID("1df9eb92-62fa-15e5-4bfb-5931f1525274"));
@@ -167,7 +163,7 @@ namespace SecondBotEvents.Commands
                     break;
                 }
             }
-            return BasicReply(found_object.ToString(), new [] { target });
+            return BasicReply(found_object.ToString(), [target]);
         }
 
         [About("Makes the bot kill itself you monster")]
@@ -183,7 +179,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("list of commands")]
         public object GetLastCommands()
         {
-            List<string> reply = new List<string>();
+            List<string> reply = [];
             foreach(CommandHistory A in master.DataStoreService.GetCommandHistory())
             {
                 reply.Add(JsonConvert.SerializeObject(A));
@@ -192,7 +188,7 @@ namespace SecondBotEvents.Commands
                     break;
                 }
             }
-            return BasicReply("ok", reply.ToArray<string>());
+            return BasicReply("ok", [.. reply]);
         }
 
         [About("Sets the bot to accept a request type from the avatar (or a object owned by the avatar)\n " +
@@ -215,30 +211,28 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup", new [] { avatar, flag, state, sticky });
+                return Failure("avatar lookup", [avatar, flag, state, sticky]);
             }
-            bool stateflag = false;
-            bool stickyflag = false;
-            if(bool.TryParse(state,out stateflag) == false)
+            if (bool.TryParse(state, out bool stateflag) == false)
             {
-                return Failure("Invaild state", new [] { avatar, flag, state, sticky });
+                return Failure("Invaild state", [avatar, flag, state, sticky]);
             }
-            if (bool.TryParse(sticky, out stickyflag) == false)
+            if (bool.TryParse(sticky, out bool stickyflag) == false)
             {
-                return Failure("Invaild sticky", new [] { avatar, flag, state, sticky });
+                return Failure("Invaild sticky", [avatar, flag, state, sticky]);
             }
-            string[] AcceptedFlags = new [] { "friend", "group", "animation", "teleport", "command", "inventory" };
+            string[] AcceptedFlags = ["friend", "group", "animation", "teleport", "command", "inventory"];
             if (AcceptedFlags.Contains(flag) == false)
             {
-                return Failure("Invaild flag", new [] { avatar, flag, state, sticky });
+                return Failure("Invaild flag", [avatar, flag, state, sticky]);
             }
             if (stateflag == true)
             {
                 // @todo add stick/normal accept dynamic actions
-                return BasicReply("Added perm: " + flag + " Sticky: " + stickyflag.ToString(), new [] { avatar, flag, state, sticky });
+                return BasicReply("Added perm: " + flag + " Sticky: " + stickyflag.ToString(), [avatar, flag, state, sticky]);
             }
             // @todo remove stick/normal accept dynamic actions
-            return BasicReply("Removed perm: " + flag + " Sticky: " + stickyflag.ToString(), new [] { avatar, flag, state, sticky });
+            return BasicReply("Removed perm: " + flag + " Sticky: " + stickyflag.ToString(), [avatar, flag, state, sticky]);
         }
 
 

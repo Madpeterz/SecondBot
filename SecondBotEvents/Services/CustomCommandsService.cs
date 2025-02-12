@@ -13,7 +13,7 @@ namespace SecondBotEvents.Services
     {
         protected new CustomCommandsConfig myConfig;
         protected bool botConnected = false;
-        protected Dictionary<string, CustomCommand> commands = new Dictionary<string, CustomCommand>();
+        protected Dictionary<string, CustomCommand> commands = [];
         public bool HasCommand(string C)
         {
             return commands.ContainsKey(C);
@@ -57,9 +57,11 @@ namespace SecondBotEvents.Services
             int loop = 1;
             while(loop <= myConfig.GetCount())
             {
-                CustomCommand C = new CustomCommand();
-                C.trigger = myConfig.GetCommandTrigger(loop);
-                C.args = myConfig.GetCommandArgs(loop);
+                CustomCommand C = new()
+                {
+                    trigger = myConfig.GetCommandTrigger(loop),
+                    args = myConfig.GetCommandArgs(loop)
+                };
                 int loop2 = 1;
                 while(loop2 <= myConfig.GetCommandSteps(loop))
                 {
@@ -127,6 +129,6 @@ namespace SecondBotEvents.Services
     {
         public string trigger = "";
         public int args = 0;
-        public List<string> steps = new List<string>();
+        public List<string> steps = [];
     }
 }

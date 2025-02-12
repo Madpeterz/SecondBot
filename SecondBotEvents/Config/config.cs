@@ -12,8 +12,8 @@ namespace SecondBotEvents.Config
 {
     public abstract class Config
     {
-        protected Dictionary<string, string> mysettings = new Dictionary<string, string>();
-        protected List<string> settings = new List<string>();
+        protected Dictionary<string, string> mysettings = [];
+        protected List<string> settings = [];
         protected string filename = "config";
         protected bool loaded = false;
         protected bool tryLoadfromEnv = false;
@@ -60,7 +60,7 @@ namespace SecondBotEvents.Config
 
         protected void MakeSettingsFile(string fromFolder)
         {
-            Dictionary<string, string> saveMe = new Dictionary<string, string>();
+            Dictionary<string, string> saveMe = [];
             Type thisType = this.GetType();
             foreach (string setting in settings)
             {
@@ -73,7 +73,7 @@ namespace SecondBotEvents.Config
                 string value = theMethod.Invoke(this, null).ToString();
                 saveMe.Add(setting, value);
             }
-            SimpleIO IO = new SimpleIO();
+            SimpleIO IO = new();
             IO.ChangeRoot(fromFolder);
             string writeFile = filename + ".json";
             IO.WriteFile(writeFile, JsonConvert.SerializeObject(saveMe));
@@ -81,7 +81,7 @@ namespace SecondBotEvents.Config
         }
         protected void LoadSettingsFromFile(string fromFolder)
         {
-            SimpleIO IO = new SimpleIO();
+            SimpleIO IO = new();
             IO.ChangeRoot(fromFolder);
             string readfile = filename + ".json";
             if (IO.Exists(readfile) == false)

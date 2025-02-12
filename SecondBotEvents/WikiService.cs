@@ -16,7 +16,7 @@ namespace SecondBotEvents
 {
     public class WikiMake
     {
-        protected SimpleIO IO = new SimpleIO();
+        protected SimpleIO IO = new();
         protected string version = "";
         protected string htmltemplate = "";
         public WikiMake()
@@ -106,7 +106,7 @@ namespace SecondBotEvents
                 + "<hr/>";
 
             
-            Dictionary<string,string> hints = new Dictionary<string,string>();
+            Dictionary<string,string> hints = [];
             foreach (ArgHints At in method.GetCustomAttributes<ArgHints>())
             {
                 hints.Add(At.name, At.about);

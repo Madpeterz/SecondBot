@@ -17,9 +17,9 @@ namespace SecondBotEvents.Services
         protected bool botConnected = false;
         protected string lastSimName = "";
         protected UUID TrackGroupUUID = UUID.Zero;
-        protected List<UUID> GroupMembers = new List<UUID>();
+        protected List<UUID> GroupMembers = [];
         protected bool GroupLoaded = false;
-        protected List<UUID> AvatarsOnSim = new List<UUID>();
+        protected List<UUID> AvatarsOnSim = [];
         protected bool GuestListLoaded = false;
         protected string lastparcelname = "";
         protected UUID OutputAvatar = UUID.Zero;
@@ -67,12 +67,12 @@ namespace SecondBotEvents.Services
             }
         }
 
-        Dictionary<string, List<string>> InventoryEvents = new Dictionary<string, List<string>>();
+        Dictionary<string, List<string>> InventoryEvents = [];
         public void AddInventoryEvent(string inventoryType, string outputTarget)
         {
             if(InventoryEvents.ContainsKey(inventoryType) == false)
             {
-                InventoryEvents.Add(inventoryType, new List<string>());
+                InventoryEvents.Add(inventoryType, []);
             }
             if (InventoryEvents[inventoryType].Contains(outputTarget) == false)
             {
@@ -154,7 +154,7 @@ namespace SecondBotEvents.Services
         {
             if ((myConfig.GetGuestTrackingSimname() != GetClient().Network.CurrentSim.Name) || (myConfig.GetGuestTrackingParcelname() != lastparcelname))
             {
-                AvatarsOnSim = new List<UUID>();
+                AvatarsOnSim = [];
                 GuestListLoaded = false;
                 return;
             }
@@ -167,7 +167,7 @@ namespace SecondBotEvents.Services
             lastAvUpdate = SecondbotHelpers.UnixTimeNow();
 
             string hashstring = "";
-            List<UUID> avs = new List<UUID>();
+            List<UUID> avs = [];
             foreach(Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.Copy().Values)
             {
                 avs.Add(A.ID);
@@ -182,12 +182,8 @@ namespace SecondBotEvents.Services
 
             if (GuestListLoaded == true)
             {
-                List<UUID> joined = new List<UUID>();
-                List<UUID> tracked = new List<UUID>();
-                foreach (UUID a in AvatarsOnSim)
-                {
-                    tracked.Add(a);
-                }
+                List<UUID> joined = [];
+                List<UUID> tracked = [.. AvatarsOnSim];
                 foreach (UUID a in avs)
                 {
                     if (tracked.Contains(a) == true)
@@ -256,7 +252,7 @@ namespace SecondBotEvents.Services
 
         protected void PushEvent(string eventname, Dictionary<string,string> args)
         {
-            OnEvent e = new OnEvent(
+            OnEvent e = new(
                 GetClient().Self.AgentID.ToString(), 
                 eventname, 
                 args, 
@@ -295,9 +291,11 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            Dictionary<string, string> args = new Dictionary<string, string>();
-            args.Add("Message", e.Message);
-            args.Add("NotificationId", e.NotificationId);
+            Dictionary<string, string> args = new()
+            {
+                { "Message", e.Message },
+                { "NotificationId", e.NotificationId }
+            };
             PushEvent("AlertMessage", args);
         }
 
@@ -307,9 +305,11 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            Dictionary<string, string> args = new Dictionary<string, string>();
-            args.Add("oldparcel", lastparcelname);
-            args.Add("newparcel", newparcelname);
+            Dictionary<string, string> args = new()
+            {
+                { "oldparcel", lastparcelname },
+                { "newparcel", newparcelname }
+            };
             lastparcelname = newparcelname;
             PushEvent("ChangedParcel", args);
         }
@@ -320,8 +320,10 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            Dictionary<string, string> args = new Dictionary<string, string>();
-            args.Add("Message", e.message);
+            Dictionary<string, string> args = new()
+            {
+                { "Message", e.message }
+            };
             PushEvent("StatusMessage", args);
         }
 
@@ -333,12 +335,8 @@ namespace SecondBotEvents.Services
             }
             if(GroupLoaded == true)
             {
-                List<UUID> joined = new List<UUID>();
-                List<UUID> tracked = new List<UUID>();
-                foreach (UUID a in GroupMembers)
-                {
-                    tracked.Add(a);
-                }
+                List<UUID> joined = [];
+                List<UUID> tracked = [.. GroupMembers];
                 master.DataStoreService.GetAvatarNames(tracked);
                 foreach (UUID a in e.Members.Keys)
                 {
@@ -365,29 +363,29 @@ namespace SecondBotEvents.Services
                 }
             }
 
-            GroupMembers = new List<UUID>();
-            foreach (UUID a in e.Members.Keys)
-            {
-                GroupMembers.Add(a);
-            }
+            GroupMembers = [.. e.Members.Keys];
             GroupLoaded = true;
         }
 
         protected void GroupMembershipEvent(UUID avatar, string action)
         {
-            Dictionary<string, string> args = new Dictionary<string, string>();
-            args.Add("uuid", avatar.ToString());
-            args.Add("name", master.DataStoreService.GetAvatarName(avatar));
-            args.Add("action", action);
+            Dictionary<string, string> args = new()
+            {
+                { "uuid", avatar.ToString() },
+                { "name", master.DataStoreService.GetAvatarName(avatar) },
+                { "action", action }
+            };
             PushEvent("GroupMembership", args);
         }
 
         protected void GuestTrackingEvent(UUID avatar, string action)
         {
-            Dictionary<string, string> args = new Dictionary<string, string>();
-            args.Add("uuid", avatar.ToString());
-            args.Add("name", master.DataStoreService.GetAvatarName(avatar));
-            args.Add("action", action);
+            Dictionary<string, string> args = new()
+            {
+                { "uuid", avatar.ToString() },
+                { "name", master.DataStoreService.GetAvatarName(avatar) },
+                { "action", action }
+            };
             PushEvent("GuestTracking", args);
         }
 
@@ -397,9 +395,11 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            Dictionary<string, string> args = new Dictionary<string, string>();
-            args.Add("lastsim", lastSimName);
-            args.Add("newsim", GetClient().Network.CurrentSim.Name);
+            Dictionary<string, string> args = new()
+            {
+                { "lastsim", lastSimName },
+                { "newsim", GetClient().Network.CurrentSim.Name }
+            };
             PushEvent("ChangedSim", args);
             lastSimName = e.PreviousSimulator.Name;
         }
@@ -410,14 +410,16 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            Dictionary<string, string> args = new Dictionary<string, string>();
-            args.Add("fromuuid", e.TransactionInfo.SourceID.ToString());
-            args.Add("touuid", e.TransactionInfo.DestID.ToString());
-            args.Add("amount", e.TransactionInfo.Amount.ToString());
-            args.Add("balance", e.Balance.ToString());
-            args.Add("fromname", master.DataStoreService.GetAvatarName(e.TransactionInfo.SourceID));
-            args.Add("toname", master.DataStoreService.GetAvatarName(e.TransactionInfo.DestID));
-            args.Add("transactionid", e.TransactionID.ToString());
+            Dictionary<string, string> args = new()
+            {
+                { "fromuuid", e.TransactionInfo.SourceID.ToString() },
+                { "touuid", e.TransactionInfo.DestID.ToString() },
+                { "amount", e.TransactionInfo.Amount.ToString() },
+                { "balance", e.Balance.ToString() },
+                { "fromname", master.DataStoreService.GetAvatarName(e.TransactionInfo.SourceID) },
+                { "toname", master.DataStoreService.GetAvatarName(e.TransactionInfo.DestID) },
+                { "transactionid", e.TransactionID.ToString() }
+            };
             PushEvent("MoneyEvent", args);
         }
 
@@ -456,7 +458,7 @@ namespace SecondBotEvents.Services
     public class OnEvent
     {
         public string EventName = "";
-        public Dictionary<string, string> Data = new Dictionary<string, string>();
+        public Dictionary<string, string> Data = [];
         public string Hash = "";
         public long Unixtime = 0;
         public string BotUUID = "";

@@ -77,7 +77,7 @@ namespace SecondBotEvents.Services
         {
             if (evacWanted == true)
             {
-                BotAlertMessage(null, new AlertMessageEventArgs("restart", "999", new OpenMetaverse.StructuredData.OSDMap()));
+                BotAlertMessage(null, new AlertMessageEventArgs("restart", "999", []));
             }
             if (GetClient().Network.CurrentSim.Name == home.name)
             {

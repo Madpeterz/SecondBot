@@ -49,7 +49,7 @@ namespace SecondBotEvents.Services
             {
                 try
                 {
-                    ConfigurationOptions configRedis = new ConfigurationOptions()
+                    ConfigurationOptions configRedis = new()
                     {
                         EndPoints = { myConfig.GetRedisSource() }
                     };
@@ -120,7 +120,7 @@ namespace SecondBotEvents.Services
             return "Enabled No chat history";
         }
 
-        readonly string[] hard_blocked_agents = new[] { "secondlife", "second life" };
+        readonly string[] hard_blocked_agents = ["secondlife", "second life"];
         protected void BotLocalchat(object o, ChatEventArgs e)
         {
             if (e.SourceID == GetClient().Self.AgentID)
@@ -220,9 +220,9 @@ namespace SecondBotEvents.Services
             }
         }
 
-        Dictionary<UUID, List<KeyValuePair<string, string>>> chatHistoryAI = new Dictionary<UUID, List<KeyValuePair<string, string>>>();
-        Dictionary<UUID, long> ChatHistoryLastAccessed = new Dictionary<UUID, long>();
-        Dictionary<UUID, long> ChatRateLimiter = new Dictionary<UUID, long>();
+        Dictionary<UUID, List<KeyValuePair<string, string>>> chatHistoryAI = [];
+        Dictionary<UUID, long> ChatHistoryLastAccessed = [];
+        Dictionary<UUID, long> ChatRateLimiter = [];
 
         protected long lastUpkeep = 0;
         protected void upkeep()
@@ -236,7 +236,7 @@ namespace SecondBotEvents.Services
             // check for expired chat windows (longer than 2 mins from last message)
             lock (ChatHistoryLastAccessed) lock (chatHistoryAI) lock (ChatRateLimiter)
                     {
-                        List<UUID> needcleaning = new List<UUID>();
+                        List<UUID> needcleaning = [];
                         long now = SecondbotHelpers.UnixTimeNow();
                         foreach (KeyValuePair<UUID, long> entry in ChatHistoryLastAccessed)
                         {
@@ -292,7 +292,7 @@ namespace SecondBotEvents.Services
             // are we using redis?
             if (RedisLive() == false)
             {
-                return new List<KeyValuePair<string, string>>();
+                return [];
             }
             // is redis enabled for this message type?
             if ((myConfig.GetRedisImchat() == true) && (avatarchat == true))
@@ -311,7 +311,7 @@ namespace SecondBotEvents.Services
                 return ReadChatFromRedis(store);
             }
             // Redis is not enabled for this message type, use local storage
-            return new List<KeyValuePair<string, string>>();
+            return [];
 
         }
 
@@ -319,7 +319,7 @@ namespace SecondBotEvents.Services
         {
             try
             {
-                RedisKey readkey = new RedisKey(myConfig.GetRedisPrefix() + store.Guid.ToString());
+                RedisKey readkey = new(myConfig.GetRedisPrefix() + store.Guid.ToString());
                 if (redisDb.KeyExists(readkey) == false)
                 {
                     string rawstring = redisDb.StringGet(readkey);
@@ -343,7 +343,7 @@ namespace SecondBotEvents.Services
         {
             if (chatHistoryAI.ContainsKey(store) == false)
             {
-                return new List<KeyValuePair<string, string>>();
+                return [];
             }
             return chatHistoryAI[store];
         }
@@ -363,7 +363,7 @@ namespace SecondBotEvents.Services
                 if (chatHistoryAI.ContainsKey(store) == false)
                 {
                     // totaly new chat build it out
-                    chatHistoryAI.Add(store, new List<KeyValuePair<string, string>>());
+                    chatHistoryAI.Add(store, []);
                     string yourname = GetClient().Self.FirstName;
                     if (myConfig.GetCustomName() != "<!FIRSTNAME!>")
                     {
@@ -437,7 +437,7 @@ namespace SecondBotEvents.Services
             {
                 history.RemoveAt(1);
             }
-            RedisKey writekey = new RedisKey(myConfig.GetRedisPrefix() + store.Guid.ToString());
+            RedisKey writekey = new(myConfig.GetRedisPrefix() + store.Guid.ToString());
             try
             {
                 string savestring = JsonConvert.SerializeObject(history);
@@ -446,7 +446,7 @@ namespace SecondBotEvents.Services
                     LogFormater.Warn("Redis failed to convert history into savable format");
                     return false;
                 }
-                RedisValue storeme = new RedisValue(savestring);
+                RedisValue storeme = new(savestring);
                 if(redisDb.StringSet(writekey, storeme) == true)
                 {
                     return redisDb.KeyExpire(writekey, TimeSpan.FromMinutes(myConfig.GetRedisMaxageMins()));
@@ -506,7 +506,7 @@ namespace SecondBotEvents.Services
             {
                 ChatRateLimiter[user] = SecondbotHelpers.UnixTimeNow() + 1;
             }
-                List<ChatMessage> messages = new List<ChatMessage>();
+                List<ChatMessage> messages = [];
             lock (chatHistoryAI) lock (ChatHistoryLastAccessed)
                 {
                     // convert history into the AI format while adding the new message
@@ -646,7 +646,7 @@ namespace SecondBotEvents.Services
             }
         }
 
-        private static readonly Random _random = new Random();
+        private static readonly Random _random = new();
 
         public static double EstimateTypingTime(string input, double randomizationFactor)
         {

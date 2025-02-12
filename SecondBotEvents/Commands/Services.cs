@@ -19,13 +19,9 @@ namespace SecondBotEvents.Commands
         "TriggerOnEventService<br/>" +
         "RelayService<br/>" +
         "ChatGptService")]
-    public class Services : CommandsAPI
+    public class Services(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public Services(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
-
-        protected List<string> controlable = new List<string> { 
+        protected List<string> controlable = [ 
             "BotClientService",
             "RLVService",
             "HttpService",
@@ -37,7 +33,7 @@ namespace SecondBotEvents.Commands
             "TriggerOnEventService",
             "RelayService",
             "ChatGptService"
-        };
+        ];
 
         [About("Marks a service as enabled and starts it")]
         [ReturnHints("ok")]

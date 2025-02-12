@@ -116,7 +116,7 @@ namespace SecondBotEvents.Services
             }
             try
             {
-                MimeMessage message = new MimeMessage();
+                MimeMessage message = new();
                 message.From.Add(new MailboxAddress(myConfig.GetMailReplyAddress() + " via secondbot", myConfig.GetMailReplyAddress()));
                 message.To.Add(new MailboxAddress(to, to));
                 message.Subject = subject;

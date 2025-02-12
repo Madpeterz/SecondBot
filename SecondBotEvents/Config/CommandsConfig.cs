@@ -5,9 +5,8 @@ using System.Linq;
 
 namespace SecondBotEvents.Config
 {
-    public class CommandsConfig : Config
+    public class CommandsConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public CommandsConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
         protected override void MakeSettings()
         {
             filename = "commands";
@@ -22,7 +21,14 @@ namespace SecondBotEvents.Config
             settings.Add("Enabled");
             settings.Add("ObjectMasterOptout");
             settings.Add("AllowServiceControl");
+            settings.Add("CommandHistoryLogResults");
             settings.Add("HideStatusOutput");
+        }
+
+
+        public bool GetCommandHistoryLogResults()
+        {
+            return ReadSettingAsBool("CommandHistoryLogResults", false);
         }
         public bool GetAllowServiceControl()
         {

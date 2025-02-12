@@ -16,14 +16,14 @@ namespace SecondBotEvents.Services
     {
         protected new OnEventConfig myConfig;
         protected bool botConnected = false;
-        Dictionary<string,List<CustomOnEvent>> MyCustomEvents = new Dictionary<string, List<CustomOnEvent>>();
-        Dictionary<string, long> lockouts = new Dictionary<string, long>();
-        List<UUID> trackEventGroups = new List<UUID>();
+        Dictionary<string,List<CustomOnEvent>> MyCustomEvents = [];
+        Dictionary<string, long> lockouts = [];
+        List<UUID> trackEventGroups = [];
         public TriggerOnEventService(EventsSecondBot setMaster) : base(setMaster)
         {
             myConfig = new OnEventConfig(master.fromEnv, master.fromFolder);
             int loop = 1;
-            string[] delimiterChars = new string[] { "{IS}", "{NOT}", "{IS_UUD}", "{MISSING}", "{CONTAINS}", "{IN_GROUP}", "{NOT_IN_GROUP}", "{LESSTHAN}", "{MORETHAN}", "{LOCKOUT}" };
+            string[] delimiterChars = ["{IS}", "{NOT}", "{IS_UUD}", "{MISSING}", "{CONTAINS}", "{IN_GROUP}", "{NOT_IN_GROUP}", "{LESSTHAN}", "{MORETHAN}", "{LOCKOUT}"];
             if(myConfig.GetCount() == 0)
             {
                 myConfig.setEnabled(false);
@@ -37,9 +37,11 @@ namespace SecondBotEvents.Services
                     loop++;
                     continue;
                 }
-                CustomOnEvent Event = new CustomOnEvent();
-                Event.Source = myConfig.GetSource(loop);
-                Event.MonitorFlags = myConfig.GetSourceMonitor(loop).Split("=#=").ToList();
+                CustomOnEvent Event = new()
+                {
+                    Source = myConfig.GetSource(loop),
+                    MonitorFlags = [.. myConfig.GetSourceMonitor(loop).Split("=#=")]
+                };
                 bool eventWhereOk = true;
                 int loop2 = 1;
                 while(loop2 <= myConfig.GetWhereCount(loop))
@@ -76,7 +78,7 @@ namespace SecondBotEvents.Services
                     continue;
                 }
                 Event.Source = myConfig.GetSource(loop);
-                Event.MonitorFlags = myConfig.GetSourceMonitor(loop).Split("=#=").ToList();
+                Event.MonitorFlags = [.. myConfig.GetSourceMonitor(loop).Split("=#=")];
                 if ((Event.Source == "GroupMemberJoin") || (Event.Source == "GroupMemberLeave"))
                 {
                     UUID groupUUID = UUID.Zero;
@@ -137,7 +139,7 @@ namespace SecondBotEvents.Services
                 }
                 if(MyCustomEvents.ContainsKey(Event.Source) == false)
                 {
-                    MyCustomEvents.Add(Event.Source, new List<CustomOnEvent>());
+                    MyCustomEvents.Add(Event.Source, []);
                 }
                 MyCustomEvents[Event.Source].Add(Event);
                 LogFormater.Info("OnEvent Service - Event " + loop.ToString() + " is being tracked");
@@ -269,15 +271,15 @@ namespace SecondBotEvents.Services
                         continue;
                     }
                     GroupNames.Add(G.ID, G.Name);
-                    GroupMembership.Add(G.ID, new List<UUID>());
+                    GroupMembership.Add(G.ID, []);
                     GroupMembershipUpdated.Add(G.ID, 0);
                 }
             }
         }
 
-        protected Dictionary<UUID, List<UUID>> GroupMembership = new Dictionary<UUID, List<UUID>>();
-        protected Dictionary<UUID, string> GroupNames = new Dictionary<UUID, string>();
-        protected Dictionary<UUID, long> GroupMembershipUpdated = new Dictionary<UUID, long>();
+        protected Dictionary<UUID, List<UUID>> GroupMembership = [];
+        protected Dictionary<UUID, string> GroupNames = [];
+        protected Dictionary<UUID, long> GroupMembershipUpdated = [];
         protected long lastGroupMembershipUpdate = 0; 
         // request group membership updates max of once per 60 secs
         // request membership update for group once every 15 mins
@@ -333,12 +335,8 @@ namespace SecondBotEvents.Services
                     }
                     return;
                 }
-                List<UUID> joined = new List<UUID>();
-                List<UUID> tracked = new List<UUID>();
-                foreach (UUID a in GroupMembership[e.GroupID])
-                {
-                    tracked.Add(a);
-                }
+                List<UUID> joined = [];
+                List<UUID> tracked = [.. GroupMembership[e.GroupID]];
                 master.DataStoreService.GetAvatarNames(tracked);
                 foreach (UUID a in e.Members.Keys)
                 {
@@ -438,7 +436,7 @@ namespace SecondBotEvents.Services
             long now = SecondbotHelpers.UnixTimeNow();
             lock (lockouts)
             {
-                List<string> toberemoved = new List<string>();
+                List<string> toberemoved = [];
                 foreach(KeyValuePair<string, long> pair in lockouts)
                 {
                     if(pair.Value > now)
@@ -478,7 +476,7 @@ namespace SecondBotEvents.Services
             }
             if (myConfig.GetDebugMe() == true)
             {
-                StringBuilder debugoutme = new StringBuilder();
+                StringBuilder debugoutme = new();
                 string debugoutmeaddon = "";
                 foreach(KeyValuePair<string,string> Ar in args)
                 {
@@ -502,8 +500,8 @@ namespace SecondBotEvents.Services
 
             List<int> AvPos = GetAvPos(avataruuid);
             Vector3 A = GetClient().Self.SimPosition;
-            List<int> BotPos = new List<int>() { (int)Math.Round(A.X), (int)Math.Round(A.Y), (int)Math.Round(A.Z) };
-            Dictionary<string, string> values = new Dictionary<string, string>
+            List<int> BotPos = [(int)Math.Round(A.X), (int)Math.Round(A.Y), (int)Math.Round(A.Z)];
+            Dictionary<string, string> values = new()
             {
                 { "alertmessage", inArgsOrDefault("alertmessage", args, "none") },
                 { "message",  inArgsOrDefault("message", args, "none") },
@@ -672,7 +670,7 @@ namespace SecondBotEvents.Services
         {
             if (UUID.TryParse(avataruuid, out UUID avUUID) == false)
             {
-                return new List<int>() { -1, -1, -1, -1 };
+                return [-1, -1, -1, -1];
             }
             foreach (Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.Copy().Values)
             {
@@ -682,9 +680,9 @@ namespace SecondBotEvents.Services
                 }
                 Vector3 avpos = A.Position;
                 int dist = (int)Math.Round(Vector3.Distance(avpos, GetClient().Self.SimPosition));
-                return new List<int>() { (int)Math.Round(A.Position.X), (int)Math.Round(A.Position.Y), (int)Math.Round(A.Position.Z), dist };
+                return [(int)Math.Round(A.Position.X), (int)Math.Round(A.Position.Y), (int)Math.Round(A.Position.Z), dist];
             }
-            return new List<int>() { -1, -1, -1, -1 };
+            return [-1, -1, -1, -1];
         }
 
         protected string GetAvParcel(string avataruuid)
@@ -721,7 +719,7 @@ namespace SecondBotEvents.Services
 
         string avatarhash = "";
         bool GuestListLoaded = false;
-        protected List<UUID> AvatarsOnSim = new List<UUID>();
+        protected List<UUID> AvatarsOnSim = [];
         protected void TrackAvatarsOnParcel()
         {
             long dif = SecondbotHelpers.UnixTimeNow() - lastAvUpdate;
@@ -732,7 +730,7 @@ namespace SecondBotEvents.Services
             }
             lastAvUpdate = SecondbotHelpers.UnixTimeNow();
             string hashstring = "";
-            List<UUID> avs = new List<UUID>();
+            List<UUID> avs = [];
             foreach (Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.Copy().Values)
             {
                 avs.Add(A.ID);
@@ -749,12 +747,8 @@ namespace SecondBotEvents.Services
 
             if (GuestListLoaded == true)
             {
-                List<UUID> joined = new List<UUID>();
-                List<UUID> tracked = new List<UUID>();
-                foreach (UUID a in AvatarsOnSim)
-                {
-                    tracked.Add(a);
-                }
+                List<UUID> joined = [];
+                List<UUID> tracked = [.. AvatarsOnSim];
                 foreach (UUID a in avs)
                 {
                     if (tracked.Contains(a) == true)
@@ -766,7 +760,7 @@ namespace SecondBotEvents.Services
                 }
                 if ((tracked.Count > 0) || (joined.Count > 0))
                 {
-                    List<UUID> seen = new List<UUID>();
+                    List<UUID> seen = [];
                     if (tracked.Count > 0)
                     {
                         
@@ -807,7 +801,7 @@ namespace SecondBotEvents.Services
                 return;
             }
             lastClockEvent = SecondbotHelpers.UnixTimeNow();
-            TriggerEvent("Clock", new Dictionary<string, string>());
+            TriggerEvent("Clock", []);
         }
 
         long lastAvUpdate = 0;
@@ -909,10 +903,10 @@ namespace SecondBotEvents.Services
     public class CustomOnEvent
     {
         public string Source = "";
-        public List<string> MonitorFlags = new List<string>();
-        public List<string> WhereChecksLeft = new List<string>();
-        public List<string> WhereChecksCenter = new List<string>();
-        public List<string> WhereChecksRight = new List<string>();
-        public List<string> Actions = new List<string>();
+        public List<string> MonitorFlags = [];
+        public List<string> WhereChecksLeft = [];
+        public List<string> WhereChecksCenter = [];
+        public List<string> WhereChecksRight = [];
+        public List<string> Actions = [];
     }
 }

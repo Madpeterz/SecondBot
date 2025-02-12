@@ -6,12 +6,8 @@ using System.Collections.Generic;
 namespace SecondBotEvents.Commands
 {
     [ClassInfo("The power of friendship")]
-    public class Friends : CommandsAPI
+    public class Friends(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public Friends(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
-
         [About("Gets the location of a friend if map access was given \n also requests a update")]
         [ReturnHints("a json object of global region X,Y  sim X,Y,Z and time it was updated")]
         [ReturnHintsFailure("avatar lookup")]
@@ -23,20 +19,20 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup", new[] { avatar });
+                return Failure("avatar lookup", [avatar]);
             }
             Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.Copy();
             if(FriendListCopy.ContainsKey(avataruuid) == false)
             {
-                return Failure("not in friends list (updating)", new[] { avatar });
+                return Failure("not in friends list (updating)", [avatar]);
             }
             GetClient().Friends.MapFriend(avataruuid);
             FriendLocations loc = master.DataStoreService.GetFriendMap(avataruuid);
             if(loc == null)
             {
-                return Failure("no map access or updating", new[] { avatar });
+                return Failure("no map access or updating", [avatar]);
             }
-            return BasicReply(JsonConvert.SerializeObject(loc), new[] { avatar });
+            return BasicReply(JsonConvert.SerializeObject(loc), [avatar]);
         }
 
         [About("Gets the friendslist")]
@@ -44,14 +40,16 @@ namespace SecondBotEvents.Commands
         public object Friendslist()
         {
             Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.Copy();
-            List< FriendListEntry > CleanedFriendsList = new List< FriendListEntry >();
+            List< FriendListEntry > CleanedFriendsList = [];
             int index = 0;
             foreach (FriendInfo A in FriendListCopy.Values)
             {
-                FriendListEntry entry = new FriendListEntry();
-                entry.id = A.UUID.ToString();
-                entry.name = A.Name;
-                entry.online = A.IsOnline;
+                FriendListEntry entry = new()
+                {
+                    id = A.UUID.ToString(),
+                    name = A.Name,
+                    online = A.IsOnline
+                };
                 CleanedFriendsList.Add(entry);
                 index++;
             }
@@ -71,24 +69,23 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup", new [] { avatar, state });
+                return Failure("avatar lookup", [avatar, state]);
             }
-            bool status = false;
-            if (bool.TryParse(state, out status) == false)
+            if (bool.TryParse(state, out bool status) == false)
             {
-                return Failure("state invaild", new [] { avatar, state });
+                return Failure("state invaild", [avatar, state]);
             }
             if (GetClient().Friends.FriendList.ContainsKey(avataruuid) == false)
             {
-                return Failure("Not A friend", new [] { avatar, state });
+                return Failure("Not A friend", [avatar, state]);
             }
             if (status == true)
             {
                 GetClient().Friends.GrantRights(avataruuid, FriendRights.CanSeeOnline | FriendRights.CanSeeOnMap | FriendRights.CanModifyObjects);
-                return BasicReply("granted", new [] { avatar, state });
+                return BasicReply("granted", [avatar, state]);
             }
             GetClient().Friends.GrantRights(avataruuid, FriendRights.None);
-            return BasicReply("removed", new [] { avatar, state });
+            return BasicReply("removed", [avatar, state]);
         }
 
         [About("Updates the friend perms for avatar avatar to State \n if true grants (Online/Map/Modify) perms")]
@@ -105,27 +102,26 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup", new [] { avatar, state });
+                return Failure("avatar lookup", [avatar, state]);
             }
-            bool status = false;
-            if (bool.TryParse(state, out status) == false)
+            if (bool.TryParse(state, out bool status) == false)
             {
-                return Failure("state invaild", new [] { avatar, state });
+                return Failure("state invaild", [avatar, state]);
             }
             if (GetClient().Friends.FriendList.ContainsKey(avataruuid) == true)
             {
                 if (status == false)
                 {
                     GetClient().Friends.TerminateFriendship(avataruuid);
-                    return BasicReply("Removed", new [] { avatar, state });
+                    return BasicReply("Removed", [avatar, state]);
                 }
             }
             if (status == false)
             {
-                return Failure("Not in friendslist", new [] { avatar, state });
+                return Failure("Not in friendslist", [avatar, state]);
             }
             GetClient().Friends.OfferFriendship(avataruuid);
-            return BasicReply("Request sent", new [] { avatar, state });
+            return BasicReply("Request sent", [avatar, state]);
             
         }
     }

@@ -8,13 +8,8 @@ using System.Threading.Tasks;
 namespace SecondBotEvents.Commands
 {
     [ClassInfo("Avatars near me and Key2Name and Name2Key lookups")]
-    public class Avatars : CommandsAPI
+    public class Avatars(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public Avatars(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
-
-
         [About("Adds avatars to the one time accept list for interactions")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar uuid")]
@@ -28,7 +23,7 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar uuid", new[] { store, avatar, remove });
+                return Failure("Invaild avatar uuid", [store, avatar, remove]);
             }
             bool toberemoved = false;
             if((remove == "true") || (remove == "True"))
@@ -37,13 +32,13 @@ namespace SecondBotEvents.Commands
             }
             if(master.DataStoreService.KnownStoreType(store) == false)
             {
-                return Failure("Unknown store type", new[] { store, avatar, remove });
+                return Failure("Unknown store type", [store, avatar, remove]);
             }
             if (master.DataStoreService.AddToAcceptNext(store, avataruuid, toberemoved) == false)
             {
-                return Failure("Unable to process request store", new[] { store, avatar, remove });
+                return Failure("Unable to process request store", [store, avatar, remove]);
             }
-            return BasicReply("ok", new[] { store, avatar, remove });
+            return BasicReply("ok", [store, avatar, remove]);
         }
         [About("Checks if the avatar is on the accept next list (without using the token) for the given store")]
         [ReturnHints("true")]
@@ -57,17 +52,17 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar uuid", new[] { store, avatar });
+                return Failure("Invaild avatar uuid", [store, avatar]);
             }
             if (master.DataStoreService.KnownStoreType(store) == false)
             {
-                return Failure("Unknown store type", new[] { store, avatar });
+                return Failure("Unknown store type", [store, avatar]);
             }
             if(master.DataStoreService.IsInAcceptNext(store,avataruuid) == false)
             {
-                return BasicReply("false", new[] { store, avatar });
+                return BasicReply("false", [store, avatar]);
             }
-            return BasicReply("true", new[] { store, avatar });
+            return BasicReply("true", [store, avatar]);
         }
 
 
@@ -80,19 +75,21 @@ namespace SecondBotEvents.Commands
             {
                 return BasicReply("Error not in a sim");
             }
-            List<NearMeDetails> BetterNearMe = new List<NearMeDetails>();
+            List<NearMeDetails> BetterNearMe = [];
             Dictionary<uint, Avatar> avcopy = GetClient().Network.CurrentSim.ObjectsAvatars.Copy();
             foreach (Avatar av in avcopy.Values)
             {
                 if (av.ID != GetClient().Self.AgentID)
                 {
-                    NearMeDetails details = new NearMeDetails();
-                    details.id = av.ID.ToString();
-                    details.name = av.Name;
-                    details.x = (int)Math.Round(av.Position.X);
-                    details.y = (int)Math.Round(av.Position.Y);
-                    details.z = (int)Math.Round(av.Position.Z);
-                    details.range = (int)Math.Round(Vector3.Distance(av.Position, GetClient().Self.SimPosition));
+                    NearMeDetails details = new()
+                    {
+                        id = av.ID.ToString(),
+                        name = av.Name,
+                        x = (int)Math.Round(av.Position.X),
+                        y = (int)Math.Round(av.Position.Y),
+                        z = (int)Math.Round(av.Position.Z),
+                        range = (int)Math.Round(Vector3.Distance(av.Position, GetClient().Self.SimPosition))
+                    };
                     BetterNearMe.Add(details);
                 }
             }
@@ -109,12 +106,12 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar uuid", new[] { avatar });
+                return Failure("Invaild avatar uuid", [avatar]);
             }
             KeyValuePair<bool, Avatar.AvatarProperties> reply = master.DataStoreService.GetAvatarAvatarProperties(avataruuid);
             if(reply.Key == false)
             {
-                return Failure("Requesting avatar details  [Retry later]", new[] { avatar });
+                return Failure("Requesting avatar details  [Retry later]", [avatar]);
             }
             return BasicReply(reply.Value.ProfileImage.ToString());
         }
@@ -128,12 +125,12 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(texture, out UUID textureUUID) == false)
             {
-                return Failure("Invaild texture uuid\"", new[] { texture });
+                return Failure("Invaild texture uuid\"", [texture]);
             }
             KeyValuePair<bool, Avatar.AvatarProperties> reply = master.DataStoreService.GetAvatarAvatarProperties(GetClient().Self.AgentID);
             if (reply.Key == false)
             {
-                return Failure("Requesting avatar details  [Retry later]", new[] { texture });
+                return Failure("Requesting avatar details  [Retry later]", [texture]);
             }
             Avatar.AvatarProperties props = reply.Value;
             props.ProfileImage = textureUUID;
@@ -151,12 +148,12 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar uuid", new[] { avatar });
+                return Failure("Invaild avatar uuid", [avatar]);
             }
             KeyValuePair<bool, Avatar.AvatarProperties> reply = master.DataStoreService.GetAvatarAvatarProperties(avataruuid);
             if (reply.Key == false)
             {
-                return Failure("Requesting avatar details  [Retry later]", new[] { avatar });
+                return Failure("Requesting avatar details  [Retry later]", [avatar]);
             }
             return BasicReply(reply.Value.AboutText.ToString());
         }
@@ -171,16 +168,16 @@ namespace SecondBotEvents.Commands
         {
             if(abouttext.Length < 10)
             {
-                return Failure("About text to short", new string[] { abouttext });
+                return Failure("About text to short", [abouttext]);
             }
             else if (abouttext.Length > 300)
             {
-                return Failure("About text to long", new string[] { abouttext });
+                return Failure("About text to long", [abouttext]);
             }
             KeyValuePair<bool, Avatar.AvatarProperties> reply = master.DataStoreService.GetAvatarAvatarProperties(GetClient().Self.AgentID);
             if (reply.Key == false)
             {
-                return Failure("Requesting avatar details  [Retry later]", new[] { abouttext });
+                return Failure("Requesting avatar details  [Retry later]", [abouttext]);
             }
             Avatar.AvatarProperties props = reply.Value;
             props.AboutText = abouttext;
@@ -199,7 +196,7 @@ namespace SecondBotEvents.Commands
             {
                 return BasicReply("Error not in a sim");
             }
-            Dictionary<UUID, string> NearMe = new Dictionary<UUID, string>();
+            Dictionary<UUID, string> NearMe = [];
             Dictionary<uint, Avatar> avcopy = GetClient().Network.CurrentSim.ObjectsAvatars.Copy();
             foreach (Avatar av in avcopy.Values)
             {

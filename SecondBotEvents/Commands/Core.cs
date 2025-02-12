@@ -3,11 +3,8 @@
 namespace SecondBotEvents.Commands
 {
     [ClassInfo("Used to test interaction with the bot... hello world for avartars")]
-    public class Core : CommandsAPI
+    public class Core(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public Core(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
         [About("Used to check connections")]
         [ReturnHints("world")]
         public object Hello()

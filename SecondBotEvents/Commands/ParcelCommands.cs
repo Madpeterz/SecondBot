@@ -13,12 +13,12 @@ using static OpenMetaverse.Stats.UtilizationStatistics;
 
 namespace SecondBotEvents.Commands
 {
-    public class parcelPacketReply
+    public class ParcelPacketReply
     {
-        public List<string> groupuuids = new List<string>();
-        public List<parcelPacketData> parcels = new List<parcelPacketData>();
+        public List<string> groupuuids = [];
+        public List<ParcelPacketData> parcels = [];
     }
-    public class parcelPacketData
+    public class ParcelPacketData
     {
         public int area;
         public int groupindex;
@@ -30,12 +30,8 @@ namespace SecondBotEvents.Commands
     }
 
     [ClassInfo("Control the land under our feet")]
-    public partial class ParcelCommands : CommandsAPI
+    public partial class ParcelCommands(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public ParcelCommands(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
-
         [About("Requests the bot update its list of parcels ready for other commands")]
         [ReturnHints("ok")]
         public object UpdateListOfParcels()
@@ -47,8 +43,8 @@ namespace SecondBotEvents.Commands
         [ReturnHints("json encoded object")]
         public object GetParcelListSnapshots()
         {
-            Dictionary<string, string> reply = new Dictionary<string, string>();
-            List<Parcel> Parcels = GetClient().Network.CurrentSim.Parcels.Copy().Values.ToList();
+            Dictionary<string, string> reply = [];
+            List<Parcel> Parcels = [.. GetClient().Network.CurrentSim.Parcels.Copy().Values];
             foreach (Parcel A in Parcels)
             {
                 reply.Add(A.Name, A.SnapshotID.ToString());
@@ -61,32 +57,32 @@ namespace SecondBotEvents.Commands
         public object GetSimParcelLayers()
         {
             Dictionary<int, Parcel> data = GetClient().Network.CurrentSim.Parcels.Copy();
-            Dictionary<string, Vector4> parcelbox = new Dictionary<string, Vector4>();
+            Dictionary<string, Vector4> parcelbox = [];
             uint SimWidth = GetClient().Network.CurrentSim.SizeX;
             uint SimHeight = GetClient().Network.CurrentSim.SizeY;
-            Dictionary<int,string> maps = new Dictionary<int,string>();
+            Dictionary<int,string> maps = [];
 
 
             int lastparcelid = 0;
             uint lowX = 0;
             uint lowY = 0;
-            Random rnd = new Random();
+            Random rnd = new();
             uint startX = 4;
             string svg = "<svg width=\"" + SimWidth + "\" height=\"" + SimHeight + "\" xmlns=\"http://www.w3.org/2000/svg\">";
             uint boxheight = 0;
             var color = "";
             Parcel P = null;
-            string parcelname = "?";
             int checkparcel = GetClient().Parcels.GetParcelLocalID(GetClient().Network.CurrentSim, new Vector3(startX, 4, 20));
             while (startX < SimWidth)
             {
                 uint startY = 4;
+                string parcelname;
                 while (startY < SimHeight)
                 {
                     checkparcel = GetClient().Parcels.GetParcelLocalID(GetClient().Network.CurrentSim, new Vector3(startX, startY, 20));
                     if ((checkparcel != lastparcelid) || (startY >= SimHeight))
                     {
-                        if(lastparcelid == 0)
+                        if (lastparcelid == 0)
                         {
                             lastparcelid = checkparcel;
                             lowX = startX - 4;
@@ -94,7 +90,7 @@ namespace SecondBotEvents.Commands
                         }
                         else
                         {
-                            boxheight = (startY-4) - lowY;
+                            boxheight = (startY - 4) - lowY;
                             color = "";
                             if (maps.ContainsKey(lastparcelid) == false)
                             {
@@ -140,7 +136,7 @@ namespace SecondBotEvents.Commands
                 lastparcelid = 0;
                 startX += 4;
             }
-            svg = svg + "</svg>";
+            svg += "</svg>";
             return BasicReply(svg);
         }
 
@@ -149,8 +145,8 @@ namespace SecondBotEvents.Commands
         [ReturnHints("json encoded object")]
         public object GetListOfParcels()
         {
-            parcelPacketReply reply = new parcelPacketReply();
-            List<Parcel> Parcels = GetClient().Network.CurrentSim.Parcels.Copy().Values.ToList();
+            ParcelPacketReply reply = new();
+            List<Parcel> Parcels = [.. GetClient().Network.CurrentSim.Parcels.Copy().Values];
             foreach (Parcel A in Parcels)
             {
                 int index = reply.groupuuids.IndexOf(A.GroupID.ToString());
@@ -159,14 +155,16 @@ namespace SecondBotEvents.Commands
                     reply.groupuuids.Add(A.GroupID.ToString());
                     index = reply.groupuuids.IndexOf(A.GroupID.ToString());
                 }
-                parcelPacketData R = new parcelPacketData();
-                R.groupindex = index;
-                R.area = A.Area;
-                R.startbox = A.AABBMin.ToString();
-                R.endbox = A.AABBMax.ToString();
-                R.currentprims = A.TotalPrims;
-                R.maxprims = A.MaxPrims;
-                R.name = A.Name;
+                ParcelPacketData R = new()
+                {
+                    groupindex = index,
+                    area = A.Area,
+                    startbox = A.AABBMin.ToString(),
+                    endbox = A.AABBMax.ToString(),
+                    currentprims = A.TotalPrims,
+                    maxprims = A.MaxPrims,
+                    name = A.Name
+                };
                 reply.parcels.Add(R);
             }
             return BasicReply(JsonConvert.SerializeObject(reply));
@@ -201,11 +199,11 @@ namespace SecondBotEvents.Commands
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if(tests.Key == false)
             {
-                return Failure(tests.Value, new [] { amount, avatar });
+                return Failure(tests.Value, [amount, avatar]);
             }
             if (int.TryParse(amount,out int amountvalue) == false)
             {
-                return Failure("Invaild amount", new [] { amount, avatar });
+                return Failure("Invaild amount", [amount, avatar]);
             }
 
             int minAmount = 1;
@@ -220,14 +218,14 @@ namespace SecondBotEvents.Commands
             }
             if ((amountvalue < minAmount) || (amountvalue > 9999999))
             {
-                return Failure("Invaild amount", new [] { amount, avatar });
+                return Failure("Invaild amount", [amount, avatar]);
             }
             targetparcel.SalePrice = amountvalue;
             targetparcel.AuthBuyerID = avataruuid;
             ParcelStatic.ParcelSetFlag(ParcelFlags.ForSale, targetparcel, true);
             ParcelStatic.ParcelSetFlag(ParcelFlags.ForSaleObjects, targetparcel, false);
             targetparcel.Update(GetClient());
-            return BasicReply("ok", new [] { amount, avatar });
+            return BasicReply("ok", [amount, avatar]);
         }
 
 
@@ -257,7 +255,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value);
             }
-            Dictionary<string, string> collection = new Dictionary<string, string>();
+            Dictionary<string, string> collection = [];
             collection.Add("ForSale", targetparcel.Flags.HasFlag(ParcelFlags.ForSale).ToString());
             collection.Add("Cost", targetparcel.SalePrice.ToString());
             collection.Add("SaleTarget", targetparcel.AuthBuyerID.ToString());
@@ -320,8 +318,8 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("timeout must be >= 2000 and <= 7000");
             }
-            AutoResetEvent landresultsTimeout = new AutoResetEvent(false);
-            List<string> collection = new List<string>();
+            AutoResetEvent landresultsTimeout = new(false);
+            List<string> collection = [];
             void LandSearchResultsReply(object sender, DirLandReplyEventArgs e)
             {
                 int counter = (100 * GetpageNum);
@@ -344,7 +342,7 @@ namespace SecondBotEvents.Commands
             GetClient().Directory.DirLandReply -= LandSearchResultsReply;
             string reply = JsonConvert.SerializeObject(collection);
 
-            return BasicReply(reply, new string[] { filterRegion, filterPrice, filterArea, pageNum, timeout });
+            return BasicReply(reply, [filterRegion, filterPrice, filterArea, pageNum, timeout]);
         }
 
 
@@ -361,24 +359,24 @@ namespace SecondBotEvents.Commands
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
-                return Failure(tests.Value,  new [] { x, y, z });
+                return Failure(tests.Value,  [x, y, z]);
             }
             if(int.TryParse(x,out int X) == false)
             {
-                return Failure("Unable to process landing point x value", new [] { x, y, z });
+                return Failure("Unable to process landing point x value", [x, y, z]);
             }
             if (int.TryParse(y, out int Y) == false)
             {
-                return Failure("Unable to process landing point y value", new [] { x, y, z });
+                return Failure("Unable to process landing point y value", [x, y, z]);
             }
             if (int.TryParse(z, out int Z) == false)
             {
-                return Failure("Unable to process landing point z value", new [] { x, y, z });
+                return Failure("Unable to process landing point z value", [x, y, z]);
             }
             targetparcel.Landing = LandingType.LandingPoint;
             targetparcel.UserLocation = new Vector3(X, Y, Z);
             targetparcel.Update(GetClient());
-            return BasicReply("ok", new [] { x, y, z });
+            return BasicReply("ok", [x, y, z]);
         }
 
 
@@ -393,15 +391,15 @@ namespace SecondBotEvents.Commands
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
-                return Failure(tests.Value, new [] { name });
+                return Failure(tests.Value, [name]);
             }
             if (SecondbotHelpers.notempty(name) == false)
             {
-                return Failure("Parcel name is empty", new [] { name });
+                return Failure("Parcel name is empty", [name]);
             }
             targetparcel.Name = name;
             targetparcel.Update(GetClient());
-            return BasicReply("ok", new [] { name });
+            return BasicReply("ok", [name]);
         }
 
         [About("Updates the current parcels description")]
@@ -414,11 +412,11 @@ namespace SecondBotEvents.Commands
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
-                return Failure(tests.Value, new [] { desc });
+                return Failure(tests.Value, [desc]);
             }
             targetparcel.Desc = desc;
             targetparcel.Update(GetClient());
-            return BasicReply("ok", new [] { desc });
+            return BasicReply("ok", [desc]);
         }
 
         [About("Fetchs the current parcels desc")]
@@ -447,7 +445,7 @@ namespace SecondBotEvents.Commands
                 return Failure(tests.Value);
             }
             Dictionary<string, ParcelFlags> flags = ParcelStatic.GetFlagsList();
-            Dictionary<string, string> collection = new();
+            Dictionary<string, string> collection = [];
             foreach (ParcelFlags cfg in flags.Values)
             {
                 collection.Add(cfg.ToString(), targetparcel.Flags.HasFlag(cfg).ToString());
@@ -464,10 +462,10 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar", new [] { avatar });
+                return Failure("Invaild avatar", [avatar]);
             }
             GetClient().Parcels.EjectUser(avataruuid, false);
-            return BasicReply("ok", new [] { avatar });
+            return BasicReply("ok", [avatar]);
         }
 
         [About("Abandons the parcel the bot is currently on, returning it to Linden's or Estate owner")]
@@ -496,12 +494,12 @@ namespace SecondBotEvents.Commands
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
-                return Failure(tests.Value, new [] { avatar });
+                return Failure(tests.Value, [avatar]);
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar", new [] { avatar });
+                return Failure("Invaild avatar", [avatar]);
             }
             bool alreadyBanned = false;
             foreach (ParcelAccessEntry E in targetparcel.AccessBlackList)
@@ -514,7 +512,7 @@ namespace SecondBotEvents.Commands
             }
             if (alreadyBanned == true)
             {
-                return BasicReply("Avatar is in the blacklist", new [] { avatar });
+                return BasicReply("Avatar is in the blacklist", [avatar]);
             }
             ParcelAccessEntry entry = new()
             {
@@ -524,7 +522,7 @@ namespace SecondBotEvents.Commands
             };
             targetparcel.AccessBlackList.Add(entry);
             targetparcel.Update(GetClient());
-            return BasicReply("ok", new [] { avatar });
+            return BasicReply("ok", [avatar]);
         }
 
         [About("Unbans an avatar from a parcel")]
@@ -539,12 +537,12 @@ namespace SecondBotEvents.Commands
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
-                return Failure(tests.Value, new [] { avatar });
+                return Failure(tests.Value, [avatar]);
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar", new [] { avatar });
+                return Failure("Invaild avatar", [avatar]);
             }
             bool alreadyBanned = false;
             ParcelAccessEntry removeentry = new();
@@ -559,11 +557,11 @@ namespace SecondBotEvents.Commands
             }
             if (alreadyBanned == false)
             {
-                return BasicReply("Avatar is already unbanned", new [] { avatar });
+                return BasicReply("Avatar is already unbanned", [avatar]);
             }
             targetparcel.AccessBlackList.Remove(removeentry);
             targetparcel.Update(GetClient());
-            return BasicReply("ok", new [] { avatar });
+            return BasicReply("ok", [avatar]);
         }
 
 
@@ -577,10 +575,10 @@ namespace SecondBotEvents.Commands
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
-                return Failure(tests.Value, new [] { musicurl });
+                return Failure(tests.Value, [musicurl]);
             }
             bool status = ParcelStatic.SetParcelMusic(GetClient(), targetparcel, musicurl);
-            return BasicReply(status.ToString(), new [] { musicurl });
+            return BasicReply(status.ToString(), [musicurl]);
         }
 
         [About("Updates the current parcels name")]
@@ -598,13 +596,13 @@ namespace SecondBotEvents.Commands
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
-                return Failure(tests.Value, new [] { escapedflagdata });
+                return Failure(tests.Value, [escapedflagdata]);
             }
-            List<string> acceptablewords = new();
+            List<string> acceptablewords = [];
             Dictionary<string, ParcelFlags> flags = ParcelStatic.GetFlagsList();
-            acceptablewords.AddRange(new[] { "True", "False" });
+            acceptablewords.AddRange(["True", "False"]);
 
-            Dictionary<string, bool> setflags = new();
+            Dictionary<string, bool> setflags = [];
             string[] args = escapedflagdata.Split(":::");
             foreach (string a in args)
             {
@@ -627,11 +625,11 @@ namespace SecondBotEvents.Commands
             }
             if (setflags.Count == 0)
             {
-                return Failure("No accepted flags", new [] { escapedflagdata });
+                return Failure("No accepted flags", [escapedflagdata]);
             }
             if (ParcelStatic.HasParcelPerm(targetparcel, GetClient()) == false)
             {
-                return Failure("Incorrect perms to control parcel", new [] { escapedflagdata });
+                return Failure("Incorrect perms to control parcel", [escapedflagdata]);
             }
             foreach (KeyValuePair<string, bool> cfg in setflags)
             {
@@ -641,7 +639,7 @@ namespace SecondBotEvents.Commands
                 }
             }
             targetparcel.Update(GetClient());
-            return BasicReply("Applying perms", new [] { escapedflagdata });
+            return BasicReply("Applying perms", [escapedflagdata]);
         }
 
         [About("Returns all objects from the current parcel for the selected avatar")]
@@ -655,15 +653,15 @@ namespace SecondBotEvents.Commands
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
-                return Failure(tests.Value, new [] { avatar });
+                return Failure(tests.Value, [avatar]);
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar UUID", new [] { avatar });
+                return Failure("Invaild avatar UUID", [avatar]);
             }
-            GetClient().Parcels.ReturnObjects(GetClient().Network.CurrentSim, targetparcel.LocalID, ObjectReturnType.None, new List<UUID>() { avataruuid });
-            return BasicReply("ok", new [] { avatar });
+            GetClient().Parcels.ReturnObjects(GetClient().Network.CurrentSim, targetparcel.LocalID, ObjectReturnType.None, [avataruuid]);
+            return BasicReply("ok", [avatar]);
         }
 
 
@@ -679,22 +677,22 @@ namespace SecondBotEvents.Commands
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
-                return Failure(tests.Value, new [] { group });
+                return Failure(tests.Value, [group]);
             }
             if (UUID.TryParse(group, out UUID groupuuid) == false)
             {
-                return Failure("Invaild group uuid", new [] { group });
+                return Failure("Invaild group uuid", [group]);
             }
             if (GetClient().Groups.GroupName2KeyCache.ContainsKey(groupuuid) == false)
             {
-                return Failure("Not in group", new [] { group });
+                return Failure("Not in group", [group]);
             }
             ParcelStatic.ParcelSetFlag(ParcelFlags.AllowDeedToGroup, targetparcel, true);
             targetparcel.GroupID = groupuuid;
             targetparcel.Update(GetClient());
             Thread.Sleep(500);
             GetClient().Parcels.DeedToGroup(GetClient().Network.CurrentSim, targetparcel.LocalID, groupuuid);
-            return BasicReply("ok", new [] { group });
+            return BasicReply("ok", [group]);
         }
 
         [About("Attempts to buy the parcel the bot is standing on, the amount must match the sale price for the land!")]
@@ -712,11 +710,11 @@ namespace SecondBotEvents.Commands
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
-                return Failure(tests.Value, new [] { amount });
+                return Failure(tests.Value, [amount]);
             }
             if ((targetparcel.AuthBuyerID != UUID.Zero) && (targetparcel.AuthBuyerID != GetClient().Self.AgentID))
             {
-                return Failure("Parcel sale locked to other avatars", new[] { amount });
+                return Failure("Parcel sale locked to other avatars", [amount]);
             }
             int minAmount = 1;
             if (targetparcel.AuthBuyerID == GetClient().Self.AgentID)
@@ -725,22 +723,22 @@ namespace SecondBotEvents.Commands
             }
             if (int.TryParse(amount, out int amountvalue) == false)
             {
-                return Failure("Invaild amount", new [] { amount });
+                return Failure("Invaild amount", [amount]);
             }
             if (amountvalue < minAmount)
             {
-                return Failure("Invaild amount", new [] { amount });
+                return Failure("Invaild amount", [amount]);
             };
             if (targetparcel.Flags.HasFlag(ParcelFlags.ForSale) == false)
             {
-                return Failure("Parcel not for sale", new [] { amount });
+                return Failure("Parcel not for sale", [amount]);
             }
             if (targetparcel.SalePrice != amountvalue)
             {
-                return Failure("Parcel sale price and amount do not match", new [] { amount });
+                return Failure("Parcel sale price and amount do not match", [amount]);
             }
             GetClient().Parcels.Buy(GetClient().Network.CurrentSim, targetparcel.LocalID, false, UUID.Zero, false, targetparcel.Area, amountvalue);
-            return BasicReply("ok", new [] { amount });
+            return BasicReply("ok", [amount]);
         }
 
         [About("Freezes an avatar")]
@@ -753,15 +751,15 @@ namespace SecondBotEvents.Commands
         {
             if (bool.TryParse(state, out bool freezestate) == false)
             {
-                return Failure("Invaild state", new [] { avatar, state });
+                return Failure("Invaild state", [avatar, state]);
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar UUID", new [] { avatar, state });
+                return Failure("Invaild avatar UUID", [avatar, state]);
             }
             GetClient().Parcels.FreezeUser(avataruuid, freezestate);
-            return BasicReply("ok", new [] { avatar, state });
+            return BasicReply("ok", [avatar, state]);
         }
 
 
@@ -815,7 +813,7 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(objectuuid, out UUID targetobject) == false)
             {
-                return Failure("Invaild object uuid", new [] { objectuuid });
+                return Failure("Invaild object uuid", [objectuuid]);
             }
             bool found = false;
             Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
@@ -830,9 +828,9 @@ namespace SecondBotEvents.Commands
             }
             if(found == false)
             {
-                return Failure("Unable to find object", new [] { objectuuid });
+                return Failure("Unable to find object", [objectuuid]);
             }
-            return BasicReply("ok", new [] { objectuuid });
+            return BasicReply("ok", [objectuuid]);
         }
 
         [About("Updates the current parcels media settings \n" +
@@ -854,7 +852,7 @@ namespace SecondBotEvents.Commands
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
             {
-                return Failure(tests.Value, new [] { escapedflagdata });
+                return Failure(tests.Value, [escapedflagdata]);
             }
             string[] args = escapedflagdata.Split(":::");
             foreach (string A in args)
@@ -915,7 +913,7 @@ namespace SecondBotEvents.Commands
                 }
             }
             targetparcel.Update(GetClient());
-            return BasicReply("ok", new [] { escapedflagdata });
+            return BasicReply("ok", [escapedflagdata]);
         }
 
         protected static bool UpdateParcelMediaType(Parcel targetparcel, string value)
@@ -952,7 +950,7 @@ namespace SecondBotEvents.Commands
 
     public class GetParcelBanlistObject
     {
-        public Dictionary<UUID, string> entrys = new();
+        public Dictionary<UUID, string> entrys = [];
         public string parcelName = "";
         public string regionName = "";
         public int delay = 0;

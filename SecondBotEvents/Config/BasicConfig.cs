@@ -4,9 +4,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class BasicConfig : Config
+    public class BasicConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public BasicConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
         protected override void MakeSettings()
         {
             filename = "basic";

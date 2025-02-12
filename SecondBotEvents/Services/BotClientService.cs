@@ -60,9 +60,11 @@ namespace SecondBotEvents.Services
         {
             running = true;
             LogFormater.Info("Client service [Starting]");
-            AutoRestartLoginTimer = new Timer();
-            AutoRestartLoginTimer.Interval = 30 * 1000;
-            AutoRestartLoginTimer.AutoReset = false;
+            AutoRestartLoginTimer = new Timer
+            {
+                Interval = 30 * 1000,
+                AutoReset = false
+            };
             AutoRestartLoginTimer.Elapsed += RestartTimer;
             Login();
         }
@@ -137,7 +139,7 @@ namespace SecondBotEvents.Services
                 {
                     if (Success)
                     {
-                        AssetNotecard empty = new AssetNotecard { BodyText = "\n" };
+                        AssetNotecard empty = new() { BodyText = "\n" };
                         empty.Encode();
                         client.Inventory.RequestUploadNotecardAsset(empty.AssetData, item.UUID,
                         (bool emptySuccess, string emptyStatus, UUID emptyItemID, UUID emptyAssetID) =>
@@ -195,7 +197,7 @@ namespace SecondBotEvents.Services
             ResetClient();
             goodticks = 0;
             master.TriggerBotClientEvent(false, false);
-            LoginParams loginParams = new LoginParams(
+            LoginParams loginParams = new(
                 client,
                 basicCfg.GetFirstName(),
                 basicCfg.GetLastName(),

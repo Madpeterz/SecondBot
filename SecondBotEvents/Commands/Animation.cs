@@ -7,14 +7,8 @@ using System.Linq;
 namespace SecondBotEvents.Commands
 {
     [ClassInfo("Animations and Gestures")]
-    internal class AnimationCommands : CommandsAPI
+    internal class AnimationCommands(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        
-
-        public AnimationCommands(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
-
         [About("Toggles if animation requests from this avatar (used for remote poseballs) are accepted")]
         [ReturnHints("Granted perm animation")]
         [ReturnHints("Removed perm animation")]
@@ -25,7 +19,7 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return BasicReply("avatar lookup", new [] { avatar });
+                return BasicReply("avatar lookup", [avatar]);
             }
             // @todo accept storage
             return Failure("@todo");
@@ -39,18 +33,18 @@ namespace SecondBotEvents.Commands
         {
             if (UUID.TryParse(gesture, out UUID gestureUUID) == false)
             {
-                return BasicReply("Error with gesture", new [] { gesture });
+                return BasicReply("Error with gesture", [gesture]);
             }
             InventoryItem itm = GetClient().Inventory.FetchItem(gestureUUID, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
             GetClient().Self.PlayGesture(itm.AssetUUID);
-            return BasicReply("Accepted", new [] { gesture });
+            return BasicReply("Accepted", [gesture]);
         }
 
         [About("Resets the animation stack for the bot")]
         [ReturnHints("Accepted - X stopped animations")]
         public object ResetAnimations()
         {
-            List<UUID> animations = GetClient().Self.SignaledAnimations.Copy().Keys.ToList();
+            List<UUID> animations = [.. GetClient().Self.SignaledAnimations.Copy().Keys];
             foreach (UUID anim in animations)
             {
                 GetClient().Self.AnimationStop(anim, true);

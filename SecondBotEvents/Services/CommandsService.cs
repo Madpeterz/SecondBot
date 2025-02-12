@@ -13,19 +13,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SecondBotEvents.Services
 {
-    public class BotCommandNotice
+    public class BotCommandNotice(string Setcommand, string Setargs, string Setsource, bool Setaccepted, string Setresults)
     {
-        public string command;
-        public string args;
-        public string source;
-        public bool accepted;
-        public BotCommandNotice(string Setcommand, string Setargs, string Setsource, bool Setaccepted)
-        {
-            command = Setcommand; 
-            args = Setargs;
-            source = Setsource;
-            accepted = Setaccepted;
-        }
+        public string command = Setcommand;
+        public string args = Setargs;
+        public string source = Setsource;
+        public bool accepted = Setaccepted;
+        public string results = Setresults;
     }
     public class CommandsService : BotServices
     {
@@ -35,10 +29,10 @@ namespace SecondBotEvents.Services
             add { lock (BotCommandNoticeLockable) { BotclientCommandEventNotices += value; } }
             remove { lock (BotCommandNoticeLockable) { BotclientCommandEventNotices -= value; } }
         }
-        private readonly object BotCommandNoticeLockable = new object();
+        private readonly object BotCommandNoticeLockable = new();
 
 
-        public CommandsConfig myConfig = null;
+        public new CommandsConfig myConfig = null;
         public bool acceptNewCommands = false;
         public CommandsService(EventsSecondBot setMaster) : base(setMaster)
         {
@@ -66,7 +60,7 @@ namespace SecondBotEvents.Services
 
         protected virtual void LoadCommandEndpoint(Type endpointtype)
         {
-            CommandsAPI controler = (CommandsAPI)Activator.CreateInstance(endpointtype, args: new object[] { master });
+            CommandsAPI controler = (CommandsAPI)Activator.CreateInstance(endpointtype, args: [master]);
             commandEndpoints.Add(endpointtype.Name, controler);
             foreach (MethodInfo M in endpointtype.GetMethods())
             {
@@ -221,7 +215,7 @@ namespace SecondBotEvents.Services
             {
                 source = "customcommand";
             }
-            SignedCommand C = new SignedCommand(this,source,message,requireSigning,myConfig.GetEnforceTimeWindow(),myConfig.GetTimeWindowSecs(),myConfig.GetSharedSecret());
+            SignedCommand C = new(this,source,message,requireSigning,myConfig.GetEnforceTimeWindow(),myConfig.GetTimeWindowSecs(),myConfig.GetSharedSecret());
             if (C.accepted == false)
             {
                 return new KeyValuePair<bool, string>(false, "Not accepted via signing");
@@ -276,8 +270,8 @@ namespace SecondBotEvents.Services
             }
             else if (mode == "HTTP")
             {
-                Dictionary<string, string> values = new Dictionary<string, string>
-                    {
+                Dictionary<string, string> values = new()
+                {
                         { "reply", output },
                         { "command", command },
                     };
@@ -301,7 +295,7 @@ namespace SecondBotEvents.Services
                 }
             }
         }
-        protected HttpClient HTTPclient = new HttpClient();
+        protected HttpClient HTTPclient = new();
 
         protected KeyValuePair<bool, string> RunBaseCommand(SignedCommand C, string source)
         {
@@ -311,10 +305,10 @@ namespace SecondBotEvents.Services
                 MethodInfo theMethod = Endpoint.GetType().GetMethod(C.command);
                 if (theMethod != null)
                 {
-                    List<string> argsList = C.args.ToList();
-                    string reply = "Inconnect number of args expected: " + theMethod.GetParameters().Count().ToString() + " but got: " + argsList.Count.ToString();
+                    List<string> argsList = [.. C.args];
+                    string reply = "Inconnect number of args expected: " + theMethod.GetParameters().Length.ToString() + " but got: " + argsList.Count.ToString();
                     bool status = false;
-                    if (argsList.Count == theMethod.GetParameters().Count())
+                    if (argsList.Count == theMethod.GetParameters().Length)
                     {
                         status = true;
                         try
@@ -323,23 +317,23 @@ namespace SecondBotEvents.Services
                             {
                                 return new KeyValuePair<bool, string>(false, "Endpoint is null");
                             }
-                            object[] argsWorker = argsList.ToArray<object>();
+                            object[] argsWorker = [.. argsList];
                             object processed = theMethod.Invoke(Endpoint, argsWorker);
                             reply = "Error";
                             if (processed != null)
                             {
                                 reply = JsonConvert.SerializeObject(processed);
                             }
-                            CommandNotice(C.command, source, String.Join("@@@", C.args), true);
+                            CommandNotice(C.command, source, String.Join("@@@", C.args), true, reply);
                             return new KeyValuePair<bool, string>(status, reply);
                         }
                         catch (Exception e)
                         {
-                            CommandNotice(C.command, source+" ~~ Failure: "+e.Message, String.Join("@@@", C.args), false);
+                            CommandNotice(C.command, source+" ~~ Failure: "+e.Message, String.Join("@@@", C.args), false, e.Message);
                             return new KeyValuePair<bool, string>(false, e.Message);
                         }
                     }
-                    CommandNotice(C.command, source + " ~~ Failure: incorrect number of args expected: "+ theMethod.GetParameters().Count().ToString()+" but got "+ argsList.Count.ToString()+"", String.Join("@@@", C.args), false);
+                    CommandNotice(C.command, source + " ~~ Failure: incorrect number of args expected: "+ theMethod.GetParameters().Length.ToString()+" but got "+ argsList.Count.ToString()+"", String.Join("@@@", C.args), false, "no results");
                     return new KeyValuePair<bool, string>(status, reply);
                 }
                 return new KeyValuePair<bool, string>(false, "theMethod is null");
@@ -392,17 +386,17 @@ namespace SecondBotEvents.Services
 
         public string[] GetFullListOfCommands()
         {
-            List<string> output = new List<string>();
+            List<string> output = [];
             foreach (string A in endpointcommandmap.Keys)
             {
                 output.Add(A.ToLowerInvariant());
             }
-            return output.ToArray();
+            return [.. output];
         }
 
-        protected Dictionary<string, CommandsAPI> commandEndpoints = new Dictionary<string, CommandsAPI>();
-        protected Dictionary<string, string> endpointcommandmap = new Dictionary<string, string>(); // command = endpoint
-        protected Dictionary<string, string> commandnameLowerToReal = new Dictionary<string, string>();
+        protected Dictionary<string, CommandsAPI> commandEndpoints = [];
+        protected Dictionary<string, string> endpointcommandmap = []; // command = endpoint
+        protected Dictionary<string, string> commandnameLowerToReal = [];
 
         protected void BotClientRestart(object o, BotClientNotice e)
         {
@@ -440,9 +434,13 @@ namespace SecondBotEvents.Services
             LogFormater.Info("Commands service [accepting IM commands]");
         }
 
-        public void CommandNotice(string command,string source, string args,bool accepted)
+        public void CommandNotice(string command,string source, string args,bool accepted, string results)
         {
-            BotCommandNotice e = new BotCommandNotice(command, args, source, accepted);
+            if(myConfig.GetCommandHistoryLogResults() == false)
+            {
+                results = "";
+            }
+            BotCommandNotice e = new(command, args, source, accepted, results);
             EventHandler<BotCommandNotice> handler = BotclientCommandEventNotices;
             handler?.Invoke(this, e);
             if(master.BotClient.basicCfg.GetLogCommands() == true)
@@ -561,7 +559,7 @@ namespace SecondBotEvents.Services
             command = bits[0];
             // command
             // args~#~args~#~args
-            args = new string[] { };
+            args = [];
             if(bits.Length == 2)
             {
                 args = bits[1].Split("~#~");

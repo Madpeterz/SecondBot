@@ -21,25 +21,25 @@ namespace SecondBotEvents.Services
             myConfig = new DataStoreConfig(master.fromEnv,master.fromFolder);
         }
 
-        protected Dictionary<string, UUID> avatarsName2Key = new();
-        protected Dictionary<UUID, long> avatarLastUsed =  new();
+        protected Dictionary<string, UUID> avatarsName2Key = [];
+        protected Dictionary<UUID, long> avatarLastUsed =  [];
 
-        protected Dictionary<UUID, string> groupsKey2Name = new();
+        protected Dictionary<UUID, string> groupsKey2Name = [];
 
-        protected Dictionary<UUID, List<UUID>> groupMembers = new();
-        protected Dictionary<UUID, Dictionary<UUID, GroupRole>> groupRoles = new();
+        protected Dictionary<UUID, List<UUID>> groupMembers = [];
+        protected Dictionary<UUID, Dictionary<UUID, GroupRole>> groupRoles = [];
 
-        protected List<string> localChatHistory = new();
+        protected List<string> localChatHistory = [];
 
-        protected Dictionary<UUID, List<string>> chatWindows = new(); // sess, list chat
-        protected Dictionary<UUID, bool> chatWindowsUnread = new(); // sess, bool
-        protected Dictionary<UUID, bool> chatWindowsIsGroup = new(); // sess, bool
-        protected Dictionary<UUID, UUID> chatWindowsOwner = new(); // sess, owner id
+        protected Dictionary<UUID, List<string>> chatWindows = []; // sess, list chat
+        protected Dictionary<UUID, bool> chatWindowsUnread = []; // sess, bool
+        protected Dictionary<UUID, bool> chatWindowsIsGroup = []; // sess, bool
+        protected Dictionary<UUID, UUID> chatWindowsOwner = []; // sess, owner id
 
-        protected Dictionary<string, string> KeyValueStore = new();
-        protected Dictionary<string, long> KeyValueStoreLastUsed = new();
+        protected Dictionary<string, string> KeyValueStore = [];
+        protected Dictionary<string, long> KeyValueStoreLastUsed = [];
 
-        protected List<CommandHistory> commandHistories = new();
+        protected List<CommandHistory> commandHistories = [];
 
 
 
@@ -47,8 +47,8 @@ namespace SecondBotEvents.Services
         protected long lastCleanupKeyValueStore = 0;
         protected long lastCleanupAvatarStore = 0;
 
-        protected List<string> acceptedStores = new List<string>() { "FriendRequest", "InventoryOffer", "GroupInvite", "Teleport" };
-        protected Dictionary<string, List<UUID>> AcceptNextStore = new Dictionary<string, List<UUID>>();
+        protected List<string> acceptedStores = ["FriendRequest", "InventoryOffer", "GroupInvite", "Teleport"];
+        protected Dictionary<string, List<UUID>> AcceptNextStore = [];
         public bool KnownStoreType(string storeType)
         {
             return acceptedStores.Contains(storeType);
@@ -82,7 +82,7 @@ namespace SecondBotEvents.Services
             }
             if(AcceptNextStore.ContainsKey(store) == false)
             {
-                AcceptNextStore.Add(store, new List<UUID>());
+                AcceptNextStore.Add(store, []);
             }
             if(AcceptNextStore[store].Contains(avatar) == true)
             {
@@ -155,7 +155,7 @@ namespace SecondBotEvents.Services
                 if (dif > 125)
                 {
                     lastCleanupKeyValueStore = unixtime;
-                    List<string> clearentrys = new();
+                    List<string> clearentrys = [];
                     foreach (KeyValuePair<string, long> entry in KeyValueStoreLastUsed)
                     {
                         dif = unixtime - entry.Value;
@@ -185,7 +185,7 @@ namespace SecondBotEvents.Services
                 if (dif > 75)
                 {
                     lastCleanupAvatarStore = unixtime;
-                    Dictionary<UUID, string> clearLinks = new();
+                    Dictionary<UUID, string> clearLinks = [];
                     foreach (KeyValuePair<string, UUID> entry in avatarsName2Key)
                     {
                         dif = unixtime - avatarLastUsed[entry.Value];
@@ -212,11 +212,11 @@ namespace SecondBotEvents.Services
             return sum.ToString();
         }
 
-        public void AddCommandToHistory(bool status, string command, string[] args)
+        public void AddCommandToHistory(bool status, string command, string[] args, string results=null)
         {
             lock (commandHistories)
             {
-                CommandHistory A = new(status, command, args, SecondbotHelpers.UnixTimeNow());
+                CommandHistory A = new(status, command, args, SecondbotHelpers.UnixTimeNow(), results);
                 commandHistories.Add(A);
                 int c = commandHistories.Count;
                 while (c > myConfig.GetCommandHistoryLimit())
@@ -290,7 +290,7 @@ namespace SecondBotEvents.Services
 
         public List<UUID> GetAllGroupsChatWithUnread()
         {
-            List<UUID> reply = new();
+            List<UUID> reply = [];
             foreach(KeyValuePair<UUID, bool> windowState in chatWindowsUnread)
             {
                 if(windowState.Value == false)
@@ -338,7 +338,7 @@ namespace SecondBotEvents.Services
         {
             if(chatWindows.ContainsKey(group) == false)
             {
-                return new List<string>();
+                return [];
             }
             chatWindowsUnread[group] = false;
             return chatWindows[group];
@@ -364,7 +364,7 @@ namespace SecondBotEvents.Services
 
         public Dictionary<UUID, string> GetGroupRoles(UUID group)
         {
-            Dictionary<UUID, string> reply = new();
+            Dictionary<UUID, string> reply = [];
             if (groupRoles.ContainsKey(group) == false)
             {
                 
@@ -401,7 +401,7 @@ namespace SecondBotEvents.Services
             {
                 if (groupMembers.ContainsKey(group) == false)
                 {
-                    groupMembers.Add(group, new List<UUID>());
+                    groupMembers.Add(group, []);
                 }
                 if (groupMembers[group].Contains(avatar) == false)
                 {
@@ -439,7 +439,7 @@ namespace SecondBotEvents.Services
             {
                 if (groupMembers.ContainsKey(Group) == false)
                 {
-                    groupMembers.Add(Group, new List<UUID>());
+                    groupMembers.Add(Group, []);
                 }
             }
             return groupMembers[Group];
@@ -544,7 +544,7 @@ namespace SecondBotEvents.Services
                     }
                     return; // chat recovered
                 }
-                chatWindows.Add(sessionID, new List<string>());
+                chatWindows.Add(sessionID, []);
                 chatWindowsUnread.Add(sessionID, false);
                 chatWindowsIsGroup.Add(sessionID, group);
                 chatWindowsOwner.Add(sessionID, ownerID);
@@ -553,7 +553,7 @@ namespace SecondBotEvents.Services
         }
 
 
-        protected Dictionary<string, KeyValuePair<string, long>> notecardDataStore = new();
+        protected Dictionary<string, KeyValuePair<string, long>> notecardDataStore = [];
 
         public List<string> GetLocalChat()
         {
@@ -593,7 +593,7 @@ namespace SecondBotEvents.Services
             if (currentHash != ObjectsAvatarsHash)
             {
                 ObjectsAvatarsHash = currentHash;
-                List<Avatar> avs = GetClient().Network.CurrentSim.ObjectsAvatars.Copy().Values.ToList();
+                List<Avatar> avs = [.. GetClient().Network.CurrentSim.ObjectsAvatars.Copy().Values];
                 foreach (Avatar A in avs)
                 {
                     AddAvatar(A.ID, A.Name);
@@ -662,7 +662,7 @@ namespace SecondBotEvents.Services
 
         public void GetAvatarNames(List<UUID> avatars)
         {
-            List<UUID> lookup = new();
+            List<UUID> lookup = [];
             foreach (UUID id in avatars)
             {
                 if (avatarsName2Key.ContainsValue(id) == false)
@@ -715,7 +715,7 @@ namespace SecondBotEvents.Services
 
         public Dictionary<UUID,string> GetAvatarImWindows()
         {
-            Dictionary<UUID, string> windows = new();
+            Dictionary<UUID, string> windows = [];
             foreach (KeyValuePair<UUID,bool> links in chatWindowsIsGroup)
             {
                 if(links.Value == true)
@@ -735,7 +735,7 @@ namespace SecondBotEvents.Services
         {
             if (chatWindowsOwner.ContainsValue(avatarId) == false)
             {
-                return new List<string>();
+                return [];
             }
             UUID sessionID = UUID.Zero;
             foreach (KeyValuePair<UUID, UUID> links in chatWindowsOwner)
@@ -748,7 +748,7 @@ namespace SecondBotEvents.Services
             }
             if(chatWindowsIsGroup[sessionID] == true)
             {
-                return new List<string>();
+                return [];
             }
             chatWindowsUnread[sessionID] = false;
             return chatWindows[sessionID];
@@ -780,7 +780,7 @@ namespace SecondBotEvents.Services
 
         public List<UUID> GetAvatarImWindowsUnread()
         {
-            List<UUID> windows = new();
+            List<UUID> windows = [];
             foreach (KeyValuePair<UUID, bool> links in chatWindowsIsGroup)
             {
                 if (links.Value == true)
@@ -819,23 +819,23 @@ namespace SecondBotEvents.Services
         {
             lastCleanupKeyValueStore = 0;
 
-            avatarsName2Key = new Dictionary<string, UUID>();
+            avatarsName2Key = [];
 
-            groupsKey2Name = new Dictionary<UUID, string>();
+            groupsKey2Name = [];
 
-            groupMembers = new Dictionary<UUID, List<UUID>>();
-            groupRoles = new Dictionary<UUID, Dictionary<UUID, GroupRole>>();
+            groupMembers = [];
+            groupRoles = [];
 
-            localChatHistory = new List<string>();
+            localChatHistory = [];
 
-            notecardDataStore = new Dictionary<string, KeyValuePair<string, long>>();
+            notecardDataStore = [];
 
-            chatWindows = new Dictionary<UUID, List<string>>(); // sess, list chat
-            chatWindowsUnread = new Dictionary<UUID, bool>(); // sess, bool
-            chatWindowsIsGroup = new Dictionary<UUID, bool>(); // sess, bool
-            chatWindowsOwner = new Dictionary<UUID, UUID>(); // sess, owner id
+            chatWindows = []; // sess, list chat
+            chatWindowsUnread = []; // sess, bool
+            chatWindowsIsGroup = []; // sess, bool
+            chatWindowsOwner = []; // sess, owner id
 
-            estateBanlist = new List<UUID>();
+            estateBanlist = [];
         }
 
 
@@ -864,7 +864,7 @@ namespace SecondBotEvents.Services
             {
                 if (groupRoles.ContainsKey(e.GroupID) == false)
                 {
-                    groupRoles.Add(e.GroupID, new Dictionary<UUID, GroupRole>());
+                    groupRoles.Add(e.GroupID, []);
                 }
                 groupRoles[e.GroupID] = e.Roles;
             }
@@ -878,7 +878,7 @@ namespace SecondBotEvents.Services
                 {
                     groupMembers.Remove(e.GroupID);
                 }
-                groupMembers.Add(e.GroupID, new List<UUID>());
+                groupMembers.Add(e.GroupID, []);
                 foreach (KeyValuePair<UUID, GroupMember> a in e.Members)
                 {
                     groupMembers[e.GroupID].Add(a.Value.ID);
@@ -890,7 +890,7 @@ namespace SecondBotEvents.Services
         {
             if (estateBanlist == null)
             {
-                List<UUID> reply = new();
+                List<UUID> reply = [];
                 AutoResetEvent fetchEvent = new(false);
                 void callback(object sender, EstateBansReplyEventArgs e)
                 {
@@ -907,8 +907,8 @@ namespace SecondBotEvents.Services
             return estateBanlist;
         }
 
-        List<UUID> estateBanlist = null;
-        Dictionary<UUID, FriendLocations> FriendMapLocations = new Dictionary<UUID, FriendLocations>();
+        protected List<UUID> estateBanlist = null;
+        protected Dictionary<UUID, FriendLocations> FriendMapLocations = [];
 
         public FriendLocations GetFriendMap(UUID id)
         {
@@ -921,8 +921,7 @@ namespace SecondBotEvents.Services
 
         protected void FindFriendReply(object o, FriendFoundReplyEventArgs e)
         {
-            uint x, y;
-            Utils.LongToUInts(e.RegionHandle, out x, out y);
+            Utils.LongToUInts(e.RegionHandle, out uint x, out uint y);
             x /= 256;
             y /= 256;
             Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.Copy();
@@ -930,7 +929,7 @@ namespace SecondBotEvents.Services
             {
                 return;
             }
-            FriendLocations NewEntry = new FriendLocations(FriendListCopy[e.AgentID].Name, e.Location, new Vector3(x,y,10));
+            FriendLocations NewEntry = new(FriendListCopy[e.AgentID].Name, e.Location, new Vector3(x,y,10));
             if(FriendMapLocations.ContainsKey(e.AgentID) == false)
             {
                 FriendMapLocations.Add(e.AgentID, NewEntry);
@@ -955,12 +954,12 @@ namespace SecondBotEvents.Services
             Task.Factory.StartNew(() =>
             {
                 Thread.Sleep(2000);
-                attachEventsAfterDelay();
+                AttachEventsAfterDelay();
             });
             
         }
 
-        Dictionary<UUID, Avatar.AvatarProperties> avprops = new Dictionary<UUID, Avatar.AvatarProperties>();
+        Dictionary<UUID, Avatar.AvatarProperties> avprops = [];
         public KeyValuePair<bool,Avatar.AvatarProperties> GetAvatarAvatarProperties(UUID agentID)
         {
             if (avprops.ContainsKey(agentID) == false)
@@ -980,7 +979,7 @@ namespace SecondBotEvents.Services
             avprops[e.AvatarID] = e.Properties;
         }
 
-        protected void attachEventsAfterDelay()
+        protected void AttachEventsAfterDelay()
         {
             GetClient().Groups.CurrentGroups += GroupCurrent;
             GetClient().Groups.GroupJoinedReply += GroupJoin;
@@ -996,9 +995,9 @@ namespace SecondBotEvents.Services
             GetClient().Friends.FriendFoundReply += FindFriendReply;
             GetClient().Avatars.AvatarPropertiesReply += AvatarDetailsReply;
             GetClient().Groups.RequestCurrentGroups();
-            GetClient().Self.RetrieveInstantMessages();
+            _ = GetClient().Self.RetrieveInstantMessages();
         }
-        readonly string[] hard_blocked_agents = new[] { "secondlife", "second life" };
+        readonly string[] hard_blocked_agents = ["secondlife", "second life"];
         protected void ChatFromSim(object o, ChatEventArgs e)
         {
             switch(e.Type)
@@ -1046,7 +1045,7 @@ namespace SecondBotEvents.Services
         {
             lock (groupsKey2Name)
             {
-                List<UUID> missingGroups = groupsKey2Name.Keys.ToList();
+                List<UUID> missingGroups = [.. groupsKey2Name.Keys];
                 foreach (Group G in e.Groups.Values)
                 {
                     missingGroups.Remove(G.ID);
@@ -1217,35 +1216,21 @@ namespace SecondBotEvents.Services
         }
     }
 
-    public class CommandHistory
+    public class CommandHistory(bool setStatus, string setCommand, string[] setArgs, long setUnixtime, string Setresults)
     {
-        public string Command = "";
-        public string[] Args = Array.Empty<string>();
-        public long Unixtime = 0;
-        public bool status = false;
-
-        public CommandHistory(bool setStatus, string setCommand, string[] setArgs, long setUnixtime)
-        {
-            status = setStatus;
-            Command = setCommand;
-            Args = setArgs;
-            Unixtime = setUnixtime;
-        }
+        public string Command = setCommand;
+        public string[] Args = setArgs;
+        public long Unixtime = setUnixtime;
+        public bool status = setStatus;
+        public string results = Setresults;
     }
 
-    public class FriendLocations
+    public class FriendLocations(string SetName, Vector3 setPos, Vector3 setRegionPos)
     {
-        public string Name;
-        public Vector3 Pos;
-        public Vector3 RegionPos;
-        public long time;
-        public FriendLocations(string SetName, Vector3 setPos, Vector3 setRegionPos)
-        {
-            time = SecondbotHelpers.UnixTimeNow();
-            Name = SetName;
-            Pos = setPos;
-            RegionPos = setRegionPos;
-        }
+        public string Name = SetName;
+        public Vector3 Pos = setPos;
+        public Vector3 RegionPos = setRegionPos;
+        public long time = SecondbotHelpers.UnixTimeNow();
     }
 }
 

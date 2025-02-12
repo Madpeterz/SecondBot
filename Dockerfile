@@ -38,6 +38,7 @@ ENV basic_Username='' \
 	commands_Enabled='true' \
 	commands_ObjectMasterOptout='false' \
 	commands_AllowServiceControl='false' \
+	commands_CommandHistoryLogResults='false' \
 	datastore_AutoCleanAvatars='true' \
 	datastore_AvatarsCleanAfterMins=10 \
 	datastore_LocalChatHistoryLimit=120 \

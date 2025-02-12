@@ -145,14 +145,9 @@ namespace SecondBotEvents.Services
         }
     }
 
-    public abstract class CommandsAPI
+    public abstract class CommandsAPI(EventsSecondBot setmaster)
     {
-        protected EventsSecondBot master;
-        public CommandsAPI(EventsSecondBot setmaster)
-        {
-            master = setmaster;
-        }
-
+        protected EventsSecondBot master = setmaster;
         protected UUID avataruuid = UUID.Zero;
         protected Parcel targetparcel = null;
 
@@ -241,72 +236,44 @@ namespace SecondBotEvents.Services
     }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class ClassInfo : Attribute
+    public class ClassInfo(string classinfo) : Attribute
     {
-        public string classinfo = "";
-        public ClassInfo(string classinfo)
-        {
-            this.classinfo = classinfo;
-        }
+        public string classinfo = classinfo;
     }
 
 
     [AttributeUsage(AttributeTargets.Method)]
-    public class About : Attribute
+    public class About(string about) : Attribute
     {
-        public string about = "";
-        public About(string about)
-        {
-            this.about = about;
-        }
+        public string about = about;
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class ReturnHints : Attribute
+    public class ReturnHints(string hint) : Attribute
     {
-        public string hint = "";
-        public ReturnHints(string hint)
-        {
-            this.hint = hint;
-        }
+        public string hint = hint;
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class ReturnHintsFailure : Attribute
+    public class ReturnHintsFailure(string hint) : Attribute
     {
-        public string hint = "";
-        public ReturnHintsFailure(string hint)
-        {
-            this.hint = hint;
-        }
+        public string hint = hint;
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class ArgHints : Attribute
+    public class ArgHints(string name, string about) : Attribute
     {
-        public string name = "";
-        public string about = "";
-
-        public ArgHints(string name, string about)
-        {
-            this.name = name;
-            this.about = about;
-        }
+        public string name = name;
+        public string about = about;
     }
 
-    public class SecondbotWebApi : WebApiController
+    public class SecondbotWebApi(EventsSecondBot setmaster) : WebApiController
     {
-        protected EventsSecondBot master;
-        public SecondbotWebApi(EventsSecondBot setmaster)
-        {
-            master = setmaster;
-        }
+        protected EventsSecondBot master = setmaster;
     }
 
-    public class HttpWebBot : SecondbotWebApi
+    public class HttpWebBot(EventsSecondBot setmaster) : SecondbotWebApi(setmaster)
     {
-        public HttpWebBot(EventsSecondBot setmaster) : base(setmaster) {  }
-
         [About("Runs a command on the bot")]
         [ReturnHints("command reply")]
         [ReturnHintsFailure("Bad token signing")]

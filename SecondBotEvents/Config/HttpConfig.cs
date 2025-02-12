@@ -4,9 +4,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class HttpConfig: Config
+    public class HttpConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public HttpConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
         protected override void MakeSettings()
         {
             filename = "http";

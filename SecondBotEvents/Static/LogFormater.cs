@@ -57,7 +57,7 @@ namespace SecondBotEvents
         public static string GetClockStamp()
         {
             var date = DateTime.Now;
-            StringBuilder n = new StringBuilder();
+            StringBuilder n = new();
             n.Append("[");
             if (date.Hour < 10)
             {
@@ -77,7 +77,7 @@ namespace SecondBotEvents
         private static string Add(string message, ConsoleLogLogLevel Level, bool send_to_console = true)
         {
             
-            StringBuilder n = new StringBuilder();
+            StringBuilder n = new();
             n.Append(GetClockStamp());
             switch (Level)
             {

@@ -5,9 +5,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class ChatGptConfig : Config
+    public class ChatGptConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public ChatGptConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
         protected override void MakeSettings()
         {
             filename = "chatgpt";

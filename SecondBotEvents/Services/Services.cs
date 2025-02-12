@@ -6,15 +6,11 @@ using SecondBotEvents.Config;
 
 namespace SecondBotEvents.Services
 {
-    public abstract class BotServices
+    public abstract class BotServices(EventsSecondBot setMaster)
     {
-        public EventsSecondBot master;
+        public EventsSecondBot master = setMaster;
         protected Config.Config myConfig;
         protected bool running = false;
-        public BotServices(EventsSecondBot setMaster)
-        {
-            master = setMaster;
-        }
 
         public void enableAndStart()
         {

@@ -4,9 +4,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class DataStoreConfig : Config
+    public class DataStoreConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public DataStoreConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
         protected override void MakeSettings()
         {
             filename = "datastore";
@@ -23,6 +22,7 @@ namespace SecondBotEvents.Config
             settings.Add("CommandHistoryLimit");
             settings.Add("HideStatusOutput");
         }
+
 
         public int GetCommandHistoryLimit()
         {

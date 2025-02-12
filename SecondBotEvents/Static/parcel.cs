@@ -59,7 +59,7 @@ namespace SecondBotEvents
             System.Type enumType = typeof(ParcelFlags);
             List<string> flagnames = new(System.Enum.GetNames(enumType));
             flagnames.Remove("None");
-            return flagnames.ToArray();
+            return [.. flagnames];
         }
 
         public static Dictionary<string, string> GetMediaList()
@@ -79,7 +79,7 @@ namespace SecondBotEvents
         }
         public static Dictionary<string, ParcelFlags> GetFlagsList()
         {
-            Dictionary<string, ParcelFlags> flags = new();
+            Dictionary<string, ParcelFlags> flags = [];
             Type enumType = typeof(ParcelFlags);
             Array enumValues = Enum.GetValues(enumType);
             Array enumNames = Enum.GetNames(enumType);

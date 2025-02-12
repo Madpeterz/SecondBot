@@ -11,7 +11,7 @@ namespace BetterSecondBot.Static
     {
         public string id;
         public string name;
-        public List<InventoryMapFolder> subfolders = new List<InventoryMapFolder>();
+        public List<InventoryMapFolder> subfolders = [];
     }
     public class InventoryMapItem
     {
@@ -116,12 +116,14 @@ namespace BetterSecondBot.Static
 
         public static List<InventoryMapItem> getfolderinventory(GridClient bot, UUID folder)
         {
-            List<InventoryMapItem> entrys = new List<InventoryMapItem>();
+            List<InventoryMapItem> entrys = [];
             InventoryNode node = bot.Inventory.Store.GetNodeFor(folder);
-            InventoryMapItem mapitem = new InventoryMapItem();
-            mapitem.name = node.Data.Name;
-            mapitem.id = node.Data.UUID.ToString();
-            mapitem.typename = "Folder";
+            InventoryMapItem mapitem = new()
+            {
+                name = node.Data.Name,
+                id = node.Data.UUID.ToString(),
+                typename = "Folder"
+            };
             entrys.Add(mapitem);
             List<InventoryBase> contents = bot.Inventory.FolderContents(folder, bot.Self.AgentID, true, true, InventorySortOrder.ByDate, TimeSpan.FromSeconds(45), true);
             if (contents != null)
@@ -130,10 +132,12 @@ namespace BetterSecondBot.Static
                 {
                     foreach (InventoryBase item in contents)
                     {
-                        mapitem = new InventoryMapItem();
-                        mapitem.name = item.Name;
-                        mapitem.id = item.UUID.ToString();
-                        mapitem.typename = item.GetType().Name;
+                        mapitem = new InventoryMapItem
+                        {
+                            name = item.Name,
+                            id = item.UUID.ToString(),
+                            typename = item.GetType().Name
+                        };
                         entrys.Add(mapitem);
                     }
                 }
@@ -147,7 +151,7 @@ namespace BetterSecondBot.Static
 
         public static KeyValuePair<string,string> MapFolderInventoryHumanReadable(GridClient bot, UUID folder)
         {
-            StringBuilder output = new StringBuilder();
+            StringBuilder output = new();
             string foldername = "Unknown";
             foreach(InventoryMapItem mitem in getfolderinventory(bot, folder))
             {
@@ -197,10 +201,12 @@ namespace BetterSecondBot.Static
 
         public static InventoryMapFolder DoMapFolderJson(GridClient bot, InventoryFolder folder, bool subfolders=true)
         {
-            InventoryMapFolder ReplyFolder = new InventoryMapFolder();
-            ReplyFolder.id = folder.UUID.ToString();
-            ReplyFolder.name = folder.Name;
-            Dictionary<string, string> foldernode = new Dictionary<string, string>();
+            InventoryMapFolder ReplyFolder = new()
+            {
+                id = folder.UUID.ToString(),
+                name = folder.Name
+            };
+            Dictionary<string, string> foldernode = [];
             List<InventoryBase> T = bot.Inventory.Store.GetContents(folder);
             foreach (InventoryBase R in T)
             {
@@ -219,7 +225,7 @@ namespace BetterSecondBot.Static
 
         public static string MapFolderHumanReadable(GridClient bot)
         {
-            StringBuilder B = new StringBuilder();
+            StringBuilder B = new();
             DoMapFolderHumanReadable(bot, 0, bot.Inventory.Store.RootFolder, B);
             return B.ToString();
         }
@@ -237,7 +243,7 @@ namespace BetterSecondBot.Static
         }
         public static string Spaces(int counter)
         {
-            StringBuilder reply = new StringBuilder();
+            StringBuilder reply = new();
             while (counter > 0)
             {
                 reply.Append("      ");

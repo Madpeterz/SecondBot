@@ -8,12 +8,8 @@ using System.Threading;
 namespace SecondBotEvents.Commands
 {
     [ClassInfo("Dont like this place lets try somewhere else")]
-    public class Movement : CommandsAPI
+    public class Movement(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public Movement(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
-
         [About("Adjusts Hover height")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Convert to float has failed")]
@@ -23,14 +19,14 @@ namespace SecondBotEvents.Commands
         {
             if (double.TryParse(height, out double level) == false)
             {
-                return Failure("Convert to float has failed", new[] { height });
+                return Failure("Convert to float has failed", [height]);
             }
             if (SecondbotHelpers.inrange(level, -2.0, 2.0) == false)
             {
-                return Failure("height value out of range(-2.0 to 2.0)", new[] { height });
+                return Failure("height value out of range(-2.0 to 2.0)", [height]);
             }
             GetClient().Self.SetHoverHeight(level);
-            return BasicReply("ok", new[] { height });
+            return BasicReply("ok", [height]);
         }
 
         [About("uses the AutoPilot to move to a location")]
@@ -45,27 +41,26 @@ namespace SecondBotEvents.Commands
         {
             if (Vector3.TryParse("<" + x + "," + y + "," + z + ">", out Vector3 pos) == false)
             {
-                return Failure("Convert to vector has failed", new [] { x, y, z });
+                return Failure("Convert to vector has failed", [x, y, z]);
             }
             if (SecondbotHelpers.inrange(pos.X, 0, 255) == false)
             {
-                return Failure("x value out of range 0-255", new [] { x, y, z });
+                return Failure("x value out of range 0-255", [x, y, z]);
             }
             if (SecondbotHelpers.inrange(pos.Y, 0, 255) == false)
             {
-                return Failure("y value out of range 0-255", new [] { x, y, z });
+                return Failure("y value out of range 0-255", [x, y, z]);
             }
             if (SecondbotHelpers.inrange(pos.Z, 0, 5000) == false)
             {
-                return Failure("z value out of range 0-5000", new [] { x, y, z });
+                return Failure("z value out of range 0-5000", [x, y, z]);
             }
             GetClient().Self.AutoPilotCancel();
             GetClient().Self.Movement.TurnToward(pos, true);
             Thread.Sleep(500);
-            uint Globalx, Globaly;
-            Utils.LongToUInts(GetClient().Network.CurrentSim.Handle, out Globalx, out Globaly);
+            Utils.LongToUInts(GetClient().Network.CurrentSim.Handle, out uint Globalx, out uint Globaly);
             GetClient().Self.AutoPilot((ulong)(Globalx + pos.X), (ulong)(Globaly + pos.Y), pos.Z);
-            return BasicReply("ok", new [] { x, y, z });
+            return BasicReply("ok", [x, y, z]);
         }
 
         [About("Stop the auto pilot system from walking")]
@@ -85,10 +80,10 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar UUID", new [] { avatar });
+                return Failure("Invaild avatar UUID", [avatar]);
             }
             GetClient().Self.SendTeleportLure(avataruuid);
-            return BasicReply("ok", new [] { avatar });
+            return BasicReply("ok", [avatar]);
         }
 
         [About("Sends a teleport request (Move the bot to the avatar)")]
@@ -100,11 +95,11 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar UUID", new [] { avatar });
+                return Failure("Invaild avatar UUID", [avatar]);
             }
             // @todo action from event log with accept
             GetClient().Self.SendTeleportLureRequest(avataruuid, "I would like to teleport to you");
-            return BasicReply("ok", new [] { avatar });
+            return BasicReply("ok", [avatar]);
         }
 
         [About("Makes the bot fly (or not)")]
@@ -115,11 +110,11 @@ namespace SecondBotEvents.Commands
         {
             if (bool.TryParse(mode, out bool flymode) == false)
             {
-                return Failure("Invaild mode", new [] { mode });
+                return Failure("Invaild mode", [mode]);
             }
             GetClient().Self.Movement.Fly = flymode;
             GetClient().Self.Movement.SendUpdate();
-            return BasicReply("ok", new [] { mode });
+            return BasicReply("ok", [mode]);
         }
 
         [About("Rotates the bot to face a vector from its current location")]
@@ -131,21 +126,21 @@ namespace SecondBotEvents.Commands
         {
             if (Vector3.TryParse(vector, out Vector3 pos) == false)
             {
-                return Failure("Invaild vector", new [] { vector });
+                return Failure("Invaild vector", [vector]);
             }
             if (SecondbotHelpers.inrange(pos.X, 0, 255) == false)
             {
-                return Failure("Vector x value is out of range 0-255", new [] { vector });
+                return Failure("Vector x value is out of range 0-255", [vector]);
             }
             if (SecondbotHelpers.inrange(pos.Y, 0, 255) == false)
             {
-                return Failure("Vector y value is out of range 0-255", new [] { vector });
+                return Failure("Vector y value is out of range 0-255", [vector]);
             }
             if (SecondbotHelpers.inrange(pos.Z, 0, 5000) == false)
             {
-                return Failure("Vector z value is out of range 0-5000", new [] { vector });
+                return Failure("Vector z value is out of range 0-5000", [vector]);
             }
-            return BasicReply(GetClient().Self.Movement.TurnToward(pos, true).ToString(), new [] { vector });
+            return BasicReply(GetClient().Self.Movement.TurnToward(pos, true).ToString(), [vector]);
         }
 
         [About("Rotates the bot to face a avatar")]
@@ -158,13 +153,13 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar UUID", new [] { avatar });
+                return Failure("Invaild avatar UUID", [avatar]);
             }
             if (GetClient().Network.CurrentSim.AvatarPositions.ContainsKey(avataruuid) == false)
             {
-                return Failure("Unable to see avatar", new [] { avatar });
+                return Failure("Unable to see avatar", [avatar]);
             }
-            return BasicReply(GetClient().Self.Movement.TurnToward(GetClient().Network.CurrentSim.AvatarPositions[avataruuid], true).ToString(), new [] { avatar });
+            return BasicReply(GetClient().Self.Movement.TurnToward(GetClient().Network.CurrentSim.AvatarPositions[avataruuid], true).ToString(), [avatar]);
         }
 
         [About("Rotates the avatar to face a rotation from north in Degrees")]
@@ -175,7 +170,7 @@ namespace SecondBotEvents.Commands
         {
             if (float.TryParse(deg, out float target_yaw) == true)
             {
-                return Failure("Unable to process rotation", new [] { deg });
+                return Failure("Unable to process rotation", [deg]);
             }
             float yaw = target_yaw;
             GetClient().Self.Movement.BodyRotation.GetEulerAngles(out float roll, out float pitch, out _);
@@ -198,7 +193,7 @@ namespace SecondBotEvents.Commands
             result.Z = cosYawOver2 * cosPitchOver2 * sinRollOver2 - sinYawOver2 * sinPitchOver2 * cosRollOver2;
             GetClient().Self.Movement.BodyRotation = result;
             GetClient().Self.Movement.SendUpdate();
-            return BasicReply("ok", new [] { deg });
+            return BasicReply("ok", [deg]);
         }
 
 
@@ -215,9 +210,9 @@ namespace SecondBotEvents.Commands
             bool status = TeleportRequest(region+"/"+x+"/"+y+"/"+z);
             if (status == false)
             {
-                return Failure("Error Unable to Teleport to location", new [] { region, x, y, z });
+                return Failure("Error Unable to Teleport to location", [region, x, y, z]);
             }
-            return BasicReply("Accepted", new [] { region, x, y, z });
+            return BasicReply("Accepted", [region, x, y, z]);
         }
 
 
@@ -229,16 +224,16 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(slurl) == false)
             {
-                return Failure("slurl is empty", new [] { slurl });
+                return Failure("slurl is empty", [slurl]);
             }
-            return BasicReply(TeleportRequest(slurl).ToString(), new [] { slurl });
+            return BasicReply(TeleportRequest(slurl).ToString(), [slurl]);
         }
 
         protected bool TeleportRequest(string url)
         {
             // Viserion/66/166/23
             GetClient().Self.AutoPilotCancel();
-            SimSlURL A = new SimSlURL(url);
+            SimSlURL A = new(url);
             if(A.name == null)
             {
                 return false;

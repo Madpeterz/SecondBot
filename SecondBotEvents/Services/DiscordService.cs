@@ -89,7 +89,7 @@ namespace SecondBotEvents.Services
             return Task.CompletedTask;
         }
 
-        private readonly object m_discordEventChatLock = new object();
+        private readonly object m_discordEventChatLock = new();
         private EventHandler<SocketMessage> m_discordChatEvent;
 
         /// <summary>Raised when a scripted object or agent within range sends a public message</summary>
@@ -104,27 +104,27 @@ namespace SecondBotEvents.Services
             if (GetReadyForDiscordActions() == false)
             {
                 // bot is not ready this message should not have got here yet.
-                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "not ready" });
+                return new KeyValuePair<bool, List<string>>(false, ["not ready"]);
             }
             if (ulong.TryParse(givenserverid, out ulong serverid) == false)
             {
-                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "invaild server" });
+                return new KeyValuePair<bool, List<string>>(false, ["invaild server"]);
             }
             if (ulong.TryParse(givenmemberid, out ulong memberid) == false)
             {
-                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "invaild member" });
+                return new KeyValuePair<bool, List<string>>(false, ["invaild member"]);
             }
             SocketGuild server = DiscordClient.GetGuild(serverid);
             if (server == null)
             {
-                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "Cant get server" });
+                return new KeyValuePair<bool, List<string>>(false, ["Cant get server"]);
             }
             SocketGuildUser user = server.GetUser(memberid);
             if (user == null)
             {
-                return new KeyValuePair<bool, List<string>>(false, new List<string>() { "Cant get user" });
+                return new KeyValuePair<bool, List<string>>(false, ["Cant get user"]);
             }
-            List<string> roleids = new List<string>();
+            List<string> roleids = [];
             foreach (SocketRole role in user.Roles)
             {
                 roleids.Add(role.Id.ToString());
@@ -132,7 +132,7 @@ namespace SecondBotEvents.Services
             return new KeyValuePair<bool, List<string>>(true, roleids);
         }
 
-        protected HttpClient HTTPclient = new HttpClient();
+        protected HttpClient HTTPclient = new();
         protected bool MessageInteractionEvent(SocketMessage message, SocketChannel socketChannel)
         {
             if (myConfig.GetInteractionEnabled() != true)
@@ -155,8 +155,8 @@ namespace SecondBotEvents.Services
             string getmessage = message.Content.Replace(myConfig.GetInteractionCommandName(), "");
             long unixtime = SecondbotHelpers.UnixTimeNow();
             string hash = SecondbotHelpers.GetSHA1(unixtime.ToString() + getmessage + master.CommandsService.myConfig.GetSharedSecret());
-            Dictionary<string, string> values = new Dictionary<string, string>
-                    {
+            Dictionary<string, string> values = new()
+            {
                         { "message", getmessage },
                         { "username", message.Author.Username },
                         { "userid", message.Author.Id.ToString() },
@@ -310,8 +310,7 @@ namespace SecondBotEvents.Services
             {
                 // handle group notice
                 // !notice {Title}@@@{Message}[@@@{Inventory UUID}]
-                List<string> args = new List<string>();
-                args.Add(groupuuid.ToString());
+                List<string> args = [groupuuid.ToString()];
                 cleaned = cleaned.Replace("!notice ", "");
                 bits = cleaned.Split("@@@", StringSplitOptions.RemoveEmptyEntries);
                 args.AddRange(bits);
@@ -321,10 +320,10 @@ namespace SecondBotEvents.Services
                     ReplyToMessage(message, "Notices require title and a message split with @@@!");
                     return;
                 }
-                SignedCommand C = new SignedCommand(
+                SignedCommand C = new(
                     master.CommandsService,
                     "discordapi",
-                    "Groupnotice", null, args.ToArray(), 0, "none", false, 0, "", false);
+                    "Groupnotice", null, [.. args], 0, "none", false, 0, "", false);
                 if (bits.Length == 3)
                 {
                     C.command = "GroupnoticeWithAttachment";
@@ -336,35 +335,27 @@ namespace SecondBotEvents.Services
             {
                 // handle group eject
                 cleaned = cleaned.Replace("!eject ", "");
-                List<string> args = new List<string>();
-                args.Add(groupuuid.ToString());
-                args.Add(cleaned);
+                List<string> args = [groupuuid.ToString(), cleaned];
                 RunCommandFromMessage(new SignedCommand(master.CommandsService,
-                    "discordapi", "GroupEject", null, args.ToArray(), 0, "none", false, 0, "", false), message);
+                    "discordapi", "GroupEject", null, [.. args], 0, "none", false, 0, "", false), message);
                 return;
             }
             else if(cleaned.StartsWith("!invite") == true)
             {
                 // hangle group invite
                 cleaned = cleaned.Replace("!invite ", "");
-                List<string> args = new List<string>();
-                args.Add(groupuuid.ToString());
-                args.Add(cleaned);
-                args.Add("everyone");
+                List<string> args = [groupuuid.ToString(), cleaned, "everyone"];
                 RunCommandFromMessage(new SignedCommand(master.CommandsService,
-                    "discordapi", "GroupInvite", null, args.ToArray(), 0, "none", false, 0, "", false), message);
+                    "discordapi", "GroupInvite", null, [.. args], 0, "none", false, 0, "", false), message);
                 return;
             }
             else if(cleaned.StartsWith("!ban") == true)
             {
                 // hangle group ban
                 cleaned = cleaned.Replace("!ban ", "");
-                List<string> args = new List<string>();
-                args.Add(groupuuid.ToString());
-                args.Add(cleaned);
-                args.Add("true");
+                List<string> args = [groupuuid.ToString(), cleaned, "true"];
                 RunCommandFromMessage(new SignedCommand(master.CommandsService,
-                    "discordapi", "GroupBan", null, args.ToArray(), 0, "none", false, 0, "", false), message);
+                    "discordapi", "GroupBan", null, [.. args], 0, "none", false, 0, "", false), message);
                 return;
             }
             if (myConfig.GethideChatterName() == false)
@@ -713,20 +704,20 @@ namespace SecondBotEvents.Services
             return "group=" + groupuuid.ToString() + "||| !clear !notice {Title}@@@{Message}[@@@{Inventory UUID}] !eject {Avatar} !invite {Avatar} !ban {Avatar}";
         }
 
-        protected Dictionary<string, ulong> ChannelMap = new Dictionary<string, ulong>();
-        protected Dictionary<string, ulong> CategoryMap = new Dictionary<string, ulong>();
+        protected Dictionary<string, ulong> ChannelMap = [];
+        protected Dictionary<string, ulong> CategoryMap = [];
 
         protected async void DoServerChannelSetup()
         {
             LogFormater.Info("Setting up channels");
             LoginEvents();
-            Dictionary<string, string> WantedTextChannels = new Dictionary<string, string>
+            Dictionary<string, string> WantedTextChannels = new()
             {
                 { "status", StatusPrefill() },
                 { "commands", "Send a command to the bot as if you are a master" },
                 { "localchat", LocalChatPrefill() }
             };
-            ChannelMap = new Dictionary<string, ulong>();
+            ChannelMap = [];
 
             SocketGuild server = DiscordClient.GetGuild(myConfig.GetServerID());
             foreach (ITextChannel channel in server.TextChannels)
@@ -750,12 +741,12 @@ namespace SecondBotEvents.Services
 
             }
 
-            List<string> WantedCategoryChannels = new List<string>
-            {
+            List<string> WantedCategoryChannels =
+            [
                 "bot",
                 "im",
                 "group"
-            };
+            ];
             foreach (ICategoryChannel category in server.CategoryChannels)
             {
                 if (WantedCategoryChannels.Contains(category.Name) == false)
@@ -834,7 +825,7 @@ namespace SecondBotEvents.Services
             SendMessageToChannel("localchat", LocalChatPrefill(), ":white_small_square: "+ objectName + ": " + message, "bot");
         }
 
-        readonly string[] hard_blocked_agents = new[] { "secondlife", "second life" };
+        readonly string[] hard_blocked_agents = ["secondlife", "second life"];
         protected void LocalChat(object o, ChatEventArgs e)
         {
             switch (e.Type)
@@ -1093,10 +1084,10 @@ namespace SecondBotEvents.Services
         {
             if (ulong.TryParse(givenserverid, out ulong serverid) == true)
             {
-                return new KeyValuePair<bool, Dictionary<string, string>>(false, new Dictionary<string, string>());
+                return new KeyValuePair<bool, Dictionary<string, string>>(false, []);
             }
             SocketGuild server = DiscordClient.GetGuild(serverid);
-            Dictionary<string, string> textChannels = new Dictionary<string, string>();
+            Dictionary<string, string> textChannels = [];
             foreach (SocketTextChannel channel in server.TextChannels)
             {
                 textChannels.Add(channel.Id.ToString(), channel.Name);
@@ -1124,10 +1115,10 @@ namespace SecondBotEvents.Services
         {
             if (ulong.TryParse(givenserverid, out ulong serverid) == false)
             {
-                return new KeyValuePair<bool, Dictionary<string, string>>(false, new Dictionary<string, string>());
+                return new KeyValuePair<bool, Dictionary<string, string>>(false, []);
             }
             SocketGuild server = DiscordClient.GetGuild(serverid);
-            Dictionary<string, string> rolesList = new Dictionary<string, string>();
+            Dictionary<string, string> rolesList = [];
             foreach (SocketRole role in server.Roles)
             {
                 rolesList.Add(role.Id.ToString(), role.Name);
@@ -1282,17 +1273,17 @@ namespace SecondBotEvents.Services
         {
             if (ulong.TryParse(givenserverid, out ulong serverid) == false)
             {
-                return new KeyValuePair<bool, Dictionary<string, string>>(false, new Dictionary<string, string>());
+                return new KeyValuePair<bool, Dictionary<string, string>>(false, []);
             }
             if (ulong.TryParse(givenroleid, out ulong roleid) == false)
             {
-                return new KeyValuePair<bool, Dictionary<string, string>>(false, new Dictionary<string, string>());
+                return new KeyValuePair<bool, Dictionary<string, string>>(false, []);
             }
             SocketGuild server = DiscordClient.GetGuild(serverid);
             SocketRole role = server.GetRole(roleid);
-            Dictionary<string, string> settings = new Dictionary<string, string>
+            Dictionary<string, string> settings = new()
             {
-                { "Config|Color", String.Join(",", new byte[3] { role.Color.R, role.Color.G, role.Color.B }) },
+                { "Config|Color", String.Join(",", [role.Color.R, role.Color.G, role.Color.B]) },
                 { "Config|Name", role.Name },
                 { "Info|AssignedCount", role.Members.ToString() },
                 { "Perm|AttachFiles", role.Permissions.AttachFiles.ToString() },
@@ -1388,11 +1379,11 @@ namespace SecondBotEvents.Services
         {
             if (ulong.TryParse(givenserverid, out ulong serverid) == false)
             {
-                return new KeyValuePair<bool, Dictionary<string, string>>(false, new Dictionary<string, string>());
+                return new KeyValuePair<bool, Dictionary<string, string>>(false, []);
             }
             SocketGuild server = DiscordClient.GetGuild(serverid);
             IEnumerable<IGuildUser> users = await server.GetUsersAsync().FlattenAsync().ConfigureAwait(true);
-            Dictionary<string, string> membersList = new Dictionary<string, string>();
+            Dictionary<string, string> membersList = [];
 
             foreach (IGuildUser user in users)
             {
@@ -1454,13 +1445,13 @@ namespace SecondBotEvents.Services
             }
             SocketGuild server = DiscordClient.GetGuild(serverid);
             SocketGuildUser user = server.GetUser(memberid);
-            TimeSpan somedays = new TimeSpan(13, 22, 59, 59, 0);
+            TimeSpan somedays = new(13, 22, 59, 59, 0);
             DateTimeOffset justundertwosweeks = DateTimeOffset.Now;
             justundertwosweeks = justundertwosweeks.Subtract(somedays);
             long unixtimelimit = justundertwosweeks.ToUnixTimeSeconds();
             foreach (SocketTextChannel channel in server.TextChannels)
             {
-                List<IMessage> DeleteMessages = new List<IMessage>();
+                List<IMessage> DeleteMessages = [];
                 IEnumerable<IMessage> messages = await channel.GetMessagesAsync(100).FlattenAsync();
                 foreach (IMessage message in messages)
                 {

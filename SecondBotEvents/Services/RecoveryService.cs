@@ -4,14 +4,10 @@ using System.Threading;
 using Timer = System.Timers.Timer;
 namespace SecondBotEvents.Services
 {
-    public class RecoveryService : BotServices
+    public class RecoveryService(EventsSecondBot setMaster) : BotServices(setMaster)
     {
         protected Timer AutoRestartLoginTimer;
-        protected new BasicConfig myConfig;
-        public RecoveryService(EventsSecondBot setMaster) : base(setMaster)
-        {
-            myConfig = new BasicConfig(false);
-        }
+        protected new BasicConfig myConfig = new BasicConfig(false);
 
         public override string Status()
         {

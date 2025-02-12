@@ -7,13 +7,8 @@ using System;
 namespace SecondBotEvents.Commands
 {
     [ClassInfo("Interface for streamadmin to create notecards, you will prob never need this")]
-    public class StreamAdmin : CommandsAPI
+    public class StreamAdmin(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public StreamAdmin(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
-
-
         [About("A streamadin command")]
         [ReturnHints("True|False")]
         [ReturnHintsFailure("Bad reply:  ...")]
@@ -28,11 +23,11 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(endpoint) == false)
             {
-                return Failure("Endpoint is empty", new [] { endpoint, endpointcode });
+                return Failure("Endpoint is empty", [endpoint, endpointcode]);
             }
             if (SecondbotHelpers.notempty(endpointcode) == false)
             {
-                return Failure("Endpointcode is empty", new [] { endpoint, endpointcode });
+                return Failure("Endpointcode is empty", [endpoint, endpointcode]);
             }
 
             string attempt_endpoint = endpoint + "sys.php";
@@ -48,34 +43,34 @@ namespace SecondBotEvents.Commands
             RestResponse endpoint_checks = client.ExecutePostAsync(request).Result;
             if (endpoint_checks.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                return Failure("HTTP status code: " + endpoint_checks.StatusCode.ToString(), new [] { endpoint, endpointcode });
+                return Failure("HTTP status code: " + endpoint_checks.StatusCode.ToString(), [endpoint, endpointcode]);
             }
             try
             {
                 NotecardEndpoint server_reply = JsonConvert.DeserializeObject<NotecardEndpoint>(endpoint_checks.Content);
                 if (server_reply.status == false)
                 {
-                    return Failure("Bad reply: " + server_reply.message, new [] { endpoint, endpointcode });
+                    return Failure("Bad reply: " + server_reply.message, [endpoint, endpointcode]);
                 }
                 if (server_reply.NotecardTitle.Length < 3)
                 {
-                    return Failure("Notecard title is to short", new [] { endpoint, endpointcode });
+                    return Failure("Notecard title is to short", [endpoint, endpointcode]);
                 }
                 ProcessAvatar(server_reply.AvatarUUID);
                 if(avataruuid == UUID.Zero)
                 {
-                    return Failure("Unable to unpack avatar", new[] { endpoint, endpointcode });
+                    return Failure("Unable to unpack avatar", [endpoint, endpointcode]);
                 }
                 bool result = master.BotClient.SendNotecard(server_reply.NotecardTitle, server_reply.NotecardContent, avataruuid);
                 if (result == false)
                 {
-                    return Failure("Failed to create/send notecard", new[] { endpoint, endpointcode });
+                    return Failure("Failed to create/send notecard", [endpoint, endpointcode]);
                 }
                 return BasicReply("ok");
             }
             catch (Exception e)
             {
-                return Failure("Error: " + e.Message + "", new [] { endpoint, endpointcode });
+                return Failure("Error: " + e.Message + "", [endpoint, endpointcode]);
             }
         }
 

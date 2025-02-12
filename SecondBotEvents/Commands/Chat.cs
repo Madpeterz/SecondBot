@@ -5,12 +5,8 @@ using SecondBotEvents.Services;
 namespace SecondBotEvents.Commands
 {
     [ClassInfo("Text based interaction,message status and history")]
-    public class Chat : CommandsAPI
+    public class Chat(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public Chat(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
-
         [About("fetchs the last localchat messages")]
         [ReturnHints("json encoded array")]
         public object LocalChatHistory()
@@ -27,11 +23,11 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.isempty(message) == true)
             {
-                return Failure("Message empty", new [] { channel, message });
+                return Failure("Message empty", [channel, message]);
             }
             if(int.TryParse(channel,out int channelnum) == false)
             {
-                return Failure("Invaild channel", new [] { channel, message });
+                return Failure("Invaild channel", [channel, message]);
             }
             master.DataStoreService.BotRecordLocalchatReply(message);
             GetClient().Self.Chat(message, channelnum, ChatType.Normal);
@@ -47,11 +43,11 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.isempty(message) == true)
             {
-                return Failure("Message empty", new[] { channel, message });
+                return Failure("Message empty", [channel, message]);
             }
             if (int.TryParse(channel, out int channelnum) == false)
             {
-                return Failure("Invaild channel", new[] { channel, message });
+                return Failure("Invaild channel", [channel, message]);
             }
             master.DataStoreService.BotRecordLocalchatReply(message);
             GetClient().Self.Chat(message, channelnum, ChatType.Shout);
@@ -67,11 +63,11 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.isempty(message) == true)
             {
-                return Failure("Message empty", new[] { channel, message });
+                return Failure("Message empty", [channel, message]);
             }
             if (int.TryParse(channel, out int channelnum) == false)
             {
-                return Failure("Invaild channel", new[] { channel, message });
+                return Failure("Invaild channel", [channel, message]);
             }
             master.DataStoreService.BotRecordLocalchatReply(message);
             GetClient().Self.Chat(message, channelnum, ChatType.Whisper);
@@ -91,15 +87,15 @@ namespace SecondBotEvents.Commands
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("avatar lookup", new [] { avatar, message });
+                return Failure("avatar lookup", [avatar, message]);
             }
             if (SecondbotHelpers.isempty(message) == true)
             {
-                return Failure("Message empty", new [] { avatar, message });
+                return Failure("Message empty", [avatar, message]);
             }
             master.DataStoreService.OpenChatWindow(false, avataruuid, avataruuid);
             master.BotClient.SendIM(avataruuid, message);
-            return BasicReply("ok",  new [] { avatar, message });
+            return BasicReply("ok",  [avatar, message]);
         }
 
         [About("gets a full list of all avatar chat windows")]

@@ -5,9 +5,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class DialogRelayConfig : Config
+    public class DialogRelayConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public DialogRelayConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
         protected override void MakeSettings()
         {
             filename = "dialogrelay";

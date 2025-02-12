@@ -22,13 +22,8 @@ using System;
 
 namespace SecondBotEvents.RLV
 {
-    public class RLVEventArgs : EventArgs
+    public class RLVEventArgs(RLVRule rule) : EventArgs
     {
-        public RLVRule Rule { set; get; }
-
-        public RLVEventArgs(RLVRule rule)
-        {
-            Rule = rule;
-        }
+        public RLVRule Rule { set; get; } = rule;
     }
 }

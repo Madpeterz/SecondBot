@@ -4,9 +4,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class RlvConfig : Config
+    public class RlvConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public RlvConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
         protected override void MakeSettings()
         {
             filename = "rlv";

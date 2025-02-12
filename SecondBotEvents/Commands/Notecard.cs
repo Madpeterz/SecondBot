@@ -7,12 +7,8 @@ using SecondBotEvents.Services;
 namespace SecondBotEvents.Commands
 {
     [ClassInfo("Why this is not a built in script command I will never know, but its due to needing this that the bot was made")]
-    public class Notecard : CommandsAPI
+    public class Notecard(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public Notecard(EventsSecondBot setmaster) : base(setmaster)
-        {
-        }
-
         [About("Reads the notecards content, if it is able to read the notecard will give a json reply of notecarduuid name and contents")]
         [ReturnHintsFailure("Not a vaild UUID")]
         [ReturnHintsFailure("Unable to find inventory item")]
@@ -27,28 +23,30 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("replytarget not set");
             }
-            NotecardReadReply reply = new NotecardReadReply();
-            reply.uuid = notecardInventoryUUID;
-            reply.name = "?";
-            reply.status = false;
-            reply.content = "Not a vaild UUID";
+            NotecardReadReply reply = new()
+            {
+                uuid = notecardInventoryUUID,
+                name = "?",
+                status = false,
+                content = "Not a vaild UUID"
+            };
             if (UUID.TryParse(notecardInventoryUUID, out var uuid) == false)
             {
                 master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
-                return Failure(reply.content, new[] { notecardInventoryUUID });
+                return Failure(reply.content, [notecardInventoryUUID]);
             }
             reply.content = "Unable to find inventory item";
             InventoryItem item = GetClient().Inventory.FetchItem(uuid, GetClient().Self.AgentID, new System.TimeSpan(0, 1, 30));
             if (item == null)
             {
                 master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
-                return Failure(reply.content, new[] { notecardInventoryUUID });
+                return Failure(reply.content, [notecardInventoryUUID]);
             }
             reply.content = "Inventory item is not a notecard";
             if (item.InventoryType != InventoryType.Notecard)
             {
                 master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
-                return Failure(reply.content, new[] { notecardInventoryUUID }); ;
+                return Failure(reply.content, [notecardInventoryUUID]); ;
             }
             InventoryNotecard notecard = (InventoryNotecard)item;
             GetClient().Assets.RequestInventoryAsset(notecard, true, UUID.Random(), (AssetDownload transfer, Asset asset) =>
@@ -95,14 +93,14 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(collection) == false)
             {
-                return Failure("Collection value is empty", new [] { collection, content });
+                return Failure("Collection value is empty", [collection, content]);
             }
             if (SecondbotHelpers.notempty(content) == false)
             {
-                return Failure("Content value is empty", new [] { collection, content });
+                return Failure("Content value is empty", [collection, content]);
             }
             master.DataStoreService.AppendKeyValue("notecard_"+collection, content);
-            return BasicReply("ok", new [] { collection, master.DataStoreService.GetKeyValue("notecard_"+collection).Length.ToString() });
+            return BasicReply("ok", [collection, master.DataStoreService.GetKeyValue("notecard_"+collection).Length.ToString()]);
         }
 
         [About("Clears the contents of a collection")]
@@ -113,7 +111,7 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(collection) == false)
             {
-                return Failure("Collection value is empty", new [] { collection });
+                return Failure("Collection value is empty", [collection]);
             }
             master.DataStoreService.ClearKeyValue("notecard_" + collection);
             return BasicReply("ok");
@@ -132,26 +130,26 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(collection) == false)
             {
-                return Failure("Collection value is empty", new [] { avatar, collection, notecardname });
+                return Failure("Collection value is empty", [avatar, collection, notecardname]);
             }
             if (SecondbotHelpers.notempty(notecardname) == false)
             {
-                return Failure("Notecardname value is empty", new [] { avatar, collection, notecardname });
+                return Failure("Notecardname value is empty", [avatar, collection, notecardname]);
             }
             ProcessAvatar(avatar);
             if(avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar uuid", new [] { avatar, collection, notecardname });
+                return Failure("Invaild avatar uuid", [avatar, collection, notecardname]);
             }
             string content = master.DataStoreService.GetKeyValue("notecard_" + collection);
             if(content.Length <= 3)
             {
-                return Failure("No content in notecard storage ?", new[] { avatar, collection, notecardname });
+                return Failure("No content in notecard storage ?", [avatar, collection, notecardname]);
             }
             bool result = master.BotClient.SendNotecard(notecardname, content, avataruuid);
             if (result == false)
             {
-                return Failure("Failed to create/send notecard", new[] { avatar, content, notecardname });
+                return Failure("Failed to create/send notecard", [avatar, content, notecardname]);
             }
             master.DataStoreService.ClearKeyValue("notecard_" + collection);
             return BasicReply("ok");
@@ -169,21 +167,21 @@ namespace SecondBotEvents.Commands
         {
             if (SecondbotHelpers.notempty(notecardname) == false)
             {
-                return Failure("notecardname value is empty", new[] { avatar, content, notecardname });
+                return Failure("notecardname value is empty", [avatar, content, notecardname]);
             }
             if (SecondbotHelpers.notempty(content) == false)
             {
-                return Failure("content value is empty", new[] { avatar, content, notecardname });
+                return Failure("content value is empty", [avatar, content, notecardname]);
             }
             ProcessAvatar(avatar);
             if (avataruuid == UUID.Zero)
             {
-                return Failure("Invaild avatar uuid", new[] { avatar, content, notecardname });
+                return Failure("Invaild avatar uuid", [avatar, content, notecardname]);
             }
             bool result = master.BotClient.SendNotecard(notecardname, content, avataruuid);
             if(result == false)
             {
-                return Failure("Failed to create/send notecard", new[] { avatar, content, notecardname });
+                return Failure("Failed to create/send notecard", [avatar, content, notecardname]);
             }
             return BasicReply("ok");
         }

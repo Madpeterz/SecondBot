@@ -48,7 +48,7 @@ namespace SecondBotEvents.Services
         {
             if (misc == null)
             {
-                misc = new Dictionary<string, string>();
+                misc = [];
             }
             if (myConfig.GetEnabled() == false)
             {
@@ -160,8 +160,10 @@ namespace SecondBotEvents.Services
 
         protected void JsonOuputCleaner(string misc, string source)
         {
-            Dictionary<string, string> reply = new Dictionary<string, string>();
-            reply.Add("value", misc);
+            Dictionary<string, string> reply = new()
+            {
+                { "value", misc }
+            };
             JsonOuputCleaner(reply, source);
         }
 
@@ -198,8 +200,10 @@ namespace SecondBotEvents.Services
                 mode = "Teleport Av to Bot";
                 markTeleport = false;
             }
-            Dictionary<string,string> misc = new Dictionary<string, string>();
-            misc.Add("mode", mode);
+            Dictionary<string,string> misc = new()
+            {
+                { "mode", mode }
+            };
             if (ProcessRequest(myConfig.GetAcceptTeleports(),myConfig.GetTeleportRequestLevel(), e.IM.FromAgentName, "Teleport", e.IM.FromAgentID, misc) == false)
             {
                 // rejected requests
@@ -226,9 +230,11 @@ namespace SecondBotEvents.Services
 
         protected void BotGroupInviteOffer(object o, GroupInvitationEventArgs e)
         {
-            Dictionary<string, string> reply = new Dictionary<string, string>();
-            reply.Add("message", e.Message);
-            reply.Add("fromuuid", e.AgentID.ToString());
+            Dictionary<string, string> reply = new()
+            {
+                { "message", e.Message },
+                { "fromuuid", e.AgentID.ToString() }
+            };
             if (ProcessRequest(myConfig.GetAcceptGroupInvites(),myConfig.GetGroupInviteLevel(), e.FromName, "GroupInvite", e.AgentID, reply) == false)
             {
                 return;
@@ -240,7 +246,7 @@ namespace SecondBotEvents.Services
         protected void BotInventoryAdd(object o, InventoryObjectAddedEventArgs e)
         {
             InventoryItem F = (InventoryItem)e.Obj;
-            Dictionary<string, string> details = new Dictionary<string, string>
+            Dictionary<string, string> details = new()
             {
                 { "itemname", e.Obj.Name },
                 { "itemuuid", e.Obj.UUID.ToString() },
@@ -255,7 +261,7 @@ namespace SecondBotEvents.Services
 
         protected void BotInventoryOffer(object o, InventoryObjectOfferedEventArgs e)
         {
-            Dictionary<string, string> details = new Dictionary<string, string>
+            Dictionary<string, string> details = new()
             {
                 { "transactionid", e.Offer.IMSessionID.ToString() },
                 { "itemtype", e.AssetType.ToString() },
@@ -285,8 +291,10 @@ namespace SecondBotEvents.Services
 
         protected void BotFriendRequested(object o, FriendshipOfferedEventArgs e)
         {
-            Dictionary<string, string> misc = new Dictionary<string, string>();
-            misc.Add("fromName", e.AgentName);
+            Dictionary<string, string> misc = new()
+            {
+                { "fromName", e.AgentName }
+            };
             if (ProcessRequest(myConfig.GetAcceptFriendRequests(),myConfig.GetFriendRequestLevel(), e.AgentName, "FriendRequest", e.AgentID, misc) == false)
             {
                 return;
@@ -370,7 +378,7 @@ namespace SecondBotEvents.Services
         public string eventType = "?";
         public bool accepted = false;
         public string info = "";
-        public Dictionary<string, string> misc = new Dictionary<string, string>();
+        public Dictionary<string, string> misc = [];
         public InteractionEvent(string setFrom, string setType, bool setAccepted, string setInfo, Dictionary<string, string> setMisc = null)
         {
             accepted = setAccepted;

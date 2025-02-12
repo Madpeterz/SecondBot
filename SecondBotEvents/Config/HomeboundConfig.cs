@@ -5,9 +5,8 @@ using System.Text;
 
 namespace SecondBotEvents.Config
 {
-    public class HomeboundConfig : Config
+    public class HomeboundConfig(bool fromENV, string fromFolder = "") : Config(fromENV, fromFolder)
     {
-        public HomeboundConfig(bool fromENV, string fromFolder = "") : base(fromENV, fromFolder) { }
         protected override void MakeSettings()
         {
             filename = "homebound";

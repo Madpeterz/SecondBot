@@ -17,7 +17,7 @@ namespace SecondBotEvents.Services
 {
     public class RLVService : BotServices
     {
-        protected RlvConfig myConfig;
+        protected new RlvConfig myConfig;
         protected bool botConnected = false;
         protected CurrentOutfitFolder CurrentOutfitFolder = null;
 
@@ -77,11 +77,11 @@ namespace SecondBotEvents.Services
             CurrentOutfitFolder = master.CurrentOutfitFolder;
             botConnected = true;
             // attach events
-            RLVWearables = new List<RLVWearable>();
-            RLVAttachments = new List<RLVAttachment>
-            {
+            RLVWearables = [];
+            RLVAttachments =
+            [
                 new RLVAttachment() {Name = "none", Point = AttachmentPoint.Default}
-            };
+            ];
             foreach (WearableType wear in Enum.GetValues(typeof(WearableType)))
             {
                 if (wear.Equals(WearableType.Invalid)) continue;
@@ -178,7 +178,7 @@ namespace SecondBotEvents.Services
         }
 
         /// <summary>Thread sync lock object</summary>
-        private readonly object m_RLVRuleChangedLock = new object();
+        private readonly object m_RLVRuleChangedLock = new();
 
         /// <summary>Triggered when an RLVRuleChangedUpdate packet is received,
         /// telling us what our avatar is currently wearing
@@ -239,8 +239,8 @@ namespace SecondBotEvents.Services
 
         GridClient client => instance.BotClient.GetClient();
         EventsSecondBot instance = null;
-        readonly Regex rlv_regex = new Regex(@"(?<behaviour>[^:=]+)(:(?<option>[^=]*))?=(?<param>\w+)", RegexOptions.Compiled);
-        readonly List<RLVRule> rules = new List<RLVRule>();
+        readonly Regex rlv_regex = new(@"(?<behaviour>[^:=]+)(:(?<option>[^=]*))?=(?<param>\w+)", RegexOptions.Compiled);
+        readonly List<RLVRule> rules = [];
         System.Timers.Timer CleanupTimer;
 
         void StartTimer()
@@ -459,13 +459,11 @@ namespace SecondBotEvents.Services
                     case "getsitid":
                         if (int.TryParse(rule.Param, out chan) && chan > 0)
                         {
-                            Avatar me;
-                            if (client.Network.CurrentSim.ObjectsAvatars.TryGetValue(client.Self.LocalID, out me))
+                            if (client.Network.CurrentSim.ObjectsAvatars.TryGetValue(client.Self.LocalID, out Avatar me))
                             {
                                 if (me.ParentID != 0)
                                 {
-                                    Primitive seat;
-                                    if (client.Network.CurrentSim.ObjectsPrimitives.TryGetValue(me.ParentID, out seat))
+                                    if (client.Network.CurrentSim.ObjectsPrimitives.TryGetValue(me.ParentID, out Primitive seat))
                                     {
                                         Respond(chan, seat.ID.ToString());
                                         break;
@@ -522,8 +520,8 @@ namespace SecondBotEvents.Services
                             {
                                 UUID.TryParse(rule.Option, out sitTarget);
                             }
-                            string[] args = { sitTarget.ToString() };
-                            SignedCommand C = new SignedCommand(master.CommandsService, "rlv", "Sit", null, args, 0, "", false, 0, "", false);
+                            string[] args = [sitTarget.ToString()];
+                            SignedCommand C = new(master.CommandsService, "rlv", "Sit", null, args, 0, "", false, 0, "", false);
                             master.CommandsService.RunCommand("RLV",C);
                         }
                         break;
@@ -532,7 +530,7 @@ namespace SecondBotEvents.Services
                         if (rule.Param == "force")
                         {
                             // stand
-                            SignedCommand C = new SignedCommand(master.CommandsService, "rlv", "Stand", null, new string[] { }, 0, "", false, 0, "", false);
+                            SignedCommand C = new(master.CommandsService, "rlv", "Stand", null, [], 0, "", false, 0, "", false);
                             master.CommandsService.RunCommand("RLV", C);
                         }
                         break;
@@ -558,8 +556,7 @@ namespace SecondBotEvents.Services
                                     float gx = float.Parse(coord[0], Utils.EnUsCulture);
                                     float gy = float.Parse(coord[1], Utils.EnUsCulture);
                                     float z = float.Parse(coord[2], Utils.EnUsCulture);
-                                    float x = 0, y = 0;
-                                    ulong h = Helpers.GlobalPosToRegionHandle(gx, gy, out x, out y);
+                                    ulong h = Helpers.GlobalPosToRegionHandle(gx, gy, out float x, out float y);
                                     client.Self.RequestTeleport(h, new Vector3(x, y, z));
                                 }
                                 else if (
@@ -572,8 +569,7 @@ namespace SecondBotEvents.Services
                                     float y = float.Parse(coord[2], Utils.EnUsCulture);
                                     float z = float.Parse(coord[3], Utils.EnUsCulture);
 
-                                    GridRegion r;
-                                    client.Grid.GetGridRegion(n, GridLayerType.Objects, out r);
+                                    client.Grid.GetGridRegion(n, GridLayerType.Objects, out GridRegion r);
                                     client.Self.RequestTeleport(r.RegionHandle, new Vector3(x, y, z));
                                 }
                             }
@@ -701,7 +697,7 @@ namespace SecondBotEvents.Services
                                 InventoryNode folder = FindFolder(rule.Option);
                                 if (folder != null)
                                 {
-                                    List<InventoryItem> allItems = new List<InventoryItem>();
+                                    List<InventoryItem> allItems = [];
                                     AllSubfolderWearables(folder, ref allItems);
                                     List<InventoryItem> allSubfolderWorn = allItems.Where(n => CurrentOutfitFolder.CanBeWorn(n)).ToList();
                                     master.CurrentOutfitFolder.RemoveFromOutfit(allSubfolderWorn);
@@ -719,7 +715,7 @@ namespace SecondBotEvents.Services
                                 var folder = client.Inventory.Store.Items[CurrentOutfitFolder.GetAttachmentItem(attachment)].Parent;
                                 if (folder != null)
                                 {
-                                    List<InventoryItem> outfit = new List<InventoryItem>();
+                                    List<InventoryItem> outfit = [];
                                     GetAllItems(folder, true, ref outfit);
                                     master.CurrentOutfitFolder.RemoveFromOutfit(outfit);
                                 }
@@ -755,7 +751,7 @@ namespace SecondBotEvents.Services
                                 if (folder != null)
                                 {
                                     UUID folderload = GetFolderFromPath(rule.Option);
-                                    List<InventoryItem> outfit = new List<InventoryItem>();
+                                    List<InventoryItem> outfit = [];
                                     if (rule.Behaviour == "attachall" || rule.Behaviour == "attachallover")
                                     {
                                         GetAllItems(folder, true, ref outfit);
@@ -814,9 +810,9 @@ namespace SecondBotEvents.Services
                     case "findfolders":
                         if (int.TryParse(rule.Param, out chan) && chan > 0)
                         {
-                            StringBuilder response = new StringBuilder();
+                            StringBuilder response = new();
 
-                            string[] keywordsArray = rule.Option.Split(new string[] { "&&" }, StringSplitOptions.None);
+                            string[] keywordsArray = rule.Option.Split(["&&"], StringSplitOptions.None);
                             if (keywordsArray.Any())
                             {
                                 List<InventoryNode> matching_nodes = FindFoldersKeyword(keywordsArray);
@@ -1031,7 +1027,7 @@ namespace SecondBotEvents.Services
             var root = RLVRootFolder();
             if (root != null)
             {
-                FindFoldersKeywordsInternal(root, keywords, new List<string>(), ref matchingNodes);
+                FindFoldersKeywordsInternal(root, keywords, [], ref matchingNodes);
             }
 
             return matchingNodes;
@@ -1084,7 +1080,7 @@ namespace SecondBotEvents.Services
 
         public List<string> GetOptions(string behaviour)
         {
-            List<string> ret = new List<string>();
+            List<string> ret = [];
 
             foreach (var rule in rules.FindAll(r => r.Behaviour == behaviour && !string.IsNullOrEmpty(r.Option))
                                       .Where(rule => !ret.Contains(rule.Option)))

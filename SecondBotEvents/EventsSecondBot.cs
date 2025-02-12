@@ -15,7 +15,7 @@ namespace SecondBotEvents
             new WikiMake();
 #endif
                 LogFormater.Info("Welcome to Secondbot [Events build] version: " + AssemblyInfo.GetGitHash());
-                EventsSecondBot worker = new EventsSecondBot(args);
+                EventsSecondBot worker = new(args);
 
                 while (worker.Exit() == false)
                 {
@@ -62,7 +62,7 @@ namespace SecondBotEvents
             remove { lock (SystemStatusMessagesEventsLockable) { SystemStatusMessages -= value; } }
         }
 
-        private readonly object SystemStatusMessagesEventsLockable = new object();
+        private readonly object SystemStatusMessagesEventsLockable = new();
 
         public void TriggerSystemStatusMessageEvent(bool change, string message)
         {
@@ -76,7 +76,7 @@ namespace SecondBotEvents
             add { lock (BotclientEventNoticesLockable) { BotclientEventNotices += value; } }
             remove { lock (BotclientEventNoticesLockable) { BotclientEventNotices -= value; } }
         }
-        private readonly object BotclientEventNoticesLockable = new object();
+        private readonly object BotclientEventNoticesLockable = new();
 
         public void TriggerBotClientEvent(bool asRestart,bool asDC)
         {
@@ -118,7 +118,7 @@ namespace SecondBotEvents
             StartServices();
         }
 
-        protected Dictionary<string, BotServices> services = new Dictionary<string, BotServices>();
+        protected Dictionary<string, BotServices> services = [];
 
         public BotServices GetService(string classname)
         {
@@ -157,8 +157,8 @@ namespace SecondBotEvents
         public void StartServices()
         {
             Ready = false;
-            services = new Dictionary<string, BotServices>();
-            lastStatus = new Dictionary<string, string>();
+            services = [];
+            lastStatus = [];
             StopService("RecoveryService"); // kill the recovery service if its still running
             RegisterService("BotClientService", false);
             RegisterService("DataStoreService");
@@ -187,7 +187,7 @@ namespace SecondBotEvents
             Ready = true;
         }
 
-        Dictionary<string, string> lastStatus = new Dictionary<string, string>();
+        Dictionary<string, string> lastStatus = [];
         public void Status()
         {
             string Output = "";
@@ -277,14 +277,9 @@ namespace SecondBotEvents
         }
     }
 
-    public class SystemStatusMessage
+    public class SystemStatusMessage(bool setChanged, string setMessage)
     {
-        public bool changed = false;
-        public string message = "";
-        public SystemStatusMessage(bool setChanged, string setMessage)
-        {
-            changed = setChanged;
-            message = setMessage;
-        }
+        public bool changed = setChanged;
+        public string message = setMessage;
     }
 }
