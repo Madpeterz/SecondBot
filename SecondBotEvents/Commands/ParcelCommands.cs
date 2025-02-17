@@ -32,6 +32,20 @@ namespace SecondBotEvents.Commands
     [ClassInfo("Control the land under our feet")]
     public partial class ParcelCommands(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
+        [About("Requests the current parcel local id")]
+        [ReturnHints("parcel local id (int)")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        public object GetCurrentParcelId()
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
+            return BasicReply(targetparcel.LocalID.ToString());
+        }
+
         [About("Requests the bot update its list of parcels ready for other commands")]
         [ReturnHints("ok")]
         public object UpdateListOfParcels()
