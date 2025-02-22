@@ -352,7 +352,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unable to find item via path", [path, avatar]);
             }
-            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(25));
             if (itm == null)
             {
                 return Failure("Unable to find item with found uuid", [path, avatar]);
@@ -380,13 +380,60 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild item uuid", [item, avatar]);
             }
-            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(25));
             if (itm == null)
             {
                 return Failure("Unable to find item", [item, avatar]);
             }
             GetClient().Inventory.GiveItem(itm.UUID, itm.Name, itm.AssetType, avataruuid, false);
             return BasicReply("ok", [item, avatar]);
+        }
+        [About("sends a item to an avatar with extra steps to bypass inventory searchs")]
+        [ReturnHints("ok")]
+        [ReturnHints("Failed")]
+        [ReturnHints("Invaild avatar uuid")]
+        [ReturnHints("Invaild item uuid")]
+        [ReturnHints("Invaild item name")]
+        [ArgHints("itemuuid", "UUID of item in inventory")]
+        [ArgHints("itemname", "the name of the item in inventory")]
+        [ArgHints("itemtype", "texture, sound, callcard, landmark, lsltext, clothing, object, notecard, animatn, gesture, mesh, material")]
+        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        public object SendItemDirect(string itemuuid, string itemname, string itemtype, string avatar)
+        {
+            if (UUID.TryParse(itemuuid, out UUID targetitem) == false)
+            {
+                return Failure("Invaild item uuid", [itemuuid, itemname, itemtype, avatar]);
+            }
+            if(SecondbotHelpers.isempty(itemname) == true)
+            {
+                return Failure("Invaild item name", [itemuuid, itemname, itemtype, avatar]);
+            }
+            if (SecondbotHelpers.isempty(itemtype) == true)
+            {
+                return Failure("Invaild item name", [itemuuid, itemname, itemtype, avatar]);
+            }
+            AssetType matchtype = AssetType.Unknown;
+            itemtype = itemtype.ToLower();
+            foreach (AssetType matchme in (AssetType[])Enum.GetValues(typeof(AssetType)))
+            {
+                string checktype = matchme.ToString().ToLower();
+                if(checktype == itemtype)
+                {
+                    matchtype = matchme;
+                    break;
+                }
+            }
+            if(matchtype == AssetType.Unknown)
+            {
+                return Failure("Invaild item type", [itemuuid, itemname, itemtype, avatar]);
+            }
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("Invaild avatar uuid", [itemuuid, itemname, itemtype, avataruuid.ToString()]);
+            }
+            GetClient().Inventory.GiveItem(targetitem, itemname, matchtype, avataruuid, false);
+            return BasicReply("ok", [itemuuid, itemname, itemtype, avataruuid.ToString()]);
         }
         [About("Sends a folder to an avatar")]
         [ReturnHints("ok")]
