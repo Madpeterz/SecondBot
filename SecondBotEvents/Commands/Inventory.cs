@@ -16,7 +16,8 @@ namespace SecondBotEvents.Commands
     {
         [About("Attachs an event for inventory changes")]
         [ReturnHints("cleared")]
-        [ReturnHints("No action")]
+        [ReturnHintsFailure("No action")]
+        [ReturnHintsFailure("Events service is not running")]
         [ReturnHints("Event added")]
         [ArgHints("inventoryType", "Types: texture,sound,callcard,landmark,clothing,object,notecard,lsltext,lslbyte,animatn,gesture,mesh")]
         [ArgHints("outputTarget", "HTTP url, channel, avatar UUID or clear to remove all events for the selected type")]
@@ -61,8 +62,8 @@ namespace SecondBotEvents.Commands
 
         [About("rezs the item at the bots current location")]
         [ReturnHints("UUID of rezzed item")]
-        [ReturnHints("Invaild item UUID")]
-        [ReturnHints("Unable to find item")]
+        [ReturnHintsFailure("Invaild item UUID")]
+        [ReturnHintsFailure("Unable to find item")]
         [ArgHints("item", "UUID of item to rez")]
         public object RezObject(string item)
         {
@@ -82,9 +83,9 @@ namespace SecondBotEvents.Commands
 
         [About("renames a folder or inventory item")]
         [ReturnHints("ok")]
-        [ReturnHints("invaild item uuid")]
-        [ReturnHints("Item name is to short")]
-        [ReturnHints("Unable to find inventory item")]
+        [ReturnHintsFailure("invaild item uuid")]
+        [ReturnHintsFailure("Item name is to short")]
+        [ReturnHintsFailure("Unable to find inventory item")]
         [ArgHints("item", "UUID of item/folder to name")]
         [ArgHints("newname", "What we are changing it to")]
         public object RenameInventory(string item, string newname)
@@ -109,7 +110,7 @@ namespace SecondBotEvents.Commands
 
         [About("Attempts to Remove the given inventory item")]
         [ReturnHints("ok")]
-        [ReturnHints("invaild item uuid")]
+        [ReturnHintsFailure("invaild item uuid")]
         [ArgHints("item", "UUID of item")]
         public object DeleteInventoryItem(string item)
         {
@@ -123,7 +124,7 @@ namespace SecondBotEvents.Commands
 
         [About("Attempts to Remove the given inventory folder")]
         [ReturnHints("ok")]
-        [ReturnHints("invaild folder uuid")]
+        [ReturnHintsFailure("invaild folder uuid")]
         [ArgHints("folder", "UUID of folder")]
         public object DeleteInventoryFolder(string folder)
         {
@@ -137,7 +138,7 @@ namespace SecondBotEvents.Commands
 
         [About("Attempts to attach the given inventory item")]
         [ReturnHints("ok")]
-        [ReturnHints("invaild item uuid")] 
+        [ReturnHintsFailure("invaild item uuid")] 
         [ArgHints("item", "UUID of item")]
         public object Attach(string item)
         {
@@ -153,7 +154,7 @@ namespace SecondBotEvents.Commands
         [About("Attempts to Detach the given inventory item (or attachment point)")]
         [ReturnHints("ok")]
         [ReturnHints("okMulti")]
-        [ReturnHints("invaild item uuid pr invaild attach point")]
+        [ReturnHintsFailure("invaild item uuid pr invaild attach point")]
         [ArgHints("item", "UUID of item, or the attach point, or * to remove everything")]
         public object Detach(string item)
         {
@@ -187,10 +188,10 @@ namespace SecondBotEvents.Commands
 
         [About("Replaces the current avatar outfit with the contents of the given folder")]
         [ReturnHints("ok")]
-        [ReturnHints("Named folder value is empty")]
-        [ReturnHints("Cant find target folder")]
-        [ReturnHints("invaild folder uuid")]
-        [ReturnHints("target folder is empty or so full I cant get it in 5 secs...")]
+        [ReturnHintsFailure("Named folder value is empty")]
+        [ReturnHintsFailure("Cant find target folder")]
+        [ReturnHintsFailure("invaild folder uuid")]
+        [ReturnHintsFailure("target folder is empty or so full I cant get it in 5 secs...")]
         [ArgHints("folder", "UUID of the folder")]
         public object SwapOutfit(string folder)
         {
@@ -218,10 +219,10 @@ namespace SecondBotEvents.Commands
 
         [About("Replaces the current avatar outfit with the Clothing/[NAME] folder<br/>Please note: This does not use the outfits folder!<br/>Please do not use links in the folder!")]
         [ReturnHints("ok")]
-        [ReturnHints("Named folder value is empty")]
-        [ReturnHints("Cant find Clothing folder")]
-        [ReturnHints("Cant find target folder")]
-        [ReturnHints("target folder is empty or so full I cant get it in 5 secs...")]
+        [ReturnHintsFailure("Named folder value is empty")]
+        [ReturnHintsFailure("Cant find Clothing folder")]
+        [ReturnHintsFailure("Cant find target folder")]
+        [ReturnHintsFailure("target folder is empty or so full I cant get it in 5 secs...")]
         [ArgHints("name", "Name of the folder")]
         public object Outfit(string name)
         {
@@ -281,7 +282,7 @@ namespace SecondBotEvents.Commands
 
         [About("Searchs the notecards folder for notecards, any older than 31 days are deleted.<br/>Depending on the number of notecards this might require multiple calls!")]
         [ReturnHints("ok")]
-        [ReturnHints("Unable to find notecard folder")]
+        [ReturnHintsFailure("Unable to find notecard folder")]
         public object InventoryPurgeNotecards()
         {
             List<InventoryBase> T = GetClient().Inventory.Store.GetContents(GetClient().Inventory.Store.RootFolder);
@@ -321,7 +322,7 @@ namespace SecondBotEvents.Commands
 
         [About("converts a inventory uuid to a realworld uuid<br/>Needed for texture preview")]
         [ReturnHints("Asset UUID or UUID zero")]
-        [ReturnHints("Invaild item uuid")]
+        [ReturnHintsFailure("Invaild item uuid")]
         [ArgHints("item", "inventory level UUID of item")]
         public object GetRealUUID(string item)
         {
@@ -335,9 +336,9 @@ namespace SecondBotEvents.Commands
 
         [About("sends a item to an avatar via a path")]
         [ReturnHints("ok")]
-        [ReturnHints("Failed")]
-        [ReturnHints("Invaild avatar uuid")]
-        [ReturnHints("Unable to find item")]
+        [ReturnHintsFailure("Failed")]
+        [ReturnHintsFailure("Invaild avatar uuid")]
+        [ReturnHintsFailure("Unable to find item")]
         [ArgHints("path", "item name and path example: Notecard/sendme or Objects/DemoItem")]
         [ArgHints("avatar", "a UUID or Firstname Lastname")]
         public object SendItemByPath(string path, string avatar)
@@ -363,10 +364,10 @@ namespace SecondBotEvents.Commands
 
         [About("sends a item to an avatar")]
         [ReturnHints("ok")]
-        [ReturnHints("Failed")]
-        [ReturnHints("Invaild avatar uuid")]
-        [ReturnHints("Invaild item uuid")]
-        [ReturnHints("Unable to find item")]
+        [ReturnHintsFailure("Failed")]
+        [ReturnHintsFailure("Invaild avatar uuid")]
+        [ReturnHintsFailure("Invaild item uuid")]
+        [ReturnHintsFailure("Unable to find item")]
         [ArgHints("item", "UUID of item")]
         [ArgHints("avatar", "a UUID or Firstname Lastname")]
         public object SendItem(string item, string avatar)
@@ -390,10 +391,10 @@ namespace SecondBotEvents.Commands
         }
         [About("sends a item to an avatar with extra steps to bypass inventory searchs")]
         [ReturnHints("ok")]
-        [ReturnHints("Failed")]
-        [ReturnHints("Invaild avatar uuid")]
-        [ReturnHints("Invaild item uuid")]
-        [ReturnHints("Invaild item name")]
+        [ReturnHintsFailure("Failed")]
+        [ReturnHintsFailure("Invaild avatar uuid")]
+        [ReturnHintsFailure("Invaild item uuid")]
+        [ReturnHintsFailure("Invaild item name")]
         [ArgHints("itemuuid", "UUID of item in inventory")]
         [ArgHints("itemname", "the name of the item in inventory")]
         [ArgHints("itemtype", "texture, sound, callcard, landmark, lsltext, clothing, object, notecard, animatn, gesture, mesh, material")]
@@ -460,10 +461,10 @@ namespace SecondBotEvents.Commands
 
         [About("Sends a folder to an avatar")]
         [ReturnHints("ok")]
-        [ReturnHints("Failed")]
-        [ReturnHints("Invaild avatar uuid")]
-        [ReturnHints("Invaild folter uuid")]
-        [ReturnHints("Unable to find folder")]
+        [ReturnHintsFailure("Failed")]
+        [ReturnHintsFailure("Invaild avatar uuid")]
+        [ReturnHintsFailure("Invaild folter uuid")]
+        [ReturnHintsFailure("Unable to find folder")]
         [ArgHints("item", "UUID of item")]
         [ArgHints("avatar", "a UUID or Firstname Lastname")]
         public object SendFolder(string folder, string avatar)
@@ -489,11 +490,11 @@ namespace SecondBotEvents.Commands
         [About("Transfers a item [ARG 2] to a objects inventory [ARG 1] (And if set with the script running state [ARG 3])")]
         [ReturnHints("Transfering running script")]
         [ReturnHints("Transfering inventory")]
-        [ReturnHints("Invaild item uuid")]
-        [ReturnHints("Invaild object uuid")]
-        [ReturnHints("Unable to find inventory")]
-        [ReturnHints("Unable to find object")]
-        [ReturnHints("Invaild running")]
+        [ReturnHintsFailure("Invaild item uuid")]
+        [ReturnHintsFailure("Invaild object uuid")]
+        [ReturnHintsFailure("Unable to find inventory")]
+        [ReturnHintsFailure("Unable to find object")]
+        [ReturnHintsFailure("Invaild running")]
         [ArgHints("item",  "UUID of item")]
         [ArgHints("object", "the uuid of the object")]
         [ArgHints("running", "true if you wish the transfered script to be running otherwise false")]
@@ -556,7 +557,7 @@ namespace SecondBotEvents.Commands
 
         [About("Requests the inventory folder layout as a json object InventoryMapFolder<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>subfolders: InventoryMapFolder[]</li></ul>")]
         [ReturnHints("array of InventoryMapFolder")]
-        [ReturnHints("Error")]
+        [ReturnHintsFailure("Error")]
         public object InventoryFolders()
         {
             string reply = HelperInventory.MapFolderJson(GetClient());
@@ -567,7 +568,7 @@ namespace SecondBotEvents.Commands
         [About("Requests folders limited to selected folder")]
         [ArgHints("targetfolder", "the UUID of the folder or root")]
         [ReturnHints("single InventoryMapFolder")]
-        [ReturnHints("Error")]
+        [ReturnHintsFailure("Error")]
         public object InventoryFoldersLimited(string targetfolder)
         {
             string reply = HelperInventory.MapFolderJson(GetClient(), targetfolder,false);
@@ -577,7 +578,7 @@ namespace SecondBotEvents.Commands
 
         [About("Requests the contents of a folder as an array of InventoryMapItem<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>typename: String</li></ul>")]
         [ReturnHints("array of InventoryMapItem")]
-        [ReturnHints("Invaild folder UUID")]
+        [ReturnHintsFailure("Invaild folder UUID")]
         [ArgHints("folderUUID", "the folder to fetch (Found via: inventory/folders)")]
         public object InventoryContents(string folderUUID)
         {
