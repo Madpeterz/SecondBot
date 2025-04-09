@@ -696,6 +696,16 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok", [avatar]);
         }
 
+        [About("Returns all objects from the current parcel for all avatars")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        public object ParcelReturnAll()
+        {
+            GetClient().Parcels.ReturnObjects(GetClient().Network.CurrentSim, targetparcel.LocalID, ObjectReturnType.None, null);
+            return BasicReply("ok");
+        }
+
 
         [About("transfers the current parcel ownership to the assigned group")]
         [ReturnHints("ok")]
