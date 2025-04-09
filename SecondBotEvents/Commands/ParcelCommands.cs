@@ -66,6 +66,24 @@ namespace SecondBotEvents.Commands
             return BasicReply(JsonConvert.SerializeObject(reply));
         }
 
+        [About("Requests the current parcel size")]
+        [ReturnHints("width,height as a csv")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        public object GetCurrentParcelSize()
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
+            Vector3 start = targetparcel.AABBMin;
+            Vector3 end = targetparcel.AABBMax;
+            Vector3 dif = end - start;
+            return BasicReply(dif.X.ToString() + "," + dif.Y.ToString());
+        }
+
+
         [About("requests the parcel layout as a SVG\n call UpdateListOfParcels first to update list before calling")]
         [ReturnHints("json encoded svg")]
         public object GetSimParcelLayers()
