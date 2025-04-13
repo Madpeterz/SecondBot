@@ -702,6 +702,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Parcel data not ready")]
         public object ParcelReturnAll()
         {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
             GetClient().Parcels.ReturnObjects(GetClient().Network.CurrentSim, targetparcel.LocalID, ObjectReturnType.None, null);
             return BasicReply("ok");
         }
