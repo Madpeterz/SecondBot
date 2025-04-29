@@ -707,8 +707,41 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value);
             }
-            GetClient().Parcels.ReturnObjects(GetClient().Network.CurrentSim, targetparcel.LocalID, ObjectReturnType.None, null);
-            return BasicReply("ok");
+            // Create a blocking event
+            AutoResetEvent eventWaitHandle = new(false);
+
+            void OnParcelObjectOwnersReply(object sender, ParcelObjectOwnersReplyEventArgs e)
+            {
+                // Signal that the event has been handled
+                eventWaitHandle.Set();
+                if(e.Simulator != GetClient().Network.CurrentSim)
+                {
+                    return;
+                }
+                foreach (ParcelPrimOwners A in e.PrimOwners)
+                {
+                    ParcelReturnTargeted(A.OwnerID.ToString());
+                }
+            }
+
+            try
+            {
+                GetClient().Parcels.ParcelObjectOwnersReply += OnParcelObjectOwnersReply;
+                GetClient().Parcels.RequestObjectOwners(GetClient().Network.CurrentSim, targetparcel.LocalID);
+                bool eventTriggered = eventWaitHandle.WaitOne(5000); // 5000ms timeout
+
+                if (!eventTriggered)
+                {
+                    return Failure("Timed out waiting for ParcelObjectOwnersReply");
+                }
+                return BasicReply("processing request");
+            }
+            finally
+            {
+                // Ensure the event handler is removed to avoid memory leaks
+                GetClient().Parcels.ParcelObjectOwnersReply -= OnParcelObjectOwnersReply;
+                
+            }
         }
 
 
