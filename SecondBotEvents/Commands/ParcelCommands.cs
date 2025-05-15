@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using static OpenMetaverse.DirectoryManager;
 using static OpenMetaverse.ParcelManager;
 using static OpenMetaverse.Stats.UtilizationStatistics;
@@ -597,6 +598,128 @@ namespace SecondBotEvents.Commands
         }
 
 
+        [About("Returns all objects on a parcel owned by selected avatar")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Land is not group owned and im not the owner")]
+        [ReturnHintsFailure("I do not have access to the group")]
+        [ReturnHintsFailure("No objects found to return")]
+        [ReturnHintsFailure("Timeout waiting for object owners reply")]
+        [ReturnHintsFailure("Invaild avatar")]
+        [ReturnHints("ok")]
+        [ArgHints("avatar", "uuid of the avatar or Firstname Lastname")]
+        public object ReturnAllObjectsOnParcelByOwner(string avatar)
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("Invaild avatar", [avatar]);
+            }
+            return ReturnAllObjectsOnParcelReal(avataruuid);
+        }
+
+        [About("Returns all objects on a parcel")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Land is not group owned and im not the owner")]
+        [ReturnHintsFailure("I do not have access to the group")]
+        [ReturnHintsFailure("No objects found to return")]
+        [ReturnHintsFailure("Timeout waiting for object owners reply")]
+        [ReturnHints("ok")]
+        public object ReturnAllObjectsOnParcel()
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
+            return ReturnAllObjectsOnParcelReal(UUID.Zero);
+        }
+
+        protected object ReturnAllObjectsOnParcelReal(UUID filter,bool repeat = false)
+        {
+            if (targetparcel.OwnerID != GetClient().Self.AgentID)
+            {
+                // im not the owner of the parcel
+                if (targetparcel.GroupID == UUID.Zero)
+                {
+                    // the parcel is not group owned
+                    return Failure("Land is not group owned and im not the owner");
+                }
+                if (targetparcel.GroupID != GetClient().Self.ActiveGroup)
+                {
+                    if (repeat == true)
+                    {
+                        return Failure("I do not have access to the group");
+                    }
+                    GetClient().Groups.ActivateGroup(targetparcel.GroupID);
+                    return ReturnAllObjectsOnParcelReal(filter,true);
+                }
+            }
+            var ownersList = new List<UUID>();
+            using (var waitHandle = new AutoResetEvent(false))
+            {
+                EventHandler<ParcelObjectOwnersReplyEventArgs> handler = null;
+                handler = (sender, e) =>
+                {
+                    // Unsubscribe immediately to avoid leaks
+                    GetClient().Parcels.ParcelObjectOwnersReply -= handler;
+
+                    foreach (ParcelPrimOwners A in e.PrimOwners)
+                    {
+                        if (A.OwnerID == UUID.Zero)
+                        {
+                            // Skip if the owner is zero
+                            continue;
+                        }
+                        if (ownersList.Contains(A.OwnerID))
+                        {
+                            // Skip if the owner is already in the list
+                            continue;
+                        }
+                        if(filter != UUID.Zero)
+                        {
+                            if (filter == A.OwnerID)
+                            {
+                                // Skip if the owner is not the filter target
+                                continue;
+                            }
+                        }
+                        ownersList.Add(A.OwnerID);
+                    }
+                    waitHandle.Set();
+                };
+
+                GetClient().Parcels.ParcelObjectOwnersReply += handler;
+                GetClient().Parcels.RequestObjectOwners(GetClient().Network.CurrentSim, targetparcel.LocalID);
+
+                // Wait for the event to be signaled, with a timeout to avoid deadlock
+                if (!waitHandle.WaitOne(13000)) // 13 seconds timeout
+                {
+                    GetClient().Parcels.ParcelObjectOwnersReply -= handler;
+                    return Failure("Timeout waiting for object owners reply");
+                }
+            }
+            if (ownersList.Count == 0)
+            {
+                return Failure("No objects found to return");
+            }
+            GetClient().Parcels.ReturnObjects(
+                GetClient().Network.CurrentSim,
+                targetparcel.LocalID,
+                ObjectReturnType.List,
+                ownersList
+            );
+
+            return BasicReply("ok");
+        }
+
+
         [About("Updates the current parcels name")]
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Error not in a sim")]
@@ -673,77 +796,6 @@ namespace SecondBotEvents.Commands
             targetparcel.Update(GetClient());
             return BasicReply("Applying perms", [escapedflagdata]);
         }
-
-        [About("Returns all objects from the current parcel for the selected avatar")]
-        [ReturnHints("ok")]
-        [ReturnHintsFailure("Error not in a sim")]
-        [ReturnHintsFailure("Parcel data not ready")]
-        [ReturnHintsFailure("Invaild avatar UUID")]
-        [ArgHints("avatar", "avatar uuid or Firstname Lastname")]
-        public object ParcelReturnTargeted(string avatar)
-        {
-            KeyValuePair<bool, string> tests = SetupCurrentParcel();
-            if (tests.Key == false)
-            {
-                return Failure(tests.Value, [avatar]);
-            }
-            ProcessAvatar(avatar);
-            if (avataruuid == UUID.Zero)
-            {
-                return Failure("Invaild avatar UUID", [avatar]);
-            }
-            GetClient().Parcels.ReturnObjects(GetClient().Network.CurrentSim, targetparcel.LocalID, ObjectReturnType.None, [avataruuid]);
-            return BasicReply("ok", [avatar]);
-        }
-
-        [About("Returns all objects from the current parcel for all avatars")]
-        [ReturnHints("ok")]
-        [ReturnHintsFailure("Error not in a sim")]
-        [ReturnHintsFailure("Parcel data not ready")]
-        public object ParcelReturnAll()
-        {
-            KeyValuePair<bool, string> tests = SetupCurrentParcel();
-            if (tests.Key == false)
-            {
-                return Failure(tests.Value);
-            }
-            // Create a blocking event
-            AutoResetEvent eventWaitHandle = new(false);
-
-            void OnParcelObjectOwnersReply(object sender, ParcelObjectOwnersReplyEventArgs e)
-            {
-                // Signal that the event has been handled
-                eventWaitHandle.Set();
-                if(e.Simulator != GetClient().Network.CurrentSim)
-                {
-                    return;
-                }
-                foreach (ParcelPrimOwners A in e.PrimOwners)
-                {
-                    ParcelReturnTargeted(A.OwnerID.ToString());
-                }
-            }
-
-            try
-            {
-                GetClient().Parcels.ParcelObjectOwnersReply += OnParcelObjectOwnersReply;
-                GetClient().Parcels.RequestObjectOwners(GetClient().Network.CurrentSim, targetparcel.LocalID);
-                bool eventTriggered = eventWaitHandle.WaitOne(5000); // 5000ms timeout
-
-                if (!eventTriggered)
-                {
-                    return Failure("Timed out waiting for ParcelObjectOwnersReply");
-                }
-                return BasicReply("processing request");
-            }
-            finally
-            {
-                // Ensure the event handler is removed to avoid memory leaks
-                GetClient().Parcels.ParcelObjectOwnersReply -= OnParcelObjectOwnersReply;
-                
-            }
-        }
-
 
         [About("transfers the current parcel ownership to the assigned group")]
         [ReturnHints("ok")]

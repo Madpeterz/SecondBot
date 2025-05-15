@@ -175,7 +175,7 @@ namespace SecondBotEvents
             RegisterService("TriggerOnEventService");
             RegisterService("RelayService");
             RegisterService("ChatGptService");
-            RegisterService("RecoveryService");
+            //RegisterService("RecoveryService");
             RegisterService("SmtpService");
             if (BotClient.IsLoaded() == false)
             {
