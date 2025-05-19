@@ -64,6 +64,8 @@ namespace SecondBotEvents.Commands
         [ReturnHints("UUID of rezzed item")]
         [ReturnHintsFailure("Invaild item UUID")]
         [ReturnHintsFailure("Unable to find item")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
         [ArgHints("item", "UUID of item to rez")]
         public object RezObject(string item)
         {
@@ -71,12 +73,90 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild item UUID: "+ item, [item]);
             }
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value, [item]);
+            }
             InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
             if (itm == null)
             {
                 return Failure("Unable to find item: " + item, [item]);
             }
             UUID rezedobject = GetClient().Inventory.RequestRezFromInventory(GetClient().Network.CurrentSim, GetClient().Self.SimRotation, GetClient().Self.RelativePosition, itm);
+            return BasicReply(rezedobject.ToString(), [item]);
+        }
+
+        [About("rezs the item at the parcel center")]
+        [ReturnHints("UUID of rezzed item")]
+        [ReturnHintsFailure("Invaild item UUID")]
+        [ReturnHintsFailure("Unable to find item")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ArgHints("item", "UUID of item to rez")]
+        public object RezObjectParcelCenter(string item)
+        {
+            if (UUID.TryParse(item, out UUID targetitem) == false)
+            {
+                return Failure("Invaild item UUID: " + item, [item]);
+            }
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value, [item]);
+            }
+            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+            if (itm == null)
+            {
+                return Failure("Unable to find item: " + item, [item]);
+            }
+            float x = targetparcel.AABBMax.X - (targetparcel.AABBMax.X / 2);
+            float y = targetparcel.AABBMax.Y - (targetparcel.AABBMax.Y / 2);
+            Vector3 resat = new Vector3(x,y, GetClient().Self.RelativePosition.Z);
+            UUID rezedobject = GetClient().Inventory.RequestRezFromInventory(GetClient().Network.CurrentSim, GetClient().Self.SimRotation, resat, itm);
+            return BasicReply(rezedobject.ToString(), [item]);
+        }
+        [About("rezs the item at the target location")]
+        [ReturnHints("UUID of rezzed item")]
+        [ReturnHintsFailure("Invaild item UUID")]
+        [ReturnHintsFailure("Unable to find item")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Unable to unpack [X,y,z] cord")]
+        [ArgHints("item", "UUID of item to rez")]
+        [ArgHints("x", "X cord to rez at")]
+        [ArgHints("y", "Y cord to rez at")]
+        [ArgHints("z", "Z cord to rez at")]
+        public object RezObjectOnPos(string item,string x,string y,string z)
+        {
+            if (UUID.TryParse(item, out UUID targetitem) == false)
+            {
+                return Failure("Invaild item UUID: " + item, [item]);
+            }
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value, [item]);
+            }
+            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+            if (itm == null)
+            {
+                return Failure("Unable to find item: " + item, [item]);
+            }
+            if(float.TryParse(x, out float x1) == false)
+            {
+                return Failure("Unable to unpack X cord", [item]);
+            }
+            if (float.TryParse(y, out float y1) == false)
+            {
+                return Failure("Unable to unpack X cord", [item]);
+            }
+            if (float.TryParse(z, out float z1) == false)
+            {
+                return Failure("Unable to unpack X cord", [item]);
+            }
+            Vector3 resat = new Vector3(x1, y1, z1);
+            UUID rezedobject = GetClient().Inventory.RequestRezFromInventory(GetClient().Network.CurrentSim, GetClient().Self.SimRotation, resat, itm);
             return BasicReply(rezedobject.ToString(), [item]);
         }
 
