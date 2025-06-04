@@ -441,7 +441,7 @@ namespace OpenMetaverse
         [NonSerialized]
         private readonly GridClient Client;
         [NonSerialized]
-        private Inventory _Store;
+        public Inventory _Store;
         private object _CallbacksLock = new object();
         private uint _CallbackPos;
         private readonly Dictionary<uint, ItemCreatedCallback> _ItemCreatedCallbacks = new Dictionary<uint, ItemCreatedCallback>();
