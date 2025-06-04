@@ -3,6 +3,7 @@ using Discord;
 using LibreMetaverse;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
+using Org.BouncyCastle.Utilities.Collections;
 using SecondBotEvents.Services;
 using System;
 using System.Collections.Generic;
@@ -59,6 +60,15 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok");
         }
 
+        protected InventoryNode SearchInventoryStore(UUID item)
+        {
+            Inventory store = GetClient().Inventory._Store;
+            if (store.Items.ContainsKey(item))
+            {
+                return store.Items[item];
+            }
+            return null;
+        }
 
         [About("rezs the item at the bots current location")]
         [ReturnHints("UUID of rezzed item")]
@@ -78,12 +88,26 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value, [item]);
             }
-            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+            InventoryNode find = SearchInventoryStore(targetitem);
+            InventoryItem itm = null;
+            if (find != null)
+            {
+                if (find.Data is InventoryItem itemfound)
+                {
+                    itm = itemfound;
+                }
+            }
+            if (itm == null)
+            {
+                // cant get the item from store try and download it
+                itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+            }
             if (itm == null)
             {
                 return Failure("Unable to find item: " + item, [item]);
             }
-            UUID rezedobject = GetClient().Inventory.RequestRezFromInventory(GetClient().Network.CurrentSim, GetClient().Self.SimRotation, GetClient().Self.RelativePosition, itm);
+            Vector3 loc = GetClient().Self.RelativePosition;
+            UUID rezedobject = GetClient().Inventory.RequestRezFromInventory(GetClient().Network.CurrentSim, GetClient().Self.SimRotation, loc, itm);
             return BasicReply(rezedobject.ToString(), [item]);
         }
 
@@ -105,13 +129,26 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value, [item]);
             }
-            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+            InventoryNode find = SearchInventoryStore(targetitem);
+            InventoryItem itm = null;
+            if (find != null)
+            {
+                if (find.Data is InventoryItem itemfound)
+                {
+                    itm = itemfound;
+                }
+            }
+            if (itm == null)
+            {
+                // cant get the item from store try and download it
+                itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+            }
             if (itm == null)
             {
                 return Failure("Unable to find item: " + item, [item]);
             }
-            float x = targetparcel.AABBMax.X - (targetparcel.AABBMax.X / 2);
-            float y = targetparcel.AABBMax.Y - (targetparcel.AABBMax.Y / 2);
+            float x = targetparcel.AABBMin.X + ((targetparcel.AABBMax.X- targetparcel.AABBMin.X) / 2);
+            float y = targetparcel.AABBMin.Y + ((targetparcel.AABBMax.Y - targetparcel.AABBMin.Y) / 2);
             Vector3 resat = new Vector3(x,y, GetClient().Self.RelativePosition.Z);
             UUID rezedobject = GetClient().Inventory.RequestRezFromInventory(GetClient().Network.CurrentSim, GetClient().Self.SimRotation, resat, itm);
             return BasicReply(rezedobject.ToString(), [item]);
@@ -138,12 +175,25 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value, [item]);
             }
-            InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+            InventoryNode find = SearchInventoryStore(targetitem);
+            InventoryItem itm = null;
+            if (find != null)
+            {
+                if (find.Data is InventoryItem itemfound)
+                {
+                    itm = itemfound;
+                }
+            }
+            if (itm == null)
+            {
+                // cant get the item from store try and download it
+                itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+            }
             if (itm == null)
             {
                 return Failure("Unable to find item: " + item, [item]);
             }
-            if(float.TryParse(x, out float x1) == false)
+            if (float.TryParse(x, out float x1) == false)
             {
                 return Failure("Unable to unpack X cord", [item]);
             }
