@@ -719,7 +719,38 @@ namespace SecondBotEvents.Commands
 
             return BasicReply("ok");
         }
-
+        [About("Controls who can trigger audio on this parcel\n if everyone is set to true then grouponly will switch to false")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Unable to process everyone value")]
+        [ReturnHintsFailure("Unable to process grouponly value")]
+        [ArgHints("everyone", "can everyone trigger audio on this parcel", "BOOL")]
+        [ArgHints("grouponly", "can everyone trigger audio on this parcel", "BOOL")]
+        public object SetParcelAudioControls(string everyone,string grouponly)
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value, [everyone,grouponly]);
+            }
+            if(bool.TryParse(everyone, out bool everyonebool) == false)
+            {
+                return Failure("Unable to process everyone value", [everyone, grouponly]);
+            }
+            if (bool.TryParse(grouponly, out bool grouponlybool) == false)
+            {
+                return Failure("Unable to process grouponly value", [everyone, grouponly]);
+            }
+            if(everyonebool == true)
+            {
+                grouponlybool = false;
+            }
+            targetparcel.AnyAVSounds = everyonebool;
+            targetparcel.GroupAVSounds = grouponlybool;
+            targetparcel.Update(GetClient());
+            return BasicReply("ok", [everyone, grouponly]);
+        }
 
         [About("Updates the current parcels name")]
         [ReturnHints("true|false")]
@@ -873,6 +904,19 @@ namespace SecondBotEvents.Commands
             }
             GetClient().Parcels.Buy(GetClient().Network.CurrentSim, targetparcel.LocalID, false, UUID.Zero, false, targetparcel.Area, amountvalue);
             return BasicReply("ok", [amount]);
+        }
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        public object SetParcelGround()
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
+            targetparcel.Ground = true;
+            targetparcel.Update(GetClient());
+            return BasicReply("ok");
         }
 
         [About("Sets the current parcels snapshot")]
