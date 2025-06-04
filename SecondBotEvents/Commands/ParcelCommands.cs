@@ -905,19 +905,6 @@ namespace SecondBotEvents.Commands
             GetClient().Parcels.Buy(GetClient().Network.CurrentSim, targetparcel.LocalID, false, UUID.Zero, false, targetparcel.Area, amountvalue);
             return BasicReply("ok", [amount]);
         }
-        [ReturnHintsFailure("Error not in a sim")]
-        [ReturnHintsFailure("Parcel data not ready")]
-        public object SetParcelGround()
-        {
-            KeyValuePair<bool, string> tests = SetupCurrentParcel();
-            if (tests.Key == false)
-            {
-                return Failure(tests.Value);
-            }
-            targetparcel.Ground = true;
-            targetparcel.Update(GetClient());
-            return BasicReply("ok");
-        }
 
         [About("Sets the current parcels snapshot")]
         [ReturnHints("ok")]
