@@ -13,7 +13,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Granted perm animation")]
         [ReturnHints("Removed perm animation")]
         [ReturnHintsFailure("avatar lookup")]
-        [ArgHints("avatar", "UUID (or Firstname Lastname)")]
+        [ArgHints("avatar", "Who to accept requests from", "AVATAR")]
         public object AddToAllowAnimations(string avatar)
         {
             ProcessAvatar(avatar);
@@ -28,7 +28,7 @@ namespace SecondBotEvents.Commands
         [About("Attempts to play a gesture")]
         [ReturnHintsFailure("Error with gesture")]
         [ReturnHints("Accepted")]
-        [ArgHints("gesture", "Inventory UUID of the gesture")]
+        [ArgHints("gesture", "What gesture to trigger", "UUID")]
         public object PlayGesture(string gesture)
         {
             if (UUID.TryParse(gesture, out UUID gestureUUID) == false)

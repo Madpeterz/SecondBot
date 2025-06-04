@@ -15,8 +15,8 @@ namespace SecondBotEvents.Commands
         }
 
         [About("sends a message to localchat (Normal chat)")]
-        [ArgHints("channel", "the channel to output on")]
-        [ArgHints("message", "the message to send")]
+        [ArgHints("channel", "the channel to output on", "Number", "123")]
+        [ArgHints("message", "the message to send", "Text", "Hi Mom im on TV")]
         [ReturnHints("array string")]
         [ReturnHintsFailure("Message empty")]
         public object Say(string channel, string message)
@@ -35,8 +35,8 @@ namespace SecondBotEvents.Commands
         }
 
         [About("sends a message to localchat (as a Shout)")]
-        [ArgHints("channel", "the channel to output on")]
-        [ArgHints("message", "the message to send")]
+        [ArgHints("channel", "the channel to output on", "Number", "123")]
+        [ArgHints("message", "the message to send", "Text", "Hi Mom im on TV")]
         [ReturnHints("array string")]
         [ReturnHintsFailure("Message empty")]
         public object Shout(string channel, string message)
@@ -55,8 +55,8 @@ namespace SecondBotEvents.Commands
         }
 
         [About("sends a message to localchat (as a Whisper)")]
-        [ArgHints("channel", "the channel to output on")]
-        [ArgHints("message", "the message to send")]
+        [ArgHints("channel", "the channel to output on", "Number", "123")]
+        [ArgHints("message", "the message to send", "Text", "Hi Mom im on TV")]
         [ReturnHints("array string")]
         [ReturnHintsFailure("Message empty")]
         public object Whisper(string channel, string message)
@@ -77,8 +77,8 @@ namespace SecondBotEvents.Commands
 
 
         [About("sends a im to the selected avatar")]
-        [ArgHints("avatar", "a UUID or Firstname Lastname")]
-        [ArgHints("message", "the message to send")]
+        [ArgHints("avatar", "Who to send the messsage to", "AVATAR")]
+        [ArgHints("message", "the message to send", "Text", "Hi there how are you today?")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Message empty")]
         [ReturnHintsFailure("avatar lookup")]
@@ -120,7 +120,7 @@ namespace SecondBotEvents.Commands
         }
 
         [About("gets the chat from the selected window for avatar")]
-        [ArgHints("window", "the UUID of the avatar you wish to view the chat from")]
+        [ArgHints("window", "avatar UUID you wish to view the chat from", "UUID")]
         [ReturnHintsFailure("avatar UUID invaild")]
         [ReturnHints("Array of text")]
         public object getimchat(string avatarid)

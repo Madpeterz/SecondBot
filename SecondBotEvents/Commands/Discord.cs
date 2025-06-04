@@ -11,9 +11,9 @@ namespace SecondBotEvents.Commands
         [About("Adds a discord server role to the selected member")]
         [ReturnHintsFailure("Discord client not ready")]
         [ReturnHints("true|false")]
-        [ArgHints("serverid", "the server id to apply this action to")]
-        [ArgHints("roleid", "the role id we are giving")]
-        [ArgHints("memberid", "who we are giving it to")]
+        [ArgHints("serverid", "the server id to apply this action to","Number","1234555123")]
+        [ArgHints("roleid", "the role id we are giving", "Number", "445442441")]
+        [ArgHints("memberid", "who we are giving it to", "Number", "66522144")]
         public object Discord_AddRole(string serverid,string roleid,string memberid)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -27,9 +27,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Discord client not ready")]
         [ReturnHintsFailure("Why empty")]
         [ReturnHints("true|false")]
-        [ArgHints("serverid", "the server id to apply this action to")]
-        [ArgHints("memberid", "who we are giving it to")]
-        [ArgHints("why", "why they are being banned")]
+        [ArgHints("serverid", "the server id to apply this action to", "Number", "1234555123")]
+        [ArgHints("memberid", "who we are giving it to", "Number", "66522144")]
+        [ArgHints("why", "why they are being banned", "Text", "Spammer")]
         public object Discord_BanMember(string serverid, string memberid, string why)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -43,6 +43,12 @@ namespace SecondBotEvents.Commands
             return BasicReply(master.DiscordService.BanMember(serverid, memberid, why).Result.ToString(), [serverid, memberid, why]);
         }
 
+        [ReturnHintsFailure("Discord client not ready")]
+        [ReturnHintsFailure("Get roles failure message")]
+        [ReturnHints("json object of roles")]
+        [About("Gets the roles assigned to the selected member")]
+        [ArgHints("serverid", "the server id to apply this action to", "Number", "1234555123")]
+        [ArgHints("memberid", "who we are giving it to", "Number", "66522144")]
         public object Discord_GetMemberRoles(string serverid, string memberid)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -60,8 +66,8 @@ namespace SecondBotEvents.Commands
         [About("Clears messages on the server sent by the member in the last 13 days, 22hours 59mins")]
         [ReturnHintsFailure("Discord client not ready")]
         [ReturnHints("true|false")]
-        [ArgHints("serverid", "the server id to apply this action to")]
-        [ArgHints("memberid", "who we are giving it to")]
+        [ArgHints("serverid", "the server id to apply this action to", "Number", "1234555123")]
+        [ArgHints("memberid", "who we are giving it to", "Number", "66522144")]
         public object Discord_BulkClear_Messages(string serverid, string memberid)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -74,9 +80,9 @@ namespace SecondBotEvents.Commands
         [About("Sends a message directly to the user [They must be in the server]\n This command requires the SERVER MEMBERS INTENT found in discord app dev")]
         [ReturnHintsFailure("Discord client not ready")]
         [ReturnHints("true|false")]
-        [ArgHints("serverid", "the server id to apply this action to")]
-        [ArgHints("memberid", "who we are giving it to")]
-        [ArgHints("message", "what we are sending")]
+        [ArgHints("serverid", "the server id to apply this action to", "Number", "1234555123")]
+        [ArgHints("memberid", "who we are giving it to", "Number", "66522144")]
+        [ArgHints("message", "what we are sending", "Text", "Whats going on")]
         public object Discord_Dm_Member(string serverid, string memberid, string message)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -91,7 +97,7 @@ namespace SecondBotEvents.Commands
             "SERVER MEMBERS INTENT set to true on the discord bot api area !!!")]
         [ReturnHintsFailure("Discord client not ready")]
         [ReturnHints("mixed array of userid: nickname|username  or   userid:username")]
-        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("serverid", "the server id to apply this action to", "Number", "1234555123")]
         public object Discord_MembersList(string serverid)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -105,10 +111,10 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Discord client not ready")]
         [ReturnHintsFailure("message empty")]
         [ReturnHints("true|false")]
-        [ArgHints("serverid", "the server id to apply this action to")]
-        [ArgHints("channelid", "the channel id to apply this action to")]
-        [ArgHints("tts", "shoud tts be enabled true or false")]
-        [ArgHints("message", "what we are sending")]
+        [ArgHints("serverid", "the server id to apply this action to", "Number", "1234555123")]
+        [ArgHints("channelid", "the channel id to apply this action to", "Number", "552121543")]
+        [ArgHints("tts", "shoud tts be enabled","BOOL")]
+        [ArgHints("message", "what we are sending", "Text", "Hi everyone in channel")]
         public object Discord_MessageChannel(string serverid, string channelid, string tts, string message)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -125,9 +131,9 @@ namespace SecondBotEvents.Commands
         [About("Sends a message to the selected channel - Optional TTS usage")]
         [ReturnHints("mixed array of userid: nickname|username  or   userid:username")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "the server id to apply this action to")]
-        [ArgHints("memberid", "who we are giving it to")]
-        [ArgHints("mode", "should we mute them \"true\" or unmute \"false\"")]
+        [ArgHints("serverid", "the server id to apply this action to", "Number", "1234555123")]
+        [ArgHints("memberid", "who we are giving it to", "Number", "66522144")]
+        [ArgHints("mode", "should we mute them", "BOOL")]
         public object Discord_MuteMember(string serverid, string memberid, string mode)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -140,9 +146,8 @@ namespace SecondBotEvents.Commands
         [About("returns a collection of settings for the given role \n This command requires Discord full client mode enabled and connected")]
         [ReturnHints("KeyPair of status: KeyPair[] item = value")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "the server id to apply this action to")]
-        [ArgHints("memberid", "who we are giving it to")]
-        [ArgHints("mode", "should we mute them \"true\" or unmute \"false\"")]
+        [ArgHints("serverid", "the server id", "Number", "1234555123")]
+        [ArgHints("roleid", "the role id", "Number", "66522144")]
         public object Discord_Role_GetSettings(string serverid, string roleid)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -156,9 +161,9 @@ namespace SecondBotEvents.Commands
             " This command requires Discord full client mode enabled and connected")]
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "the server id to apply this action to")]
-        [ArgHints("roleid", "who we are giving it to")]
-        [ArgHints("flagscsv", "what we are setting")]
+        [ArgHints("serverid", "the server id to apply this action to", "Number", "1234555123")]
+        [ArgHints("roleid", "the role id", "Number", "66522144")]
+        [ArgHints("flagscsv", "what we are setting", "Text", "Speak=True,SendMessages=False")]
         public object Discord_Role_UpdatePerms(string serverid, string roleid, string flagscsv)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -172,8 +177,8 @@ namespace SecondBotEvents.Commands
     " This command requires Discord full client mode enabled and connected")]
         [ReturnHints("KeyPair of statusmessage=roleid or 0")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "the server id to apply this action to")]
-        [ArgHints("role", "the name of the role we are creating")]
+        [ArgHints("serverid", "the server id to apply this action to", "Number", "1234555123")]
+        [ArgHints("role", "the name of the role we are creating", "Text", "Buyersclub")]
         public object Discord_RoleCreate(string serverid, string role)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -186,7 +191,7 @@ namespace SecondBotEvents.Commands
         [About("Returns a list of roles and their ids in collection \n This command requires Discord full client mode enabled and connected")]
         [ReturnHints("KeyPair of status: KeyPair of roleid: rolename")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("serverid", "the server id to apply this action to", "Number", "1234555123")]
         public object Discord_RoleList(string serverid)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -199,7 +204,7 @@ namespace SecondBotEvents.Commands
         [About("Remove a role from a server \n This command requires Discord full client mode enabled and connected")]
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("serverid", "the server id to apply this action to", "Number", "1234555123")]
         public object Discord_RoleRemove(string serverid, string roleid)
         {
             if (master.DiscordService.DiscordReady() == false)
@@ -212,7 +217,7 @@ namespace SecondBotEvents.Commands
         [About("Returns a list of text channels in a server")]
         [ReturnHints("array of channelid: name")]
         [ReturnHintsFailure("Discord client not ready")]
-        [ArgHints("serverid", "the server id to apply this action to")]
+        [ArgHints("serverid", "the server id to apply this action to", "Number", "1234555123")]
         public object Discord_TextChannels_List(string serverid)
         {
             if (master.DiscordService.DiscordReady() == false)

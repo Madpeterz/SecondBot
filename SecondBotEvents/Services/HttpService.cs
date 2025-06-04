@@ -261,10 +261,13 @@ namespace SecondBotEvents.Services
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class ArgHints(string name, string about) : Attribute
+    public class ArgHints(string name, string about, string defaultValueType=null, string exampleValue=null, string[] acceptedValues=null) : Attribute
     {
         public string name = name;
         public string about = about;
+        public string defaultValueType = defaultValueType ?? string.Empty; // Default to empty string if not provided
+        public string exampleValue = exampleValue ?? string.Empty; // Default to empty string if not provided
+        public string[] acceptedValues = acceptedValues ?? Array.Empty<string>(); // Default to empty array if not provided
     }
 
     public class SecondbotWebApi(EventsSecondBot setmaster) : WebApiController

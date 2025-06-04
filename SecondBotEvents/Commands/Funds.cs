@@ -26,8 +26,8 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Amount out of range")]
         [ReturnHintsFailure("Invaild amount")]
         [ReturnHintsFailure("Transfer funds to avatars disabled")]
-        [ArgHints("avatar", "the avatars UUID or Firstname Lastname")]
-        [ArgHints("amount", "the amount to pay (from 1 to current balance)")]
+        [ArgHints("avatar", "Who to pay", "AVATAR")]
+        [ArgHints("amount", "the amount to pay (from 1 to current balance)", "Number", "442")]
         public object PayAvatar(string avatar, string amount)
         {
             if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
@@ -59,9 +59,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild amount")]
         [ReturnHintsFailure("Amount out of range")]
         [ReturnHintsFailure("Funds commands are disabled")]
-        [ArgHints("object", "UUID of the object to pay")]
-        [ArgHints("primname", "The name of the prim on the object to pay")]
-        [ArgHints("amount", "the amount to pay (from 1 to current balance)")]
+        [ArgHints("object", "Object to pay","UUID")]
+        [ArgHints("primname", "The name of the prim on the object to pay","Text","MyBank")]
+        [ArgHints("amount", "the amount to pay (from 1 to current balance)","Number","312")]
         public object PayObject(string objectuuid,string primname,string amount)
         {
             if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)

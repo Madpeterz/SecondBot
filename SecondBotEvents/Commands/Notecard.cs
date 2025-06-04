@@ -15,8 +15,8 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Inventory item is not a notecard")]
         [ReturnHintsFailure("replytarget not set")]
         [ReturnHints("Making request to get data from notecard")]
-        [ArgHints("notecardInventoryUUID", "The inventory UUID of the notecard to read")]
-        [ArgHints("replytarget", "where to send the results to (smartreply target Avatar UUID, HTTP url, chat channel")]
+        [ArgHints("notecardInventoryUUID", "What notecard to read","UUID")]
+        [ArgHints("replytarget", "Were to send the reply","SMART")]
         public object NotecardRead(string notecardInventoryUUID, string replytarget)
         {
             if(SecondbotHelpers.isempty(replytarget) == true)
@@ -87,8 +87,8 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Collection value is empty")]
         [ReturnHintsFailure("Content value is empty")]
         [ReturnHints("ok")]
-        [ArgHints("collection", "The name of the collection")]
-        [ArgHints("content", "The text to add to the collection")]
+        [ArgHints("collection", "The name of the collection","Text","StorageMeme")]
+        [ArgHints("content", "The text to add to the collection","Text","Add this line \n Please and thanks")]
         public object NotecardAdd(string collection, string content)
         {
             if (SecondbotHelpers.notempty(collection) == false)
@@ -106,7 +106,7 @@ namespace SecondBotEvents.Commands
         [About("Clears the contents of a collection")]
         [ReturnHintsFailure("Collection value is empty")]
         [ReturnHints("ok")]
-        [ArgHints("collection", "The name of the collection")]
+        [ArgHints("collection", "The name of the collection", "Text", "StorageMeme")]
         public object NotecardClear(string collection)
         {
             if (SecondbotHelpers.notempty(collection) == false)
@@ -123,9 +123,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild avatar uuid")]
         [ReturnHintsFailure("No content in notecard storage ?")]
         [ReturnHints("ok")]
-        [ArgHints("avatar", "The UUID or Name of an avatar")]
-        [ArgHints("collection", "The name of the collection")]
-        [ArgHints("notecardname", "What to call the created notecard")]
+        [ArgHints("avatar", "Who to send it to","AVATAR")]
+        [ArgHints("collection", "The name of the collection", "Text", "StorageMeme")]
+        [ArgHints("notecardname", "What to call the created notecard","Text", "My custom notecard")]
         public object NotecardSend(string avatar, string collection, string notecardname)
         {
             if (SecondbotHelpers.notempty(collection) == false)
@@ -160,9 +160,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Content value is empty")]
         [ReturnHintsFailure("Invaild avatar uuid")]
         [ReturnHints("ok")]
-        [ArgHints("avatar", "The UUID or Name of an avatar")]
-        [ArgHints("content", "The text to add to the collection")]
-        [ArgHints("notecardname", "What to call the created notecard")]
+        [ArgHints("avatar", "Who to send the notecard to","AVATAR")]
+        [ArgHints("content", "What to put in the notecard","Text","I am in a notecard")]
+        [ArgHints("notecardname", "Whats the name of the notecard","Text","Custom notecard")]
         public object NotecardDirectSend(string avatar, string content, string notecardname)
         {
             if (SecondbotHelpers.notempty(notecardname) == false)

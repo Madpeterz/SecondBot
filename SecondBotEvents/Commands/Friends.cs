@@ -13,7 +13,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("avatar lookup")]
         [ReturnHintsFailure("not in friends list")]
         [ReturnHintsFailure("no map access or updating")]
-        [ArgHints("avatar", "A avatar uuid or Firstname Lastname")]
+        [ArgHints("avatar", "Who to get the location of","AVATAR")]
         public object FriendsGetLocation(string avatar)
         {
             ProcessAvatar(avatar);
@@ -57,8 +57,8 @@ namespace SecondBotEvents.Commands
         }
 
         [About("Updates the friend perms for avatar avatar to State \n if true grants (Online/Map/Modify) perms")]
-        [ArgHints("avatar", "A avatar uuid or Firstname Lastname")]
-        [ArgHints("state", "true: Grant perms, false: Remove perms")]
+        [ArgHints("avatar", "Who we are talking about","AVATAR")]
+        [ArgHints("state", "true: Grant perms, false: Remove perms","BOOL")]
         [ReturnHints("granted")]
         [ReturnHints("removed")]
         [ReturnHintsFailure("Not A friend")]
@@ -95,8 +95,8 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Not in friendslist")]
         [ReturnHintsFailure("state invaild")]
         [ReturnHintsFailure("avatar lookup")]
-        [ArgHints("avatar", "A avatar uuid or Firstname Lastname")]
-        [ArgHints("state", "true: Send invite, false: Remove from friendslist")]
+        [ArgHints("avatar", "Who to request/remove from friends list","AVATAR")]
+        [ArgHints("state", "true: Send invite, false: Remove from friendslist","BOOL")]
         public object FriendRequest(string avatar, string state)
         {
             ProcessAvatar(avatar);

@@ -15,9 +15,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild avatar uuid")]
         [ReturnHintsFailure("Unknown store type")]
         [ReturnHintsFailure("Unable to process request store")]
-        [ArgHints("store", "What type of request to accept: \"FriendRequest\", \"InventoryOffer\", \"GroupInvite\", \"Teleport\"")]
-        [ArgHints("avatar", "a UUID or Firstname Lastname")]
-        [ArgHints("remove", "set to \"true\" or \"True\" to remove that avatar from the accept next for that store type")]
+        [ArgHints("store", "What type of request to accept", "Text", "GroupInvite", new string[] { "FriendRequest", "InventoryOffer", "GroupInvite", "Teleport" })]
+        [ArgHints("avatar", "Who to accept the request from", "AVATAR")]
+        [ArgHints("remove", "Should this remove the entry", "BOOL")]
         public Object AcceptNext(string store, string avatar, string remove)
         {
             ProcessAvatar(avatar);
@@ -45,8 +45,8 @@ namespace SecondBotEvents.Commands
         [ReturnHints("false")]
         [ReturnHintsFailure("Invaild avatar uuid")]
         [ReturnHintsFailure("Unknown store type")]
-        [ArgHints("store", "What type of request to check: \"FriendRequest\", \"InventoryOffer\", \"GroupInvite\", \"Teleport\"")]
-        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        [ArgHints("store", "What type of request to accept", "Text", "GroupInvite", new string[] { "FriendRequest", "InventoryOffer", "GroupInvite", "Teleport" })]
+        [ArgHints("avatar", "Who to accept the request from", "AVATAR")]
         public Object IsOnAcceptNext(string store, string avatar)
         {
             ProcessAvatar(avatar);
@@ -100,7 +100,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("profile UUID")]
         [ReturnHintsFailure("Invaild avatar uuid")]
         [ReturnHints("Requesting avatar details  [Retry later]")]
-        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        [ArgHints("avatar", "Who are we getting the profile image of", "AVATAR")]
         public object GetProfileImage(string avatar)
         {
             ProcessAvatar(avatar);
@@ -120,7 +120,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHints("Requesting avatar details [Retry later]")]
         [ReturnHintsFailure("Invaild texture uuid")]
-        [ArgHints("texture", "a UUID of a texture to use")]
+        [ArgHints("texture", "What texture to use", "UUID")]
         public object SetProfileImage(string texture)
         {
             if (UUID.TryParse(texture, out UUID textureUUID) == false)
@@ -142,7 +142,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("profile UUID")]
         [ReturnHintsFailure("Invaild avatar uuid")]
         [ReturnHints("Requesting avatar details  [Retry later]")]
-        [ArgHints("avatar", "a UUID or Firstname Lastname")]
+        [ArgHints("avatar", "Who are we getting the profile about of", "AVATAR")]
         public object GetProfileAbout(string avatar)
         {
             ProcessAvatar(avatar);
@@ -163,7 +163,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Requesting avatar details [Retry later]")]
         [ReturnHintsFailure("about text to short")]
         [ReturnHintsFailure("about text to long")]
-        [ArgHints("abouttext", "text to use in the about me area, length 10 to 300")]
+        [ArgHints("abouttext", "text to use in the about me area, length 10 to 300", "Text", "Hello world!")]
         public object SetProfileAbout(string abouttext)
         {
             if(abouttext.Length < 10)
@@ -209,7 +209,7 @@ namespace SecondBotEvents.Commands
         }
 
         [About("searchs the AV database if not found triggers a lookup")]
-        [ArgHints("uuid", "the UUID to find the name for")]
+        [ArgHints("uuid", "What uuid are we getting the name for", "UUID")]
         [ReturnHints("the name of the avatar")]
         [ReturnHints("lookup")]
         [ReturnHintsFailure("Not a vaild UUID")]
@@ -227,7 +227,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("the uuid of the avatar")]
         [ReturnHints("lookup")]
         [ReturnHintsFailure("Not a vaild name")]
-        [ArgHints("name", "the name to find the uuid for")]
+        [ArgHints("name", "the name to find the uuid for", "Text", "Madpeter Zond")]
         public object Name2Key(string name)
         {
             if(name == null)

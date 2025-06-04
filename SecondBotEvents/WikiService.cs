@@ -1,4 +1,5 @@
-﻿using OpenMetaverse.ImportExport.Collada14;
+﻿using OpenMetaverse;
+using OpenMetaverse.ImportExport.Collada14;
 using RestSharp.Extensions;
 using SecondBotEvents.Services;
 using System;
@@ -107,26 +108,78 @@ namespace SecondBotEvents
 
             
             Dictionary<string,string> hints = [];
+            Dictionary<string, string> hinttypes = [];
+            Dictionary<string, string> hintexamplevalue = [];
+
+            string examplecall = method.Name;
             foreach (ArgHints At in method.GetCustomAttributes<ArgHints>())
             {
                 hints.Add(At.name, At.about);
+                hinttypes.Add(At.name, At.defaultValueType);
+                hintexamplevalue.Add(At.name, At.exampleValue);
             }
 
             if (method.GetParameters().Length > 0)
             {
                 content = content + "<h5>Args</h5><div class=\"table-responsive\"><table class=\"table table-hover table-bordered table-striped\">";
                 content = content + "<thead><tr><th>Name</th>";
-                content = content + "<th>Hint</th></tr></thead><tbody>";
+                content = content + "<th>Hint</th><th>Type</th><th>Example</th></tr></thead><tbody>";
+                bool hadStartSplit = false;
+                string addon = "";
                 foreach (ParameterInfo pram in method.GetParameters())
                 {
+                    if(hadStartSplit == false)
+                    {
+                        hadStartSplit = true;
+                        examplecall = examplecall + "###";
+                    }
                     content = content + "<tr>";
                     content = content + "<td>" + pram.Name + "</a></td>";
                     string hinttext = "";
+                    string hinttype = "";
+                    string hintexample = "";
+                    string hintexamplecmd = "";
+                    if (hintexamplevalue.ContainsKey(pram.Name) == true)
+                    {
+                        if (hintexamplevalue[pram.Name] != null)
+                        {
+                            hintexample = hintexamplevalue[pram.Name];
+                            hintexamplecmd = hintexamplevalue[pram.Name];
+                        }
+                    }
+                    if (hinttypes.ContainsKey(pram.Name) == true)
+                    {
+                        hinttype = hinttypes[pram.Name];
+                        if (hinttype == "UUID")
+                        {
+                            hintexample = UUID.Random().ToString();
+                            hintexamplecmd = hintexample;
+                        }
+                        else if (hinttype == "AVATAR")
+                        {
+                            hintexample = "Firstname Lastname or UUID";
+                            hintexamplecmd = "Madpeter Zond";
+                        }
+                        else if(hinttype == "BOOL")
+                        {
+                            hintexample = "false";
+                            hintexamplecmd = "true";
+                        }
+                    }
                     if (hints.ContainsKey(pram.Name) == true)
                     {
-                        hinttext = hints[pram.Name];
+                        if (hints[pram.Name] != null)
+                        {
+                            hinttext = hints[pram.Name];
+                        }
                     }
-                    content = content + "<td>" + hinttext + "</td></tr>";
+                    examplecall = examplecall + addon + "" + hintexamplecmd;
+                    addon = "~#~";
+                    content = content + "" +
+                        "<td>" + hinttext + "</td>" +
+                        "<td>"+ hinttype+"</td>" +
+                        "<td>"+ hintexample +"</td>" +
+                        "</tr>";
                 }
                 content = content + "</tbody></table></div>";
             }
@@ -140,7 +193,7 @@ namespace SecondBotEvents
             {
                 content = content + "<li class=\"list-group-item text-danger\">❌ "+ At.hint+"</li>";
             }
-            content = content + "</ul>";
+            content = content + "</ul><br/><h5>Example call</h5><br/>"+examplecall+"";
             makefile("command"+method.Name.ToLower(), content, "Command info for " + method.Name);
         }
 

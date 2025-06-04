@@ -21,7 +21,7 @@ namespace SecondBotEvents.Commands
         "ChatGptService")]
     public class Services(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        protected List<string> controlable = [ 
+        public static readonly string[] controlable = { 
             "BotClientService",
             "RLVService",
             "HttpService",
@@ -33,13 +33,14 @@ namespace SecondBotEvents.Commands
             "TriggerOnEventService",
             "RelayService",
             "ChatGptService"
-        ];
+        };
 
         [About("Marks a service as enabled and starts it")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Unknown service")]
         [ReturnHintsFailure("Unable to manage selected service")]
         [ReturnHintsFailure("Service control is not enabled by config")]
+        [ArgHints("servicename","What service to enable","SERVICES","HttpService")]
         public object EnableAndStartService(string servicename)
         {
             if(master.CommandsService.GetAllowServiceCommands() == false)
@@ -64,6 +65,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unknown service")]
         [ReturnHintsFailure("Unable to manage selected service")]
         [ReturnHintsFailure("Service control is not enabled by config")]
+        [ArgHints("servicename", "What service to stop", "SERVICES", "HttpService")]
         public object StopService(string servicename)
         {
             if (master.CommandsService.GetAllowServiceCommands() == false)
@@ -88,6 +90,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unknown service")]
         [ReturnHintsFailure("Unable to manage selected service")]
         [ReturnHintsFailure("Service control is not enabled by config")]
+        [ArgHints("servicename", "What service to Restart", "SERVICES", "HttpService")]
         public object RestartService(string servicename)
         {
             if (master.CommandsService.GetAllowServiceCommands() == false)
@@ -112,6 +115,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unknown service")]
         [ReturnHintsFailure("Unable to manage selected service")]
         [ReturnHintsFailure("Service control is not enabled by config")]
+        [ArgHints("servicename", "What service to adjust the config for", "SERVICES", "HttpService")]
+        [ArgHints("configname", "What config value are we updating", "Text", "example")]
+        [ArgHints("configvalue", "What is the new value", "Text", "changedvalue")]
         public object ChangeConfigValue(string servicename,string configname,string configvalue)
         {
             if (master.CommandsService.GetAllowServiceCommands() == false)

@@ -14,7 +14,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Convert to float has failed")]
         [ReturnHintsFailure("value out of range (-2.0, 2.0)")]
-        [ArgHints("height", "what height to hover at from (-2.0, 2.0)")]
+        [ArgHints("height", "what height to hover at from (-2.0, 2.0)","Number","0.5")]
         public object HoverHeight(string height)
         {
             if (double.TryParse(height, out double level) == false)
@@ -34,9 +34,9 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Convert to vector has failed")]
         [ReturnHintsFailure("?  value out of range 0-?")]
-        [ArgHints("x", "X location to AutoPilot to")]
-        [ArgHints("y", "Y location to AutoPilot to")]
-        [ArgHints("z", "Z location to AutoPilot to")]
+        [ArgHints("x", "X location to AutoPilot to","Number","44")]
+        [ArgHints("y", "Y location to AutoPilot to","Number","78")]
+        [ArgHints("z", "Z location to AutoPilot to","Number","26")]
         public object AutoPilot(string x, string y, string z)
         {
             if (Vector3.TryParse("<" + x + "," + y + "," + z + ">", out Vector3 pos) == false)
@@ -74,7 +74,7 @@ namespace SecondBotEvents.Commands
         [About("Make the bot request the target avatar teleport to the bot")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar UUID")]
-        [ArgHints("avatar", "Avatar UUID or Firstname Lastname")]
+        [ArgHints("avatar", "Who to send the join me via teleport to","AVATAR")]
         public object SendTeleportLure(string avatar)
         {
             ProcessAvatar(avatar);
@@ -89,7 +89,7 @@ namespace SecondBotEvents.Commands
         [About("Sends a teleport request (Move the bot to the avatar)")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar UUID")]
-        [ArgHints("avatar", "Avatar UUID or Firstname Lastname")]
+        [ArgHints("avatar", "Who to request a teleport from","AVATAR")]
         public object RequestTeleport(string avatar)
         {
             ProcessAvatar(avatar);
@@ -105,7 +105,7 @@ namespace SecondBotEvents.Commands
         [About("Makes the bot fly (or not)")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild mode")]
-        [ArgHints("mode", "true: Start flying, false: stop flying (super fun at height)")]
+        [ArgHints("mode", "true: Start flying, false: stop flying (super fun at height)","BOOL")]
         public object Fly(string mode)
         {
             if (bool.TryParse(mode, out bool flymode) == false)
@@ -121,7 +121,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Invaild vector")]
         [ReturnHintsFailure("Vector ? value is out of range 0-?")]
-        [ArgHints("vector", "a vector to face eg <123,45,44>")]
+        [ArgHints("vector", "What direction to face","Vector", "<123,45,44>")]
         public object RotateToFaceVector(string vector)
         {
             if (Vector3.TryParse(vector, out Vector3 pos) == false)
@@ -147,7 +147,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Invaild avatar UUID")]
         [ReturnHintsFailure("Unable to see avatar")]
-        [ArgHints("avatar", "An avatar UUID or Firstname Lastname")]
+        [ArgHints("avatar", "Who to turn to look at","AVATAR")]
         public object RotateToFace(string avatar)
         {
             ProcessAvatar(avatar);
@@ -165,7 +165,7 @@ namespace SecondBotEvents.Commands
         [About("Rotates the avatar to face a rotation from north in Degrees")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Unable to process rotation")]
-        [ArgHints("deg", "0 to 360")]
+        [ArgHints("deg", "0 to 360","Number","180")]
         public object RotateTo(string deg)
         {
             if (float.TryParse(deg, out float target_yaw) == true)
@@ -202,9 +202,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error Unable to Teleport to location")]
         [ReturnHints("Accepted")]
         [ArgHints("region", "the name of the region we are going to")]
-        [ArgHints("x", "X location to teleport to")]
-        [ArgHints("y", "y location to teleport to")]
-        [ArgHints("z", "z location to teleport to")]
+        [ArgHints("x", "X location to teleport to","Number","55")]
+        [ArgHints("y", "y location to teleport to","Number","78")]
+        [ArgHints("z", "z location to teleport to","Number","244")]
         public object Teleport(string region, string x, string y, string z)
         {
             bool status = TeleportRequest(region+"/"+x+"/"+y+"/"+z);
@@ -219,7 +219,7 @@ namespace SecondBotEvents.Commands
         [About("Attempt to teleport to a new region via a SL url")]
         [ReturnHintsFailure("slurl is empty")]
         [ReturnHints("True|False")]
-        [ArgHints("slurl", "a full SLurl")]
+        [ArgHints("slurl", "a full SLurl","Text", "secondlife://Example%20Land/115/130/24")]
         public object TeleportSLURL(string slurl)
         {
             if (SecondbotHelpers.notempty(slurl) == false)

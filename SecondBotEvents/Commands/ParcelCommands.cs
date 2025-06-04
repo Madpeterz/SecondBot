@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using static OpenMetaverse.DirectoryManager;
 using static OpenMetaverse.ParcelManager;
 using static OpenMetaverse.Stats.UtilizationStatistics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SecondBotEvents.Commands
 {
@@ -93,7 +94,7 @@ namespace SecondBotEvents.Commands
             Dictionary<string, Vector4> parcelbox = [];
             uint SimWidth = GetClient().Network.CurrentSim.SizeX;
             uint SimHeight = GetClient().Network.CurrentSim.SizeY;
-            Dictionary<int,string> maps = [];
+            Dictionary<int, string> maps = [];
 
 
             int lastparcelid = 0;
@@ -225,16 +226,16 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild amount")]
-        [ArgHints("amount", "The amount to sell the parcel for from 1 to 9999999, can be zero if avatar is assigned.")]
-        [ArgHints("avatar", "Avatar uuid or Firstname Lastname or \"none\" who we are locking the sale to")]
-        public object SetParcelSale(string amount,string avatar)
+        [ArgHints("amount", "The amount to sell the parcel for from 1 to 9999999, can be zero if avatar is assigned.", "Number", "4323")]
+        [ArgHints("avatar", "Who to sell the parcel to or \"none\" to allow anyone", "AVATAR")]
+        public object SetParcelSale(string amount, string avatar)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
-            if(tests.Key == false)
+            if (tests.Key == false)
             {
                 return Failure(tests.Value, [amount, avatar]);
             }
-            if (int.TryParse(amount,out int amountvalue) == false)
+            if (int.TryParse(amount, out int amountvalue) == false)
             {
                 return Failure("Invaild amount", [amount, avatar]);
             }
@@ -244,7 +245,7 @@ namespace SecondBotEvents.Commands
             if (avatar != "none")
             {
                 ProcessAvatar(avatar);
-                if(avataruuid != UUID.Zero)
+                if (avataruuid != UUID.Zero)
                 {
                     minAmount = 0;
                 }
@@ -307,11 +308,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild timeout")]
         [ReturnHintsFailure("timeout must be >= 2000 and <= 7000")]
         [ReturnHintsFailure("Timed out while doing land search")]
-        [ArgHints("filterRegion", "Any,Auction,Mainland,Estate")]
-        [ArgHints("filterPrice", "the max price to get results for: a number greater than or equal to zero")]
-        [ArgHints("filterArea", "the max area to get results for: a number greater than or equal to zero")]
-        [ArgHints("pageNum", "the page to load from (starting at zero): a number greater than or equal to zero")]
-        [ArgHints("timeout", "how long to wait for results: a number greater in the range 2000 to 7000")]
+        [ArgHints("filterRegion", "What are we looking for", "Text", "Auction", new string[] { "Any", "Auction", "Mainland", "Estate" })]
+        [ArgHints("filterPrice", "the max price to get results for: a number greater than or equal to zero","Number","432")]
+        [ArgHints("filterArea", "the max area to get results for: a number greater than or equal to zero","Number","65")]
+        [ArgHints("pageNum", "the page to load from (starting at zero): a number greater than or equal to zero","Number","0")]
+        [ArgHints("timeout", "how long to wait for results: a number greater in the range 2000 to 7000","Number","2000")]
 
         public object QueryLandSaleData(string filterRegion,string filterPrice, string filterArea, string pageNum, string timeout)
         {
@@ -384,9 +385,9 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild amount")]
-        [ArgHints("x", "X point for landing")]
-        [ArgHints("y", "Y point for landing")]
-        [ArgHints("z", "Z point for landing")]
+        [ArgHints("x", "X point for landing","Number","129")]
+        [ArgHints("y", "Y point for landing","Number","32")]
+        [ArgHints("z", "Z point for landing","Number","11")]
         public object SetParcelLandingZone(string x, string y, string z)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -418,7 +419,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Parcel name is empty")]
-        [ArgHints("name", "The new name of the parcel")]
+        [ArgHints("name", "The new name of the parcel","Text","My Home")]
         public object SetParcelName(string name)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -439,7 +440,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
-        [ArgHints("desc", "The new desc of the parcel")]
+        [ArgHints("desc", "The new desc of the parcel","Text","All are invited")]
         public object SetParcelDesc(string desc)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -489,7 +490,7 @@ namespace SecondBotEvents.Commands
         [About("Ejects an avatar")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar")]
-        [ArgHints("avatar", "uuid of the avatar or Firstname Lastname")]
+        [ArgHints("avatar", "Who to eject from the parcel","AVATAR")]
         public object ParcelEject(string avatar)
         {
             ProcessAvatar(avatar);
@@ -521,7 +522,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild avatar")]
         [ReturnHintsFailure("Avatar is in the blacklist")]
-        [ArgHints("avatar", "uuid of the avatar or Firstname Lastname")]
+        [ArgHints("avatar", "Who to ban from the parcel","AVATAR")]
         public object ParcelBan(string avatar)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -564,7 +565,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild avatar")]
         [ReturnHintsFailure("Avatar is already unbanned")]
-        [ArgHints("avatar", "uuid of the avatar or Firstname Lastname")]
+        [ArgHints("avatar", "Who to unban from the parcel","AVATAR")]
         public object ParcelUnBan(string avatar)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -607,7 +608,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Timeout waiting for object owners reply")]
         [ReturnHintsFailure("Invaild avatar")]
         [ReturnHints("ok")]
-        [ArgHints("avatar", "uuid of the avatar or Firstname Lastname")]
+        [ArgHints("avatar", "who to return all objects on parcel", "AVATAR")]
         public object ReturnAllObjectsOnParcelByOwner(string avatar)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -724,7 +725,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
-        [ArgHints("musicurl", "The new name of the parcel")]
+        [ArgHints("musicurl", "the URL to set for streaming audio", "URL","http://podcast.mysite.com")]
         public object SetParcelMusic(string musicurl)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -745,7 +746,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to set flag ...")]
         [ReturnHintsFailure("Flag: ? is unknown")]
         [ReturnHintsFailure("Flag: ? missing \"=\"")]
-        [ArgHints("escapedflagdata", "repeatable flag data split by ::: formated Flag=True|False")]
+        [ArgHints("escapedflagdata", "repeatable flag data split by ::: formated Flag=True|False","Text","")]
         public object SetParcelFlag(string escapedflagdata)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -799,7 +800,7 @@ namespace SecondBotEvents.Commands
 
         [About("transfers the current parcel ownership to the assigned group")]
         [ReturnHints("ok")]
-        [ArgHints("group", "The group uuid to assign")]
+        [ArgHints("group", "The group to deed the land to","UUID")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild group uuid")]
@@ -836,7 +837,8 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Parcel sale locked to other avatars")]
         [ReturnHintsFailure("Parcel sale price and amount do not match")]
         [ReturnHintsFailure("Invaild amount")]
-        [ArgHints("amount", "amount to pay for the parcel (min 1, unless the land is set to the bot as the locked buyer then its 0)")]
+        [ArgHints("amount", "amount to pay for the parcel (min 1, unless the land is set to the bot as the locked buyer then its 0)",
+            "Number","1234")]
         public object ParcelBuy(string amount)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -877,8 +879,8 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar UUID")]
         [ReturnHintsFailure("Invaild state")]
-        [ArgHints("avatar", "avatar uuid or Firstname Lastname")]
-        [ArgHints("state", "setting state to false will unfreeze or true to freeze")]
+        [ArgHints("avatar", "Who to freeze","AVATAR")]
+        [ArgHints("state", "setting state to false will unfreeze or true to freeze","BOOL")]
         public object ParcelFreeze(string avatar, string state)
         {
             if (bool.TryParse(state, out bool freezestate) == false)
@@ -978,7 +980,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
-        [ArgHints("escapedflagdata", "repeatable flag data split by ::: formated Flag=True|False")]
+        [ArgHints("escapedflagdata", "repeatable flag data split by ::: formated Flag=Value","TEXT", "MediaDesc=lol what:::MediaAutoScale=True:::MediaLoop=False")]
         public object ParcelSetMedia(string escapedflagdata)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();

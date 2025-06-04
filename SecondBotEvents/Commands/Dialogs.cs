@@ -12,7 +12,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("removed")]
         [ReturnHintsFailure("unable to find avatar")]
         [ReturnHintsFailure("looking up avatar please try again")]
-        [ArgHints("avatar", "the UUID or avatar name to add")]
+        [ArgHints("avatar", "Who to send the dialog relay to", "AVATAR")]
         public object DialogRelayAvatarTarget(string avatar)
         {
             if(UUID.TryParse(avatar, out UUID avUUID) == false)
@@ -35,7 +35,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("removed")]
         [ReturnHintsFailure("channel must be zero or more")]
         [ReturnHintsFailure("channel is not vaild")]
-        [ArgHints("channel", "a number >= 0")]
+        [ArgHints("channel", "what channel number to send the reply to (must be zero or higher)","Number", "123")]
         public object DialogRelayChatTarget(string channel)
         {
             if (int.TryParse(channel, out int channelnum) == false)
@@ -53,7 +53,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("added")]
         [ReturnHints("removed")]
         [ReturnHintsFailure("url must start with http")]
-        [ArgHints("url", "a vaild http url")]
+        [ArgHints("url", "the URL to send the replys to","URL","http://mycoolsite.com/botdialog.php")]
         public object DialogRelayHttpTarget(string url)
         {
             if(url.StartsWith("http") == false)
@@ -69,8 +69,8 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild dialog window")]
         [ReturnHintsFailure("Invaild dialog button")]
         [ReturnHintsFailure("bad dialog id")]
-        [ArgHints("dialogid", "The ID for the dialog")]
-        [ArgHints("buttontext", "The button text to push")]
+        [ArgHints("dialogid", "The ID for the dialog","Number","442")]
+        [ArgHints("buttontext", "The button text to push","Text","Unlock")]
         public object DialogResponce(string dialogid, string buttontext)
         {
             if (int.TryParse(dialogid, out int dialogidnum) == false)

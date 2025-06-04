@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 using OpenMetaverse;
+using OpenMetaverse.ImportExport.Collada14;
 using SecondBotEvents.Services;
 using System.Collections.Generic;
 using System.Linq;
+using static NRedisStack.Search.Schema;
 
 namespace SecondBotEvents.Commands
 {
@@ -13,9 +15,9 @@ namespace SecondBotEvents.Commands
         [ReturnHints("sending")]
         [ReturnHintsFailure("Send was rejected because: X")]
         [ReturnHintsFailure("ARG is empty")]
-        [ArgHints("to", "the email addres to send to")]
-        [ArgHints("subject", "the subject of the email")]
-        [ArgHints("body", "the contents of the email")]
+        [ArgHints("to", "the email addres to send to", "Text", "me@email.com")]
+        [ArgHints("subject", "the subject of the email", "Text", "This is the subject")]
+        [ArgHints("body", "the contents of the email", "Text", "Email is fun")]
         public object SendEmail(string to, string subject, string body)
         {
             if (SecondbotHelpers.isempty(to) == true) {
@@ -23,18 +25,18 @@ namespace SecondBotEvents.Commands
             }
             else if (SecondbotHelpers.isempty(subject) == true)
             {
-                return Failure("subject is empty", [ to ]);
+                return Failure("subject is empty", [to]);
             }
             else if (SecondbotHelpers.isempty(body) == true)
             {
                 return Failure("body is empty", [to, subject]);
             }
             KeyValuePair<bool, string> reply = master.SmtpService.commandEmail(to, subject, body);
-            if(reply.Key == false)
+            if (reply.Key == false)
             {
-                return Failure("Send was rejected because: "+reply.Value, [ to, subject, body ]);
+                return Failure("Send was rejected because: " + reply.Value, [to, subject, body]);
             }
-            return BasicReply("sending",[to,subject,body]);
+            return BasicReply("sending", [to, subject, body]);
         }
 
         [About("Makes the bot teleport to its home region")]
@@ -47,7 +49,7 @@ namespace SecondBotEvents.Commands
 
         [About("Makes the bot turn to face a avatar and point at it (if found)")]
         [ReturnHints("ok")]
-        [ArgHints("targetUUID", "UUID of a avatar to point at")]
+        [ArgHints("targetUUID", "The avatar to point at", "AVATAR")]
         [ReturnHintsFailure("Cant find UUID in sim")]
         public object PointAt(string targetUUID)
         {
@@ -68,7 +70,7 @@ namespace SecondBotEvents.Commands
         [About("Reads a value from the KeyValue storage (temp unless SQL is enabled)")]
         [ReturnHints("value")]
         [ReturnHintsFailure("Unknown Key: KeyName")]
-        [ArgHints("Key", "the key we are trying to read from")]
+        [ArgHints("Key", "the key we are trying to read from", "Text", "ExampleKey")]
         public object ReadKeyValue(string Key)
         {
             return BasicReply(master.DataStoreService.GetKeyValue(Key));
@@ -78,8 +80,8 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Key is empty")]
         [ReturnHintsFailure("Value is empty")]
-        [ArgHints("Key", "the key we are trying to set")]
-        [ArgHints("Value", "the value we are tring to put on the key")]
+        [ArgHints("Key", "the key we are trying to set", "Text", "ExampleKey")]
+        [ArgHints("Value", "the value we are tring to put on the key", "Text", "ExampleValue")]
         public object SetKeyValue(string Key, string Value)
         {
             if (SecondbotHelpers.isempty(Key) == false)
@@ -97,7 +99,7 @@ namespace SecondBotEvents.Commands
         [About("Reads a value from the KeyValue storage (temp unless SQL is enabled)")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Key is empty")]
-        [ArgHints("Key", "the key we are trying to clear")]
+        [ArgHints("Key", "the key we are trying to clear", "Text", "ExampleKey")]
         public object ClearKeyValue(string Key)
         {
             if (SecondbotHelpers.isempty(Key) == false)
@@ -111,7 +113,7 @@ namespace SecondBotEvents.Commands
         [About("Makes the bot sit on the ground or on a object if it can see it")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild object UUID")]
-        [ArgHints("target", "a object UUID anything or nothing will also work")]
+        [ArgHints("target", "a object UUID or the word ground", "Text", "ground")]
         public object Sit(string target)
         {
             if ((target == "ground") || (target == UUID.Zero.ToString()))
@@ -119,7 +121,7 @@ namespace SecondBotEvents.Commands
                 GetClient().Self.SitOnGround();
                 return BasicReply("ok", [target]);
             }
-            if(UUID.TryParse(target,out UUID objectuuid) == false)
+            if (UUID.TryParse(target, out UUID objectuuid) == false)
             {
                 return Failure("Invaild object uuid and not ground");
             }
@@ -141,7 +143,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Invaild object UUID")]
         [ReturnHintsFailure("Unable to see object")]
-        [ArgHints("target", "object UUID")]
+        [ArgHints("target", "the object to click on", "UUID")]
         public object ClickObject(string target)
         {
             if (UUID.TryParse(target, out UUID objectuuid) == false)
@@ -180,10 +182,10 @@ namespace SecondBotEvents.Commands
         public object GetLastCommands()
         {
             List<string> reply = [];
-            foreach(CommandHistory A in master.DataStoreService.GetCommandHistory())
+            foreach (CommandHistory A in master.DataStoreService.GetCommandHistory())
             {
                 reply.Add(JsonConvert.SerializeObject(A));
-                if(reply.Count >= 5)
+                if (reply.Count >= 5)
                 {
                     break;
                 }
@@ -202,10 +204,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild state")]
         [ReturnHintsFailure("Invaild sticky")]
         [ReturnHintsFailure("Invaild flag")]
-        [ArgHints("avatar", "avatar uuid or Firstname Lastname")]
-        [ArgHints("flag", "friend, group, animation, teleport, inventory or command")]
-        [ArgHints("state", "State to set the flag to true or false")]
-        [ArgHints("sticky", "if true the permissing will not expire after the first use otherwise false")]
+        [ArgHints("avatar", "Who to asign the flag to", "AVATAR")]
+        [ArgHints("flag", "What flag to assign", "Text", "group", 
+            new string[] { "friend", "group", "animation", "teleport", "inventory","command" })]
+        [ArgHints("state", "What state to put the flag into","BOOL")]
+        [ArgHints("sticky", "Should this be repeatable","BOOL")]
         public object SetPermFlag(string avatar, string flag, string state, string sticky)
         {
             ProcessAvatar(avatar);
