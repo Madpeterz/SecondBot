@@ -165,6 +165,11 @@ namespace SecondBotEvents
                             hintexample = "false";
                             hintexamplecmd = "true";
                         }
+                        else if(hinttype == "SMART")
+                        {
+                            hintexample = "HTTP URL, Avatar UUID or chat chanel";
+                            hintexamplecmd = "1234";
+                        }
                     }
                     if (hints.ContainsKey(pram.Name) == true)
                     {
