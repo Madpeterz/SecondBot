@@ -118,12 +118,23 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to find item")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Invaild Z offset")]
+        [ReturnHintsFailure("Z offset must be between -2 and 2")]
         [ArgHints("item", "what to rez", "UUID")]
-        public object RezObjectParcelCenter(string item)
+        [ArgHints("zoffset", "Z offset to apply (range -2 to 2)", "Number", "0.5")]
+        public object RezObjectParcelCenter(string item, string zoffset)
         {
             if (UUID.TryParse(item, out UUID targetitem) == false)
             {
                 return Failure("Invaild item UUID: " + item, [item]);
+            }
+            if(float.TryParse(zoffset, out float zoff) == false)
+            {
+                return Failure("Invaild Z offset: " + zoffset, [item]);
+            }
+            if(zoff < -2 || zoff > 2)
+            {
+                return Failure("Z offset must be between -2 and 2", [item, zoffset]);
             }
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
             if (tests.Key == false)
@@ -150,7 +161,7 @@ namespace SecondBotEvents.Commands
             }
             float x = targetparcel.AABBMin.X + ((targetparcel.AABBMax.X - targetparcel.AABBMin.X) / 2);
             float y = targetparcel.AABBMin.Y + ((targetparcel.AABBMax.Y - targetparcel.AABBMin.Y) / 2);
-            Vector3 resat = new Vector3(x, y, GetClient().Self.RelativePosition.Z);
+            Vector3 resat = new Vector3(x, y, GetClient().Self.RelativePosition.Z+zoff);
             UUID rezedobject = GetClient().Inventory.RequestRezFromInventory(GetClient().Network.CurrentSim, GetClient().Self.SimRotation, resat, itm);
             return BasicReply(rezedobject.ToString(), [item]);
         }
