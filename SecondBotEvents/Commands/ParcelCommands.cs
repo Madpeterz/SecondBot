@@ -875,6 +875,28 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok", [amount]);
         }
 
+        [About("Sets the current parcels snapshot")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Invaild texture uuid")]
+        [ArgHints("texture", "The texture uuid to set as the snapshot", "UUID")]
+        public object SetParcelSnapshot(string texture)
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
+            if (UUID.TryParse(texture, out UUID textureuuid) == false)
+            {
+                return Failure("Invaild texture uuid", [texture]);
+            }
+            targetparcel.SnapshotID = textureuuid;
+            targetparcel.Update(GetClient());
+            return BasicReply("ok", [texture]);
+        }
+
         [About("Freezes an avatar")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar UUID")]
