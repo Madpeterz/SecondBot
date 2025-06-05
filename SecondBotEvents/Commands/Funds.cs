@@ -10,6 +10,7 @@ namespace SecondBotEvents.Commands
         [About("Requests the current balance and requests the balance to update.")]
         [ReturnHints("Current fund level")]
         [ReturnHintsFailure("Funds commands are disabled")]
+        [CmdTypeGet()]
         public object Balance()
         {
             if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
@@ -28,6 +29,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Transfer funds to avatars disabled")]
         [ArgHints("avatar", "Who to pay", "AVATAR")]
         [ArgHints("amount", "the amount to pay (from 1 to current balance)", "Number", "442")]
+        [CmdTypeDo()]
         public object PayAvatar(string avatar, string amount)
         {
             if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)
@@ -62,6 +64,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("object", "Object to pay","UUID")]
         [ArgHints("primname", "The name of the prim on the object to pay","Text","MyBank")]
         [ArgHints("amount", "the amount to pay (from 1 to current balance)","Number","312")]
+        [CmdTypeDo()]
         public object PayObject(string objectuuid,string primname,string amount)
         {
             if (master.CommandsService.myConfig.GetAllowFundsCommands() == false)

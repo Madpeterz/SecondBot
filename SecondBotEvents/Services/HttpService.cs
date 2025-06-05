@@ -241,6 +241,42 @@ namespace SecondBotEvents.Services
         public string classinfo = classinfo;
     }
 
+    [AttributeUsage(AttributeTargets.Method)]
+    public class CmdType(CommandType setType) : Attribute
+    {
+        public CommandType cmdtype = setType;
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class CmdTypeGet : CmdType
+    {
+        public CmdTypeGet() : base(CommandType.Get)
+        {
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class CmdTypeSet : CmdType
+    {
+        public CmdTypeSet() : base(CommandType.Set)
+        {
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class CmdTypeDo : CmdType
+    {
+        public CmdTypeDo() : base(CommandType.Do)
+        {
+        }
+    }
+
+    public enum CommandType
+    {
+        Get,
+        Set,
+        Do,
+    }
 
     [AttributeUsage(AttributeTargets.Method)]
     public class About(string about) : Attribute
@@ -312,4 +348,5 @@ namespace SecondBotEvents.Services
             return JsonConvert.SerializeObject(master.CommandsService.RunCommand("HTTP",C));
         }
     }
+
 }

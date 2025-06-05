@@ -38,6 +38,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("parcel local id (int)")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
+        [CmdTypeGet()]
         public object GetCurrentParcelId()
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -50,13 +51,16 @@ namespace SecondBotEvents.Commands
 
         [About("Requests the bot update its list of parcels ready for other commands")]
         [ReturnHints("ok")]
+        [CmdTypeDo()]
         public object UpdateListOfParcels()
         {
             GetClient().Parcels.RequestAllSimParcels(GetClient().Network.CurrentSim);
             return BasicReply("ok");
         }
+
         [About("Requests a packet blob for the parcels snapshot data")]
         [ReturnHints("json encoded object")]
+        [CmdTypeGet()]
         public object GetParcelListSnapshots()
         {
             Dictionary<string, string> reply = [];
@@ -72,6 +76,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("width,height as a csv")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
+        [CmdTypeGet()]
         public object GetCurrentParcelSize()
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -88,6 +93,7 @@ namespace SecondBotEvents.Commands
 
         [About("requests the parcel layout as a SVG\n call UpdateListOfParcels first to update list before calling")]
         [ReturnHints("json encoded svg")]
+        [CmdTypeGet()]
         public object GetSimParcelLayers()
         {
             Dictionary<int, Parcel> data = GetClient().Network.CurrentSim.Parcels.Copy();
@@ -177,6 +183,7 @@ namespace SecondBotEvents.Commands
 
         [About("Requests a packet blob for the parcels in the current sim\n call UpdateListOfParcels first to update list before calling")]
         [ReturnHints("json encoded object")]
+        [CmdTypeGet()]
         public object GetListOfParcels()
         {
             ParcelPacketReply reply = new();
@@ -208,6 +215,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
+        [CmdTypeDo()]
         public object CancelParcelSale()
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -228,6 +236,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild amount")]
         [ArgHints("amount", "The amount to sell the parcel for from 1 to 9999999, can be zero if avatar is assigned.", "Number", "4323")]
         [ArgHints("avatar", "Who to sell the parcel to or \"none\" to allow anyone", "AVATAR")]
+        [CmdTypeSet()]
         public object SetParcelSale(string amount, string avatar)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -268,6 +277,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("traffic value")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
+        [CmdTypeGet()]
         public object GetParcelTraffic()
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -282,6 +292,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("json object with sale amount and target for sale")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
+        [CmdTypeGet()]
         public object GetParcelSaleDetails()
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -313,7 +324,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("filterArea", "the max area to get results for: a number greater than or equal to zero","Number","65")]
         [ArgHints("pageNum", "the page to load from (starting at zero): a number greater than or equal to zero","Number","0")]
         [ArgHints("timeout", "how long to wait for results: a number greater in the range 2000 to 7000","Number","2000")]
-
+        [CmdTypeGet()]
         public object QueryLandSaleData(string filterRegion,string filterPrice, string filterArea, string pageNum, string timeout)
         {
             if (Enum.TryParse<DirectoryManager.SearchTypeFlags>(filterRegion, out DirectoryManager.SearchTypeFlags filterRegionType) == false)
@@ -388,6 +399,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("x", "X point for landing","Number","129")]
         [ArgHints("y", "Y point for landing","Number","32")]
         [ArgHints("z", "Z point for landing","Number","11")]
+        [CmdTypeSet()]
         public object SetParcelLandingZone(string x, string y, string z)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -420,6 +432,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Parcel name is empty")]
         [ArgHints("name", "The new name of the parcel","Text","My Home")]
+        [CmdTypeSet()]
         public object SetParcelName(string name)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -441,6 +454,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ArgHints("desc", "The new desc of the parcel","Text","All are invited")]
+        [CmdTypeSet()]
         public object SetParcelDesc(string desc)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -457,6 +471,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
+        [CmdTypeGet()]
         public object GetParcelDesc()
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -471,6 +486,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
+        [CmdTypeGet()]
         public object GetParcelFlags()
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -491,6 +507,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar")]
         [ArgHints("avatar", "Who to eject from the parcel","AVATAR")]
+        [CmdTypeDo()]
         public object ParcelEject(string avatar)
         {
             ProcessAvatar(avatar);
@@ -504,6 +521,7 @@ namespace SecondBotEvents.Commands
 
         [About("Abandons the parcel the bot is currently on, returning it to Linden's or Estate owner")]
         [ReturnHints("ok")]
+        [CmdTypeDo()]
         public object AbandonLand()
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -523,6 +541,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild avatar")]
         [ReturnHintsFailure("Avatar is in the blacklist")]
         [ArgHints("avatar", "Who to ban from the parcel","AVATAR")]
+        [CmdTypeDo()]
         public object ParcelBan(string avatar)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -566,6 +585,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild avatar")]
         [ReturnHintsFailure("Avatar is already unbanned")]
         [ArgHints("avatar", "Who to unban from the parcel","AVATAR")]
+        [CmdTypeDo()]
         public object ParcelUnBan(string avatar)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -609,6 +629,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild avatar")]
         [ReturnHints("ok")]
         [ArgHints("avatar", "who to return all objects on parcel", "AVATAR")]
+        [CmdTypeDo()]
         public object ReturnAllObjectsOnParcelByOwner(string avatar)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -632,6 +653,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("No objects found to return")]
         [ReturnHintsFailure("Timeout waiting for object owners reply")]
         [ReturnHints("ok")]
+        [CmdTypeDo()]
         public object ReturnAllObjectsOnParcel()
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -724,6 +746,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("a json object with prim counts")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
+        [CmdTypeGet()]
         public object GetParcelPrimCounts()
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -748,6 +771,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to process grouponly value")]
         [ArgHints("everyone", "can everyone trigger audio on this parcel", "BOOL")]
         [ArgHints("grouponly", "can everyone trigger audio on this parcel", "BOOL")]
+        [CmdTypeSet()]
         public object SetParcelAudioControls(string everyone,string grouponly)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -778,6 +802,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ArgHints("musicurl", "the URL to set for streaming audio", "URL","http://podcast.mysite.com")]
+        [CmdTypeSet()]
         public object SetParcelMusic(string musicurl)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -799,6 +824,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Flag: ? is unknown")]
         [ReturnHintsFailure("Flag: ? missing \"=\"")]
         [ArgHints("escapedflagdata", "repeatable flag data split by ::: formated Flag=True|False","Text","")]
+        [CmdTypeSet()]
         public object SetParcelFlag(string escapedflagdata)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -857,6 +883,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild group uuid")]
         [ReturnHintsFailure("Not in group")]
+        [CmdTypeDo()]
         public object ParcelDeedToGroup(string group)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -891,6 +918,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild amount")]
         [ArgHints("amount", "amount to pay for the parcel (min 1, unless the land is set to the bot as the locked buyer then its 0)",
             "Number","1234")]
+        [CmdTypeDo()]
         public object ParcelBuy(string amount)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -933,6 +961,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Invaild texture uuid")]
         [ArgHints("texture", "The texture uuid to set as the snapshot", "UUID")]
+        [CmdTypeSet()]
         public object SetParcelSnapshot(string texture)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -955,6 +984,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild state")]
         [ArgHints("avatar", "Who to freeze","AVATAR")]
         [ArgHints("state", "setting state to false will unfreeze or true to freeze","BOOL")]
+        [CmdTypeDo()]
         public object ParcelFreeze(string avatar, string state)
         {
             if (bool.TryParse(state, out bool freezestate) == false)
@@ -975,6 +1005,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("json object: GetParcelBanlistObject")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
+        [CmdTypeGet()]
         public object GetParcelBanlist()
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();
@@ -1017,6 +1048,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild object uuid")]
         [ReturnHintsFailure("Unable to find object")]
         [ArgHints("objectuuid", "object UUID to unrez")]
+        [CmdTypeDo()]
         public object UnRezObject(string objectuuid)
         {
             if (UUID.TryParse(objectuuid, out UUID targetobject) == false)
@@ -1055,6 +1087,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ArgHints("escapedflagdata", "repeatable flag data split by ::: formated Flag=Value","TEXT", "MediaDesc=lol what:::MediaAutoScale=True:::MediaLoop=False")]
+        [CmdTypeSet()]
         public object ParcelSetMedia(string escapedflagdata)
         {
             KeyValuePair<bool, string> tests = SetupCurrentParcel();

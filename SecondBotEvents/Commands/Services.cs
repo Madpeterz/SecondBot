@@ -41,6 +41,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to manage selected service")]
         [ReturnHintsFailure("Service control is not enabled by config")]
         [ArgHints("servicename","What service to enable","SERVICES","HttpService")]
+        [CmdTypeDo()]
         public object EnableAndStartService(string servicename)
         {
             if(master.CommandsService.GetAllowServiceCommands() == false)
@@ -66,6 +67,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to manage selected service")]
         [ReturnHintsFailure("Service control is not enabled by config")]
         [ArgHints("servicename", "What service to stop", "SERVICES", "HttpService")]
+        [CmdTypeDo()]
         public object StopService(string servicename)
         {
             if (master.CommandsService.GetAllowServiceCommands() == false)
@@ -91,6 +93,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to manage selected service")]
         [ReturnHintsFailure("Service control is not enabled by config")]
         [ArgHints("servicename", "What service to Restart", "SERVICES", "HttpService")]
+        [CmdTypeDo()]
         public object RestartService(string servicename)
         {
             if (master.CommandsService.GetAllowServiceCommands() == false)
@@ -118,6 +121,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("servicename", "What service to adjust the config for", "SERVICES", "HttpService")]
         [ArgHints("configname", "What config value are we updating", "Text", "example")]
         [ArgHints("configvalue", "What is the new value", "Text", "changedvalue")]
+        [CmdTypeSet()]
         public object ChangeConfigValue(string servicename,string configname,string configvalue)
         {
             if (master.CommandsService.GetAllowServiceCommands() == false)

@@ -17,6 +17,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Making request to get data from notecard")]
         [ArgHints("notecardInventoryUUID", "What notecard to read","UUID")]
         [ArgHints("replytarget", "Were to send the reply","SMART")]
+        [CmdTypeGet()]
         public object NotecardRead(string notecardInventoryUUID, string replytarget)
         {
             if(SecondbotHelpers.isempty(replytarget) == true)
@@ -89,6 +90,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ArgHints("collection", "The name of the collection","Text","StorageMeme")]
         [ArgHints("content", "The text to add to the collection","Text","Add this line \n Please and thanks")]
+        [CmdTypeSet()]
         public object NotecardAdd(string collection, string content)
         {
             if (SecondbotHelpers.notempty(collection) == false)
@@ -107,6 +109,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Collection value is empty")]
         [ReturnHints("ok")]
         [ArgHints("collection", "The name of the collection", "Text", "StorageMeme")]
+        [CmdTypeSet()]
         public object NotecardClear(string collection)
         {
             if (SecondbotHelpers.notempty(collection) == false)
@@ -126,6 +129,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("avatar", "Who to send it to","AVATAR")]
         [ArgHints("collection", "The name of the collection", "Text", "StorageMeme")]
         [ArgHints("notecardname", "What to call the created notecard","Text", "My custom notecard")]
+        [CmdTypeDo()]
         public object NotecardSend(string avatar, string collection, string notecardname)
         {
             if (SecondbotHelpers.notempty(collection) == false)
@@ -163,6 +167,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("avatar", "Who to send the notecard to","AVATAR")]
         [ArgHints("content", "What to put in the notecard","Text","I am in a notecard")]
         [ArgHints("notecardname", "Whats the name of the notecard","Text","Custom notecard")]
+        [CmdTypeDo()]
         public object NotecardDirectSend(string avatar, string content, string notecardname)
         {
             if (SecondbotHelpers.notempty(notecardname) == false)

@@ -15,6 +15,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Convert to float has failed")]
         [ReturnHintsFailure("value out of range (-2.0, 2.0)")]
         [ArgHints("height", "what height to hover at from (-2.0, 2.0)","Number","0.5")]
+        [CmdTypeSet()]
         public object HoverHeight(string height)
         {
             if (double.TryParse(height, out double level) == false)
@@ -37,6 +38,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("x", "X location to AutoPilot to","Number","44")]
         [ArgHints("y", "Y location to AutoPilot to","Number","78")]
         [ArgHints("z", "Z location to AutoPilot to","Number","26")]
+        [CmdTypeDo()]
         public object AutoPilot(string x, string y, string z)
         {
             if (Vector3.TryParse("<" + x + "," + y + "," + z + ">", out Vector3 pos) == false)
@@ -65,6 +67,7 @@ namespace SecondBotEvents.Commands
 
         [About("Stop the auto pilot system from walking")]
         [ReturnHints("ok")]
+        [CmdTypeDo()]
         public object AutoPilotStop()
         {
             GetClient().Self.AutoPilotCancel();
@@ -75,6 +78,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar UUID")]
         [ArgHints("avatar", "Who to send the join me via teleport to","AVATAR")]
+        [CmdTypeDo()]
         public object SendTeleportLure(string avatar)
         {
             ProcessAvatar(avatar);
@@ -90,6 +94,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild avatar UUID")]
         [ArgHints("avatar", "Who to request a teleport from","AVATAR")]
+        [CmdTypeDo()]
         public object RequestTeleport(string avatar)
         {
             ProcessAvatar(avatar);
@@ -106,6 +111,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild mode")]
         [ArgHints("mode", "true: Start flying, false: stop flying (super fun at height)","BOOL")]
+        [CmdTypeSet()]
         public object Fly(string mode)
         {
             if (bool.TryParse(mode, out bool flymode) == false)
@@ -122,6 +128,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild vector")]
         [ReturnHintsFailure("Vector ? value is out of range 0-?")]
         [ArgHints("vector", "What direction to face","Vector", "<123,45,44>")]
+        [CmdTypeSet()]
         public object RotateToFaceVector(string vector)
         {
             if (Vector3.TryParse(vector, out Vector3 pos) == false)
@@ -148,6 +155,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild avatar UUID")]
         [ReturnHintsFailure("Unable to see avatar")]
         [ArgHints("avatar", "Who to turn to look at","AVATAR")]
+        [CmdTypeSet()]
         public object RotateToFace(string avatar)
         {
             ProcessAvatar(avatar);
@@ -166,6 +174,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Unable to process rotation")]
         [ArgHints("deg", "0 to 360","Number","180")]
+        [CmdTypeSet()]
         public object RotateTo(string deg)
         {
             if (float.TryParse(deg, out float target_yaw) == true)
@@ -205,6 +214,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("x", "X location to teleport to","Number","55")]
         [ArgHints("y", "y location to teleport to","Number","78")]
         [ArgHints("z", "z location to teleport to","Number","244")]
+        [CmdTypeDo()]
         public object Teleport(string region, string x, string y, string z)
         {
             bool status = TeleportRequest(region+"/"+x+"/"+y+"/"+z);
@@ -220,6 +230,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("slurl is empty")]
         [ReturnHints("True|False")]
         [ArgHints("slurl", "a full SLurl","Text", "secondlife://Example%20Land/115/130/24")]
+        [CmdTypeDo()]
         public object TeleportSLURL(string slurl)
         {
             if (SecondbotHelpers.notempty(slurl) == false)

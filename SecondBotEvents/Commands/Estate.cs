@@ -15,6 +15,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("delay", "How long to delay the restart for (30 to 240 secs) - defaults to 240 if out of bounds \n" +
             "set to 0 if your canceling!", "Number", "60")]
         [ArgHints("mode", "true to start a restart, false to cancel", "BOOL")]
+        [CmdTypeDo()]
         public object SimRestart(string delay, string mode)
         {
             if (GetClient().Network.CurrentSim.IsEstateManager == false)
@@ -41,6 +42,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Message empty")]
         [ReturnHints("ok")]
         [ArgHints("message", "What the message is", "Text", "Hi everyone I need to restart this sim")]
+        [CmdTypeDo()]
         public object SimMessage(string message)
         {
             if (SecondbotHelpers.notempty(message) == false)
@@ -59,6 +61,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to find region")]
         [ReturnHints("Texture UUID")]
         [ArgHints("regionname", "the name of the region we are fetching", "Text", "Lostworld")]
+        [CmdTypeGet()]
         public object GetSimTexture(string regionname)
         {
             if (GetClient().Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region) == false)
@@ -71,6 +74,7 @@ namespace SecondBotEvents.Commands
         [About("Reclaims ownership of the current parcel")]
         [ReturnHintsFailure("Not an estate manager here")]
         [ReturnHints("ok")]
+        [CmdTypeDo()]
         public object EstateParcelReclaim()
         {
             if (GetClient().Network.CurrentSim.IsEstateManager == false)
@@ -86,6 +90,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("regionname", "the region we want", "Text", "Lostworld")]
         [ReturnHintsFailure("Unable to find region")]
         [ReturnHints("a json object with the x,y and region name")]
+        [CmdTypeGet()]
         public object GetSimGlobalPos(string regionname)
         {
             if (GetClient().Grid.GetGridRegion(regionname, GridLayerType.Objects, out GridRegion region) == false)
@@ -103,6 +108,7 @@ namespace SecondBotEvents.Commands
 
         [About("Requests the estate banlist")]
         [ReturnHints("ban list json")]
+        [CmdTypeGet()]
         public object GetEstateBanList()
         {
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetEstateBans()));
@@ -117,7 +123,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("avatar", "avatar you wish to ban", "AVATAR")]
         [ArgHints("mode", "What action would you like to take<br/>Defaults to remove if not given \"add\"", "Text", "add", new string[] {"add","remove"})]
         [ArgHints("global", "if true this the ban/unban will be applyed to all estates the bot has access to", "BOOL")]
-
+        [CmdTypeSet()]
         public object UpdateEstateBanlist(string avatar, string mode, string global)
         {
             if (GetClient().Network.CurrentSim.IsEstateManager == false)

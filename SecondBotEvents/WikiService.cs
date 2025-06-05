@@ -4,6 +4,7 @@ using RestSharp.Extensions;
 using SecondBotEvents.Services;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -66,37 +67,139 @@ namespace SecondBotEvents
             makefile("index", content, "Index");
         }
 
-        protected void makecommandlist(Type endpoint, string namespaceworker, string aboutnamespace)
+        protected string makeCommandList(string namespaceworker, List<MethodInfo> commands)
         {
-            string content = "<br/><a href=\"index.html\"><- Back to command sections</a><br/> " +
-                "<h4>"+namespaceworker.FirstCharToUpper()+"</h4><p>"+ aboutnamespace + "</p>"
-                +"<hr/><div class=\"table-responsive\"><table class=\"table table-hover table-bordered table-striped\">";
-            content = content + "<thead><tr><th>Command</th>";
-            content = content + "<th>About</th></tr></thead><tbody>";
-            foreach (MethodInfo M in endpoint.GetMethods())
+            commands = commands.OrderBy(x => x.Name).ToList();
+            string reply = "<div class=\"list-group\">";
+            foreach (MethodInfo M in commands)
             {
-                bool isCallable = false;
                 string about = "";
                 foreach (CustomAttributeData At in M.CustomAttributes)
                 {
                     if (At.AttributeType.Name == "About")
                     {
                         about = M.GetAttribute<About>().about;
-                        isCallable = true;
                         break;
                     }
                 }
-                if(isCallable == false)
+                if(about == "")
                 {
-                    continue;
+                    about = "No description";
+                }
+                if(about.Contains("<br>") == true)
+                {
+                    about = about.Split("<br>")[0];
+                }
+                if (about.Contains("\n") == true)
+                {
+                    about = about.Split("\n")[0];
                 }
                 string url = "command" + M.Name.ToLower() + ".html";
-                content = content + "<tr>";
-                content = content + "<td><a href=\""+ url+"\">" + M.Name + "</a></td>";
-                content = content + "<td>" + about + "</td></tr>";
+                reply = reply + "<a href=\""+ url+"\" class=\"list-group-item list-group-item-action\" aria-current=\"false\">";
+                reply = reply + "<div class=\"d-flex w-100 justify-content-between\">";
+                reply = reply + "<span class=\"text-primary fw-bold text-decoration-underline\">" + M.Name+"</span>";
+                reply = reply + "</div>";
+                reply = reply + "<p class=\"mb-1\"><small>" + about + "</small></p>";
+                reply = reply + "</a>";
                 makecommandfile(namespaceworker, M, about);
             }
-            content = content + "</tbody></table></div>";
+            reply = reply + "</div>";
+            return reply;
+        }
+        protected void makecommandlist(Type endpoint, string namespaceworker, string aboutnamespace)
+        {
+            List<MethodInfo> getCommands = [];
+            List<MethodInfo> setCommands = [];
+            List<MethodInfo> doCommands = [];
+            foreach (MethodInfo M in endpoint.GetMethods())
+            {
+                foreach (CustomAttributeData At in M.CustomAttributes)
+                {
+                    if (typeof(CmdType).IsAssignableFrom(At.AttributeType))
+                    {
+                        if (At.AttributeType.Name == "CmdTypeGet")
+                        {
+                            getCommands.Add(M);
+                        }
+                        else if (At.AttributeType.Name == "CmdTypeSet")
+                        {
+                            setCommands.Add(M);
+                        }
+                        else if (At.AttributeType.Name == "CmdTypeDo")
+                        {
+                            doCommands.Add(M);
+                        }
+                        break;
+                    }
+                }
+            }
+            string content = "";
+            if (((getCommands.Count > 0) || (setCommands.Count > 0)) && (doCommands.Count == 0))
+            {
+                // get set only (no do commands)
+                content = "<br/><a href=\"index.html\"><- Back to command sections</a><br/> " +
+                    "<h4>" + namespaceworker.FirstCharToUpper() + "</h4><p>" + aboutnamespace + "</p>"
+                    + "<hr/>" +
+                    "<div class=\"table-responsive\"><table class=\"table table-bordered table-striped\">" +
+                    "<thead><tr>" +
+                    "<th>Get (" + getCommands.Count.ToString() + ") / Set (" + setCommands.Count.ToString() + ")</th>" +
+                    "</tr></thead>";
+
+                content = content + "<tbody><tr>" +
+                    "<td>" + makeCommandList(namespaceworker, getCommands) + "" + makeCommandList(namespaceworker, setCommands) + "</td>" +
+                    "</tbody></table></div>";
+            }
+            else if (((getCommands.Count == 0) && (setCommands.Count == 0)) && (doCommands.Count > 0))
+            {
+                // Do only (no get/set commands)
+                content = "<br/><a href=\"index.html\"><- Back to command sections</a><br/> " +
+                    "<h4>" + namespaceworker.FirstCharToUpper() + "</h4><p>" + aboutnamespace + "</p>"
+                    + "<hr/>" +
+                    "<div class=\"table-responsive\"><table class=\"table table-bordered table-striped\">" +
+                    "<thead><tr>" +
+                    "<th>Do (" + doCommands.Count.ToString() + ")</th>" +
+                    "</tr></thead>";
+
+                content = content + "<tbody><tr>" +
+                    "<td>" + makeCommandList(namespaceworker, doCommands) + "</td>" +
+                    "</tbody></table></div>";
+            }
+            else if ((getCommands.Count > 4) && (setCommands.Count > 4))
+            {
+                // mix of both
+                content = "<br/><a href=\"index.html\"><- Back to command sections</a><br/> " +
+                "<h4>" + namespaceworker.FirstCharToUpper() + "</h4><p>" + aboutnamespace + "</p>"
+                + "<hr/>" +
+                "<div class=\"table-responsive\"><table class=\"table table-bordered table-striped\">" +
+                "<thead><tr>" +
+                "<th>Get (" + getCommands.Count.ToString() + ")</th>" +
+                "<th>Set (" + setCommands.Count.ToString() + ")</th>" +
+                "<th>Do (" + doCommands.Count.ToString() + ")</th>" +
+                "</tr></thead>";
+
+                content = content + "<tbody><tr>" +
+                    "<td>" + makeCommandList(namespaceworker, getCommands) + "</td>" +
+                    "<td>" + makeCommandList(namespaceworker, setCommands) + "</td>" +
+                    "<td>" + makeCommandList(namespaceworker, doCommands) + "</td></tr>" +
+                    "</tbody></table></div>";
+            }
+            else
+            {     
+                // mix of both
+                content = "<br/><a href=\"index.html\"><- Back to command sections</a><br/> " +
+                "<h4>" + namespaceworker.FirstCharToUpper() + "</h4><p>" + aboutnamespace + "</p>"
+                + "<hr/>" +
+                "<div class=\"table-responsive\"><table class=\"table table-bordered table-striped\">" +
+                "<thead><tr>" +
+                "<th>Get (" + getCommands.Count.ToString() + ") / Set (" + setCommands.Count.ToString() + ")</th>" +
+                "<th>Do (" + doCommands.Count.ToString() + ")</th>" +
+                "</tr></thead>";
+
+                content = content + "<tbody><tr>" +
+                    "<td>" + makeCommandList(namespaceworker, getCommands) + "" + makeCommandList(namespaceworker, setCommands) + "</td>" +
+                    "<td>" + makeCommandList(namespaceworker, doCommands) + "</td></tr>" +
+                    "</tbody></table></div>";
+            }
             makefile(namespaceworker, content, "Command list for "+ namespaceworker.FirstCharToUpper());
         }
 

@@ -19,6 +19,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Notecard title is to short")]
         [ArgHints("endpoint", "The end point","Text","No help given")]
         [ArgHints("endpointcode", "The end point code", "Text", "No help given")]
+        [CmdTypeGet()]
         public object FetchNextNotecard(string endpoint, string endpointcode)
         {
             if (SecondbotHelpers.notempty(endpoint) == false)

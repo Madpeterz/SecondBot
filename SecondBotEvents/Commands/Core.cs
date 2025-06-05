@@ -7,6 +7,7 @@ namespace SecondBotEvents.Commands
     {
         [About("Used to check connections")]
         [ReturnHints("world")]
+        [CmdTypeGet()]
         public object Hello()
         {
             return BasicReply("world");

@@ -14,6 +14,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("not in friends list")]
         [ReturnHintsFailure("no map access or updating")]
         [ArgHints("avatar", "Who to get the location of","AVATAR")]
+        [CmdTypeGet()]
         public object FriendsGetLocation(string avatar)
         {
             ProcessAvatar(avatar);
@@ -37,6 +38,7 @@ namespace SecondBotEvents.Commands
 
         [About("Gets the friendslist")]
         [ReturnHints("array of FriendListEntry")]
+        [CmdTypeGet()]
         public object Friendslist()
         {
             Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.Copy();
@@ -64,6 +66,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Not A friend")]
         [ReturnHintsFailure("state invaild")]
         [ReturnHintsFailure("avatar lookup")]
+        [CmdTypeSet()]
         public object FriendFullPerms(string avatar, string state)
         {
             ProcessAvatar(avatar);
@@ -97,6 +100,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("avatar lookup")]
         [ArgHints("avatar", "Who to request/remove from friends list","AVATAR")]
         [ArgHints("state", "true: Send invite, false: Remove from friendslist","BOOL")]
+        [CmdTypeDo()]
         public object FriendRequest(string avatar, string state)
         {
             ProcessAvatar(avatar);

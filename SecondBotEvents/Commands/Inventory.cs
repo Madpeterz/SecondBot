@@ -23,6 +23,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("inventoryType", "What type to watch for", "Text", "texture", new string[] { "texture","sound","callcard","landmark","clothing",
         "object","notecard","lsltext","lslbyte","animation","gesture","mesh" })]
         [ArgHints("outputTarget", "Where to send the updates to", "SMART")]
+        [CmdTypeSet()]
         public object SetInventoryUpdate(string inventoryType, string outputTarget)
         {
             if (master.EventsService.isRunning() == true)
@@ -37,6 +38,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ArgHints("sourcePath", "accepts a file path to a wave PCM file @ 44100", "FILE")]
         [ArgHints("inventoryName", "the name in secondlife", "Text", "mycoolsound")]
+        [CmdTypeDo()]
         public object UploadMediaWave(string sourcePath, string inventoryName)
         {
             byte[] audioData = File.ReadAllBytes(sourcePath);
@@ -78,6 +80,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ArgHints("item", "What to rez", "UUID")]
+        [CmdTypeDo()]
         public object RezObject(string item)
         {
             if (UUID.TryParse(item, out UUID targetitem) == false)
@@ -122,6 +125,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Z offset must be between -2 and 2")]
         [ArgHints("item", "what to rez", "UUID")]
         [ArgHints("zoffset", "Z offset to apply (range -2 to 2)", "Number", "0.5")]
+        [CmdTypeDo()]
         public object RezObjectParcelCenter(string item, string zoffset)
         {
             if (UUID.TryParse(item, out UUID targetitem) == false)
@@ -176,6 +180,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("x", "X cord to rez at", "Number", "123")]
         [ArgHints("y", "Y cord to rez at", "Number", "45")]
         [ArgHints("z", "Z cord to rez at", "Number", "26")]
+        [CmdTypeDo()]
         public object RezObjectOnPos(string item, string x, string y, string z)
         {
             if (UUID.TryParse(item, out UUID targetitem) == false)
@@ -230,6 +235,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to find inventory item")]
         [ArgHints("item", "item/folder to name", "UUID")]
         [ArgHints("newname", "What we are changing it to", "Text", "Better name")]
+        [CmdTypeSet()]
         public object RenameInventory(string item, string newname)
         {
             if (UUID.TryParse(item, out UUID target) == false)
@@ -254,6 +260,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("invaild item uuid")]
         [ArgHints("item", "what item are we Deleting", "UUID")]
+        [CmdTypeSet()]
         public object DeleteInventoryItem(string item)
         {
             if (UUID.TryParse(item, out UUID target) == false)
@@ -268,6 +275,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("invaild folder uuid")]
         [ArgHints("folder", "what folder are we removing", "UUID")]
+        [CmdTypeSet()]
         public object DeleteInventoryFolder(string folder)
         {
             if (UUID.TryParse(folder, out UUID target) == false)
@@ -282,6 +290,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("invaild item uuid")]
         [ArgHints("item", "what item are we attaching", "UUID")]
+        [CmdTypeDo()]
         public object Attach(string item)
         {
             if (UUID.TryParse(item, out UUID itemuuid) == false)
@@ -298,6 +307,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("okMulti")]
         [ReturnHintsFailure("invaild item uuid pr invaild attach point")]
         [ArgHints("item", "UUID of item, or the attach point, or * to remove everything", "Text", "Left Hand")]
+        [CmdTypeDo()]
         public object Detach(string item)
         {
             if (UUID.TryParse(item, out UUID itemuuid) == false)
@@ -335,6 +345,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("invaild folder uuid")]
         [ReturnHintsFailure("target folder is empty or so full I cant get it in 5 secs...")]
         [ArgHints("folder", "what folder are we swapping to", "UUID")]
+        [CmdTypeDo()]
         public object SwapOutfit(string folder)
         {
             UUID folderUUID = UUID.Zero;
@@ -366,6 +377,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Cant find target folder")]
         [ReturnHintsFailure("target folder is empty or so full I cant get it in 5 secs...")]
         [ArgHints("name", "Name of the folder", "Text", "My other outfit")]
+        [CmdTypeDo()]
         public object Outfit(string name)
         {
             if (SecondbotHelpers.notempty(name) == false)
@@ -425,6 +437,7 @@ namespace SecondBotEvents.Commands
         [About("Searchs the notecards folder for notecards, any older than 31 days are deleted.<br/>Depending on the number of notecards this might require multiple calls!")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Unable to find notecard folder")]
+        [CmdTypeDo()]
         public object InventoryPurgeNotecards()
         {
             List<InventoryBase> T = GetClient().Inventory.Store.GetContents(GetClient().Inventory.Store.RootFolder);
@@ -466,6 +479,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Asset UUID or UUID zero")]
         [ReturnHintsFailure("Invaild item uuid")]
         [ArgHints("item", "inventory level item", "UUID")]
+        [CmdTypeGet()]
         public object GetRealUUID(string item)
         {
             if (UUID.TryParse(item, out UUID itemUUID) == false)
@@ -483,6 +497,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to find item")]
         [ArgHints("path", "item path and name", "Text", "Objects/DemoItem")]
         [ArgHints("avatar", "Who we are sending it to", "AVATAR")]
+        [CmdTypeDo()]
         public object SendItemByPath(string path, string avatar)
         {
             ProcessAvatar(avatar);
@@ -512,6 +527,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to find item")]
         [ArgHints("item", "what are we sending", "UUID")]
         [ArgHints("avatar", "Who are we sending it to", "AVATAR")]
+        [CmdTypeDo()]
         public object SendItem(string item, string avatar)
         {
             ProcessAvatar(avatar);
@@ -542,6 +558,7 @@ namespace SecondBotEvents.Commands
             new string[] { "texture", "sound", "callcard", "landmark", "lsltext", "clothing", "object", 
                 "notecard", "animatn", "gesture", "mesh", "material" })]
         [ArgHints("avatar", "Who are we sending it to","AVATAR")]
+        [CmdTypeDo()]
         public object SendItemDirect(string itemuuid, string itemname, string itemtype, string avatar)
         {
             if (UUID.TryParse(itemuuid, out UUID targetitem) == false)
@@ -585,6 +602,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to find folder")]
         [ArgHints("path", "path to the folder from root","Text","Objects/MyFolderToSend")]
         [ArgHints("avatar", "Who are we sending it to","AVATAR")]
+        [CmdTypeDo()]
         public object SendFolderByPath(string path, string avatar)
         {
             ProcessAvatar(avatar);
@@ -610,6 +628,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to find folder")]
         [ArgHints("item", "what folder are we sending","UUID")]
         [ArgHints("avatar", "Who are we sending it to", "AVATAR")]
+        [CmdTypeDo()]
         public object SendFolder(string folder, string avatar)
         {
             ProcessAvatar(avatar);
@@ -641,6 +660,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("item",  "what are we sending","UUID")]
         [ArgHints("object", "were are we sending it","UUID")]
         [ArgHints("running", "should it be running","BOOL")]
+        [CmdTypeDo()]
         public object TransferInventoryToObject(string item, string objectuuid, string running)
         {
             if (UUID.TryParse(item, out UUID itemuuid) == false)
@@ -701,6 +721,7 @@ namespace SecondBotEvents.Commands
         [About("Requests the inventory folder layout as a json object InventoryMapFolder<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>subfolders: InventoryMapFolder[]</li></ul>")]
         [ReturnHints("array of InventoryMapFolder")]
         [ReturnHintsFailure("Error")]
+        [CmdTypeGet()]
         public object InventoryFolders()
         {
             string reply = HelperInventory.MapFolderJson(GetClient());
@@ -712,6 +733,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("targetfolder", "the folder to look up","UUID")]
         [ReturnHints("single InventoryMapFolder")]
         [ReturnHintsFailure("Error")]
+        [CmdTypeGet()]
         public object InventoryFoldersLimited(string targetfolder)
         {
             string reply = HelperInventory.MapFolderJson(GetClient(), targetfolder,false);
@@ -723,6 +745,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("array of InventoryMapItem")]
         [ReturnHintsFailure("Invaild folder UUID")]
         [ArgHints("folderUUID", "the folder to fetch (Found via: inventory/folders)","UUID")]
+        [CmdTypeGet()]
         public object InventoryContents(string folderUUID)
         {
             if (UUID.TryParse(folderUUID, out UUID folder) == false)
@@ -738,6 +761,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("new folder name is too short, must be longer than 3 characters.")]
         [ArgHints("parentFolder", "folder to create a subfolder in","UUID")]
         [ArgHints("folderName", "name of the new folder","Text","MyNewFolder")]
+        [CmdTypeSet()]
         public object CreateInventoryFolder(string parentFolder, string folderName)
         {
             if (UUID.TryParse(parentFolder, out UUID parentFolderUUID) == false)
@@ -760,6 +784,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("invaild folder uuid")]
         [ArgHints("item", " item to move", "UUID")]
         [ArgHints("folder", "destination folder", "UUID")]
+        [CmdTypeDo()]
         public object MoveInventoryItem(string item, string folder)
         {
             if (UUID.TryParse(item, out UUID itemUUID) == false)
@@ -780,6 +805,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("invaild dest folder uuid")]
         [ArgHints("sourceFolder", "folder to move", "UUID")]
         [ArgHints("destFolder", "destination folder", "UUID")]
+        [CmdTypeDo()]
         public object MoveInventoryFolder(string sourceFolder, string destFolder)
         {
             if (UUID.TryParse(sourceFolder, out UUID sourceFolderUUID) == false)

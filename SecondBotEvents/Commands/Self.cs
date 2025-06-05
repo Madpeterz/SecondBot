@@ -18,6 +18,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("to", "the email addres to send to", "Text", "me@email.com")]
         [ArgHints("subject", "the subject of the email", "Text", "This is the subject")]
         [ArgHints("body", "the contents of the email", "Text", "Email is fun")]
+        [CmdTypeDo()]
         public object SendEmail(string to, string subject, string body)
         {
             if (SecondbotHelpers.isempty(to) == true) {
@@ -41,6 +42,7 @@ namespace SecondBotEvents.Commands
 
         [About("Makes the bot teleport to its home region")]
         [ReturnHints("ok")]
+        [CmdTypeDo()]
         public object GoHome()
         {
             master.HomeboundService.GoHome();
@@ -51,6 +53,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ArgHints("targetUUID", "The avatar to point at", "AVATAR")]
         [ReturnHintsFailure("Cant find UUID in sim")]
+        [CmdTypeDo()]
         public object PointAt(string targetUUID)
         {
             if (GetClient().Network.CurrentSim.AvatarPositions.ContainsKey(avataruuid) == false)
@@ -71,6 +74,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("value")]
         [ReturnHintsFailure("Unknown Key: KeyName")]
         [ArgHints("Key", "the key we are trying to read from", "Text", "ExampleKey")]
+        [CmdTypeGet()]
         public object ReadKeyValue(string Key)
         {
             return BasicReply(master.DataStoreService.GetKeyValue(Key));
@@ -82,6 +86,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Value is empty")]
         [ArgHints("Key", "the key we are trying to set", "Text", "ExampleKey")]
         [ArgHints("Value", "the value we are tring to put on the key", "Text", "ExampleValue")]
+        [CmdTypeSet()]
         public object SetKeyValue(string Key, string Value)
         {
             if (SecondbotHelpers.isempty(Key) == false)
@@ -100,6 +105,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Key is empty")]
         [ArgHints("Key", "the key we are trying to clear", "Text", "ExampleKey")]
+        [CmdTypeSet()]
         public object ClearKeyValue(string Key)
         {
             if (SecondbotHelpers.isempty(Key) == false)
@@ -114,6 +120,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("ok")]
         [ReturnHintsFailure("Invaild object UUID")]
         [ArgHints("target", "a object UUID or the word ground", "Text", "ground")]
+        [CmdTypeDo()]
         public object Sit(string target)
         {
             if ((target == "ground") || (target == UUID.Zero.ToString()))
@@ -131,6 +138,7 @@ namespace SecondBotEvents.Commands
 
         [About("Makes the bot stand up if sitting (also resets animations)")]
         [ReturnHints("ok")]
+        [CmdTypeDo()]
         public object Stand()
         {
             master.HomeboundService.MarkStandup();
@@ -144,6 +152,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild object UUID")]
         [ReturnHintsFailure("Unable to see object")]
         [ArgHints("target", "the object to click on", "UUID")]
+        [CmdTypeDo()]
         public object ClickObject(string target)
         {
             if (UUID.TryParse(target, out UUID objectuuid) == false)
@@ -170,6 +179,7 @@ namespace SecondBotEvents.Commands
 
         [About("Makes the bot kill itself you monster")]
         [ReturnHints("ok")]
+        [CmdTypeDo()]
         public object Logoff()
         {
             master.BotClient.flagLogoutExpected();
@@ -179,6 +189,7 @@ namespace SecondBotEvents.Commands
 
         [About("Gets the last 5 commands issued to the bot")]
         [ReturnHints("list of commands")]
+        [CmdTypeGet()]
         public object GetLastCommands()
         {
             List<string> reply = [];
@@ -209,6 +220,7 @@ namespace SecondBotEvents.Commands
             new string[] { "friend", "group", "animation", "teleport", "inventory","command" })]
         [ArgHints("state", "What state to put the flag into","BOOL")]
         [ArgHints("sticky", "Should this be repeatable","BOOL")]
+        [CmdTypeSet()]
         public object SetPermFlag(string avatar, string flag, string state, string sticky)
         {
             ProcessAvatar(avatar);

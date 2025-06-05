@@ -16,6 +16,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("avatar lookup")]
         [ArgHints("group", "What group to check","UUID")]
         [ArgHints("avatar", "The avatar in check","AVATAR")]
+        [CmdTypeGet()]
         public object IsGroupMember(string group, string avatar)
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
@@ -33,6 +34,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild group UUID")]
         [ReturnHintsFailure("avatar lookup")]
         [ArgHints("group", "the group to get members list from","UUID")]
+        [CmdTypeGet()]
         public object GetGroupMembers(string group)
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
@@ -52,6 +54,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("group", "the group to apply the ban in","UUID")]
         [ArgHints("avatar", "the avatar to ban/unban","AVATAR")]
         [ArgHints("state", "true to ban false to unban","BOOL")]
+        [CmdTypeDo()]
         public object GroupBan(string group, string avatar, string state)
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
@@ -92,6 +95,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Missing group Eject power")]
         [ArgHints("group", "the group to eject from", "UUID")]
         [ArgHints("avatar", "the avatar to remove from the group", "UUID")]
+        [CmdTypeDo()]
         public object GroupEject(string group, string avatar)
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
@@ -122,6 +126,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("group", "the group to give the avatar the new role for","UUID")]
         [ArgHints("avatar", "the avatar to give the role to", "AVATAR")]
         [ArgHints("role", "the role to give the avatar in the group", "UUID")]
+        [CmdTypeSet()]
         public object GroupAddRole(string group, string avatar, string role)
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
@@ -157,6 +162,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("group", "the group to invite to","UUID")]
         [ArgHints("avatar", "the avatar you wish to invite","AVATAR")]
         [ArgHints("role", "the role to invite them with or \"everyone\" to give the default role","UUID","everyone")]
+        [CmdTypeDo()]
         public object GroupInvite(string group, string avatar, string role)
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
@@ -198,6 +204,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("group", "the group to send the notice to", "UUID")]
         [ArgHints("title", "The title of the group notice", "Text", "New releases")]
         [ArgHints("message", "The body of the group notice", "Text", "We have 4 new items in store with 5% off for the first hour!")]
+        [CmdTypeDo()]
         public object Groupnotice(string group, string title, string message)
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
@@ -233,6 +240,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild role UUID")]
         [ArgHints("group", "the group to get the role from", "UUID")]
         [ArgHints("role", "the role to fetch the title from", "UUID")]
+        [CmdTypeDo()]
         public object GroupActiveTitle(string group, string role)
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
@@ -256,6 +264,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unknown group")]
         [ReturnHintsFailure("Invaild group UUID")]
         [ArgHints("group", "the group to set as active", "UUID")]
+        [CmdTypeGet()]
         public object GroupActiveGroup(string group)
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
@@ -282,6 +291,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("title", "The title of the group notice","Text","Update to terms for rentals")]
         [ArgHints("message", "The body of the group notice","Text", "Hi everyone there has been a TOS update please check and review")]
         [ArgHints("attachment", "the inventory to send", "UUID")]
+        [CmdTypeDo()]
         public object GroupnoticeWithAttachment(string group, string title, string message, string attachment)
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
@@ -318,6 +328,7 @@ namespace SecondBotEvents.Commands
 
         [About("fetchs a list of all groups known to the bot")]
         [ReturnHints("array UUID=name")]
+        [CmdTypeGet()]
         public object GetGroupList()
         {
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroups()));
@@ -325,6 +336,7 @@ namespace SecondBotEvents.Commands
 
         [About("Forces the bot to reload the groups list")]
         [ReturnHints("Working on it")]
+        [CmdTypeDo()]
         public object ForceLoadGroups()
         {
             master.BotClient.client.Groups.RequestCurrentGroups();
@@ -337,6 +349,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild group UUID")]
         [ReturnHintsFailure("Updating")]
         [ArgHints("group", "the group to get roles from", "UUID")]
+        [CmdTypeGet()]
         public object GetGroupRoles(string group)
         {
             if (UUID.TryParse(group, out UUID groupuuid) == false)
@@ -352,6 +365,7 @@ namespace SecondBotEvents.Commands
 
         [About("fetchs a list of all groups with unread messages")]
         [ReturnHints("array UUID")]
+        [CmdTypeGet()]
         public object GroupchatListAllUnreadGroups()
         {
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetAllGroupsChatWithUnread()));
@@ -362,6 +376,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unknown group")]
         [ReturnHintsFailure("group value is invaild")]
         [ArgHints("group", "the group to check if it has any unread messages", "UUID")]
+        [CmdTypeGet()]
         public object GroupchatGroupHasUnread(string group)
         {
             if(UUID.TryParse(group,out UUID groupUUID) == false)
@@ -378,6 +393,7 @@ namespace SecondBotEvents.Commands
 
         [About("checks if there are any groups with unread messages")]
         [ReturnHints("True|False")]
+        [CmdTypeGet()]
         public object GroupchatAnyUnread()
         {
             return BasicReply(master.DataStoreService.GetGroupChatHasAnyUnread().ToString());
@@ -385,6 +401,7 @@ namespace SecondBotEvents.Commands
 
         [About("Clears all group chat buffers at once")]
         [ReturnHints("ok")]
+        [CmdTypeSet()]
         public object GroupchatClearAll()
         {
             master.DataStoreService.ClearGroupChat();
@@ -395,6 +412,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Group UUID invaild")]
         [ReturnHints("Group Chat")]
         [ArgHints("group", "what group to get the chat history of","UUID")]
+        [CmdTypeGet()]
         public object GroupchatHistory(string group)
         {
             if (UUID.TryParse(group, out UUID groupUUID) == false)
@@ -410,6 +428,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Sending")]
         [ReturnHintsFailure("Group UUID invaild")]
         [ReturnHintsFailure("Unknown group")]
+        [CmdTypeDo()]
         public object Groupchat(string group, string message)
         {
             if (UUID.TryParse(group, out UUID groupUUID) == false)

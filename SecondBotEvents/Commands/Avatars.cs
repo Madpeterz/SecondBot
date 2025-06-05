@@ -18,6 +18,7 @@ namespace SecondBotEvents.Commands
         [ArgHints("store", "What type of request to accept", "Text", "GroupInvite", new string[] { "FriendRequest", "InventoryOffer", "GroupInvite", "Teleport" })]
         [ArgHints("avatar", "Who to accept the request from", "AVATAR")]
         [ArgHints("remove", "Should this remove the entry", "BOOL")]
+        [CmdTypeDo()]
         public Object AcceptNext(string store, string avatar, string remove)
         {
             ProcessAvatar(avatar);
@@ -47,6 +48,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unknown store type")]
         [ArgHints("store", "What type of request to accept", "Text", "GroupInvite", new string[] { "FriendRequest", "InventoryOffer", "GroupInvite", "Teleport" })]
         [ArgHints("avatar", "Who to accept the request from", "AVATAR")]
+        [CmdTypeDo()]
         public Object IsOnAcceptNext(string store, string avatar)
         {
             ProcessAvatar(avatar);
@@ -69,6 +71,7 @@ namespace SecondBotEvents.Commands
         [About("an improved version of near me with extra details<br/>NearMeDetails is a object formated as follows<br/><ul><li>id</li><li>name</li><li>x</li><li>y</li><li>z</li><li>range</li></ul>")]
         [ReturnHints("array NearMeDetails")]
         [ReturnHintsFailure("Error not in a sim")]
+        [CmdTypeGet()]
         public object NearmeWithDetails()
         {
             if (GetClient().Network.CurrentSim == null)
@@ -101,6 +104,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild avatar uuid")]
         [ReturnHints("Requesting avatar details  [Retry later]")]
         [ArgHints("avatar", "Who are we getting the profile image of", "AVATAR")]
+        [CmdTypeGet()]
         public object GetProfileImage(string avatar)
         {
             ProcessAvatar(avatar);
@@ -121,6 +125,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Requesting avatar details [Retry later]")]
         [ReturnHintsFailure("Invaild texture uuid")]
         [ArgHints("texture", "What texture to use", "UUID")]
+        [CmdTypeSet()]
         public object SetProfileImage(string texture)
         {
             if (UUID.TryParse(texture, out UUID textureUUID) == false)
@@ -143,6 +148,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild avatar uuid")]
         [ReturnHints("Requesting avatar details  [Retry later]")]
         [ArgHints("avatar", "Who are we getting the profile about of", "AVATAR")]
+        [CmdTypeGet()]
         public object GetProfileAbout(string avatar)
         {
             ProcessAvatar(avatar);
@@ -164,6 +170,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("about text to short")]
         [ReturnHintsFailure("about text to long")]
         [ArgHints("abouttext", "text to use in the about me area, length 10 to 300", "Text", "Hello world!")]
+        [CmdTypeSet()]
         public object SetProfileAbout(string abouttext)
         {
             if(abouttext.Length < 10)
@@ -190,6 +197,7 @@ namespace SecondBotEvents.Commands
         [About("returns a list of all known avatars nearby")]
         [ReturnHints("array UUID = Name")]
         [ReturnHintsFailure("Error not in a sim")]
+        [CmdTypeGet()]
         public object Nearme()
         {
             if (GetClient().Network.CurrentSim == null)
@@ -213,6 +221,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("the name of the avatar")]
         [ReturnHints("lookup")]
         [ReturnHintsFailure("Not a vaild UUID")]
+        [CmdTypeDo()]
         public object Key2Name(string uuid)
         {
             UUID avUUID = UUID.Zero;
@@ -228,6 +237,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("lookup")]
         [ReturnHintsFailure("Not a vaild name")]
         [ArgHints("name", "the name to find the uuid for", "Text", "Madpeter Zond")]
+        [CmdTypeDo()]
         public object Name2Key(string name)
         {
             if(name == null)

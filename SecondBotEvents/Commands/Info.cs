@@ -11,6 +11,7 @@ namespace SecondBotEvents.Commands
     {
         [About("Lists objects that are sculpty type in the current sim that the bot can see")]
         [ReturnHints("A json object")]
+        [CmdTypeGet()]
         public object ListSculptys()
         {
             Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
@@ -71,6 +72,7 @@ namespace SecondBotEvents.Commands
 
         [About("Fetchs the current bot")]
         [ReturnHints("The build ID of the bot")]
+        [CmdTypeGet()]
         public object Version()
         {
             return BasicReply(master.GetVersion());
@@ -79,6 +81,7 @@ namespace SecondBotEvents.Commands
 
         [About("Fetchs the name of the bot")]
         [ReturnHints("Firstname Lastname")]
+        [CmdTypeGet()]
         public object Name()
         {
             return BasicReply(GetClient().Self.FirstName + " " + GetClient().Self.LastName);
@@ -88,6 +91,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Parcelname")]
         [ReturnHintsFailure("Error parcel not found")]
         [ReturnHintsFailure("Error not in a sim")]
+        [CmdTypeGet()]
         public object ParcelName()
         {
             if (GetClient().Network.CurrentSim == null)
@@ -104,6 +108,7 @@ namespace SecondBotEvents.Commands
 
         [About("Requests the current unixtime at the bot")]
         [ReturnHints("Unixtime")]
+        [CmdTypeGet()]
         public object UnixTimeNow()
         {
             return BasicReply(SecondbotHelpers.UnixTimeNow().ToString());
@@ -112,6 +117,7 @@ namespace SecondBotEvents.Commands
         [About("Fetchs the current region name")]
         [ReturnHints("Regionname")]
         [ReturnHintsFailure("Error not in a sim")]
+        [CmdTypeGet()]
         public object SimName()
         {
             if (GetClient().Network.CurrentSim == null)
@@ -124,6 +130,7 @@ namespace SecondBotEvents.Commands
         [About("Fetchs the current location of the bot")]
         [ReturnHints("array of X,Y,Z values")]
         [ReturnHintsFailure("Error not in a sim")]
+        [CmdTypeGet()]
         public object GetPosition()
         {
             if (GetClient().Network.CurrentSim == null)

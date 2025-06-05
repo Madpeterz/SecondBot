@@ -14,6 +14,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("Removed perm animation")]
         [ReturnHintsFailure("avatar lookup")]
         [ArgHints("avatar", "Who to accept requests from", "AVATAR")]
+        [CmdTypeSet()]
         public object AddToAllowAnimations(string avatar)
         {
             ProcessAvatar(avatar);
@@ -29,6 +30,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Error with gesture")]
         [ReturnHints("Accepted")]
         [ArgHints("gesture", "What gesture to trigger", "UUID")]
+        [CmdTypeDo()]
         public object PlayGesture(string gesture)
         {
             if (UUID.TryParse(gesture, out UUID gestureUUID) == false)
@@ -42,6 +44,7 @@ namespace SecondBotEvents.Commands
 
         [About("Resets the animation stack for the bot")]
         [ReturnHints("Accepted - X stopped animations")]
+        [CmdTypeDo()]
         public object ResetAnimations()
         {
             List<UUID> animations = [.. GetClient().Self.SignaledAnimations.Copy().Keys];

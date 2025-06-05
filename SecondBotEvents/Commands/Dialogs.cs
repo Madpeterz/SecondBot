@@ -13,6 +13,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("unable to find avatar")]
         [ReturnHintsFailure("looking up avatar please try again")]
         [ArgHints("avatar", "Who to send the dialog relay to", "AVATAR")]
+        [CmdTypeSet()]
         public object DialogRelayAvatarTarget(string avatar)
         {
             if(UUID.TryParse(avatar, out UUID avUUID) == false)
@@ -36,6 +37,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("channel must be zero or more")]
         [ReturnHintsFailure("channel is not vaild")]
         [ArgHints("channel", "what channel number to send the reply to (must be zero or higher)","Number", "123")]
+        [CmdTypeSet()]
         public object DialogRelayChatTarget(string channel)
         {
             if (int.TryParse(channel, out int channelnum) == false)
@@ -54,6 +56,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("removed")]
         [ReturnHintsFailure("url must start with http")]
         [ArgHints("url", "the URL to send the replys to","URL","http://mycoolsite.com/botdialog.php")]
+        [CmdTypeSet()]
         public object DialogRelayHttpTarget(string url)
         {
             if(url.StartsWith("http") == false)
@@ -71,6 +74,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("bad dialog id")]
         [ArgHints("dialogid", "The ID for the dialog","Number","442")]
         [ArgHints("buttontext", "The button text to push","Text","Unlock")]
+        [CmdTypeDo()]
         public object DialogResponce(string dialogid, string buttontext)
         {
             if (int.TryParse(dialogid, out int dialogidnum) == false)
