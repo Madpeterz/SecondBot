@@ -719,6 +719,27 @@ namespace SecondBotEvents.Commands
 
             return BasicReply("ok");
         }
+
+        [About("Gets the current parcel prim count data")]
+        [ReturnHints("a json object with prim counts")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        public object GetParcelPrimCounts()
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
+            Dictionary<string, string> collection = [];
+            collection.Add("TotalPrims", targetparcel.TotalPrims.ToString()); 
+            collection.Add("GroupPrims", targetparcel.GroupPrims.ToString());
+            collection.Add("OwnerPrims", targetparcel.OwnerPrims.ToString());
+            collection.Add("OtherPrims", targetparcel.OtherPrims.ToString());
+            collection.Add("MaxPrims", targetparcel.MaxPrims.ToString());
+            collection.Add("ParcelPrimBonus", targetparcel.ParcelPrimBonus.ToString());
+            return BasicReply(JsonConvert.SerializeObject(collection));
+        }
         [About("Controls who can trigger audio on this parcel\n if everyone is set to true then grouponly will switch to false")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Error not in a sim")]
