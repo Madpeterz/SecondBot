@@ -1073,6 +1073,43 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok", [objectuuid]);
         }
 
+        [About("Returns all objects in the current parcel")]
+        [ReturnHints("json object with all objects in the parcel")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("No objects found in the parcel")]
+        [CmdTypeGet()]
+        public object GetObjectsInParcel()
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
+            List<Primitive> objects = [];
+            Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
+            foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
+            {
+                if (Obj.Value.ParentID == 0)
+                {
+                    if(Obj.Value.Position is Vector3 position)
+                    {
+                        if (position.X < targetparcel.AABBMax.X && position.X > targetparcel.AABBMin.X &&
+                            position.Y < targetparcel.AABBMax.Y && position.Y > targetparcel.AABBMin.Y &&
+                            position.Z < targetparcel.AABBMax.Z && position.Z > targetparcel.AABBMin.Z)
+                        {
+                            objects.Add(Obj.Value);
+                        }
+                    }
+                }
+            }
+            if(objects.Count == 0)
+            {
+                return Failure("No objects found in the parcel");
+            }
+            return BasicReply(JsonConvert.SerializeObject(objects));
+        }
+
         [About("Updates the current parcels media settings \n" +
             "MediaAutoScale=Bool (True|False)\n" +
             "MediaLoop=Bool (True|False)\n" +
