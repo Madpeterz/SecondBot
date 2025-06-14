@@ -8,6 +8,60 @@ namespace SecondBotEvents.Commands
     [ClassInfo("Look after a sim as the estate manager")]
     public class Estate(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
+        [About("Adds an estate manager to the current sim or all estates you control")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("Not an estate manager here")]
+        [ReturnHintsFailure("Unable to find avatar UUID")]
+        [ReturnHintsFailure("Unable to process all estates value please use true or false")]
+        [ArgHints("avatar", "the avatar you wish to add as an estate manager", "AVATAR")]
+        [ArgHints("allEstates", "true to add to all estates you control, false to add to just this sim", "BOOL", "false")]
+        [CmdTypeSet()]
+        public object AddEstateManager(string avatar, string allEstates)
+        {
+            if (GetClient().Network.CurrentSim.IsEstateManager == false)
+            {
+                return Failure("Not an estate manager here", [avatar]);
+            }
+            if(bool.TryParse(allEstates, out bool allEstatesFlag) == false)
+            {
+                return Failure("Unable to process all estates value please use true or false", [avatar, allEstates]);
+            }
+            UUID avataruuid = UUID.Zero;
+            if (UUID.TryParse(avatar, out avataruuid) == false)
+            {
+                return Failure("Unable to find avatar UUID", [avatar]);
+            }
+            GetClient().Estate.AddEstateManager(avataruuid, allEstatesFlag);
+            return BasicReply("ok", [avatar]);
+        }
+
+        [About("Removes an estate manager from the current sim or all estates you control")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("Not an estate manager here")]
+        [ReturnHintsFailure("Unable to find avatar UUID")]
+        [ReturnHintsFailure("Unable to process all estates value please use true or false")]
+        [ArgHints("avatar", "the avatar you wish to remove as an estate manager", "AVATAR")]
+        [ArgHints("allEstates", "true to remove from all estates you control, false to remove from just this sim", "BOOL", "false")]
+        [CmdTypeSet()]
+        public object RemoveEstateManager(string avatar, string allEstates)
+        {
+            if (GetClient().Network.CurrentSim.IsEstateManager == false)
+            {
+                return Failure("Not an estate manager here", [avatar]);
+            }
+            if (bool.TryParse(allEstates, out bool allEstatesFlag) == false)
+            {
+                return Failure("Unable to process all estates value please use true or false", [avatar, allEstates]);
+            }
+            UUID avataruuid = UUID.Zero;
+            if (UUID.TryParse(avatar, out avataruuid) == false)
+            {
+                return Failure("Unable to find avatar UUID", [avatar]);
+            }
+            GetClient().Estate.RemoveEstateManager(avataruuid, allEstatesFlag);
+            return BasicReply("ok", [avatar]);
+        }
+
         [About("Sends the message to the current sim")]
         [ReturnHints("restarting")]
         [ReturnHintsFailure("Not an estate manager here")]
