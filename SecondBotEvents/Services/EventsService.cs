@@ -28,6 +28,7 @@ namespace SecondBotEvents.Services
 
         public void InventoryUpdateEvent(Dictionary<string, string> detail)
         {
+            detail["itemtype"] = detail["itemtype"].ToLower().FirstCharToUpper();
             if (InventoryEvents.ContainsKey(detail["itemtype"]) == true)
             {
                 foreach(string A in InventoryEvents[detail["itemtype"]])

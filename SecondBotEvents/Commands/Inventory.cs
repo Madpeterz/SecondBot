@@ -20,14 +20,15 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("No action")]
         [ReturnHintsFailure("Events service is not running")]
         [ReturnHints("Event added")]
-        [ArgHints("inventoryType", "What type to watch for", "Text", "texture", new string[] { "texture","sound","callcard","landmark","clothing",
-        "object","notecard","lsltext","lslbyte","animation","gesture","mesh" })]
+        [ArgHints("inventoryType", "What type to watch for", "Text", "Texture", new string[] { "Texture","Sound","Callcard","Landmark","Clothing",
+        "Object","Notecard","Lsltext","Lslbyte","Animation","Gesture","Mesh" })]
         [ArgHints("outputTarget", "Where to send the updates to", "SMART")]
         [CmdTypeSet()]
         public object SetInventoryUpdate(string inventoryType, string outputTarget)
         {
             if (master.EventsService.isRunning() == true)
             {
+                inventoryType = inventoryType.ToLower().FirstCharToUpper();
                 master.EventsService.AddInventoryEvent(inventoryType, outputTarget);
                 return BasicReply("Ok");
             }
