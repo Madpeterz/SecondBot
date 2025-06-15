@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Utilities;
 
 namespace SecondBotEvents.Services
 {
@@ -230,7 +231,22 @@ namespace SecondBotEvents.Services
 
         protected static string GetCallingCommand()
         {
-            return (new System.Diagnostics.StackTrace()).GetFrame(2).GetMethod().Name;
+            string commandName = "Unable to get";
+            try
+            {
+                int index = 2;
+                do
+                {
+                    commandName = (new System.Diagnostics.StackTrace()).GetFrame(index).GetMethod().Name;
+                    index++;
+                }
+                while (commandName.StartsWith("InvokeWith") == true);
+            }
+            catch (Exception)
+            {
+                commandName = "errorFetchCommandName";
+            }
+            return commandName;
         }
 
     }
