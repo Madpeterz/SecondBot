@@ -4,6 +4,7 @@ using OpenMetaverse.ImportExport.Collada14;
 using SecondBotEvents.Services;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using static NRedisStack.Search.Schema;
 
 namespace SecondBotEvents.Commands
@@ -160,21 +161,22 @@ namespace SecondBotEvents.Commands
                 return Failure("Invaild object UUID", [target]);
             }
 
-            GetClient().Self.PointAtEffect(GetClient().Self.AgentID, objectuuid, new Vector3d(0, 0, 0), PointAtType.Select, new UUID("1df9eb92-62fa-15e5-4bfb-5931f1525274"));
-
             Dictionary<uint, Primitive> objectsentrys = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
-
-            bool found_object = false;
-            foreach (KeyValuePair<uint, Primitive> entry in objectsentrys)
+            var found = objectsentrys.FirstOrDefault(kv => kv.Value.ID == objectuuid);
+            if (found.Value == null)
             {
-                if (entry.Value.ID == objectuuid)
-                {
-                    GetClient().Objects.ClickObject(GetClient().Network.CurrentSim, entry.Key);
-                    found_object = true;
-                    break;
-                }
+                GetClient().Objects.RequestObjectPropertiesFamily(GetClient().Network.CurrentSim, objectuuid);
+                Thread.Sleep(500); // Wait for the sim to respond
+                objectsentrys = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
+                found = objectsentrys.FirstOrDefault(kv => kv.Value.ID == objectuuid);
             }
-            return BasicReply(found_object.ToString(), [target]);
+
+            GetClient().Self.PointAtEffect(GetClient().Self.AgentID, objectuuid, new Vector3d(0, 0, 0), PointAtType.Select, new UUID("1df9eb92-62fa-15e5-4bfb-5931f1525274"));
+            if (found.Value != null)
+            {
+                GetClient().Objects.ClickObject(GetClient().Network.CurrentSim, found.Key);
+            }
+            return BasicReply(found.ToString(), [target]);
         }
 
         [About("Makes the bot kill itself you monster")]
