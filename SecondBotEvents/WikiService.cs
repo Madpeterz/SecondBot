@@ -213,6 +213,7 @@ namespace SecondBotEvents
             Dictionary<string,string> hints = [];
             Dictionary<string, string> hinttypes = [];
             Dictionary<string, string> hintexamplevalue = [];
+            Dictionary<string, string[]> hintacceptvalues = [];
 
             string examplecall = method.Name;
             foreach (ArgHints At in method.GetCustomAttributes<ArgHints>())
@@ -220,13 +221,14 @@ namespace SecondBotEvents
                 hints.Add(At.name, At.about);
                 hinttypes.Add(At.name, At.defaultValueType);
                 hintexamplevalue.Add(At.name, At.exampleValue);
+                hintacceptvalues.Add(At.name, At.acceptedValues);
             }
 
             if (method.GetParameters().Length > 0)
             {
                 content = content + "<h5>Args</h5><div class=\"table-responsive\"><table class=\"table table-hover table-bordered table-striped\">";
                 content = content + "<thead><tr><th>Name</th>";
-                content = content + "<th>Hint</th><th>Type</th><th>Example</th></tr></thead><tbody>";
+                content = content + "<th>Hint</th><th>Type</th><th>Example value</th><th>Supported values</th></tr></thead><tbody>";
                 bool hadStartSplit = false;
                 string addon = "";
                 foreach (ParameterInfo pram in method.GetParameters())
@@ -242,6 +244,29 @@ namespace SecondBotEvents
                     string hinttype = "";
                     string hintexample = "";
                     string hintexamplecmd = "";
+                    string hinttextsuggested = "";
+                    if(hintacceptvalues.ContainsKey(pram.Name) == true)
+                    {
+                        if (hintacceptvalues[pram.Name] != null)
+                        {
+                            hinttextsuggested = "";
+                            string addoncsv = "";
+                            int loop = 0;
+                            foreach(string a in hintacceptvalues[pram.Name])
+                            {
+                                if (loop == 3)
+                                {
+                                    hinttextsuggested = hinttextsuggested + "<br/>";
+                                    addoncsv = "";
+                                    loop = 0;
+                                }
+                                hinttextsuggested = hinttextsuggested + addoncsv;
+                                hinttextsuggested = hinttextsuggested + a;
+                                addoncsv = ", ";
+                                loop++;
+                            }
+                        }
+                    }
                     if (hintexamplevalue.ContainsKey(pram.Name) == true)
                     {
                         if (hintexamplevalue[pram.Name] != null)
@@ -287,6 +312,7 @@ namespace SecondBotEvents
                         "<td>" + hinttext + "</td>" +
                         "<td>"+ hinttype+"</td>" +
                         "<td>"+ hintexample +"</td>" +
+                        "<td>" + hinttextsuggested + "</td>" +
                         "</tr>";
                 }
                 content = content + "</tbody></table></div>";
@@ -301,7 +327,7 @@ namespace SecondBotEvents
             {
                 content = content + "<li class=\"list-group-item text-danger\">❌ "+ At.hint+"</li>";
             }
-            content = content + "</ul><br/><h5>Example call</h5><br/>"+examplecall+"";
+            content = content + "</ul><br/><h5>Example call</h5><br/>"+examplecall+"<br/><br/>";
             makefile("command"+method.Name.ToLower(), content, "Command info for " + method.Name);
         }
 
