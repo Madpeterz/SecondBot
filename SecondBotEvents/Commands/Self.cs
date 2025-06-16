@@ -170,8 +170,29 @@ namespace SecondBotEvents.Commands
                 objectsentrys = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
                 found = objectsentrys.FirstOrDefault(kv => kv.Value.ID == objectuuid);
             }
-
-            GetClient().Self.PointAtEffect(GetClient().Self.AgentID, objectuuid, new Vector3d(0, 0, 0), PointAtType.Select, new UUID("1df9eb92-62fa-15e5-4bfb-5931f1525274"));
+            if (found.Value != null)
+            {
+                GetClient().Self.PointAtEffect(GetClient().Self.AgentID, objectuuid, new Vector3d(0, 0, 0), PointAtType.Select, new UUID("1df9eb92-62fa-15e5-4bfb-5931f1525274"));
+            }
+            if (found.Value == null)
+            { 
+                var avatars = GetClient().Network.CurrentSim.ObjectsAvatars.Copy();
+                foreach (var avatar in avatars.Values)
+                {
+                    // Attachments are children of the avatar primitive
+                    foreach (var attachment in avatar.GetChildren(GetClient()))
+                    {
+                        if (attachment.ID == objectuuid)
+                        {
+                            // Use the attachment's LocalID for click
+                            found = new KeyValuePair<uint, Primitive>(attachment.LocalID, attachment);
+                            break;
+                        }
+                    }
+                    if (found.Value != null)
+                        break;
+                }
+            }
             if (found.Value != null)
             {
                 GetClient().Objects.ClickObject(GetClient().Network.CurrentSim, found.Key);
