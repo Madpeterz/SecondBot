@@ -161,13 +161,13 @@ namespace SecondBotEvents.Commands
                 return Failure("Invaild object UUID", [target]);
             }
 
-            Dictionary<uint, Primitive> objectsentrys = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
+            Dictionary<uint, Primitive> objectsentrys = GetClient().Network.CurrentSim.ObjectsPrimitives.ToDictionary(k => k.Key, v => v.Value);
             var found = objectsentrys.FirstOrDefault(kv => kv.Value.ID == objectuuid);
             if (found.Value == null)
             {
                 GetClient().Objects.RequestObjectPropertiesFamily(GetClient().Network.CurrentSim, objectuuid);
                 Thread.Sleep(500); // Wait for the sim to respond
-                objectsentrys = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
+                objectsentrys = GetClient().Network.CurrentSim.ObjectsPrimitives.ToDictionary(k => k.Key, v => v.Value);
                 found = objectsentrys.FirstOrDefault(kv => kv.Value.ID == objectuuid);
             }
             if (found.Value != null)
@@ -176,7 +176,7 @@ namespace SecondBotEvents.Commands
             }
             if (found.Value == null)
             { 
-                var avatars = GetClient().Network.CurrentSim.ObjectsAvatars.Copy();
+                var avatars = GetClient().Network.CurrentSim.ObjectsAvatars.ToDictionary(k => k.Key, v => v.Value);
                 foreach (var avatar in avatars.Values)
                 {
                     // Attachments are children of the avatar primitive

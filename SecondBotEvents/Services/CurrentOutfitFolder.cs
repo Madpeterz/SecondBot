@@ -271,7 +271,10 @@ namespace SecondBotEvents.Services
             InitialUpdateDone = true;
             lock (Content)
             {
-                var myAtt = GetClient().Network.CurrentSim.ObjectsPrimitives.FindAll(p => p.ParentID == GetClient().Self.LocalID);
+                var myAtt = GetClient().Network.CurrentSim.ObjectsPrimitives
+                                   .Where(p => p.Value.ParentID == GetClient().Self.LocalID)
+                                   .Select(p => p.Value)
+                                   .ToList();
 
                 foreach (var item in Content.Values
                              .Where(item => item is InventoryObject || item is InventoryAttachment)

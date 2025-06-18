@@ -672,7 +672,7 @@ namespace SecondBotEvents.Services
             {
                 return [-1, -1, -1, -1];
             }
-            foreach (Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.Copy().Values)
+            foreach (Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.ToDictionary(k => k.Key, v => v.Value).Values)
             {
                 if (A.ID != avUUID)
                 {
@@ -691,7 +691,7 @@ namespace SecondBotEvents.Services
             {
                 return "?";
             }
-            foreach (Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.Copy().Values)
+            foreach (Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.ToDictionary(k => k.Key, v => v.Value).Values)
             {
                 if(A.ID != avUUID)
                 {
@@ -731,7 +731,7 @@ namespace SecondBotEvents.Services
             lastAvUpdate = SecondbotHelpers.UnixTimeNow();
             string hashstring = "";
             List<UUID> avs = [];
-            foreach (Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.Copy().Values)
+            foreach (Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.ToDictionary(k => k.Key, v => v.Value).Values)
             {
                 avs.Add(A.ID);
                 master.DataStoreService.AddAvatar(A.ID, A.Name);

@@ -1056,7 +1056,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Invaild object uuid", [objectuuid]);
             }
             bool found = false;
-            Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
+            Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.ToDictionary(k => k.Key, v => v.Value);
             foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
             {
                 if (Obj.Value.ID == targetobject)
@@ -1087,7 +1087,7 @@ namespace SecondBotEvents.Commands
                 return Failure(tests.Value);
             }
             List<Primitive> objects = [];
-            Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
+            Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.ToDictionary(k => k.Key, v => v.Value);
             foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
             {
                 if (Obj.Value.ParentID == 0)

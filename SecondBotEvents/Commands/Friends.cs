@@ -2,6 +2,7 @@
 using SecondBotEvents.Services;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SecondBotEvents.Commands
 {
@@ -22,8 +23,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("avatar lookup", [avatar]);
             }
-            Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.Copy();
-            if(FriendListCopy.ContainsKey(avataruuid) == false)
+            Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.ToDictionary(k => k.Key, v => v.Value);
             {
                 return Failure("not in friends list (updating)", [avatar]);
             }
@@ -41,7 +41,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object Friendslist()
         {
-            Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.Copy();
+            Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.ToDictionary(k => k.Key, v => v.Value);
             List< FriendListEntry > CleanedFriendsList = [];
             int index = 0;
             foreach (FriendInfo A in FriendListCopy.Values)

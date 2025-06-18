@@ -3,6 +3,7 @@ using OpenMetaverse;
 using SecondBotEvents.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SecondBotEvents.Commands
 {
@@ -14,7 +15,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object ListSculptys()
         {
-            Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
+            Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             Dictionary<uint, uint> mapLocalID = [];
             Dictionary<uint, Primitive> sculpts = [];

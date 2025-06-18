@@ -266,8 +266,7 @@ namespace SecondBotEvents.Services
                 }
             }
 
-            foreach (var obj in objects.Where(obj => client.Network.CurrentSim.ObjectsPrimitives
-                                           .Find(p => p.ID == obj) == null))
+            foreach (var obj in objects.Where(obj => !client.Network.CurrentSim.ObjectsPrimitives.Values.Any(p => p.ID == obj)))
             {
                 Clear(obj);
             }
@@ -419,7 +418,7 @@ namespace SecondBotEvents.Services
                     case "getpath":
                         if (int.TryParse(rule.Param, out chan) && chan > 0)
                         {
-                            var attachment = client.Network.CurrentSim.ObjectsPrimitives.Find(p => p.ParentID == client.Self.LocalID && p.ID == rule.Sender);
+                            var attachment = client.Network.CurrentSim.ObjectsPrimitives.Values.FirstOrDefault(p => p.ParentID == client.Self.LocalID && p.ID == rule.Sender);
                             if (attachment != null && client.Inventory.Store.Items.ContainsKey(CurrentOutfitFolder.GetAttachmentItem(attachment)))
                             {
                                 var item = client.Inventory.Store.Items[CurrentOutfitFolder.GetAttachmentItem(attachment)];
@@ -434,7 +433,7 @@ namespace SecondBotEvents.Services
                         {
                             if (UUID.TryParse(rule.Option, out UUID uuid) && uuid != UUID.Zero)
                             {
-                                var attachment = client.Network.CurrentSim.ObjectsPrimitives.Find(p => p.ParentID == client.Self.LocalID && p.ID == uuid);
+                                var attachment = client.Network.CurrentSim.ObjectsPrimitives.Values.FirstOrDefault(p => p.ParentID == client.Self.LocalID && p.ID == uuid);
                                 if (attachment != null && client.Inventory.Store.Items.ContainsKey(CurrentOutfitFolder.GetAttachmentItem(attachment)))
                                 {
                                     var item = client.Inventory.Store.Items[CurrentOutfitFolder.GetAttachmentItem(attachment)];
@@ -614,7 +613,10 @@ namespace SecondBotEvents.Services
                         if (int.TryParse(rule.Param, out chan) && chan > 0)
                         {
                             string res = "";
-                            var attachments = client.Network.CurrentSim.ObjectsPrimitives.FindAll(p => p.ParentID == client.Self.LocalID);
+                            // With this corrected code:
+                            var attachments = client.Network.CurrentSim.ObjectsPrimitives.Values
+                                .Where(p => p.ParentID == client.Self.LocalID)
+                                .ToList();
                             if (attachments.Count > 0)
                             {
                                 var myPoints = new List<AttachmentPoint>(attachments.Count);
@@ -661,7 +663,7 @@ namespace SecondBotEvents.Services
                                 var point = RLVAttachments.Find(a => a.Name == rule.Option);
                                 if (point.Name == rule.Option)
                                 {
-                                    var attachment = client.Network.CurrentSim.ObjectsPrimitives.Find(p => p.ParentID == client.Self.LocalID && p.PrimData.AttachmentPoint == point.Point);
+                                    var attachment = client.Network.CurrentSim.ObjectsPrimitives.Values.FirstOrDefault(p => p.ParentID == client.Self.LocalID && p.PrimData.AttachmentPoint == point.Point);
                                     if (attachment != null && client.Inventory.Store.Items.ContainsKey(CurrentOutfitFolder.GetAttachmentItem(attachment)))
                                     {
                                         master.CurrentOutfitFolder.Detach((InventoryItem)client.Inventory.Store.Items[CurrentOutfitFolder.GetAttachmentItem(attachment)].Data);
@@ -679,13 +681,13 @@ namespace SecondBotEvents.Services
                             }
                             else
                             {
-                                client.Network.CurrentSim.ObjectsPrimitives.FindAll(p => p.ParentID == client.Self.LocalID).ForEach(attachment =>
+                                foreach (var attachment in client.Network.CurrentSim.ObjectsPrimitives.Values.Where(p => p.ParentID == client.Self.LocalID))
                                 {
                                     if (client.Inventory.Store.Items.ContainsKey(CurrentOutfitFolder.GetAttachmentItem(attachment)))
                                     {
                                         master.CurrentOutfitFolder.Detach((InventoryItem)client.Inventory.Store.Items[CurrentOutfitFolder.GetAttachmentItem(attachment)].Data);
                                     }
-                                });
+                                }
                             }
                         }
                         break;
@@ -709,7 +711,7 @@ namespace SecondBotEvents.Services
                     case "detachallthis":
                         if (rule.Param == "force")
                         {
-                            var attachment = client.Network.CurrentSim.ObjectsPrimitives.Find(p => p.ParentID == client.Self.LocalID && p.ID == rule.Sender);
+                            var attachment = client.Network.CurrentSim.ObjectsPrimitives.Values.FirstOrDefault(p => p.ParentID == client.Self.LocalID && p.ID == rule.Sender);
                             if (attachment != null && client.Inventory.Store.Items.ContainsKey(CurrentOutfitFolder.GetAttachmentItem(attachment)))
                             {
                                 var folder = client.Inventory.Store.Items[CurrentOutfitFolder.GetAttachmentItem(attachment)].Parent;
@@ -913,8 +915,11 @@ namespace SecondBotEvents.Services
         protected string GetWornIndicator(InventoryNode node)
         {
             var currentOutfit = new List<AppearanceManager.WearableData>(client.Appearance.GetWearables());
-            var currentAttachments =
-                client.Network.CurrentSim.ObjectsPrimitives.FindAll(p => p.ParentID == client.Self.LocalID);
+ 
+            // With this corrected code:
+            var attachments = client.Network.CurrentSim.ObjectsPrimitives.Values
+                .Where(p => p.ParentID == client.Self.LocalID)
+                .ToList();
             int myItemsCount = 0;
             int myItemsWornCount = 0;
 
@@ -925,7 +930,7 @@ namespace SecondBotEvents.Services
                     myItemsCount++;
                     if ((n.Data is InventoryWearable wearable
                             && CurrentOutfitFolder.IsWorn(currentOutfit, wearable))
-                        || CurrentOutfitFolder.IsAttached(currentAttachments, (InventoryItem)n.Data))
+                        || CurrentOutfitFolder.IsAttached(attachments, (InventoryItem)n.Data))
                     {
                         myItemsWornCount++;
                     }
@@ -949,7 +954,7 @@ namespace SecondBotEvents.Services
             {
                 allItemsCount++;
                 if ((n is InventoryWearable && CurrentOutfitFolder.IsWorn(currentOutfit, n)) ||
-                    CurrentOutfitFolder.IsAttached(currentAttachments, n))
+                    CurrentOutfitFolder.IsAttached(attachments, n))
                 {
                     allItemsWornCount++;
                 }
@@ -1102,9 +1107,11 @@ namespace SecondBotEvents.Services
         {
             if (!Enabled || item == null) return true;
 
-            List<Primitive> myAtt =
-                client.Network.CurrentSim.ObjectsPrimitives.FindAll(p => p.ParentID == client.Self.LocalID);
-            foreach (var att in myAtt.Where(att => CurrentOutfitFolder.GetAttachmentItem(att) == item.UUID))
+            // With this corrected code:
+            var primitives = client.Network.CurrentSim.ObjectsPrimitives.Values
+                .Where(p => p.ParentID == client.Self.LocalID)
+                .ToList();
+            foreach (var att in primitives.Where(att => CurrentOutfitFolder.GetAttachmentItem(att) == item.UUID))
             {
                 if (rules.FindAll(r => r.Behaviour == "detach" && r.Sender == att.ID).Count > 0)
                 {

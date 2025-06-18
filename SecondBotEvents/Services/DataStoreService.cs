@@ -593,7 +593,7 @@ namespace SecondBotEvents.Services
             if (currentHash != ObjectsAvatarsHash)
             {
                 ObjectsAvatarsHash = currentHash;
-                List<Avatar> avs = [.. GetClient().Network.CurrentSim.ObjectsAvatars.Copy().Values];
+                List<Avatar> avs = [.. GetClient().Network.CurrentSim.ObjectsAvatars.ToDictionary(k => k.Key, v => v.Value).Values];
                 foreach (Avatar A in avs)
                 {
                     AddAvatar(A.ID, A.Name);
@@ -924,7 +924,7 @@ namespace SecondBotEvents.Services
             Utils.LongToUInts(e.RegionHandle, out uint x, out uint y);
             x /= 256;
             y /= 256;
-            Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.Copy();
+            Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.ToDictionary(k => k.Key, v => v.Value);
             if (FriendListCopy.ContainsKey(e.AgentID) == false)
             {
                 return;

@@ -4,6 +4,7 @@ using OpenMetaverse;
 using Newtonsoft.Json;
 using SecondBotEvents.Services;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace SecondBotEvents.Commands
 {
@@ -79,8 +80,8 @@ namespace SecondBotEvents.Commands
                 return BasicReply("Error not in a sim");
             }
             List<NearMeDetails> BetterNearMe = [];
-            Dictionary<uint, Avatar> avcopy = GetClient().Network.CurrentSim.ObjectsAvatars.Copy();
-            foreach (Avatar av in avcopy.Values)
+            List<Avatar> avcopy = [.. GetClient().Network.CurrentSim.ObjectsAvatars.Values];
+            foreach (Avatar av in avcopy)
             {
                 if (av.ID != GetClient().Self.AgentID)
                 {
@@ -205,8 +206,8 @@ namespace SecondBotEvents.Commands
                 return BasicReply("Error not in a sim");
             }
             Dictionary<UUID, string> NearMe = [];
-            Dictionary<uint, Avatar> avcopy = GetClient().Network.CurrentSim.ObjectsAvatars.Copy();
-            foreach (Avatar av in avcopy.Values)
+            List<Avatar> avcopy = [.. GetClient().Network.CurrentSim.ObjectsAvatars.Values];
+            foreach (Avatar av in avcopy)
             {
                 if (av.ID != GetClient().Self.AgentID)
                 {

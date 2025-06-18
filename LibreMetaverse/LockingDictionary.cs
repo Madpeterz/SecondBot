@@ -29,7 +29,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 
 namespace OpenMetaverse
 {
@@ -90,20 +89,12 @@ namespace OpenMetaverse
 
         }
 
-        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            lock (Dictionary)
-                Dictionary.GetObjectData(info, context);
-        }
-
         public void OnDeserialization(object sender)
         {
             lock( Dictionary)
                 Dictionary.OnDeserialization(sender);
         }
 
-        /// <inheritdoc/>
         public IEqualityComparer<TKey> Comparer
         {
             get { lock (Dictionary) return Dictionary.Comparer; }
@@ -179,15 +170,6 @@ namespace OpenMetaverse
         /// <param name="key">Key to use for lookup</param>
         /// <param name="value">Value returned</param>
         /// <returns><see langword="true"/> if specified key exists,  <see langword="false"/> if not found</returns>
-        /// <example>
-        /// <code>
-        /// // find your avatar using the Simulator.ObjectsAvatars LockingDictionary:
-        ///    Avatar av;
-        ///    if (Client.Network.CurrentSim.ObjectsAvatars.TryGetValue(Client.Self.AgentID, out av))
-        ///        Console.WriteLine("Found Avatar {0}", av.Name);
-        /// </code>
-        /// <see cref="Simulator.ObjectsAvatars"/>
-        /// </example>
         public bool TryGetValue(TKey key, out TValue value)
         {
             lock (Dictionary)

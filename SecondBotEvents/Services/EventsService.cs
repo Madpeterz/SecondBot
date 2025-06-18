@@ -169,7 +169,7 @@ namespace SecondBotEvents.Services
 
             string hashstring = "";
             List<UUID> avs = [];
-            foreach(Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.Copy().Values)
+            foreach(Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.ToDictionary(k => k.Key, v => v.Value).Values)
             {
                 avs.Add(A.ID);
                 hashstring = hashstring+A.ID.ToString();

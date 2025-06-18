@@ -682,7 +682,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unable to find inventory", [item, objectuuid, running]);
             }
-            Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.Copy();
+            Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.ToDictionary(k => k.Key, v => v.Value);
             KeyValuePair<uint, Primitive> RealObject = new(0, null);
             foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
             {
