@@ -152,7 +152,18 @@ ENV basic_Username='' \
 	smtp_User='me@email.addr.tld' \
 	smtp_Token='none' \
 	smtp_SendAlertsAndLoginsTo='me@somewhere.tld' \
-	smtp_HideStatusOutput='false'
+	smtp_HideStatusOutput='false' \
+	rabbit_Enabled='false' \
+	rabbit_HideStatusOutput='false' \
+	rabbit_HostIP='127.0.0.1' \
+	rabbit_HostUsername='guest' \
+	rabbit_HostPassword='guest' \
+	rabbit_HostPort='5672' \
+	rabbit_NotecardQueue='notecards' \
+	rabbit_CommandQueue='commands' \
+	rabbit_ImQueue='ims' \
+	rabbit_GroupImQueue='groupims' \
+	rabbit_LogDebug='true'
 
 EXPOSE 80
 ENV ASPNETCORE_URLS http://+:80
