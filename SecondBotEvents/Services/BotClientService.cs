@@ -120,17 +120,21 @@ namespace SecondBotEvents.Services
             client.Self.InstantMessage(avatar, message);
         }
 
-        public bool SendNotecard(string name, string content, UUID sendToUUID, bool attachDateTime=true)
+        public bool SendNotecard(string name, string content, UUID sendToUUID, bool attachDateTime=true, string subject=null)
         {
             bool returnstatus = true;
             if (attachDateTime == true)
             {
                 name = name + " " + DateTime.Now;
             }
+            if (subject == null)
+            {
+                subject = name + " Created via SecondBot notecard API";
+            }
             client.Inventory.RequestCreateItem(
                 client.Inventory.FindFolderForType(AssetType.Notecard),
                 name,
-                name + " Created via SecondBot notecard API",
+                subject,
                 AssetType.Notecard,
                 UUID.Random(),
                 InventoryType.Notecard,
