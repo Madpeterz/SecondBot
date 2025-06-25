@@ -75,7 +75,11 @@ namespace SecondBotEvents.Services
                 LogFormater.Info("Client service [Stopping]");
             }
             running = false;
-            AutoRestartLoginTimer.Stop();
+            if (AutoRestartLoginTimer != null)
+            {
+                AutoRestartLoginTimer.Stop();
+                AutoRestartLoginTimer = null;
+            }
             ResetClient();
         }
 
@@ -87,7 +91,11 @@ namespace SecondBotEvents.Services
 
         protected void BotSimConnected(object o, SimConnectedEventArgs e)
         {
-            AutoRestartLoginTimer.Stop();
+            if (AutoRestartLoginTimer != null)
+            {
+                AutoRestartLoginTimer.Stop();
+                AutoRestartLoginTimer = null;
+            }
             goodticks = 0;
             LogFormater.Info("Client service ~ Connected to sim: "+e.Simulator.Name);
         }
