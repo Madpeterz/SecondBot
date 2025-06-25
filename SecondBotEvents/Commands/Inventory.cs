@@ -7,8 +7,11 @@ using Org.BouncyCastle.Utilities.Collections;
 using SecondBotEvents.Services;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using static Betalgo.Ranul.OpenAI.ObjectModels.RealtimeModels.RealtimeEventTypes;
 
 namespace SecondBotEvents.Commands
 {
@@ -371,66 +374,35 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok", [folder]);
         }
 
-        [About("Replaces the current avatar outfit with the Clothing/[NAME] folder<br/>Please note: This does not use the outfits folder!<br/>Please do not use links in the folder!")]
+        [About("Replaces the current avatar outfit with the contents of the given folder")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Named folder value is empty")]
-        [ReturnHintsFailure("Cant find Clothing folder")]
         [ReturnHintsFailure("Cant find target folder")]
+        [ReturnHintsFailure("invaild folder uuid")]
+        [ReturnHintsFailure("target folder is empty or so full I cant get it in 5 secs...")]
+        [ArgHints("folderpath", "what folder are we swapping to", "UUID")]
+        [CmdTypeDo()]
+        public object SwapOutfitByPath(string folderpath)
+        {
+            UUID folderload = GetFolderFromPath(folderpath);
+            if(folderload == UUID.Zero)
+            {
+                return Failure("Named folder value is empty", [folderpath]);
+            }
+            return SwapOutfit(folderload.ToString());
+        }
+
+        [About("Replaces the current avatar outfit with the My Outfits/[NAME] folder")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("Named folder value is empty")]
+        [ReturnHintsFailure("Cant find target folder")]
+        [ReturnHintsFailure("invaild folder uuid")]
         [ReturnHintsFailure("target folder is empty or so full I cant get it in 5 secs...")]
         [ArgHints("name", "Name of the folder", "Text", "My other outfit")]
         [CmdTypeDo()]
         public object Outfit(string name)
         {
-            if (SecondbotHelpers.notempty(name) == false)
-            {
-                return Failure("Named folder value is empty", [name]);
-            }
-            // uses the Clothing folder
-            // must be a full outfit (shapes/eyes ect)
-            InventoryFolder AA = GetClient().Inventory.Store.RootFolder;
-            List<InventoryBase> T = GetClient().Inventory.Store.GetContents(AA);
-            AA = null;
-            foreach (InventoryBase R in T)
-            {
-                if (R.Name == "Clothing")
-                {
-                    AA = (InventoryFolder)R;
-                    break;
-                }
-            }
-            if (AA == null)
-            {
-                return Failure("Cant find Clothing folder", [name]);
-            }
-            T = GetClient().Inventory.Store.GetContents(AA);
-            AA = null;
-            foreach (InventoryBase R in T)
-            {
-                if (R.Name == name)
-                {
-                    AA = (InventoryFolder)R;
-                    break;
-                }
-            }
-            if (AA == null)
-            {
-                return Failure("Cant find target folder", [name]);
-            }
-            List<InventoryBase> contents = GetClient().Inventory.FolderContents(AA.UUID, GetClient().Self.AgentID, true, true, InventorySortOrder.ByName, TimeSpan.FromSeconds(15));
-            List<InventoryItem> wareables = [];
-            if (contents == null)
-            {
-                return Failure("target folder is empty or so full I cant get it in 5 secs...", [name]);
-            }
-            foreach (InventoryBase item in contents)
-            {
-                if ((item is InventoryWearable) || (item is InventoryObject))
-                {
-                    wareables.Add((InventoryItem)item);
-                }
-            }
-            GetClient().Appearance.ReplaceOutfit(wareables, false);
-            return BasicReply("ok", [name]);
+            return SwapOutfitByPath("My Outfits/" + name);
         }
 
 
@@ -819,6 +791,44 @@ namespace SecondBotEvents.Commands
             }
             GetClient().Inventory.MoveFolder(sourceFolderUUID, destFolderUUID);
             return BasicReply("Ok", [sourceFolder, destFolder]);
+        }
+
+
+        protected InventoryNode FindFolderInternal(InventoryNode currentNode, string currentPath, string desiredPath)
+        {
+            if (desiredPath == currentPath || desiredPath == (currentPath + "/"))
+            {
+                return currentNode;
+            }
+            return currentNode.Nodes.Values.Select(
+                n => FindFolderInternal(n, (currentPath == "/"
+                    ? currentPath
+                    : currentPath + "/") + n.Data.Name.ToLower(), desiredPath))
+                .FirstOrDefault(res => res != null);
+        }
+        protected InventoryNode RootFolder()
+        {
+            return GetClient().Inventory._Store.GetNodeFor(GetClient().Inventory._Store.RootFolder.UUID);
+        }
+        protected InventoryNode FindFolder(string path)
+        {
+            var root = RootFolder();
+            if(root == null)
+            {
+                return null;
+            }
+            var pathfinder = Regex.Replace(path, @"^[/\s]*(.*)[/\s]*", @"$1").ToLower();
+            var result = FindFolderInternal(root, "/", "/" + pathfinder);
+            return root == null ? null : result;
+        }
+        protected UUID GetFolderFromPath(string path)
+        {
+            InventoryNode A = FindFolder(path);
+            if (A != null)
+            {
+                return A.Data.UUID;
+            }
+            return UUID.Zero;
         }
     }
 }
