@@ -560,8 +560,16 @@ namespace OpenMetaverse
         }
 
         /// <summary>Estate panel "Region" tab settings</summary>
+        /// @deprecated Use the version with the adult flag instead
         public void SetRegionInfo(bool blockTerraform, bool blockFly, bool allowDamage, bool allowLandResell, bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus, bool mature)
         {
+            SetRegionInfo(blockTerraform, blockFly, allowDamage, allowLandResell, restrictPushing, allowParcelJoinDivide, agentLimit, objectBonus, mature, false);
+        }
+
+        /// <summary>Estate panel "Region" tab settings</summary>
+        public void SetRegionInfo(bool blockTerraform, bool blockFly, bool allowDamage, bool allowLandResell, bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus, bool mature, bool adult)
+        {
+
             List<string> listParams = new List<string>();
             listParams.Add(blockTerraform ? "Y" : "N");
             listParams.Add(blockFly ? "Y" : "N");
@@ -569,7 +577,14 @@ namespace OpenMetaverse
             listParams.Add(allowLandResell ? "Y" : "N");
             listParams.Add(agentLimit.ToString(CultureInfo.InvariantCulture));
             listParams.Add(objectBonus.ToString(CultureInfo.InvariantCulture));
-            listParams.Add(mature ? "21" : "13"); //FIXME - enumerate these settings
+            if (adult)
+            {
+                listParams.Add(((int)RegionMaturity.Adult).ToString());
+            }
+            else
+            {
+                listParams.Add(((int)(mature ? RegionMaturity.Mature : RegionMaturity.PG)).ToString());
+            }
             listParams.Add(restrictPushing ? "Y" : "N");
             listParams.Add(allowParcelJoinDivide ? "Y" : "N");
             EstateOwnerMessage("setregioninfo", listParams);
@@ -940,7 +955,12 @@ namespace OpenMetaverse
 
             }
         }
-
+        public enum RegionMaturity
+        {
+            PG = 13,
+            Mature = 21,
+            Adult = 42
+        }
         private void LandStatCapsReplyHandler(string capsKey, IMessage message, Simulator simulator)
         {
             LandStatReplyMessage m = (LandStatReplyMessage)message;

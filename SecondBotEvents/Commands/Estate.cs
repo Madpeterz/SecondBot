@@ -25,6 +25,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to process agent limit value please use a number")]
         [ReturnHintsFailure("Unable to process object bonus value please use a number")]
         [ReturnHintsFailure("Unable to process mature value please use true or false")]
+        [ReturnHintsFailure("Unable to process adult value please use true or false")]
         [ArgHints("setBlockTerraform", "true to block terraform, false to allow it", "BOOL", "false")]
         [ArgHints("setBlockFly", "true to block flying, false to allow it", "BOOL", "false")]
         [ArgHints("setAllowDamage", "true to allow damage, false to block it", "BOOL", "false")]
@@ -34,8 +35,9 @@ namespace SecondBotEvents.Commands
         [ArgHints("setAgentLimit", "the maximum number of agents allowed in the sim", "Number", "100")]
         [ArgHints("setObjectBonus", "the object bonus for the sim", "Number", "1.0")]
         [ArgHints("setMature", "true to set the sim as mature, false to set it as general", "BOOL", "false")]
+        [ArgHints("setAdult", "true to set the sim as adult, false use the setMature setting", "BOOL", "false")]
         [CmdTypeSet()]
-        public object SetRegionFlags(string setBlockTerraform, string setBlockFly, string setAllowDamage, string setAllowLandResell, string setBlockPushing, string setAllowParcelJoinDivide, string setAgentLimit, string setObjectBonus, string setMature)
+        public object SetRegionFlags(string setBlockTerraform, string setBlockFly, string setAllowDamage, string setAllowLandResell, string setBlockPushing, string setAllowParcelJoinDivide, string setAgentLimit, string setObjectBonus, string setMature, string setAdult)
         {
             if(GetClient().Network.CurrentSim.IsEstateManager == false)
             {
@@ -77,8 +79,12 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unable to process mature value please use true or false", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing, setAllowParcelJoinDivide, setAgentLimit, setObjectBonus, setMature]);
             }
-            GetClient().Estate.SetRegionInfo(blockTerraform, blockFly, allowDamage, allowLandResell, blockPushing, allowParcelJoinDivide, agentLimit, objectBonus, mature);
-            return BasicReply("ok", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing, setAllowParcelJoinDivide, setAgentLimit, setObjectBonus, setMature]);
+            if (bool.TryParse(setAdult, out bool adult) == false)
+            {
+                return Failure("Unable to process adult value please use true or false", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing, setAllowParcelJoinDivide, setAgentLimit, setObjectBonus, setMature, setAdult]);
+            }
+            GetClient().Estate.SetRegionInfo(blockTerraform, blockFly, allowDamage, allowLandResell, blockPushing, allowParcelJoinDivide, agentLimit, objectBonus, mature, adult);
+            return BasicReply("ok", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing, setAllowParcelJoinDivide, setAgentLimit, setObjectBonus, setMature, setAdult]);
         }
 
         [About("Adds an estate manager to the current sim or all estates you control")]
