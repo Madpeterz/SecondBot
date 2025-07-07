@@ -306,7 +306,7 @@ namespace SecondBotEvents.Services
                 if (theMethod != null)
                 {
                     List<string> argsList = [.. C.args];
-                    string reply = "Inconnect number of args expected: " + theMethod.GetParameters().Length.ToString() + " but got: " + argsList.Count.ToString();
+                    string reply = "incorrect number of args expected: " + theMethod.GetParameters().Length.ToString() + " but got: " + argsList.Count.ToString();
                     bool status = false;
                     if (argsList.Count == theMethod.GetParameters().Length)
                     {
