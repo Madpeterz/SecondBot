@@ -7,12 +7,114 @@ using Swan;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static OpenMetaverse.EstateTools;
 
 namespace SecondBotEvents.Commands
 {
     [ClassInfo("Look after a sim as the estate manager")]
     public class Estate(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
+
+        [About("Sets the extended region info for the sim you are on")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("Not an estate manager here")]
+        [ReturnHintsFailure("Unable to process block terraform value please use true or false")]
+        [ReturnHintsFailure("Unable to process block fly value please use true or false")]
+        [ReturnHintsFailure("Unable to process block fly over value please use true or false")]
+        [ReturnHintsFailure("Unable to process allow damage value please use true or false")]
+        [ReturnHintsFailure("Unable to process allow land resell value please use true or false")]
+        [ReturnHintsFailure("Unable to process agent limit value please use a number")]
+        [ReturnHintsFailure("Unable to process prim bonus value please use a number")]
+        [ReturnHintsFailure("Unable to process mature value please use true or false")]
+        [ReturnHintsFailure("Unable to process adult value please use true or false")]
+        [ReturnHintsFailure("Unable to process block object push value please use true or false")]
+        [ReturnHintsFailure("Unable to process allow parcel changes value please use true or false")]
+        [ReturnHintsFailure("Unable to process block parcel search value please use true or false")]
+        [ArgHints("setBlockTerraform", "true to block terraform, false to allow it", "BOOL", "false")]
+        [ArgHints("setBlockFly", "true to block flying, false to allow it", "BOOL", "false")]
+        [ArgHints("setBlockFlyOver", "true to block flying over, false to allow it", "BOOL", "false")]
+        [ArgHints("setAllowDamage", "true to allow damage, false to block it", "BOOL", "false")]
+        [ArgHints("setAllowLandResell", "true to allow land reselling, false to block it", "BOOL", "false")]
+        [ArgHints("setAgentLimit", "the maximum number of agents allowed in the sim", "Number", "100")]
+        [ArgHints("setPrimBonus", "the prim bonus for the sim", "Number", "1.0")]
+        [ArgHints("setMature", "true to set the sim as mature, false to set it as general", "BOOL", "false")]
+        [ArgHints("setAdult", "true to set the sim as adult, false use the setMature setting", "BOOL", "false")]
+        [ArgHints("setBlockObjectPush", "true to block object pushing, false to allow it", "BOOL", "false")]
+        [ArgHints("setAllowParcelChanges", "true to allow parcel changes, false to block it", "BOOL", "false")]
+        [ArgHints("setBlockParcelSearch", "true to block parcel search, false to allow it", "BOOL", "false")]
+        [CmdTypeSet()]
+        public object SetExtendedRegionInfo(string setBlockTerraform, string setBlockFly, string setBlockFlyOver,
+            string setAllowDamage, string setAllowLandResell, string setAgentLimit, 
+            string setPrimBonus, string setMature, string setAdult, string setBlockObjectPush, 
+            string setAllowParcelChanges, string setBlockParcelSearch
+            )
+        {
+            if (GetClient().Network.CurrentSim.IsEstateManager == false)
+            {
+                return Failure("Not an estate manager here");
+            }
+            if (bool.TryParse(setBlockTerraform, out bool blockTerraform) == false)
+            {
+                return Failure("Unable to process block terraform value please use true or false", [setBlockTerraform]);
+            }
+            if (bool.TryParse(setBlockFly, out bool blockFly) == false)
+            {
+                return Failure("Unable to process block fly value please use true or false", [setBlockTerraform, setBlockFly]);
+            }
+            if (bool.TryParse(setBlockFlyOver, out bool blockFlyOver) == false)
+            {
+                return Failure("Unable to process block fly over value please use true or false", [setBlockTerraform, setBlockFly, setBlockFlyOver]);
+            }
+            if (bool.TryParse(setAllowDamage, out bool allowDamage) == false)
+            {
+                return Failure("Unable to process allow damage value please use true or false", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage]);
+            }
+            if (bool.TryParse(setAllowLandResell, out bool allowLandResell) == false)
+            {
+                return Failure("Unable to process allow land resell value please use true or false", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell]);
+            }
+            if (int.TryParse(setAgentLimit, out int agentLimitValue) == false)
+            {
+                return Failure("Unable to process agent limit value please use a number", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit]);
+            }
+            if (float.TryParse(setPrimBonus, out float primBonusValue) == false)
+            {
+                return Failure("Unable to process prim bonus value please use a number", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit, setPrimBonus]);
+            }
+            if (bool.TryParse(setMature, out bool mature) == false)
+            {
+                return Failure("Unable to process mature value please use true or false", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit, setPrimBonus, setMature]);
+            }
+            if (bool.TryParse(setAdult, out bool adult) == false)
+            {
+                return Failure("Unable to process adult value please use true or false", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit, setPrimBonus, setMature, setAdult]);
+            }
+            if (bool.TryParse(setBlockObjectPush, out bool blockObjectPush) == false)
+            {
+                return Failure("Unable to process block object push value please use true or false", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit, setPrimBonus, setMature, setAdult, setBlockObjectPush]);
+            }
+            if (bool.TryParse(setAllowParcelChanges, out bool allowParcelChanges) == false)
+            {
+                return Failure("Unable to process allow parcel changes value please use true or false", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit, setPrimBonus, setMature, setAdult, setBlockObjectPush, setAllowParcelChanges]);
+            }
+            if (bool.TryParse(setBlockParcelSearch, out bool blockParcelSearch) == false)
+            {
+                return Failure("Unable to process block parcel search value please use true or false", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit, setPrimBonus, setMature, setAdult, setBlockObjectPush, setAllowParcelChanges, setBlockParcelSearch]);
+            }
+            RegionMaturity regionMaturity = RegionMaturity.PG;
+            if (mature)
+            {
+                regionMaturity = RegionMaturity.Mature;
+            }
+            if (adult)
+            {
+                regionMaturity = RegionMaturity.Adult;
+            }
+            GetClient().Estate.extendedSetRegionInfoAsync(blockTerraform, blockFly, blockFlyOver, allowDamage, allowLandResell,
+                agentLimitValue, primBonusValue, regionMaturity, blockObjectPush, allowParcelChanges, blockParcelSearch);
+            return BasicReply("ok", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit, setPrimBonus, setMature, setAdult, setBlockObjectPush, setAllowParcelChanges, setBlockParcelSearch]);
+        }
+
         [About("Set the current region flags for the sim you are on")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Not an estate manager here")]

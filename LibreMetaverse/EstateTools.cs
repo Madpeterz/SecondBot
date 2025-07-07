@@ -29,6 +29,12 @@ using OpenMetaverse.Interfaces;
 using OpenMetaverse.Messages.Linden;
 using System.Collections.Generic;
 using System.Globalization;
+using MessagePack.Formatters;
+using OpenMetaverse.StructuredData;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Policy;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OpenMetaverse
 {
@@ -588,6 +594,59 @@ namespace OpenMetaverse
             listParams.Add(restrictPushing ? "Y" : "N");
             listParams.Add(allowParcelJoinDivide ? "Y" : "N");
             EstateOwnerMessage("setregioninfo", listParams);
+        }
+
+        public async void extendedSetRegionInfoAsync(bool blockTerraform, bool blockFly, bool blockFlyover, bool allowDamage,bool allowLandResell, int agentLimit, float primBonus, RegionMaturity maturityLevel, bool blockObjectPush, bool allowParcelChanges, bool blockParcelSearch)
+        {
+            if (Client == null)
+            {
+                Logger.Log($"No client object (what the fuck)", Helpers.LogLevel.Warning);
+                return;
+            }
+            if (Client.Network == null)
+            {
+                Logger.Log($"Not connected to a network extendedSetRegionInfoAsync", Helpers.LogLevel.Warning);
+                return;
+            }
+            if(Client.Network.CurrentSim == null)
+            {
+                Logger.Log($"Not connected to a sim extendedSetRegionInfoAsync", Helpers.LogLevel.Warning);
+                return;
+            }
+            if(Client.Network.CurrentSim.Caps == null)
+            {
+                Logger.Log($"No caps endpoint for current sim extendedSetRegionInfoAsync", Helpers.LogLevel.Warning);
+                return;
+            }
+            Uri uri = Client.Network.CurrentSim.Caps.CapabilityURI("DispatchRegionInfo");
+            if (uri == null)
+            {
+                Logger.Log($"unable to get URI for DispatchRegionInfo extendedSetRegionInfoAsync", Helpers.LogLevel.Warning);
+                return;
+            }
+            OSDMap request = new OSDMap();
+            request["block_terraform"] = blockTerraform;
+            request["block_fly"] = blockFly;
+            request["block_fly_over"] = blockFlyover;
+            request["allow_damage"] = allowDamage;
+            request["allow_land_resell"] = allowLandResell;
+            request["agent_limit"] = agentLimit;
+            request["prim_bonus"] = primBonus;
+            request["sim_access"] = (int)maturityLevel;
+            request["restrict_pushobject"] = blockObjectPush;
+            request["allow_parcel_changes"] = allowParcelChanges;
+            request["block_parcel_search"] = blockParcelSearch;
+            OSDLlsdXml body = new OSDLlsdXml(request);
+            using (var reply = await Client.HttpCapsClient.PostAsync(uri.ToString(), null))
+            {
+                bool success = reply.IsSuccessStatusCode;
+
+                if (!success)
+                {
+                    Logger.Log($"Failed to make HTTP request to DispatchRegionInfo for extended update",
+                        Helpers.LogLevel.Warning);
+                }
+            }
         }
 
         /// <summary>Estate panel "Debug" tab settings</summary>
