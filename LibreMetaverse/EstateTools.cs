@@ -35,6 +35,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Policy;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Text;
 
 namespace OpenMetaverse
 {
@@ -596,7 +598,7 @@ namespace OpenMetaverse
             EstateOwnerMessage("setregioninfo", listParams);
         }
 
-        public async void extendedSetRegionInfoAsync(bool blockTerraform, bool blockFly, bool blockFlyover, bool allowDamage,bool allowLandResell, int agentLimit, float primBonus, RegionMaturity maturityLevel, bool blockObjectPush, bool allowParcelChanges, bool blockParcelSearch)
+        public async void extendedSetRegionInfoAsync(bool blockTerraform, bool blockFly, bool blockFlyover, bool allowDamage, bool allowLandResell, int agentLimit, float primBonus, RegionMaturity maturityLevel, bool blockObjectPush, bool allowParcelChanges, bool blockParcelSearch)
         {
             if (Client == null)
             {
@@ -608,12 +610,12 @@ namespace OpenMetaverse
                 Logger.Log($"Not connected to a network extendedSetRegionInfoAsync", Helpers.LogLevel.Warning);
                 return;
             }
-            if(Client.Network.CurrentSim == null)
+            if (Client.Network.CurrentSim == null)
             {
                 Logger.Log($"Not connected to a sim extendedSetRegionInfoAsync", Helpers.LogLevel.Warning);
                 return;
             }
-            if(Client.Network.CurrentSim.Caps == null)
+            if (Client.Network.CurrentSim.Caps == null)
             {
                 Logger.Log($"No caps endpoint for current sim extendedSetRegionInfoAsync", Helpers.LogLevel.Warning);
                 return;
@@ -636,15 +638,22 @@ namespace OpenMetaverse
             request["restrict_pushobject"] = blockObjectPush;
             request["allow_parcel_changes"] = allowParcelChanges;
             request["block_parcel_search"] = blockParcelSearch;
-            OSDLlsdXml body = new OSDLlsdXml(request);
-            using (var reply = await Client.HttpCapsClient.PostAsync(uri.ToString(), null))
-            {
-                bool success = reply.IsSuccessStatusCode;
 
-                if (!success)
+            // Serialize OSDMap to XML string
+            string requestBody = request.ToString();
+
+            // Use StringContent to convert the string to HttpContent
+            using (var content = new StringContent(requestBody, Encoding.UTF8, "application/llsd+xml"))
+            {
+                using (var reply = await Client.HttpCapsClient.PostAsync(uri.ToString(), content))
                 {
-                    Logger.Log($"Failed to make HTTP request to DispatchRegionInfo for extended update",
-                        Helpers.LogLevel.Warning);
+                    bool success = reply.IsSuccessStatusCode;
+
+                    if (!success)
+                    {
+                        Logger.Log($"Failed to make HTTP request to DispatchRegionInfo for extended update",
+                            Helpers.LogLevel.Warning);
+                    }
                 }
             }
         }
