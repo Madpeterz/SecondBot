@@ -9,6 +9,7 @@ using RabbitMQ.Client.Events;
 using Newtonsoft.Json;
 using Swan;
 using OpenMetaverse;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace SecondBotEvents.Services
 {
@@ -167,6 +168,45 @@ namespace SecondBotEvents.Services
             LogFormater.Info("Rabbit service [Starting]");
             running = true;
             master.BotClientNoticeEvent += BotClientRestart;
+        }
+
+        public KeyValuePair<bool,string> SendMessage(string Qname,string message)
+        {
+            if (connection == null || connection.IsOpen == false)
+            {
+                LogFormater.Warn("Rabbit service [Connection is not open] cannot send message to queue " + Qname);
+                return new KeyValuePair<bool, string>(false, "Connection is not open");
+            }
+            if (string.IsNullOrEmpty(Qname) || string.IsNullOrEmpty(message))
+            {
+                LogFormater.Warn("Rabbit service [Queue name or message is empty] cannot send message to queue " + Qname);
+                return new KeyValuePair<bool, string>(false, "Queue name or message is empty");
+            }
+            IChannel channel = null;
+            if (channels.ContainsKey(Qname) == false)
+            {
+                channel = connection.CreateChannelAsync().Await();
+                channel.QueueDeclareAsync(queue: Qname, durable: true, exclusive: false, autoDelete: false,
+        arguments: null);
+                channels.Add(Qname, channel);
+            }
+            channel = channels[Qname];
+            if (channel == null || channel.IsOpen == false)
+            {
+                LogFormater.Warn("Rabbit service [Channel is not open] " + Qname + " reconnecting");
+                channel = connection.CreateChannelAsync().Await();
+                channel.QueueDeclareAsync(queue: Qname, durable: true, exclusive: false, autoDelete: false,
+        arguments: null);
+                channels[Qname] = channel;
+            }
+            if (channel == null || channel.IsOpen == false)
+            {
+                LogFormater.Warn("Rabbit service [Channel is still not open] " + Qname + " cannot send message");
+                return new KeyValuePair<bool, string>(false, "Channel is still not open");
+            }
+            var body = Encoding.UTF8.GetBytes(message);
+            channel.BasicPublishAsync(exchange: "", routingKey: Qname, body: body);
+            return new KeyValuePair<bool, string>(true, "Message sent to queue " + Qname);
         }
 
         protected void connectService()
