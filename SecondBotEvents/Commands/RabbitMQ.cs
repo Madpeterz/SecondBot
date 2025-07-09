@@ -10,7 +10,7 @@ namespace SecondBotEvents.Commands
     [ClassInfo("Talk back to the rabbit MQ")]
     public class RabbitMQ(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        [About("Fetchs the current region type the bot is in")]
+        [About("Send a message to the rabbit server the bot is connected to")]
         [ArgHints("Qname", "Name of the queue to send the message to","TEXT","exampleq")]
         [ArgHints("message", "Message to send to the queue","TEXT","Hello world")]
         [ReturnHints("Message sent to the queue")]
