@@ -10,6 +10,20 @@ namespace SecondBotEvents.Commands
     [ClassInfo("What is going on with the bot")]
     public class Info(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
+        [About("Fetchs the current region type the bot is in")]
+        [ReturnHints("Region type as string")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [CmdTypeGet()]
+        public object GetCurrentRegionType()
+        {
+            if(GetClient().Network.CurrentSim == null)
+            {
+                return Failure("Error not in a sim");
+            }
+            return BasicReply(GetClient().Network.CurrentSim.ProductName);
+
+        }
+
         [About("Lists objects that are sculpty type in the current sim that the bot can see")]
         [ReturnHints("A json object")]
         [CmdTypeGet()]
