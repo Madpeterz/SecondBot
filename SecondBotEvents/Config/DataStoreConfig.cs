@@ -17,12 +17,17 @@ namespace SecondBotEvents.Config
             settings.Add("PrefetchGroupMembers");
             settings.Add("PrefetchGroupRoles");
             settings.Add("PrefetchEstateBanlist");
+            settings.Add("PrefetchAvatarDisplaynames");
             settings.Add("AutoCleanKeyValueStore");
             settings.Add("CleanKeyValueStoreAfterMins");
             settings.Add("CommandHistoryLimit");
             settings.Add("HideStatusOutput");
         }
 
+        public bool GetPrefetchAvatarDisplaynames()
+        {
+            return ReadSettingAsBool("PrefetchAvatarDisplaynames", true);
+        }
 
         public int GetCommandHistoryLimit()
         {

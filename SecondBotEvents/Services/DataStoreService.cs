@@ -9,6 +9,7 @@ using System.Threading;
 using SecondBotEvents.Commands;
 using OpenMetaverse.ImportExport.Collada14;
 using System.Threading.Tasks;
+using OpenMetaverse.Messages.Linden;
 
 namespace SecondBotEvents.Services
 {
@@ -23,6 +24,7 @@ namespace SecondBotEvents.Services
 
         protected Dictionary<string, UUID> avatarsName2Key = [];
         protected Dictionary<UUID, long> avatarLastUsed =  [];
+        protected Dictionary<UUID, string> avatarsKey2Displayname = [];
 
         protected Dictionary<UUID, string> groupsKey2Name = [];
 
@@ -195,12 +197,13 @@ namespace SecondBotEvents.Services
                         }
                         clearLinks.Add(entry.Value, entry.Key);
                     }
-                    lock (avatarLastUsed) lock(avatarsName2Key)
+                    lock (avatarLastUsed) lock (avatarsName2Key) lock(avatarsKey2Displayname)
                     {
                         foreach (KeyValuePair<UUID, string> A in clearLinks)
                         {
                             avatarLastUsed.Remove(A.Key);
                             avatarsName2Key.Remove(A.Value);
+                            avatarsKey2Displayname.Remove(A.Key);
                         }
                     }
                 }
@@ -1025,6 +1028,11 @@ namespace SecondBotEvents.Services
                         }
                         lock (localChatHistory)
                         {
+                            if (source == "{Av}")
+                            {
+                                AddAvatar(e.SourceID, e.FromName);
+                            }
+
                             localChatHistory.Add(source+ " "+e.FromName + ": " + e.Message);
                             if (localChatHistory.Count <= myConfig.GetLocalChatHistoryLimit())
                             {
@@ -1087,18 +1095,53 @@ namespace SecondBotEvents.Services
             GetClient().Groups.RequestCurrentGroups();
         }
 
+        protected void displayNameFinder(UUID Avatar)
+        {
+            if (myConfig.GetPrefetchAvatarDisplaynames() == true)
+            {
+                requestDisplayName(Avatar);
+            }
+        }
+        protected void requestDisplayName(UUID Avatar)
+        {
+            if (avatarsKey2Displayname.ContainsKey(Avatar) == false)
+            {
+                return; // unable to fetch not in avatar DB
+            }
+            if (avatarsKey2Displayname[Avatar] != "?")
+            {
+                return; // already known
+            }
+            _ = GetClient().Avatars.RequestAgentProfile(Avatar, (status, properties) =>
+            {
+                avatarsKey2Displayname[Avatar] = properties.DisplayName;
+            });
+        }
         public void AddAvatar(UUID id, string name)
         {
-            lock (avatarsName2Key) lock (avatarLastUsed)
-            {
-                if (avatarsName2Key.ContainsValue(id) == true)
+            lock (avatarsName2Key) lock (avatarLastUsed) lock(avatarsKey2Displayname)
                 {
-                    avatarLastUsed[id] = SecondbotHelpers.UnixTimeNow();
-                    return;
+                    if (avatarsName2Key.ContainsValue(id) == true)
+                    {
+                        avatarLastUsed[id] = SecondbotHelpers.UnixTimeNow();
+                        displayNameFinder(id);
+                        return;
+                    }
+                    avatarsName2Key.Add(name, id);
+                    avatarLastUsed.Add(id, SecondbotHelpers.UnixTimeNow());
+                    avatarsKey2Displayname.Add(id, "?");
+                    displayNameFinder(id);
                 }
-                avatarsName2Key.Add(name, id);
-                avatarLastUsed.Add(id, SecondbotHelpers.UnixTimeNow());
+        }
+
+        public string GetDisplayName(UUID id)
+        {
+            requestDisplayName(id);
+            if (avatarsKey2Displayname.ContainsKey(id) == false)
+            {
+                return "?";
             }
+            return avatarsKey2Displayname[id];
         }
 
         protected void AvatarUUIDName(object o, UUIDNameReplyEventArgs e)

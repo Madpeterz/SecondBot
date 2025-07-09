@@ -71,7 +71,15 @@ namespace SecondBotEvents.Services
 
         protected void DiscordMessage(object o, SocketMessage e)
         {
-            triggerRelayEvent("discord", e.Source.ToString(), e.Channel.ToString(), e.Author.Username, e.CleanContent);
+            triggerRelayEvent(
+                "discord", 
+                e.Source.ToString(), 
+                e.Channel.ToString(), 
+                e.Author.Username, 
+                e.CleanContent,
+                e.Channel.Name,
+                e.Author.GlobalName
+            );
         }
 
         readonly string[] hard_blocked_agents = ["secondlife", "second life"];
@@ -91,6 +99,7 @@ namespace SecondBotEvents.Services
                             break;
                         }
                         string source = "avatar";
+                        string sourcename = e.Type.ToString().ToLowerInvariant();
                         if (e.SourceType == ChatSourceType.Object)
                         {
                             source = "object";
@@ -103,8 +112,21 @@ namespace SecondBotEvents.Services
                         {
                             source = "ownersay";
                         }
+                        string triggerdisplayname = e.SourceID.ToString();
+                        if (source == "avatar")
+                        {
+                            triggerdisplayname = master.DataStoreService.GetDisplayName(e.SourceID);
+                        }
                         // trigger localchat
-                        triggerRelayEvent("localchat", source, e.SourceID.ToString(), e.FromName, e.Message);
+                        triggerRelayEvent(
+                            source: "localchat", 
+                            filter: source, 
+                            sourceuuid: e.SourceID.ToString(), 
+                            triggername: e.FromName, 
+                            message: e.Message,
+                            sourcename: sourcename,
+                            triggerdisplayname: triggerdisplayname
+                         );
                         break;
                     }
                 default:
@@ -121,7 +143,15 @@ namespace SecondBotEvents.Services
                 case InstantMessageDialog.MessageFromObject:
                     {
                         // trigger object IM
-                        triggerRelayEvent("object", e.IM.FromAgentID.ToString(), e.IM.IMSessionID.ToString(), e.IM.FromAgentName, e.IM.Message);
+                        triggerRelayEvent(
+                            source: "object",
+                            filter: e.IM.FromAgentID.ToString(),
+                            sourceuuid: e.IM.IMSessionID.ToString(),
+                            triggername: e.IM.FromAgentName,
+                            message: e.IM.Message,
+                            sourcename: e.IM.Dialog.ToString(),
+                            triggerdisplayname: "objectim"
+                         );
                         break;
                     }
                 case InstantMessageDialog.MessageFromAgent: // shared with SessionSend
@@ -130,8 +160,15 @@ namespace SecondBotEvents.Services
                         if (master.DataStoreService.GetIsGroup(e.IM.IMSessionID) == false)
                         {
                             // trigger avatar IM
-                            triggerRelayEvent("avatar", e.IM.FromAgentID.ToString(), e.IM.IMSessionID.ToString(), e.IM.FromAgentName, e.IM.Message);
-                            break;
+                            triggerRelayEvent(
+                                source: "avatar",
+                                filter: e.IM.FromAgentID.ToString(),
+                                sourceuuid: e.IM.IMSessionID.ToString(),
+                                triggername: e.IM.FromAgentName,
+                                message: e.IM.Message,
+                                sourcename: e.IM.Dialog.ToString(),
+                                triggerdisplayname: master.DataStoreService.GetDisplayName(e.IM.FromAgentID)
+                             );
                         }
                         // trigger group IM
                         string groupname = "?";
@@ -139,7 +176,15 @@ namespace SecondBotEvents.Services
                         {
                             groupname = GetClient().Groups.GroupName2KeyCache[e.IM.IMSessionID];
                         }
-                        triggerRelayEvent("group", groupname, e.IM.IMSessionID.ToString(), e.IM.FromAgentName, e.IM.Message);
+                        triggerRelayEvent(
+                            source: "group",
+                            filter: groupname,
+                            sourceuuid: e.IM.IMSessionID.ToString(),
+                            triggername: e.IM.FromAgentName,
+                            message: e.IM.Message,
+                            sourcename: e.IM.Dialog.ToString(),
+                            triggerdisplayname: master.DataStoreService.GetDisplayName(e.IM.FromAgentID)
+                         );
                         break;
                     }
                 default:
@@ -149,7 +194,16 @@ namespace SecondBotEvents.Services
             }
         }
         
-        protected void triggerRelayEvent(string source, string filter, string sourceuuid, string name, string message)
+        protected void triggerRelayEvent(
+            string source, 
+            string filter, 
+            string sourceuuid, 
+            string triggername, 
+            string message,
+            string sourcename="",
+            string triggerdisplayname=""
+
+        )
         {
             int loop = 1;
             if(message.Contains("{Relay}") == true)
@@ -160,11 +214,24 @@ namespace SecondBotEvents.Services
             relayEvent a = new()
             {
                 message = message,
-                name = name,
+                name = triggername,
                 sourcetype = source,
                 sourceoption = filter
             };
             string eventMessage = JsonConvert.SerializeObject(a);
+            relayEventExtended relayEventExtended = new()
+            {
+                source = source,
+                sourceid = filter,
+                sourcename = sourcename,
+                triggerid = sourceuuid,
+                triggername = triggername,
+                triggerdisplayname = triggerdisplayname,
+                message = message,
+                unixtime = SecondbotHelpers.UnixTimeNow().ToString()
+            };
+            string eventMessageExtended = JsonConvert.SerializeObject(relayEventExtended);
+
             while (loop <= myConfig.GetRelayCount())
             {
                 int index = loop;
@@ -183,7 +250,8 @@ namespace SecondBotEvents.Services
                 }
                 string targetType = myConfig.RelayTargetType(index);
                 string targetOption = myConfig.RelayTargetOption(index);
-                if(targetType == "localchat")
+                string useEventMessage = myConfig.GetRelayJson(index) ? eventMessageExtended : eventMessage;
+                if (targetType == "localchat")
                 {
                     if(int.TryParse(targetOption, out int target) == false)
                     {
@@ -193,7 +261,7 @@ namespace SecondBotEvents.Services
                     {
                         continue;
                     }
-                    GetClient().Self.Chat(eventMessage, target, ChatType.Normal);
+                    GetClient().Self.Chat(useEventMessage, target, ChatType.Normal);
                 }
                 else if(targetType == "group")
                 {
@@ -201,7 +269,7 @@ namespace SecondBotEvents.Services
                     {
                         continue;
                     }
-                    GetClient().Self.InstantMessageGroup(targetuuid, eventMessage);
+                    GetClient().Self.InstantMessageGroup(targetuuid, useEventMessage);
                 }
                 else if(targetType == "avatar")
                 {
@@ -209,7 +277,7 @@ namespace SecondBotEvents.Services
                     {
                         continue;
                     }
-                    GetClient().Self.InstantMessage(targetuuid, eventMessage);
+                    GetClient().Self.InstantMessage(targetuuid, useEventMessage);
                 }
                 else if(targetType == "http")
                 {
@@ -222,7 +290,7 @@ namespace SecondBotEvents.Services
                     request.AddParameter("method", "Relay");
                     request.AddParameter("action", "Service");
                     request.AddParameter("botname", GetClient().Self.Name);
-                    request.AddParameter("event", eventMessage);
+                    request.AddParameter("event", useEventMessage);
                     request.AddHeader("content-type", "application/x-www-form-urlencoded");
                     client.ExecutePostAsync(request);
                 }
@@ -245,7 +313,11 @@ namespace SecondBotEvents.Services
                     {
                         continue;
                     }
-                    master.DiscordService.SendMessageToChannel(targetserver, targetchannel, message);
+                    master.DiscordService.SendMessageToChannel(targetserver, targetchannel, useEventMessage);
+                }
+                else if(targetType == "rabbit")
+                {
+                    master.RabbitService.SendMessage(targetOption, useEventMessage);
                 }
             }
         }
@@ -282,5 +354,18 @@ namespace SecondBotEvents.Services
         public string sourcetype = "";
         public string sourceoption = "";
     }
+
+    public class relayEventExtended
+    {
+        public string source = "";
+        public string sourceid = "";
+        public string sourcename = "";
+        public string triggerid = "";
+        public string triggername = "";
+        public string triggerdisplayname = "";
+        public string message = "";
+        public string unixtime = "";
+    }
 }
+
 

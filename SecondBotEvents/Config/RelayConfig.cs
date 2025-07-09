@@ -34,6 +34,15 @@ namespace SecondBotEvents.Config
             return true;
         }
 
+        public bool GetRelayJson(int relayID)
+        {
+            if (GetUseShortEncoder() == false)
+            {
+                return ReadSettingAsBool(relayID.ToString() + "_extended", false);
+            }
+            return true;
+        }
+
         public string RelaySourceType(int relayID)
         {
             if (GetUseShortEncoder() == false)

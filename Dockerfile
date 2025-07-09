@@ -42,6 +42,7 @@ ENV basic_Username='' \
 	datastore_AutoCleanAvatars='true' \
 	datastore_AvatarsCleanAfterMins=10 \
 	datastore_LocalChatHistoryLimit=120 \
+	datastore_PrefetchAvatarDisplaynames='true' \
 	datastore_GroupChatHistoryLimitPerGroup=50 \
 	datastore_ImChatHistoryLimit=50 \
 	datastore_PrefetchGroupMembers='true' \
