@@ -236,7 +236,7 @@ namespace SecondBotEvents
                     if(hadStartSplit == false)
                     {
                         hadStartSplit = true;
-                        examplecall = examplecall + "###";
+                        examplecall = examplecall + "|||";
                     }
                     content = content + "<tr>";
                     content = content + "<td>" + pram.Name + "</a></td>";
