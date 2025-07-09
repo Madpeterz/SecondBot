@@ -28,7 +28,8 @@ namespace SecondBotEvents
                 { "parcel", typeof(ParcelCommands) },
                 { "self", typeof(Self) },
                 { "streamadmin", typeof(StreamAdmin) },
-                { "services", typeof(SecondBotEvents.Commands.Services) }
+                { "services", typeof(SecondBotEvents.Commands.Services) },
+                { "rabbitmq", typeof(SecondBotEvents.Commands.RabbitMQ) }
             };
             return reply;
         }

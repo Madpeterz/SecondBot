@@ -11,8 +11,8 @@ namespace SecondBotEvents.Commands
     public class RabbitMQ(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
         [About("Fetchs the current region type the bot is in")]
-        [ArgHints("Qname", "Name of the queue to send the message to")]
-        [ArgHints("message", "Message to send to the queue")]
+        [ArgHints("Qname", "Name of the queue to send the message to","TEXT","exampleq")]
+        [ArgHints("message", "Message to send to the queue","TEXT","Hello world")]
         [ReturnHints("Message sent to the queue")]
         [ReturnHintsFailure("Error sending message: ...")]
         [ReturnHintsFailure("RabbitMQ service not available")]
