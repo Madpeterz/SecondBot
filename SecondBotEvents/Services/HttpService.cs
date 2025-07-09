@@ -15,13 +15,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Utilities;
+using Swan;
 
 namespace SecondBotEvents.Services
 {
     public class HttpService : BotServices
     {
         protected WebServer HTTPendpoint = null;
-        protected new HttpConfig myConfig;
+        public new HttpConfig myConfig;
         protected bool acceptBotCommands = false;
         public HttpService(EventsSecondBot setMaster) : base(setMaster)
         {
@@ -133,10 +134,33 @@ namespace SecondBotEvents.Services
                 .WithMode(HttpListenerMode.EmbedIO))
                 .WithCors()
                 .WithWebApi("/api", SerializationCallback, m => m.WithController(() => new HttpWebBot(master)))
+                .WithModule(new ActionModule("/json", HttpVerbs.Post, ctx => ctx.SendDataAsync(JsonInput(ctx))))
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendDataAsync(new { Message = "Error" }))
             );
             HTTPendpoint.RunAsync();
             LogFormater.Info("HTTP service [Enabled] on port 80");
+        }
+
+        protected string JsonInput(IHttpContext httpContext)
+        {
+            if (master.HttpService.GetAcceptBotCommands() == false)
+            {
+                return "No bot connected yet";
+            }
+            string body = httpContext.GetRequestBodyAsStringAsync().Await();
+            if(body == null || body.Length < 1)
+            {
+                return "No body sent";
+            }
+            SignedCommand C = new(master.CommandsService, "http", body, !master.HttpService.myConfig.GetDisableCommandValidation(),
+                master.CommandsService.myConfig.GetEnforceTimeWindow(),
+                master.CommandsService.myConfig.GetTimeWindowSecs(),
+                master.CommandsService.myConfig.GetSharedSecret());
+            if (C.accepted == false)
+            {
+                return "Command request rejected";
+            }
+            return JsonConvert.SerializeObject(master.CommandsService.RunCommand("HTTP", C));
         }
         public static async Task SerializationCallback(IHttpContext context, object? data)
         {
@@ -356,7 +380,7 @@ namespace SecondBotEvents.Services
             SignedCommand C = new(
                 master.CommandsService,"http",
                 commandName, signing, myArgs, cmdUnixtime, null,true, master.CommandsService.myConfig.GetTimeWindowSecs(),
-                master.CommandsService.myConfig.GetSharedSecret());
+                master.CommandsService.myConfig.GetSharedSecret(), !master.HttpService.myConfig.GetDisableCommandValidation());
             if(C.accepted == false)
             {
                 return "Command request rejected";

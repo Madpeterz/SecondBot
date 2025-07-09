@@ -11,11 +11,17 @@ namespace SecondBotEvents.Config
             filename = "http";
             settings.Add("Enabled");
             settings.Add("HideStatusOutput");
+            settings.Add("DisableCommandValidation");
         }
 
         public bool GetEnabled()
         {
             return ReadSettingAsBool("Enabled", true);
+        }
+
+        public bool GetDisableCommandValidation()
+        {
+            return ReadSettingAsBool("DisableCommandValidation", false);
         }
     }
 

@@ -81,6 +81,7 @@ ENV basic_Username='' \
 	homebound_ReturnToHomeSimAfterMins=5 \
 	http_Enabled='false' \
 	http_Port=80 \
+	http_DisableCommandValidation='false' \
 	interaction_Enabled='true' \
 	interaction_AcceptTeleports='false' \
 	interaction_AcceptGroupInvites='false' \
