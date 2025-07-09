@@ -29,13 +29,9 @@ using OpenMetaverse.Interfaces;
 using OpenMetaverse.Messages.Linden;
 using System.Collections.Generic;
 using System.Globalization;
-using MessagePack.Formatters;
-using OpenMetaverse.StructuredData;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Policy;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Net.Http;
+using System.Threading.Tasks;
+using OpenMetaverse.StructuredData;
 using System.Text;
 
 namespace OpenMetaverse
@@ -83,6 +79,13 @@ namespace OpenMetaverse
         }
 
         #region Enums
+        public enum RegionMaturity
+        {
+            PG = 13,
+            Mature = 21,
+            Adult = 42
+        }
+
         /// <summary>Used in the ReportType field of a LandStatRequest</summary>
         public enum LandStatReportType
         {
@@ -91,7 +94,7 @@ namespace OpenMetaverse
         }
 
         /// <summary>Used by EstateOwnerMessage packets</summary>
-        public enum EstateAccessDelta : uint 
+        public enum EstateAccessDelta : uint
         {
             BanUser = 64,
             BanUserAllEstates = 66,
@@ -186,7 +189,7 @@ namespace OpenMetaverse
         {
             add { lock (m_TopCollidersReply_Lock) { m_TopCollidersReply += value; } }
             remove { lock (m_TopCollidersReply_Lock) { m_TopCollidersReply -= value; } }
-        }        
+        }
 
         /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<TopScriptsReplyEventArgs> m_TopScriptsReply;
@@ -299,7 +302,7 @@ namespace OpenMetaverse
             add { lock (m_EstateBansReply_Lock) { m_EstateBansReply += value; } }
             remove { lock (m_EstateBansReply_Lock) { m_EstateBansReply -= value; } }
         }
-                
+
         /// <summary>The event subscribers. null if no subscribers</summary>
         private EventHandler<EstateCovenantReplyEventArgs> m_EstateCovenantReply;
 
@@ -567,64 +570,36 @@ namespace OpenMetaverse
             EstateOwnerMessage("restart", "-1");
         }
 
-        /// <summary>Estate panel "Region" tab settings</summary>
-        /// @deprecated Use the version with the adult flag instead
-        public void SetRegionInfo(bool blockTerraform, bool blockFly, bool allowDamage, bool allowLandResell, bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus, bool mature)
-        {
-            SetRegionInfo(blockTerraform, blockFly, allowDamage, allowLandResell, restrictPushing, allowParcelJoinDivide, agentLimit, objectBonus, mature, false);
-        }
-
-        /// <summary>Estate panel "Region" tab settings</summary>
-        public void SetRegionInfo(bool blockTerraform, bool blockFly, bool allowDamage, bool allowLandResell, bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus, bool mature, bool adult)
-        {
-
-            List<string> listParams = new List<string>();
-            listParams.Add(blockTerraform ? "Y" : "N");
-            listParams.Add(blockFly ? "Y" : "N");
-            listParams.Add(allowDamage ? "Y" : "N");
-            listParams.Add(allowLandResell ? "Y" : "N");
-            listParams.Add(agentLimit.ToString(CultureInfo.InvariantCulture));
-            listParams.Add(objectBonus.ToString(CultureInfo.InvariantCulture));
-            if (adult)
-            {
-                listParams.Add(((int)RegionMaturity.Adult).ToString());
-            }
-            else
-            {
-                listParams.Add(((int)(mature ? RegionMaturity.Mature : RegionMaturity.PG)).ToString());
-            }
-            listParams.Add(restrictPushing ? "Y" : "N");
-            listParams.Add(allowParcelJoinDivide ? "Y" : "N");
-            EstateOwnerMessage("setregioninfo", listParams);
-        }
-
-        public async void extendedSetRegionInfoAsync(bool blockTerraform, bool blockFly, bool blockFlyover, bool allowDamage, bool allowLandResell, int agentLimit, float primBonus, RegionMaturity maturityLevel, bool blockObjectPush, bool allowParcelChanges, bool blockParcelSearch)
+        public async Task<KeyValuePair<bool, string>> extendedSetRegionInfo(
+            bool blockTerraform, bool blockFly, bool blockFlyover, bool allowDamage, bool allowLandResell,
+            int agentLimit, float primBonus, RegionMaturity maturityLevel, bool blockObjectPush,
+            bool allowParcelChanges, bool blockParcelSearch)
         {
             if (Client == null)
             {
-                Logger.Log($"No client object (what the fuck)", Helpers.LogLevel.Warning);
-                return;
+                return new KeyValuePair<bool, string>(false, "No client object");
             }
-            if (Client.Network == null)
+            else if (Client.Network == null)
             {
-                Logger.Log($"Not connected to a network extendedSetRegionInfoAsync", Helpers.LogLevel.Warning);
-                return;
+                return new KeyValuePair<bool, string>(false, "Not connected to a network");
             }
-            if (Client.Network.CurrentSim == null)
+            else if (Client.Network.CurrentSim == null)
             {
-                Logger.Log($"Not connected to a sim extendedSetRegionInfoAsync", Helpers.LogLevel.Warning);
-                return;
+                return new KeyValuePair<bool, string>(false, "Not connected to a sim");
             }
-            if (Client.Network.CurrentSim.Caps == null)
+            else if (Client.Network.CurrentSim.Caps == null)
             {
-                Logger.Log($"No caps endpoint for current sim extendedSetRegionInfoAsync", Helpers.LogLevel.Warning);
-                return;
+                return new KeyValuePair<bool, string>(false, "No caps endpoint for current sim");
             }
+            else if (Client.HttpCapsClient == null)
+            {
+                return new KeyValuePair<bool, string>(false, "No HttpCapsClient available");
+            }
+
             Uri uri = Client.Network.CurrentSim.Caps.CapabilityURI("DispatchRegionInfo");
             if (uri == null)
             {
-                Logger.Log($"unable to get URI for DispatchRegionInfo extendedSetRegionInfoAsync", Helpers.LogLevel.Warning);
-                return;
+                return new KeyValuePair<bool, string>(false, "Unable to get URI for DispatchRegionInfo");
             }
             OSDMap request = new OSDMap();
             request["block_terraform"] = blockTerraform;
@@ -639,23 +614,48 @@ namespace OpenMetaverse
             request["allow_parcel_changes"] = allowParcelChanges;
             request["block_parcel_search"] = blockParcelSearch;
 
-            // Serialize OSDMap to XML string
-            string requestBody = request.ToString();
-
-            // Use StringContent to convert the string to HttpContent
-            using (var content = new StringContent(requestBody, Encoding.UTF8, "application/llsd+xml"))
+            string requestBody = OSDParser.SerializeLLSDXmlString(request);
+            try
             {
-                using (var reply = await Client.HttpCapsClient.PostAsync(uri.ToString(), content))
-                {
-                    bool success = reply.IsSuccessStatusCode;
+                var content = new StringContent(requestBody, Encoding.UTF8, "application/llsd+xml");
+                var reply = await Client.HttpCapsClient.PostAsync(uri.ToString(), content);
+                string responseContent = await reply.Content.ReadAsStringAsync();
 
-                    if (!success)
-                    {
-                        Logger.Log($"Failed to make HTTP request to DispatchRegionInfo for extended update",
-                            Helpers.LogLevel.Warning);
-                    }
+                if (reply.IsSuccessStatusCode)
+                {
+                    return new KeyValuePair<bool, string>(true, "ok");
                 }
+                return new KeyValuePair<bool, string>(false, $"HTTP {reply.StatusCode}: {responseContent}");
             }
+            catch (Exception e)
+            {
+                return new KeyValuePair<bool, string>(false, e.Message);
+            }
+        }
+
+        /// <summary>Estate panel "Region" tab settings</summary>
+        /// @deprecated Use the version with RegionMaturity support
+        public void SetRegionInfo(bool blockTerraform, bool blockFly, bool allowDamage, bool allowLandResell, bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus, bool mature)
+        {
+            RegionMaturity rating = mature ? RegionMaturity.Mature : RegionMaturity.PG;
+            SetRegionInfo(blockTerraform, blockFly, allowDamage, allowLandResell, restrictPushing, allowParcelJoinDivide, agentLimit, objectBonus, rating);
+        }
+
+        /// <summary>Estate panel "Region" tab settings</summary>
+        public void SetRegionInfo(bool blockTerraform, bool blockFly, bool allowDamage, bool allowLandResell, bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus, RegionMaturity maturity)
+        {
+
+            List<string> listParams = new List<string>();
+            listParams.Add(blockTerraform ? "Y" : "N");
+            listParams.Add(blockFly ? "Y" : "N");
+            listParams.Add(allowDamage ? "Y" : "N");
+            listParams.Add(allowLandResell ? "Y" : "N");
+            listParams.Add(agentLimit.ToString(CultureInfo.InvariantCulture));
+            listParams.Add(objectBonus.ToString(CultureInfo.InvariantCulture));
+            listParams.Add(maturity.ToString());
+            listParams.Add(restrictPushing ? "Y" : "N");
+            listParams.Add(allowParcelJoinDivide ? "Y" : "N");
+            EstateOwnerMessage("setregioninfo", listParams);
         }
 
         /// <summary>Estate panel "Debug" tab settings</summary>
@@ -1001,11 +1001,11 @@ namespace OpenMetaverse
 
                 if (type == LandStatReportType.TopScripts)
                 {
-                    OnTopScriptsReply(new TopScriptsReplyEventArgs((int)p.RequestData.TotalObjectCount, Tasks)); 
+                    OnTopScriptsReply(new TopScriptsReplyEventArgs((int)p.RequestData.TotalObjectCount, Tasks));
                 }
                 else if (type == LandStatReportType.TopColliders)
                 {
-                    OnTopCollidersReply(new TopCollidersReplyEventArgs((int) p.RequestData.TotalObjectCount, Tasks)); 
+                    OnTopCollidersReply(new TopCollidersReplyEventArgs((int)p.RequestData.TotalObjectCount, Tasks));
                 }
 
                 /*
@@ -1022,12 +1022,6 @@ namespace OpenMetaverse
                 */
 
             }
-        }
-        public enum RegionMaturity
-        {
-            PG = 13,
-            Mature = 21,
-            Adult = 42
         }
         private void LandStatCapsReplyHandler(string capsKey, IMessage message, Simulator simulator)
         {
@@ -1051,11 +1045,11 @@ namespace OpenMetaverse
 
             if (type == LandStatReportType.TopScripts)
             {
-                OnTopScriptsReply(new TopScriptsReplyEventArgs((int)m.TotalObjectCount, Tasks)); 
+                OnTopScriptsReply(new TopScriptsReplyEventArgs((int)m.TotalObjectCount, Tasks));
             }
             else if (type == LandStatReportType.TopColliders)
             {
-                OnTopCollidersReply(new TopCollidersReplyEventArgs((int)m.TotalObjectCount, Tasks)); 
+                OnTopCollidersReply(new TopCollidersReplyEventArgs((int)m.TotalObjectCount, Tasks));
             }
         }
         #endregion

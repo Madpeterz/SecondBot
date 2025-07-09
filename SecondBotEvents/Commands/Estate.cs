@@ -110,8 +110,12 @@ namespace SecondBotEvents.Commands
             {
                 regionMaturity = RegionMaturity.Adult;
             }
-            GetClient().Estate.extendedSetRegionInfoAsync(blockTerraform, blockFly, blockFlyOver, allowDamage, allowLandResell,
-                agentLimitValue, primBonusValue, regionMaturity, blockObjectPush, allowParcelChanges, blockParcelSearch);
+            KeyValuePair<bool, string> result = GetClient().Estate.extendedSetRegionInfo(blockTerraform, blockFly, blockFlyOver, allowDamage, allowLandResell,
+                agentLimitValue, primBonusValue, regionMaturity, blockObjectPush, allowParcelChanges, blockParcelSearch).Await();
+            if (result.Key == false)
+            {
+                return Failure(result.Value, [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit, setPrimBonus, setMature, setAdult, setBlockObjectPush, setAllowParcelChanges, setBlockParcelSearch]);
+            }
             return BasicReply("ok", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit, setPrimBonus, setMature, setAdult, setBlockObjectPush, setAllowParcelChanges, setBlockParcelSearch]);
         }
 
@@ -185,7 +189,12 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unable to process adult value please use true or false", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing, setAllowParcelJoinDivide, setAgentLimit, setObjectBonus, setMature, setAdult]);
             }
-            GetClient().Estate.SetRegionInfo(blockTerraform, blockFly, allowDamage, allowLandResell, blockPushing, allowParcelJoinDivide, agentLimit, objectBonus, mature, adult);
+            RegionMaturity rating = mature ? RegionMaturity.Mature : RegionMaturity.PG;
+            if (adult)
+            {
+                rating = RegionMaturity.Adult;
+            }
+            GetClient().Estate.SetRegionInfo(blockTerraform, blockFly, allowDamage, allowLandResell, blockPushing, allowParcelJoinDivide, agentLimit, objectBonus, rating);
             return BasicReply("ok", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing, setAllowParcelJoinDivide, setAgentLimit, setObjectBonus, setMature, setAdult]);
         }
 
