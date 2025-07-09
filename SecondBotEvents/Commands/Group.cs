@@ -371,7 +371,7 @@ namespace SecondBotEvents.Commands
             return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetAllGroupsChatWithUnread()));
         }
 
-        [About("fetchs a list of all groups with unread messages")]
+        [About("checks if a given group has any unread messages")]
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Unknown group")]
         [ReturnHintsFailure("group value is invaild")]

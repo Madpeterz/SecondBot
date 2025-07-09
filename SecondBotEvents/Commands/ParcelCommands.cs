@@ -797,7 +797,7 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok", [everyone, grouponly]);
         }
 
-        [About("Updates the current parcels name")]
+        [About("Updates the current parcels music url")]
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
@@ -814,7 +814,7 @@ namespace SecondBotEvents.Commands
             return BasicReply(status.ToString(), [musicurl]);
         }
 
-        [About("Updates the current parcels name")]
+        [About("Updates a flag setting for a parcel")]
         [ReturnHints("true|false")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
