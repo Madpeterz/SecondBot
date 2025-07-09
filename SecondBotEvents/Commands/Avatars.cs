@@ -165,6 +165,22 @@ namespace SecondBotEvents.Commands
             return BasicReply(reply.Value.AboutText.ToString());
         }
 
+        [About("Requests the given avatars display name")]
+        [ReturnHints("display name if set or ?")]
+        [ReturnHintsFailure("Invaild avatar uuid")]
+        [ReturnHints("Requesting avatar details  [Retry later]")]
+        [ArgHints("avatar", "Who are we getting the profile about of", "AVATAR")]
+        [CmdTypeGet()]
+        public object GetDisplayName(string avatar)
+        {
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("Invaild avatar uuid", [avatar]);
+            }
+            return BasicReply(master.DataStoreService.GetDisplayName(avataruuid));
+        }
+
         [About("Requests the bot updates its about me")]
         [ReturnHints("ok")]
         [ReturnHints("Requesting avatar details [Retry later]")]
