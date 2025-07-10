@@ -1,19 +1,93 @@
-﻿using MimeKit.Cryptography;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OpenMetaverse;
-using OpenMetaverse.Assets;
 using SecondBotEvents.Services;
 using Swan;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using static OpenMetaverse.EstateTools;
 
 namespace SecondBotEvents.Commands
 {
+  
+
     [ClassInfo("Look after a sim as the estate manager")]
     public class Estate(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
+        [About("Gets the estate covenant for the current sim")]
+        [ReturnHints("Estate covenant json object with Fetched, ID, Timestamp, EstateName, EstateOwnerID and CovenantText" +
+            "please note CovenantText is likely to say [unsupported] as EstateAsset transfer is not supported" +
+            "currently")]
+        [ReturnHintsFailure("Timed out waiting for EstateCovenantReply")]
+        [ReturnHintsFailure("No estate covenant reply received")]
+        [ReturnHintsFailure("Failed to fetch covenant asset")]
+        [ReturnHintsFailure("Failed to fetch covenant asset is null")]
+        [CmdTypeGet()]
+        public object GetEstateCovenant()
+        {
+            EstateCovenantReplyEventArgs result = null;
+            using (var waitHandle = new System.Threading.ManualResetEventSlim(false))
+            {
+                EventHandler<EstateCovenantReplyEventArgs> handler = null;
+                handler = (sender, e) =>
+                {
+                    GetClient().Estate.EstateCovenantReply -= handler;
+                    result = e;
+                    waitHandle.Set();
+                };
+
+                GetClient().Estate.EstateCovenantReply += handler;
+                GetClient().Estate.RequestCovenant();
+
+                // Wait up to 10 seconds for the reply
+                if (!waitHandle.Wait(10000))
+                {
+                    GetClient().Estate.EstateCovenantReply -= handler;
+                    return Failure("Timed out waiting for EstateCovenantReply");
+                }
+            }
+
+            if (result == null)
+                return Failure("No estate covenant reply received");
+
+            if (result.EstateOwnerID == UUID.Zero)
+            {
+                return BasicReply(JsonConvert.SerializeObject(new
+                {
+                    Fetched = true,
+                    CovenantID = result.CovenantID.ToString(),
+                    Timestamp = result.Timestamp.ToString(),
+                    EstateName = result.EstateName.ToString(),
+                    EstateOwnerID = result.EstateOwnerID.ToString(),
+                    CovenantText = "There is no Covenant provided for this Estate." +
+                    "The grid default Covenant might be enforced"
+                }));
+            }
+            if (result.CovenantID == UUID.Zero)
+            {
+                return BasicReply(JsonConvert.SerializeObject(new
+                {
+                    Fetched = true,
+                    CovenantID = result.CovenantID.ToString(),
+                    Timestamp = result.Timestamp.ToString(),
+                    EstateName = result.EstateName.ToString(),
+                    EstateOwnerID = result.EstateOwnerID.ToString(),
+                    CovenantText = "There is no Covenant provided for this Estate. " +
+                    "The land on this estate is being sold by the Estate owner, not Grid provider.  " +
+                    "Please contact the Estate Owner for sales details."
+                }));
+            }
+
+            // Return the result as a JSON object, including the text
+            return BasicReply(JsonConvert.SerializeObject(new
+            {
+                Fetched = true,
+                CovenantID = result.CovenantID.ToString(),
+                Timestamp = result.Timestamp.ToString(),
+                EstateName = result.EstateName.ToString(),
+                EstateOwnerID = result.EstateOwnerID.ToString(),
+                CovenantText = "[unsupported]"
+            }));
+        }
 
         [About("Sets the extended region info for the sim you are on")]
         [ReturnHints("ok")]
