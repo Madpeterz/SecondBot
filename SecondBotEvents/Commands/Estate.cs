@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 using OpenMetaverse;
+using OpenMetaverse.Assets;
 using SecondBotEvents.Services;
 using Swan;
 using System;
 using System.Collections.Generic;
+using static Betalgo.Ranul.OpenAI.ObjectModels.RealtimeModels.RealtimeEventTypes;
 using static OpenMetaverse.EstateTools;
 
 namespace SecondBotEvents.Commands
@@ -13,10 +15,62 @@ namespace SecondBotEvents.Commands
     [ClassInfo("Look after a sim as the estate manager")]
     public class Estate(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
+        public KeyValuePair<bool,string> GetEstateNotecard(UUID notecarduuid)
+        {
+
+            KeyValuePair<bool, string> reply = new KeyValuePair<bool, string>(false, "!ERROR! - unable to read notecard"); ;
+            using (var waitHandle = new System.Threading.ManualResetEventSlim(false))
+            {
+                AssetDownload transfer = new AssetDownload
+                {
+                    ID = UUID.Random(),
+                    AssetID = notecarduuid,
+                    AssetType = AssetType.Notecard,
+                    Priority = 100.0f + (true ? 1.0f : 0.0f),
+                    Channel = ChannelType.Asset,
+                    Source = SourceType.SimEstate,
+                    Simulator = GetClient().Network.CurrentSim,
+                    Callback = (AssetDownload transfer, Asset asset) =>
+                    {
+                        if (transfer.Success == false)
+                        {
+                            reply = new KeyValuePair<bool, string>(false, "!ERROR! - unable to read notecard");
+                        }
+                        else
+                        {
+                            AssetNotecard note = (AssetNotecard)asset;
+                            note.Decode();
+                            string contents = "";
+                            for (int index = 0; index < note.BodyText.Length; index++)
+                            {
+                                char c = note.BodyText[index];
+                                if ((int)c == 0xdbc0)
+                                {
+                                    contents = "[ATTACHMENT]";
+                                }
+                                else
+                                {
+                                    contents += c;
+                                }
+                            }
+                            reply = new KeyValuePair<bool, string>(true, contents);
+                        }
+                        waitHandle.Set();
+                    }
+                };
+                GetClient().Assets.RequestEstateAsset(transfer, EstateAssetType.Covenant);
+                // Wait up to 10 seconds for the reply
+                if (!waitHandle.Wait(10000))
+                {
+                    reply = new KeyValuePair<bool, string>(false, "Timed out waiting for RequestEstateAsset");
+                }
+                return reply;
+            }
+        }
+
+
         [About("Gets the estate covenant for the current sim")]
-        [ReturnHints("Estate covenant json object with Fetched, ID, Timestamp, EstateName, EstateOwnerID and CovenantText" +
-            "please note CovenantText is likely to say [unsupported] as EstateAsset transfer is not supported" +
-            "currently")]
+        [ReturnHints("Estate covenant json object with Fetched, ID, Timestamp, EstateName, EstateOwnerID and CovenantText")]
         [ReturnHintsFailure("Timed out waiting for EstateCovenantReply")]
         [ReturnHintsFailure("No estate covenant reply received")]
         [ReturnHintsFailure("Failed to fetch covenant asset")]
@@ -47,45 +101,25 @@ namespace SecondBotEvents.Commands
             }
 
             if (result == null)
+            {
                 return Failure("No estate covenant reply received");
-
-            if (result.EstateOwnerID == UUID.Zero)
-            {
-                return BasicReply(JsonConvert.SerializeObject(new
-                {
-                    Fetched = true,
-                    CovenantID = result.CovenantID.ToString(),
-                    Timestamp = result.Timestamp.ToString(),
-                    EstateName = result.EstateName.ToString(),
-                    EstateOwnerID = result.EstateOwnerID.ToString(),
-                    CovenantText = "There is no Covenant provided for this Estate." +
-                    "The grid default Covenant might be enforced"
-                }));
-            }
-            if (result.CovenantID == UUID.Zero)
-            {
-                return BasicReply(JsonConvert.SerializeObject(new
-                {
-                    Fetched = true,
-                    CovenantID = result.CovenantID.ToString(),
-                    Timestamp = result.Timestamp.ToString(),
-                    EstateName = result.EstateName.ToString(),
-                    EstateOwnerID = result.EstateOwnerID.ToString(),
-                    CovenantText = "There is no Covenant provided for this Estate. " +
-                    "The land on this estate is being sold by the Estate owner, not Grid provider.  " +
-                    "Please contact the Estate Owner for sales details."
-                }));
             }
 
+            KeyValuePair<bool, string> covenantAssetRead = new KeyValuePair<bool, string>(false, "There is no Covenant provided for this Estate");
+            if(result.CovenantID != UUID.Zero)
+            {
+                covenantAssetRead = GetEstateNotecard(result.CovenantID);
+            }
+            string covenantText = covenantAssetRead.Value;
             // Return the result as a JSON object, including the text
             return BasicReply(JsonConvert.SerializeObject(new
             {
-                Fetched = true,
+                Fetched = covenantAssetRead.Key,
                 CovenantID = result.CovenantID.ToString(),
                 Timestamp = result.Timestamp.ToString(),
                 EstateName = result.EstateName.ToString(),
                 EstateOwnerID = result.EstateOwnerID.ToString(),
-                CovenantText = "[unsupported]"
+                CovenantText = covenantAssetRead.Value
             }));
         }
 
