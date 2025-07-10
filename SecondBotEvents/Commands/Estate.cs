@@ -18,10 +18,15 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild inventoryNotecardUUID")]
         [ReturnHintsFailure("Unable to find notecard")]
         [ReturnHintsFailure("Item is not a notecard")]
+        [ReturnHintsFailure("Not an estate manager here")]
         [ArgHints("inventoryNotecardUUID", "the UUID of the notecard you wish to set as the estate covenant", "UUID")]
         [CmdTypeSet()]
         public object SetEstateCovenant(string inventoryNotecardUUID)
         {
+            if (GetClient().Network.CurrentSim.IsEstateManager == false)
+            {
+                return Failure("Not an estate manager here", [inventoryNotecardUUID]);
+            }
             if (UUID.TryParse(inventoryNotecardUUID, out UUID targetitem) == false)
             {
                 return Failure("Invaild inventoryNotecardUUID", [inventoryNotecardUUID]);
