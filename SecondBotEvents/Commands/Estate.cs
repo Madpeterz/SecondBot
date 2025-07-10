@@ -10,12 +10,53 @@ using static OpenMetaverse.EstateTools;
 
 namespace SecondBotEvents.Commands
 {
-  
-
     [ClassInfo("Look after a sim as the estate manager")]
     public class Estate(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-        public KeyValuePair<bool,string> GetEstateNotecard(UUID notecarduuid)
+        [About("Sets the estate covenant for the current sim")]
+        [ReturnHints("changed Covenant to notecard: <notecard name>")]
+        [ReturnHintsFailure("Invaild inventoryNotecardUUID")]
+        [ReturnHintsFailure("Unable to find notecard")]
+        [ReturnHintsFailure("Item is not a notecard")]
+        [ArgHints("inventoryNotecardUUID", "the UUID of the notecard you wish to set as the estate covenant", "UUID")]
+        [CmdTypeSet()]
+        public object SetEstateCovenant(string inventoryNotecardUUID)
+        {
+            if (UUID.TryParse(inventoryNotecardUUID, out UUID targetitem) == false)
+            {
+                return Failure("Invaild inventoryNotecardUUID", [inventoryNotecardUUID]);
+            }
+            InventoryNode find = null;
+            if (GetClient().Inventory._Store.Items.ContainsKey(targetitem))
+            {
+                find = GetClient().Inventory._Store.Items[targetitem];
+            }
+            InventoryItem itm = null;
+            if (find != null)
+            {
+                if (find.Data is InventoryItem itemfound)
+                {
+                    itm = itemfound;
+                }
+            }
+            if (itm == null)
+            {
+                // cant get the item from store try and download it
+                itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+            }
+            if (itm == null)
+            {
+                return Failure("Unable to find notecard",[inventoryNotecardUUID]);
+            }
+            if (itm.AssetType != AssetType.Notecard)
+            {
+                return Failure("Item is not a notecard", [inventoryNotecardUUID]);
+            }
+            GetClient().Estate.EstateOwnerMessage("estatechangecovenantid", itm.AssetUUID.ToString());
+            return BasicReply("changed Covenant to notecard: "+itm.Name, [inventoryNotecardUUID]);
+        }
+
+        protected KeyValuePair<bool,string> GetEstateNotecard(UUID notecarduuid)
         {
 
             KeyValuePair<bool, string> reply = new KeyValuePair<bool, string>(false, "!ERROR! - unable to read notecard"); ;
