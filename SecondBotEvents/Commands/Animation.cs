@@ -26,19 +26,38 @@ namespace SecondBotEvents.Commands
             return Failure("@todo");
         }
 
-        [About("Attempts to play a gesture")]
-        [ReturnHintsFailure("Error with gesture")]
+        [About("Attempts to play a gesture \n using the inventory uuid")]
+        [ReturnHintsFailure("Error with gesture inventory uuid")]
         [ReturnHints("Accepted")]
-        [ArgHints("gesture", "What gesture to trigger", "UUID")]
+        [ArgHints("gesture", "inventory uuid for the gesture to trigger", "UUID")]
+        [ReturnHintsFailure("unable to get gesture from inventory")]
         [CmdTypeDo()]
         public object PlayGesture(string gesture)
         {
             if (UUID.TryParse(gesture, out UUID gestureUUID) == false)
             {
-                return BasicReply("Error with gesture", [gesture]);
+                return BasicReply("Error with gesture inventory uuid", [gesture]);
             }
             InventoryItem itm = GetClient().Inventory.FetchItem(gestureUUID, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+            if (itm == null)
+            {
+                return BasicReply("unable to get getsture from inventory", [gesture]);
+            }
             GetClient().Self.PlayGesture(itm.AssetUUID);
+            return BasicReply("Accepted", [gesture]);
+        }
+        [About("Attempts to play a gesture \n using the real asset uuid not the inventory uuid")]
+        [ReturnHintsFailure("Error with gesture asset uuid")]
+        [ReturnHints("Accepted")]
+        [ArgHints("gesture", "asset uuid for the gesture to trigger", "UUID")]
+        [CmdTypeDo()]
+        public object PlayGestureDirect(string gesture)
+        {
+            if (UUID.TryParse(gesture, out UUID gestureUUID) == false)
+            {
+                return BasicReply("Error with gesture", [gesture]);
+            }
+            GetClient().Self.PlayGesture(gestureUUID);
             return BasicReply("Accepted", [gesture]);
         }
 
