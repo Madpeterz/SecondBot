@@ -1,11 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using EmbedIO;
+using Newtonsoft.Json;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using SecondBotEvents.Services;
 using Swan;
 using System;
 using System.Collections.Generic;
+using System.Security.Policy;
 using static Betalgo.Ranul.OpenAI.ObjectModels.RealtimeModels.RealtimeEventTypes;
+using static Betalgo.Ranul.OpenAI.ObjectModels.StaticValues.AudioStatics;
 using static OpenMetaverse.EstateTools;
 
 namespace SecondBotEvents.Commands
@@ -13,6 +16,73 @@ namespace SecondBotEvents.Commands
     [ClassInfo("Look after a sim as the estate manager")]
     public class Estate(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
+
+        /*
+        public object SetEstateConfig(string estate_name, string sun_hour, string is_sun_fixed, string is_externally_visible,
+            string allow_direct_teleport, string deny_anonymous, string deny_age_unverified, string deny_age_unverified,
+            string block_bots, string allow_voice_chat, string override_public_access, string override_environment, 
+            string invoice, )
+        {
+            if (GetClient().Network.CurrentSim.IsEstateManager == false)
+            {
+                return Failure("Not an estate manager here");
+            }
+            body["estate_name"] = getName();
+            body["sun_hour"] = getSunHour();
+
+            body["is_sun_fixed"] = getUseFixedSun();
+            body["is_externally_visible"] = getIsExternallyVisible();
+            body["allow_direct_teleport"] = getAllowDirectTeleport();
+            body["deny_anonymous"] = getDenyAnonymous();
+            body["deny_age_unverified"] = getDenyAgeUnverified();
+            body["block_bots"] = getDenyScriptedAgents();
+            body["allow_voice_chat"] = getAllowVoiceChat();
+            body["override_public_access"] = getAllowAccessOverride();
+
+            body["override_environment"] = getAllowEnvironmentOverride();
+            body["invoice"] = LLFloaterRegionInfo::getLastInvoice();
+        }
+        */
+
+        [About("Sets the terrain for the current sim from a url")]
+        [ReturnHints("ok uploading with uuid <uuid>")]
+        [ReturnHintsFailure("Not an estate manager here")]
+        [ReturnHintsFailure("No url provided")]
+        [ReturnHintsFailure("url must start with http:// or https://")]
+        [ReturnHintsFailure("Unable to download terrain data from url error <error message>")]
+        [ArgHints("urltofile", "the url to the terrain file you wish to upload", "Text")]
+        [CmdTypeDo()]
+        public object SetEstateTerrainRaw(string urltofile)
+        {
+            if (GetClient().Network.CurrentSim.IsEstateManager == false)
+            {
+                return Failure("Not an estate manager here", [urltofile]);
+            }
+            if (string.IsNullOrEmpty(urltofile))
+            {
+                return Failure("No url provided");
+            }
+            if (urltofile.StartsWith("http://") == false && urltofile.StartsWith("https://") == false)
+            {
+                return Failure("url must start with http:// or https://", [urltofile]);
+            }
+            byte[] terraindata = null;
+            try
+            {
+                using (var httpClient = new System.Net.Http.HttpClient())
+                {
+                    terraindata = httpClient.GetByteArrayAsync(urltofile).GetAwaiter().GetResult();
+                }
+            }
+            catch (Exception ex)
+            {
+                return Failure("Unable to download terrain data from url error "+ ex.Message, [urltofile]);
+            }
+            string filename = urltofile.Split('/')[^1];
+            UUID request = GetClient().Estate.UploadTerrain(terraindata, filename);
+            return BasicReply("ok uploading with uuid "+ request.ToString(), [urltofile]);
+        }
+
         [About("Sets the estate covenant for the current sim")]
         [ReturnHints("changed Covenant to notecard: <notecard name>")]
         [ReturnHintsFailure("Invaild inventoryNotecardUUID")]
