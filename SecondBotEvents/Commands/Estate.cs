@@ -104,12 +104,6 @@ namespace SecondBotEvents.Commands
                 return Failure("Unable to process override environment value please use true or false", [sun_hour, is_sun_fixed, is_externally_visible, allow_direct_teleport, deny_anonymous, deny_age_unverified, block_bots, allow_voice_chat, override_public_access, override_environment]);
             }
 
-            Uri uri = GetClient().Network.CurrentSim.Caps.CapabilityURI("EstateChangeInfo");
-            if (uri == null)
-            {
-                return new KeyValuePair<bool, string>(false, "Unable to get URI for EstateChangeInfo");
-            }
-
             // Block inline and wait for the estate info reply to get the estate name
             string estatename = null;
             using (var waitHandle = new System.Threading.ManualResetEventSlim(false))
@@ -136,6 +130,28 @@ namespace SecondBotEvents.Commands
             if (string.IsNullOrEmpty(estatename))
             {
                 return Failure("No estate info reply received");
+            }
+            Uri uri = GetClient().Network.CurrentSim.Caps.CapabilityURI("EstateChangeInfo");
+            if (uri == null)
+            {
+                // try data server fallback
+                List<string> config = new List<string>();
+                config.Add(estatename);
+                Int64 bitmask = 0;
+                if (issunfixed) bitmask |= 1 << 4;
+                if (isexternallyvisible) bitmask |= 1 << 15;
+                if (allowdirectteleport) bitmask |= 1 << 20;
+                if (denyanonymous) bitmask |= 1 << 23;
+                if (denyageunverified) bitmask |= 1 << 30;
+                if (blockbots) bitmask |= 1 << 31;
+                if (allowvoicechat) bitmask |= 1 << 28;
+                if (overridepublicaccess) bitmask |= 1 << 5;
+                if (overrideenvironment) bitmask |= 1 << 9;
+                config.Add(bitmask.ToString());
+                config.Add((sunhourvalue * 1024.0f).ToString());
+                GetClient().Estate.EstateOwnerMessage("estatechangeinfo", config);
+
+                return BasicReply("ok using fallback", [sun_hour, is_sun_fixed, is_externally_visible, allow_direct_teleport, deny_anonymous, deny_age_unverified, block_bots, allow_voice_chat, override_public_access, override_environment]);
             }
 
             OSDMap body = new OSDMap();
