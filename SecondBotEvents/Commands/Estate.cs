@@ -35,6 +35,11 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to process allow voice chat value please use true or false")]
         [ReturnHintsFailure("Unable to process override public access value please use true or false")]
         [ReturnHintsFailure("Unable to process override environment value please use true or false")]
+        [ReturnHintsFailure("Timed out waiting for EstateInfoReply")]
+        [ReturnHintsFailure("No estate info reply received")]
+        [ReturnHintsFailure("Unable to get URI for EstateChangeInfo")]
+        [ReturnHintsFailure("HTTP error <http status> <response content>")]
+        [ReturnHintsFailure("EstateChangeInfo error <error message>")]
         [ArgHints("sun_hour", "the hour of the day the sun should be at, 0 to 23", "Number", "12.0")]
         [ArgHints("is_sun_fixed", "true to fix the sun at the specified hour, false to have it move normally", "BOOL", "false")]
         [ArgHints("is_externally_visible", "true to make the region visible on the map, false to hide it", "BOOL", "true")]
@@ -155,13 +160,13 @@ namespace SecondBotEvents.Commands
 
                 if (reply.IsSuccessStatusCode)
                 {
-                    return new KeyValuePair<bool, string>(true, "ok");
+                    return BasicReply("ok", [sun_hour, is_sun_fixed, is_externally_visible, allow_direct_teleport, deny_anonymous, deny_age_unverified, block_bots, allow_voice_chat, override_public_access, override_environment]);
                 }
-                return new KeyValuePair<bool, string>(false, $"HTTP {reply.StatusCode}: {responseContent}");
+                return Failure( $"HTTP error {reply.StatusCode.ToString()} {responseContent}", [sun_hour, is_sun_fixed, is_externally_visible, allow_direct_teleport, deny_anonymous, deny_age_unverified, block_bots, allow_voice_chat, override_public_access, override_environment]);
             }
             catch (Exception e)
             {
-                return new KeyValuePair<bool, string>(false, e.Message);
+                return Failure("EstateChangeInfo error "+ e.Message, [sun_hour, is_sun_fixed, is_externally_visible, allow_direct_teleport, deny_anonymous, deny_age_unverified, block_bots, allow_voice_chat, override_public_access, override_environment]);
             }
         }
 
