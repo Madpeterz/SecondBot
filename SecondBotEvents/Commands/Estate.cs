@@ -23,6 +23,7 @@ namespace SecondBotEvents.Commands
     {
         [About("Sets the estate configuration for the current sim")]
         [ReturnHints("ok")]
+        [ReturnHints("ok using fallback")]
         [ReturnHintsFailure("Not an estate manager here")]
         [ReturnHintsFailure("Unable to process sun hour value please use a number between 0 and 23")]
         [ReturnHintsFailure("Sun hour value must be between 0 and 23")]
@@ -40,6 +41,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Unable to get URI for EstateChangeInfo")]
         [ReturnHintsFailure("HTTP error <http status> <response content>")]
         [ReturnHintsFailure("EstateChangeInfo error <error message>")]
+
         [ArgHints("sun_hour", "the hour of the day the sun should be at, 0 to 23", "Number", "12.0")]
         [ArgHints("is_sun_fixed", "true to fix the sun at the specified hour, false to have it move normally", "BOOL", "false")]
         [ArgHints("is_externally_visible", "true to make the region visible on the map, false to hide it", "BOOL", "true")]
