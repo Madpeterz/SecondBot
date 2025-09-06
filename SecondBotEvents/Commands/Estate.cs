@@ -2,11 +2,16 @@
 using Newtonsoft.Json;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
+using OpenMetaverse.StructuredData;
+using Org.BouncyCastle.Asn1.Ocsp;
 using SecondBotEvents.Services;
 using Swan;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Security.Policy;
+using System.Text;
+using System.Threading.Tasks;
 using static Betalgo.Ranul.OpenAI.ObjectModels.RealtimeModels.RealtimeEventTypes;
 using static Betalgo.Ranul.OpenAI.ObjectModels.StaticValues.AudioStatics;
 using static OpenMetaverse.EstateTools;
@@ -16,33 +21,149 @@ namespace SecondBotEvents.Commands
     [ClassInfo("Look after a sim as the estate manager")]
     public class Estate(EventsSecondBot setmaster) : CommandsAPI(setmaster)
     {
-
-        /*
-        public object SetEstateConfig(string estate_name, string sun_hour, string is_sun_fixed, string is_externally_visible,
-            string allow_direct_teleport, string deny_anonymous, string deny_age_unverified, string deny_age_unverified,
-            string block_bots, string allow_voice_chat, string override_public_access, string override_environment, 
-            string invoice, )
+        [About("Sets the estate configuration for the current sim")]
+        [ReturnHints("ok")]
+        [ReturnHintsFailure("Not an estate manager here")]
+        [ReturnHintsFailure("Unable to process sun hour value please use a number between 0 and 23")]
+        [ReturnHintsFailure("Sun hour value must be between 0 and 23")]
+        [ReturnHintsFailure("Unable to process is sun fixed value please use true or false")]
+        [ReturnHintsFailure("Unable to process is externally visible value please use true or false")]
+        [ReturnHintsFailure("Unable to process allow direct teleport value please use true or false")]
+        [ReturnHintsFailure("Unable to process deny anonymous value please use true or false")]
+        [ReturnHintsFailure("Unable to process deny age unverified value please use true or false")]
+        [ReturnHintsFailure("Unable to process block bots value please use true or false")]
+        [ReturnHintsFailure("Unable to process allow voice chat value please use true or false")]
+        [ReturnHintsFailure("Unable to process override public access value please use true or false")]
+        [ReturnHintsFailure("Unable to process override environment value please use true or false")]
+        [ArgHints("sun_hour", "the hour of the day the sun should be at, 0 to 23", "Number", "12.0")]
+        [ArgHints("is_sun_fixed", "true to fix the sun at the specified hour, false to have it move normally", "BOOL", "false")]
+        [ArgHints("is_externally_visible", "true to make the region visible on the map, false to hide it", "BOOL", "true")]
+        [ArgHints("allow_direct_teleport", "true to allow direct teleports to the region, false to block them", "BOOL", "true")]
+        [ArgHints("deny_anonymous", "true to deny access to anonymous users, false to allow them", "BOOL", "false")]
+        [ArgHints("deny_age_unverified", "true to deny access to age unverified users, false to allow them", "BOOL", "false")]
+        [ArgHints("block_bots", "true to block known bots, false to allow them", "BOOL", "false")]
+        [ArgHints("allow_voice_chat", "true to allow voice chat, false to block it", "BOOL", "true")]
+        [ArgHints("override_public_access", "true to override public access settings, false to use parcel settings", "BOOL", "false")]
+        [ArgHints("override_environment", "true to override environment settings, false to use parcel settings", "BOOL", "false")]
+        [CmdTypeSet()]
+        public object SetEstateConfig(string sun_hour, string is_sun_fixed, string is_externally_visible,
+            string allow_direct_teleport, string deny_anonymous, string deny_age_unverified,
+            string block_bots, string allow_voice_chat, string override_public_access, string override_environment)
         {
             if (GetClient().Network.CurrentSim.IsEstateManager == false)
             {
                 return Failure("Not an estate manager here");
             }
-            body["estate_name"] = getName();
-            body["sun_hour"] = getSunHour();
+            if (float.TryParse(sun_hour, out float sunhourvalue) == false)
+            {
+                return Failure("Unable to process sun hour value please use a number between 0 and 23", [sun_hour]);
+            }
+            if(sunhourvalue < 0.0f || sunhourvalue > 23.0f)
+            {
+                return Failure("Sun hour value must be between 0 and 23", [sun_hour]);
+            }
+            if (bool.TryParse(is_sun_fixed, out bool issunfixed) == false)
+            {
+                return Failure("Unable to process is sun fixed value please use true or false", [sun_hour, is_sun_fixed]);
+            }
+            if(bool.TryParse(is_externally_visible, out bool isexternallyvisible) == false)
+            {
+                return Failure("Unable to process is externally visible value please use true or false", [sun_hour, is_sun_fixed, is_externally_visible]);
+            }
+            if (bool.TryParse(allow_direct_teleport, out bool allowdirectteleport) == false)
+            {
+                return Failure("Unable to process allow direct teleport value please use true or false", [sun_hour, is_sun_fixed, is_externally_visible, allow_direct_teleport]);
+            }
+            if (bool.TryParse(deny_anonymous, out bool denyanonymous) == false)
+            {
+                return Failure("Unable to process deny anonymous value please use true or false", [sun_hour, is_sun_fixed, is_externally_visible, allow_direct_teleport, deny_anonymous]);
+            }
+            if (bool.TryParse(deny_age_unverified, out bool denyageunverified) == false)
+            {
+                return Failure("Unable to process deny age unverified value please use true or false", [sun_hour, is_sun_fixed, is_externally_visible, allow_direct_teleport, deny_anonymous, deny_age_unverified]);
+            }
+            if (bool.TryParse(block_bots, out bool blockbots) == false)
+            {
+                return Failure("Unable to process block bots value please use true or false", [sun_hour, is_sun_fixed, is_externally_visible, allow_direct_teleport, deny_anonymous, deny_age_unverified, block_bots]);
+            }
+            if (bool.TryParse(allow_voice_chat, out bool allowvoicechat) == false)
+            {
+                return Failure("Unable to process allow voice chat value please use true or false", [sun_hour, is_sun_fixed, is_externally_visible, allow_direct_teleport, deny_anonymous, deny_age_unverified, block_bots, allow_voice_chat]);
+            }
+            if (bool.TryParse(override_public_access, out bool overridepublicaccess) == false)
+            {
+                return Failure("Unable to process override public access value please use true or false", [sun_hour, is_sun_fixed, is_externally_visible, allow_direct_teleport, deny_anonymous, deny_age_unverified, block_bots, allow_voice_chat, override_public_access]);
+            }
+            if (bool.TryParse(override_environment, out bool overrideenvironment) == false)
+            {
+                return Failure("Unable to process override environment value please use true or false", [sun_hour, is_sun_fixed, is_externally_visible, allow_direct_teleport, deny_anonymous, deny_age_unverified, block_bots, allow_voice_chat, override_public_access, override_environment]);
+            }
 
-            body["is_sun_fixed"] = getUseFixedSun();
-            body["is_externally_visible"] = getIsExternallyVisible();
-            body["allow_direct_teleport"] = getAllowDirectTeleport();
-            body["deny_anonymous"] = getDenyAnonymous();
-            body["deny_age_unverified"] = getDenyAgeUnverified();
-            body["block_bots"] = getDenyScriptedAgents();
-            body["allow_voice_chat"] = getAllowVoiceChat();
-            body["override_public_access"] = getAllowAccessOverride();
+            Uri uri = GetClient().Network.CurrentSim.Caps.CapabilityURI("EstateChangeInfo");
+            if (uri == null)
+            {
+                return new KeyValuePair<bool, string>(false, "Unable to get URI for EstateChangeInfo");
+            }
 
-            body["override_environment"] = getAllowEnvironmentOverride();
-            body["invoice"] = LLFloaterRegionInfo::getLastInvoice();
+            // Block inline and wait for the estate info reply to get the estate name
+            string estatename = null;
+            using (var waitHandle = new System.Threading.ManualResetEventSlim(false))
+            {
+                EventHandler<EstateUpdateInfoReplyEventArgs> handler = null;
+                handler = (sender, e) =>
+                {
+                    GetClient().Estate.EstateUpdateInfoReply -= handler;
+                    estatename = e.EstateName;
+                    waitHandle.Set();
+                };
+
+                GetClient().Estate.EstateUpdateInfoReply += handler;
+                GetClient().Estate.RequestInfo();
+
+                // Wait up to 3 seconds for the reply
+                if (!waitHandle.Wait(3000))
+                {
+                    GetClient().Estate.EstateUpdateInfoReply -= handler;
+                    return Failure("Timed out waiting for EstateInfoReply");
+                }
+            }
+
+            if (string.IsNullOrEmpty(estatename))
+            {
+                return Failure("No estate info reply received");
+            }
+
+            OSDMap body = new OSDMap();
+            body["estate_name"] = estatename;
+            body["sun_hour"] = (sunhourvalue * 1024.0f);
+            body["is_sun_fixed"] = issunfixed;
+            body["is_externally_visible"] = isexternallyvisible;
+            body["allow_direct_teleport"] = allowdirectteleport;
+            body["deny_anonymous"] = denyanonymous;
+            body["deny_age_unverified"] = denyageunverified;
+            body["block_bots"] = blockbots;
+            body["allow_voice_chat"] = allowvoicechat;
+            body["override_public_access"] = overridepublicaccess;
+            body["override_environment"] = overrideenvironment;
+            body["invoice"] = UUID.Random();
+            string requestBody = OSDParser.SerializeLLSDXmlString(body);
+            try
+            {
+                var content = new StringContent(requestBody, Encoding.UTF8, "application/llsd+xml");
+                var reply = GetClient().HttpCapsClient.PostAsync(uri.ToString(), content).Await();
+                string responseContent = reply.Content.ReadAsStringAsync().Await();
+
+                if (reply.IsSuccessStatusCode)
+                {
+                    return new KeyValuePair<bool, string>(true, "ok");
+                }
+                return new KeyValuePair<bool, string>(false, $"HTTP {reply.StatusCode}: {responseContent}");
+            }
+            catch (Exception e)
+            {
+                return new KeyValuePair<bool, string>(false, e.Message);
+            }
         }
-        */
 
         [About("Sets the terrain for the current sim from a url")]
         [ReturnHints("ok uploading with uuid <uuid>")]
