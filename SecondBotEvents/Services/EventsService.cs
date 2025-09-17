@@ -268,8 +268,12 @@ namespace SecondBotEvents.Services
             {
                 GetClient().Self.InstantMessage(OutputAvatar, output);
             }
-            if(myConfig.GetOutputHttpURL() != null)
+            if(SecondbotHelpers.isempty(myConfig.GetOutputHttpURL()) == false)
             {
+                if(myConfig.GetOutputHttpURL().StartsWith("http") == false)
+                {
+                    return;
+                }
                 long unixtime = SecondbotHelpers.UnixTimeNow();
                 string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "EventService" + GetClient().Self.AgentID + output + master.CommandsService.myConfig.GetSharedSecret());
                 var client = new RestClient(myConfig.GetOutputHttpURL());
