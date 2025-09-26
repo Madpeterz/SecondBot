@@ -48,6 +48,26 @@ namespace SecondBotEvents.Commands
             }
             return BasicReply(targetparcel.LocalID.ToString());
         }
+        [About("Requests the current parcel uuid")]
+        [ReturnHints("parcel uuid")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Unable to get parcel uuid")]
+        [CmdTypeGet()]
+        public object GetCurrentParcelUUID()
+        {
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value);
+            }
+            UUID test = GetClient().Parcels.RequestRemoteParcelID(GetClient().Self.SimPosition, GetClient().Network.CurrentSim.Handle, GetClient().Network.CurrentSim.RegionID); 
+            if(test == UUID.Zero)
+            {
+                return Failure("Unable to get parcel uuid");
+            }
+            return BasicReply(test.ToString());
+        }
 
         [About("Requests the bot update its list of parcels ready for other commands")]
         [ReturnHints("ok")]
