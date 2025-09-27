@@ -25,17 +25,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+using LibreMetaverse;
+using OpenMetaverse.Interfaces;
+using OpenMetaverse.Messages.Linden;
+using OpenMetaverse.Packets;
+using OpenMetaverse.StructuredData;
+using SkiaSharp;
 using System;
-using System.Threading;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
-using OpenMetaverse.Packets;
-using OpenMetaverse.Interfaces;
-using OpenMetaverse.StructuredData;
-using OpenMetaverse.Messages.Linden;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
-using LibreMetaverse;
 
 namespace OpenMetaverse
 {
@@ -614,6 +615,102 @@ namespace OpenMetaverse
         public void Update(GridClient client, bool wantReply)
         {
             Update(client, client.Network.CurrentSim, wantReply);
+        }
+
+        public void UpdateParcelAccessList(
+            GridClient Client,
+            AccessList flags,
+            List<ParcelManager.ParcelAccessEntry> entries)
+        {
+            if(Client == null) throw new InvalidOperationException("Client is null");
+            if(Client.Network == null) throw new InvalidOperationException("Client.Network is null");
+            if(Client.Network.CurrentSim == null) throw new InvalidOperationException("Client.Network.CurrentSim is null");
+            Simulator simulator = Client.Network.CurrentSim;
+            if (simulator == null) throw new InvalidOperationException("No current simulator");
+            int parcelLocalId = LocalID;
+            if (parcelLocalId == 0) throw new InvalidOperationException("Parcel LocalID is zero");
+            if (entries.Count == 0)
+            {
+                // send an empty block to clear the list
+                Guid sendemptyGuid = Guid.NewGuid();
+                var packet = new ParcelAccessListUpdatePacket
+                {
+                    AgentData = {
+                    AgentID = Client.Self.AgentID,
+                    SessionID = Client.Self.SessionID
+                    },
+                    Data = {
+                        Flags = (uint)flags,
+                        LocalID = parcelLocalId,
+                        TransactionID = new UUID(sendemptyGuid.ToString()),
+                        SequenceID = 1,
+                        Sections = 0
+                    },
+                    List = { }
+                };
+                packet.List = new ParcelAccessListUpdatePacket.ListBlock[1];
+                packet.List[0] = new ParcelAccessListUpdatePacket.ListBlock
+                {
+                    ID = UUID.Zero,
+                    Time = 0,
+                    Flags = 0
+                };
+                simulator.SendPacket(packet);
+                return;
+            }
+
+            const int PARCEL_MAX_ENTRIES_PER_PACKET = 48; // Set to your actual max
+            int count = entries.Count;
+            int numSections = (int)Math.Ceiling((double)count / PARCEL_MAX_ENTRIES_PER_PACKET);
+            int sequenceId = 1;
+            Guid transactionUUID = Guid.NewGuid();
+            int entryIndex = 0;
+            for (int section = 0; section < numSections; section++)
+            {
+                var packet = new ParcelAccessListUpdatePacket
+                {
+                    AgentData = {
+                    AgentID = Client.Self.AgentID,
+                    SessionID = Client.Self.SessionID
+                    },
+                            Data = {
+                        Flags = (uint)flags,
+                        LocalID = parcelLocalId,
+                        TransactionID = new UUID(transactionUUID.ToString()),
+                        SequenceID = sequenceId,
+                        Sections = numSections
+                    },
+                    List = new ParcelAccessListUpdatePacket.ListBlock[
+                        Math.Min(PARCEL_MAX_ENTRIES_PER_PACKET, count - entryIndex)
+                    ]
+                };
+
+                for (int i = 0; i < packet.List.Length; i++, entryIndex++)
+                {
+                    var entry = entries[entryIndex];
+                    packet.List[i] = new ParcelAccessListUpdatePacket.ListBlock
+                    {
+                        ID = entry.AgentID,
+                        Time = (int)(entry.Time.Subtract(new DateTime(1970, 1, 1))).TotalSeconds,
+                        Flags = (uint)entry.Flags
+                    };
+                }
+
+                // If there are no entries, send an empty block
+                if (packet.List.Length == 0)
+                {
+                    packet.List = new ParcelAccessListUpdatePacket.ListBlock[1];
+                    packet.List[0] = new ParcelAccessListUpdatePacket.ListBlock
+                    {
+                        ID = UUID.Zero,
+                        Time = 0,
+                        Flags = 0
+                    };
+                }
+
+                simulator.SendPacket(packet);
+                sequenceId++;
+            }
         }
 
         /// <summary>

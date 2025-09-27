@@ -931,7 +931,7 @@ namespace OpenMetaverse
         {
             // Add this transfer to the dictionary
             lock (Transfers) Transfers[transfer.ID] = transfer;
-
+            
             // Build the request packet and send it
             var request = new TransferRequestPacket
             {
@@ -943,7 +943,7 @@ namespace OpenMetaverse
                     TransferID = transfer.ID
                 }
             };
-
+            
             var paramField = new byte[36];
             Buffer.BlockCopy(Client.Self.AgentID.GetBytes(), 0, paramField, 0, 16);
             Buffer.BlockCopy(Client.Self.SessionID.GetBytes(), 0, paramField, 16, 16);
@@ -953,7 +953,7 @@ namespace OpenMetaverse
             Client.Network.SendPacket(request, transfer.Simulator);
         }
 
-        #region Uploads
+#region Uploads
         /// <summary>
         /// Used to force asset data into the PendingUpload property, ie: for raw terrain uploads
         /// </summary>

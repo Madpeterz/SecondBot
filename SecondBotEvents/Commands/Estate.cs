@@ -246,9 +246,9 @@ namespace SecondBotEvents.Commands
                 return Failure("Invaild inventoryNotecardUUID", [inventoryNotecardUUID]);
             }
             InventoryNode find = null;
-            if (GetClient().Inventory._Store.Items.ContainsKey(targetitem))
+            if (GetClient().Inventory.GetStore.Items.ContainsKey(targetitem))
             {
-                find = GetClient().Inventory._Store.Items[targetitem];
+                find = GetClient().Inventory.GetStore.Items[targetitem];
             }
             InventoryItem itm = null;
             if (find != null)
@@ -469,101 +469,24 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unable to process block parcel search value please use true or false", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit, setPrimBonus, setMature, setAdult, setBlockObjectPush, setAllowParcelChanges, setBlockParcelSearch]);
             }
-            RegionMaturity regionMaturity = RegionMaturity.PG;
+            RegionMaturity maturity = RegionMaturity.PG;
             if (mature)
             {
-                regionMaturity = RegionMaturity.Mature;
+                maturity = RegionMaturity.Mature;
             }
             if (adult)
             {
-                regionMaturity = RegionMaturity.Adult;
+                maturity = RegionMaturity.Adult;
             }
-            KeyValuePair<bool, string> result = GetClient().Estate.extendedSetRegionInfo(blockTerraform, blockFly, blockFlyOver, allowDamage, allowLandResell,
-                agentLimitValue, primBonusValue, regionMaturity, blockObjectPush, allowParcelChanges, blockParcelSearch).Await();
-            if (result.Key == false)
-            {
-                return Failure(result.Value, [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit, setPrimBonus, setMature, setAdult, setBlockObjectPush, setAllowParcelChanges, setBlockParcelSearch]);
-            }
+            GetClient().Estate.SetRegionInfo(blockTerraform, blockFly, blockFlyOver, allowDamage, allowLandResell, blockObjectPush, allowParcelChanges, agentLimitValue, primBonusValue, blockParcelSearch, maturity);
             return BasicReply("ok", [setBlockTerraform, setBlockFly, setBlockFlyOver, setAllowDamage, setAllowLandResell, setAgentLimit, setPrimBonus, setMature, setAdult, setBlockObjectPush, setAllowParcelChanges, setBlockParcelSearch]);
         }
 
-        [About("Set the current region flags for the sim you are on")]
-        [ReturnHints("ok")]
-        [ReturnHintsFailure("Not an estate manager here")]
-        [ReturnHintsFailure("Unable to process block terraform value please use true or false")]
-        [ReturnHintsFailure("Unable to process block fly value please use true or false")]
-        [ReturnHintsFailure("Unable to process allow damage value please use true or false")]
-        [ReturnHintsFailure("Unable to process allow land resell value please use true or false")]
-        [ReturnHintsFailure("Unable to process block pushing value please use true or false")]
-        [ReturnHintsFailure("Unable to process allow parcel join divide value please use true or false")]
-        [ReturnHintsFailure("Unable to process agent limit value please use a number")]
-        [ReturnHintsFailure("Unable to process object bonus value please use a number")]
-        [ReturnHintsFailure("Unable to process mature value please use true or false")]
-        [ReturnHintsFailure("Unable to process adult value please use true or false")]
-        [ArgHints("setBlockTerraform", "true to block terraform, false to allow it", "BOOL", "false")]
-        [ArgHints("setBlockFly", "true to block flying, false to allow it", "BOOL", "false")]
-        [ArgHints("setAllowDamage", "true to allow damage, false to block it", "BOOL", "false")]
-        [ArgHints("setAllowLandResell", "true to allow land reselling, false to block it", "BOOL", "false")]
-        [ArgHints("setBlockPushing", "true to block pushing, false to allow it", "BOOL", "false")]
-        [ArgHints("setAllowParcelJoinDivide", "true to allow parcel join and divide, false to block it", "BOOL", "false")]
-        [ArgHints("setAgentLimit", "the maximum number of agents allowed in the sim", "Number", "100")]
-        [ArgHints("setObjectBonus", "the object bonus for the sim", "Number", "1.0")]
-        [ArgHints("setMature", "true to set the sim as mature, false to set it as general", "BOOL", "false")]
-        [ArgHints("setAdult", "true to set the sim as adult, false use the setMature setting", "BOOL", "false")]
+        [About("Legacy command - will be phased out please use SetExtendedRegionInfo")]
         [CmdTypeSet()]
         public object SetRegionFlags(string setBlockTerraform, string setBlockFly, string setAllowDamage, string setAllowLandResell, string setBlockPushing, string setAllowParcelJoinDivide, string setAgentLimit, string setObjectBonus, string setMature, string setAdult)
         {
-            if(GetClient().Network.CurrentSim.IsEstateManager == false)
-            {
-                return Failure("Not an estate manager here");
-            }
-            if(bool.TryParse(setBlockTerraform, out bool blockTerraform) == false)
-            {
-                return Failure("Unable to process block terraform value please use true or false", [setBlockTerraform]);
-            }
-            if (bool.TryParse(setBlockFly, out bool blockFly) == false)
-            {
-                return Failure("Unable to process block fly value please use true or false", [setBlockTerraform, setBlockFly]);
-            }
-            if (bool.TryParse(setAllowDamage, out bool allowDamage) == false)
-            {
-                return Failure("Unable to process allow damage value please use true or false", [setBlockTerraform, setBlockFly, setAllowDamage]);
-            }
-            if (bool.TryParse(setAllowLandResell, out bool allowLandResell) == false)
-            {
-                return Failure("Unable to process allow land resell value please use true or false", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell]);
-            }
-            if (bool.TryParse(setBlockPushing, out bool blockPushing) == false)
-            {
-                return Failure("Unable to process block pushing value please use true or false", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing]);
-            }
-            if (bool.TryParse(setAllowParcelJoinDivide, out bool allowParcelJoinDivide) == false)
-            {
-                return Failure("Unable to process allow parcel join divide value please use true or false", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing, setAllowParcelJoinDivide]);
-            }
-            if (float.TryParse(setAgentLimit, out float agentLimit) == false)
-            {
-                return Failure("Unable to process agent limit value please use a number", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing, setAllowParcelJoinDivide, setAgentLimit]);
-            }
-            if (float.TryParse(setObjectBonus, out float objectBonus) == false)
-            {
-                return Failure("Unable to process object bonus value please use a number", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing, setAllowParcelJoinDivide, setAgentLimit, setObjectBonus]);
-            }
-            if (bool.TryParse(setMature, out bool mature) == false)
-            {
-                return Failure("Unable to process mature value please use true or false", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing, setAllowParcelJoinDivide, setAgentLimit, setObjectBonus, setMature]);
-            }
-            if (bool.TryParse(setAdult, out bool adult) == false)
-            {
-                return Failure("Unable to process adult value please use true or false", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing, setAllowParcelJoinDivide, setAgentLimit, setObjectBonus, setMature, setAdult]);
-            }
-            RegionMaturity rating = mature ? RegionMaturity.Mature : RegionMaturity.PG;
-            if (adult)
-            {
-                rating = RegionMaturity.Adult;
-            }
-            GetClient().Estate.SetRegionInfo(blockTerraform, blockFly, allowDamage, allowLandResell, blockPushing, allowParcelJoinDivide, agentLimit, objectBonus, rating);
-            return BasicReply("ok", [setBlockTerraform, setBlockFly, setAllowDamage, setAllowLandResell, setBlockPushing, setAllowParcelJoinDivide, setAgentLimit, setObjectBonus, setMature, setAdult]);
+            return SetExtendedRegionInfo(setBlockTerraform, setBlockFly, "false", setAllowDamage, setAllowLandResell, setAgentLimit, setObjectBonus, setMature, setAdult, setBlockPushing, setAllowParcelJoinDivide, "false");
         }
 
         [About("Adds an estate manager to the current sim or all estates you control")]

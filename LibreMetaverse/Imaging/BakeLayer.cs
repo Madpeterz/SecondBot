@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2007-2008, openmetaverse.co
- * Copyright (c) 2024, Sjofn LLC.
+ * Copyright (c) 2024-2025, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -360,7 +360,7 @@ namespace OpenMetaverse.Imaging
                 SKBitmap bitmap = null;
                 lock (ResourceSync)
                 {
-                    using (Stream stream = Helpers.GetResourceStream(fileName, Settings.RESOURCE_DIR))
+                    using (Stream stream = Helpers.GetResourceStream(fileName, Path.Combine(Settings.RESOURCE_DIR, "static_assets")))
                     {
                         if (stream != null)
                         {

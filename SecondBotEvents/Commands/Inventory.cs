@@ -69,7 +69,7 @@ namespace SecondBotEvents.Commands
 
         protected InventoryNode SearchInventoryStore(UUID item)
         {
-            Inventory store = GetClient().Inventory._Store;
+            Inventory store = GetClient().Inventory.GetStore;
             if (store.Items.ContainsKey(item))
             {
                 return store.Items[item];
@@ -808,7 +808,7 @@ namespace SecondBotEvents.Commands
         }
         protected InventoryNode RootFolder()
         {
-            return GetClient().Inventory._Store.GetNodeFor(GetClient().Inventory._Store.RootFolder.UUID);
+            return GetClient().Inventory.GetStore.GetNodeFor(GetClient().Inventory.GetStore.RootFolder.UUID);
         }
         protected InventoryNode FindFolder(string path)
         {

@@ -24,6 +24,7 @@ namespace SecondBotEvents.Commands
                 return Failure("avatar lookup", [avatar]);
             }
             Dictionary<UUID, FriendInfo> FriendListCopy = GetClient().Friends.FriendList.ToDictionary(k => k.Key, v => v.Value);
+            if (FriendListCopy.ContainsKey(avataruuid) == false)
             {
                 return Failure("not in friends list (updating)", [avatar]);
             }

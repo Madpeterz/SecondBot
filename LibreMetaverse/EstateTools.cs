@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006-2016, openmetaverse.co
+ * Copyright (c) 2025, Sjofn LLC.
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -30,9 +31,10 @@ using OpenMetaverse.Messages.Linden;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
-using System.Threading.Tasks;
-using OpenMetaverse.StructuredData;
 using System.Text;
+using System.Threading.Tasks;
+using LibreMetaverse;
+using OpenMetaverse.StructuredData;
 
 namespace OpenMetaverse
 {
@@ -350,6 +352,78 @@ namespace OpenMetaverse
         #endregion
 
         #region Public Methods
+
+
+        /// <summary>
+        /// Updates estate-level configuration settings for the current region.
+        /// Attempts to send the update via the "EstateChangeInfo" HTTP caps if available
+        /// or you can enable a fallback to the legacy method.
+        /// </summary>
+        /// <param name="estateName">The name of the estate.</param>
+        /// <param name="sunhourvalue">The sun hour value (0.0–24.0, scaled internally).</param>
+        /// <param name="issunfixed">Whether the sun position is fixed.</param>
+        /// <param name="isexternallyvisible">Whether the estate is visible externally.</param>
+        /// <param name="allowdirectteleport">Allow direct teleport to the estate.</param>
+        /// <param name="denyanonymous">Deny access to anonymous users.</param>
+        /// <param name="denyageunverified">Deny access to age-unverified users.</param>
+        /// <param name="blockbots">Block bots from entering the estate.</param>
+        /// <param name="allowvoicechat">Allow voice chat in the estate.</param>
+        /// <param name="overridepublicaccess">Override public access settings.</param>
+        /// <param name="overrideenvironment">Override environment settings.</param>
+        public async Task<Task> UpdateEstateInfo(
+            string estateName, float sunhourvalue, bool issunfixed, bool isexternallyvisible, 
+            bool allowdirectteleport, bool denyanonymous, bool denyageunverified, bool blockbots, 
+            bool allowvoicechat, bool overridepublicaccess, bool overrideenvironment)
+        {
+            Uri uri = Client.Network.CurrentSim.Caps.CapabilityURI("EstateChangeInfo");
+            if (uri == null)
+            {
+                Logger.Log("using UpdateEstateInfoFallback one day we will have working caps for this", Helpers.LogLevel.Info);
+                List<string> config = new List<string>();
+                config.Add(estateName);
+                Int64 bitmask = 0;
+                if (issunfixed) bitmask |= 1 << 4;
+                if (isexternallyvisible) bitmask |= 1 << 15;
+                if (allowdirectteleport) bitmask |= 1 << 20;
+                if (denyanonymous) bitmask |= 1 << 23;
+                if (denyageunverified) bitmask |= 1 << 30;
+                if (blockbots) bitmask |= 1 << 31;
+                if (allowvoicechat) bitmask |= 1 << 28;
+                if (overridepublicaccess) bitmask |= 1 << 5;
+                if (overrideenvironment) bitmask |= 1 << 9;
+                config.Add(bitmask.ToString(CultureInfo.InvariantCulture));
+                config.Add((sunhourvalue * 1024.0f).ToString(CultureInfo.InvariantCulture));
+                EstateOwnerMessage("estatechangeinfo", config);
+                return Task.CompletedTask;
+            }
+            OSDMap body = new OSDMap();
+            body["estate_name"] = estateName;
+            body["sun_hour"] = (sunhourvalue * 1024.0f);
+            body["is_sun_fixed"] = issunfixed;
+            body["is_externally_visible"] = isexternallyvisible;
+            body["allow_direct_teleport"] = allowdirectteleport;
+            body["deny_anonymous"] = denyanonymous;
+            body["deny_age_unverified"] = denyageunverified;
+            body["block_bots"] = blockbots;
+            body["allow_voice_chat"] = allowvoicechat;
+            body["override_public_access"] = overridepublicaccess;
+            body["override_environment"] = overrideenvironment;
+            body["invoice"] = UUID.Random();
+            string requestBody = OSDParser.SerializeLLSDXmlString(body);
+            try
+            {
+                var content = new StringContent(requestBody, Encoding.UTF8, "application/llsd+xml");
+                var reply = await Client.HttpCapsClient.PostAsync(uri.ToString(), content);
+                _ = await reply.Content.ReadAsStringAsync();
+                Logger.Log($"EstateChangeInfo update {reply.StatusCode.ToString()}", Helpers.LogLevel.Info);
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"EstateChangeInfo error {e.Message}", Helpers.LogLevel.Error);
+            }
+            return Task.CompletedTask;
+        }
+
         /// <summary>
         /// Requests estate information such as top scripts and colliders
         /// </summary>
@@ -359,13 +433,21 @@ namespace OpenMetaverse
         /// <param name="filter"></param>
         public void LandStatRequest(int parcelLocalID, LandStatReportType reportType, uint requestFlags, string filter)
         {
-            LandStatRequestPacket p = new LandStatRequestPacket();
-            p.AgentData.AgentID = Client.Self.AgentID;
-            p.AgentData.SessionID = Client.Self.SessionID;
-            p.RequestData.Filter = Utils.StringToBytes(filter);
-            p.RequestData.ParcelLocalID = parcelLocalID;
-            p.RequestData.ReportType = (uint)reportType;
-            p.RequestData.RequestFlags = requestFlags;
+            LandStatRequestPacket p = new LandStatRequestPacket
+            {
+                AgentData =
+                {
+                    AgentID = Client.Self.AgentID,
+                    SessionID = Client.Self.SessionID
+                },
+                RequestData =
+                {
+                    Filter = Utils.StringToBytes(filter),
+                    ParcelLocalID = parcelLocalID,
+                    ReportType = (uint)reportType,
+                    RequestFlags = requestFlags
+                }
+            };
             Client.Network.SendPacket(p);
         }
 
@@ -432,11 +514,19 @@ namespace OpenMetaverse
             }
             else
             {
-                SimWideDeletesPacket simDelete = new SimWideDeletesPacket();
-                simDelete.AgentData.AgentID = Client.Self.AgentID;
-                simDelete.AgentData.SessionID = Client.Self.SessionID;
-                simDelete.DataBlock.TargetID = Target;
-                simDelete.DataBlock.Flags = (uint)flag;
+                SimWideDeletesPacket simDelete = new SimWideDeletesPacket
+                {
+                    AgentData =
+                    {
+                        AgentID = Client.Self.AgentID,
+                        SessionID = Client.Self.SessionID
+                    },
+                    DataBlock =
+                    {
+                        TargetID = Target,
+                        Flags = (uint)flag
+                    }
+                };
                 Client.Network.SendPacket(simDelete);
             }
         }
@@ -458,17 +548,27 @@ namespace OpenMetaverse
         /// <param name="listParams">List of parameters to include</param>
         public void EstateOwnerMessage(string method, List<string> listParams)
         {
-            EstateOwnerMessagePacket estate = new EstateOwnerMessagePacket();
-            estate.AgentData.AgentID = Client.Self.AgentID;
-            estate.AgentData.SessionID = Client.Self.SessionID;
-            estate.AgentData.TransactionID = UUID.Zero;
-            estate.MethodData.Invoice = UUID.Random();
-            estate.MethodData.Method = Utils.StringToBytes(method);
-            estate.ParamList = new EstateOwnerMessagePacket.ParamListBlock[listParams.Count];
+            EstateOwnerMessagePacket estate = new EstateOwnerMessagePacket
+            {
+                AgentData =
+                {
+                    AgentID = Client.Self.AgentID,
+                    SessionID = Client.Self.SessionID,
+                    TransactionID = UUID.Zero
+                },
+                MethodData =
+                {
+                    Invoice = UUID.Random(),
+                    Method = Utils.StringToBytes(method)
+                },
+                ParamList = new EstateOwnerMessagePacket.ParamListBlock[listParams.Count]
+            };
             for (int i = 0; i < listParams.Count; i++)
             {
-                estate.ParamList[i] = new EstateOwnerMessagePacket.ParamListBlock();
-                estate.ParamList[i].Parameter = Utils.StringToBytes(listParams[i]);
+                estate.ParamList[i] = new EstateOwnerMessagePacket.ParamListBlock
+                {
+                    Parameter = Utils.StringToBytes(listParams[i])
+                };
             }
             Client.Network.SendPacket((Packet)estate);
         }
@@ -570,79 +670,70 @@ namespace OpenMetaverse
             EstateOwnerMessage("restart", "-1");
         }
 
-        public async Task<KeyValuePair<bool, string>> extendedSetRegionInfo(
-            bool blockTerraform, bool blockFly, bool blockFlyover, bool allowDamage, bool allowLandResell,
-            int agentLimit, float primBonus, RegionMaturity maturityLevel, bool blockObjectPush,
-            bool allowParcelChanges, bool blockParcelSearch)
+        [Obsolete("Use SetRegionInfo with new arguments or SetRegionInfoUdp")]
+        public void SetRegionInfo(bool blockTerraform, bool blockFly, bool allowDamage, bool allowLandResell,
+            bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus,
+            RegionMaturity maturity)
         {
-            if (Client == null)
+            SetRegionInfo(blockTerraform, blockFly, false, allowDamage, allowLandResell, restrictPushing,
+                allowParcelJoinDivide, agentLimit, objectBonus, false, maturity);
+        }
+        
+        public void SetRegionInfo(bool blockTerraform, bool blockFly, bool blockFlyOver, bool allowDamage, 
+            bool allowLandResell, bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus, 
+            bool blockParcelSearch, RegionMaturity maturity)
+        {
+            if (Client.Network.CurrentSim?.Caps?.CapabilityURI("DispatchRegionInfo") == null 
+                || !SetRegionInfoHttp(blockTerraform, blockFly, blockFlyOver, allowDamage, allowLandResell, restrictPushing, 
+                    allowParcelJoinDivide, agentLimit, objectBonus, blockParcelSearch, maturity).Result)
             {
-                return new KeyValuePair<bool, string>(false, "No client object");
+                Logger.Log("Falling back to LLUDP SetRegionInfo", Helpers.LogLevel.Info);
+                SetRegionInfoUdp(blockTerraform, blockFly, allowDamage, allowLandResell, restrictPushing,
+                    allowParcelJoinDivide, agentLimit, objectBonus, maturity);
             }
-            else if (Client.Network == null)
+        }
+        
+        public async Task<bool> SetRegionInfoHttp(bool blockTerraform, bool blockFly, bool blockFlyOver, bool allowDamage, 
+            bool allowLandResell, bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus, 
+            bool blockParcelSearch, RegionMaturity maturity)
+        {
+            var uri = Client.Network.CurrentSim?.Caps?.CapabilityURI("DispatchRegionInfo");
+            if (uri != null)
             {
-                return new KeyValuePair<bool, string>(false, "Not connected to a network");
-            }
-            else if (Client.Network.CurrentSim == null)
-            {
-                return new KeyValuePair<bool, string>(false, "Not connected to a sim");
-            }
-            else if (Client.Network.CurrentSim.Caps == null)
-            {
-                return new KeyValuePair<bool, string>(false, "No caps endpoint for current sim");
-            }
-            else if (Client.HttpCapsClient == null)
-            {
-                return new KeyValuePair<bool, string>(false, "No HttpCapsClient available");
-            }
-
-            Uri uri = Client.Network.CurrentSim.Caps.CapabilityURI("DispatchRegionInfo");
-            if (uri == null)
-            {
-                return new KeyValuePair<bool, string>(false, "Unable to get URI for DispatchRegionInfo");
-            }
-            OSDMap request = new OSDMap();
-            request["block_terraform"] = blockTerraform;
-            request["block_fly"] = blockFly;
-            request["block_fly_over"] = blockFlyover;
-            request["allow_damage"] = allowDamage;
-            request["allow_land_resell"] = allowLandResell;
-            request["agent_limit"] = agentLimit;
-            request["prim_bonus"] = primBonus;
-            request["sim_access"] = (int)maturityLevel;
-            request["restrict_pushobject"] = blockObjectPush;
-            request["allow_parcel_changes"] = allowParcelChanges;
-            request["block_parcel_search"] = blockParcelSearch;
-
-            string requestBody = OSDParser.SerializeLLSDXmlString(request);
-            try
-            {
-                var content = new StringContent(requestBody, Encoding.UTF8, "application/llsd+xml");
-                var reply = await Client.HttpCapsClient.PostAsync(uri.ToString(), content);
-                string responseContent = await reply.Content.ReadAsStringAsync();
-
-                if (reply.IsSuccessStatusCode)
+                var req = new OSDMap
                 {
-                    return new KeyValuePair<bool, string>(true, "ok");
+                    ["block_terraform"] = blockTerraform,
+                    ["block_fly"] = blockFly,
+                    ["block_fly_over"] = blockFlyOver,
+                    ["allow_damage"] = allowDamage,
+                    ["allow_land_resell"] = allowLandResell,
+                    ["agent_limit"] = agentLimit,
+                    ["prim_bonus"] = objectBonus,
+                    ["sim_access"] = maturity.ToString("D"),
+                    ["restrict_pushobject"] = restrictPushing,
+                    ["allow_parcel_changes"] = allowParcelJoinDivide,
+                    ["block_parcel_search"] = blockParcelSearch
+                };
+                using (var content = new StringContent(OSDParser.SerializeLLSDXmlString(req), Encoding.UTF8,
+                           "application/llsd+xml"))
+                {
+                    using (var reply = await Client.HttpCapsClient.PostAsync(uri, content))
+                    {
+                        if (reply.IsSuccessStatusCode)
+                        {
+                            return true;
+                        }
+
+                        Logger.Log($"Failed to set region info via capability: {reply.ReasonPhrase}", Helpers.LogLevel.Warning);
+                    }
                 }
-                return new KeyValuePair<bool, string>(false, $"HTTP {reply.StatusCode}: {responseContent}");
             }
-            catch (Exception e)
-            {
-                return new KeyValuePair<bool, string>(false, e.Message);
-            }
+            return false;
         }
-
+        
         /// <summary>Estate panel "Region" tab settings</summary>
-        /// @deprecated Use the version with RegionMaturity support
-        public void SetRegionInfo(bool blockTerraform, bool blockFly, bool allowDamage, bool allowLandResell, bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus, bool mature)
-        {
-            RegionMaturity rating = mature ? RegionMaturity.Mature : RegionMaturity.PG;
-            SetRegionInfo(blockTerraform, blockFly, allowDamage, allowLandResell, restrictPushing, allowParcelJoinDivide, agentLimit, objectBonus, rating);
-        }
-
-        /// <summary>Estate panel "Region" tab settings</summary>
-        public void SetRegionInfo(bool blockTerraform, bool blockFly, bool allowDamage, bool allowLandResell, bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus, RegionMaturity maturity)
+        public void SetRegionInfoUdp(bool blockTerraform, bool blockFly, bool allowDamage, bool allowLandResell, 
+            bool restrictPushing, bool allowParcelJoinDivide, float agentLimit, float objectBonus, RegionMaturity maturity)
         {
 
             List<string> listParams = new List<string>();
@@ -652,7 +743,7 @@ namespace OpenMetaverse
             listParams.Add(allowLandResell ? "Y" : "N");
             listParams.Add(agentLimit.ToString(CultureInfo.InvariantCulture));
             listParams.Add(objectBonus.ToString(CultureInfo.InvariantCulture));
-            listParams.Add(maturity.ToString());
+            listParams.Add(maturity.ToString("D"));
             listParams.Add(restrictPushing ? "Y" : "N");
             listParams.Add(allowParcelJoinDivide ? "Y" : "N");
             EstateOwnerMessage("setregioninfo", listParams);
@@ -699,10 +790,49 @@ namespace OpenMetaverse
         /// <summary>Requests the estate covenant</summary>
         public void RequestCovenant()
         {
-            EstateCovenantRequestPacket req = new EstateCovenantRequestPacket();
-            req.AgentData.AgentID = Client.Self.AgentID;
-            req.AgentData.SessionID = Client.Self.SessionID;
+            EstateCovenantRequestPacket req = new EstateCovenantRequestPacket
+            {
+                AgentData =
+                {
+                    AgentID = Client.Self.AgentID,
+                    SessionID = Client.Self.SessionID
+                }
+            };
             Client.Network.SendPacket(req);
+        }
+
+        /// <summary>
+        /// Requests Estate Covenant notecard from <see cref="Client.Network.CurrentSim" /> asset service
+        /// </summary>
+        /// <param name="covenantId">Asset UUID for estate covenant notecard</param>
+        /// <param name="callback">Asset Received callback</param>
+        /// <seealso cref="AssetManager.RequestAssetUDP"/>
+        public void RequestCovenantNotecard(UUID covenantId, AssetManager.AssetReceivedCallback callback)
+        {
+            RequestCovenantNotecard(covenantId, Client.Network.CurrentSim, callback);
+        }
+
+        /// <summary>
+        /// Requests Estate Covenant notecard from asset service
+        /// </summary>
+        /// <param name="covenantId">Asset UUID for estate covenant notecard</param>
+        /// <param name="simulator">Requested simulator</param>
+        /// <param name="callback">Asset Received callback</param>
+        /// <seealso cref="AssetManager.RequestAssetUDP"/>
+        public void RequestCovenantNotecard(UUID covenantId, Simulator simulator, AssetManager.AssetReceivedCallback callback)
+        {
+            var transfer = new AssetDownload
+            {
+                ID = UUID.Random(),
+                AssetID = covenantId,
+                AssetType = AssetType.Notecard,
+                Priority = 101.0f,
+                Channel = ChannelType.Asset,
+                Source = SourceType.SimEstate,
+                Simulator = simulator,
+                Callback = callback
+            };
+            Client.Assets.RequestEstateAsset(transfer, EstateAssetType.Covenant);
         }
 
         /// <summary>
@@ -713,11 +843,13 @@ namespace OpenMetaverse
         /// <returns>The Id of the transfer request</returns>
         public UUID UploadTerrain(byte[] fileData, string fileName)
         {
-            AssetUpload upload = new AssetUpload();
-            upload.AssetData = fileData;
-            upload.AssetType = AssetType.Unknown;
-            upload.Size = fileData.Length;
-            upload.ID = UUID.Random();
+            AssetUpload upload = new AssetUpload
+            {
+                AssetData = fileData,
+                AssetType = AssetType.Unknown,
+                Size = fileData.Length,
+                ID = UUID.Random()
+            };
 
             // Tell the library we have a pending file to upload
             Client.Assets.SetPendingAssetUploadData(upload);
@@ -987,13 +1119,15 @@ namespace OpenMetaverse
 
                 foreach (LandStatReplyPacket.ReportDataBlock rep in p.ReportData)
                 {
-                    EstateTask task = new EstateTask();
-                    task.Position = new Vector3(rep.LocationX, rep.LocationY, rep.LocationZ);
-                    task.Score = rep.Score;
-                    task.TaskID = rep.TaskID;
-                    task.TaskLocalID = rep.TaskLocalID;
-                    task.TaskName = Utils.BytesToString(rep.TaskName);
-                    task.OwnerName = Utils.BytesToString(rep.OwnerName);
+                    EstateTask task = new EstateTask
+                    {
+                        Position = new Vector3(rep.LocationX, rep.LocationY, rep.LocationZ),
+                        Score = rep.Score,
+                        TaskID = rep.TaskID,
+                        TaskLocalID = rep.TaskLocalID,
+                        TaskName = Utils.BytesToString(rep.TaskName),
+                        OwnerName = Utils.BytesToString(rep.OwnerName)
+                    };
                     Tasks.Add(task.TaskID, task);
                 }
 
@@ -1030,14 +1164,16 @@ namespace OpenMetaverse
 
             foreach (LandStatReplyMessage.ReportDataBlock rep in m.ReportDataBlocks)
             {
-                EstateTask task = new EstateTask();
-                task.Position = rep.Location;
-                task.Score = rep.Score;
-                task.MonoScore = rep.MonoScore;
-                task.TaskID = rep.TaskID;
-                task.TaskLocalID = rep.TaskLocalID;
-                task.TaskName = rep.TaskName;
-                task.OwnerName = rep.OwnerName;
+                EstateTask task = new EstateTask
+                {
+                    Position = rep.Location,
+                    Score = rep.Score,
+                    MonoScore = rep.MonoScore,
+                    TaskID = rep.TaskID,
+                    TaskLocalID = rep.TaskLocalID,
+                    TaskName = rep.TaskName,
+                    OwnerName = rep.OwnerName
+                };
                 Tasks.Add(task.TaskID, task);
             }
 

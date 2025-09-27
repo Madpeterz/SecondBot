@@ -47,9 +47,8 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(tests.Value);
             }
-            targetparcel.AccessBlackList.Clear();
-            targetparcel.AccessWhiteList.Clear();
-            targetparcel.Update(GetClient());
+            targetparcel.UpdateParcelAccessList(GetClient(), AccessList.Access, new List<ParcelAccessEntry>());
+            targetparcel.UpdateParcelAccessList(GetClient(), AccessList.Ban, new List<ParcelAccessEntry>());
             return BasicReply("ok");
         }
         [About("Requests the current parcel local id")]
