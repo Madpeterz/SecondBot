@@ -617,18 +617,52 @@ namespace OpenMetaverse
             Update(client, client.Network.CurrentSim, wantReply);
         }
 
+        /// <summary>
+        /// UpdateParcelAccessList - Update the parcel access or ban list on the simulator
+        /// </summary>
+        /// <param name="Client">The grid client we are using</param>
+        /// <param name="flags">what list to update sending AccessList.Both will result in a warning</param>
+        /// <param name="entries">list of avatar entry records</param>
         public void UpdateParcelAccessList(
             GridClient Client,
             AccessList flags,
             List<ParcelManager.ParcelAccessEntry> entries)
         {
-            if(Client == null) throw new InvalidOperationException("Client is null");
-            if(Client.Network == null) throw new InvalidOperationException("Client.Network is null");
-            if(Client.Network.CurrentSim == null) throw new InvalidOperationException("Client.Network.CurrentSim is null");
+            // based on Alchemy Viewer's implementation
+            // might want to be cleaned up later
+            if (flags == AccessList.Both)
+            {
+                Logger.Log("Warning: UpdateParcelAccessList called with AccessList.Both, this is not supported. " +
+                    "Use AccessList.Access or AccessList.Ban", Helpers.LogLevel.Warning);
+                return;
+            }
+            if (Client == null)
+            {
+                Logger.Log("Client is null", Helpers.LogLevel.Error);
+                return;
+            }
+            if (Client.Network == null)
+            {
+                Logger.Log("Client.Network is null", Helpers.LogLevel.Error);
+                return;
+            }
+            if (Client.Network.CurrentSim == null)
+            {
+                Logger.Log("Client.Network.CurrentSim is null", Helpers.LogLevel.Error);
+                return;
+            }
             Simulator simulator = Client.Network.CurrentSim;
-            if (simulator == null) throw new InvalidOperationException("No current simulator");
+            if (Client.Network.CurrentSim == null)
+            {
+                Logger.Log("simulator is null", Helpers.LogLevel.Error);
+                return;
+            }
             int parcelLocalId = LocalID;
-            if (parcelLocalId == 0) throw new InvalidOperationException("Parcel LocalID is zero");
+            if (parcelLocalId == 0) 
+            {
+                Logger.Log("Parcel LocalID is zero", Helpers.LogLevel.Error);
+                return;
+            }
             if (entries.Count == 0)
             {
                 // send an empty block to clear the list
@@ -659,7 +693,7 @@ namespace OpenMetaverse
                 return;
             }
 
-            const int PARCEL_MAX_ENTRIES_PER_PACKET = 48; // Set to your actual max
+            const int PARCEL_MAX_ENTRIES_PER_PACKET = 48; // ?? matching viewer's limit, but not documented anywhere
             int count = entries.Count;
             int numSections = (int)Math.Ceiling((double)count / PARCEL_MAX_ENTRIES_PER_PACKET);
             int sequenceId = 1;

@@ -591,15 +591,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar", [avatar]);
             }
-            bool alreadyBanned = false;
-            foreach (ParcelAccessEntry E in targetparcel.AccessBlackList)
-            {
-                if (E.AgentID == avataruuid)
-                {
-                    alreadyBanned = true;
-                    break;
-                }
-            }
+            bool alreadyBanned = targetparcel.AccessBlackList.Any(e => e.AgentID == avataruuid);
             if (alreadyBanned == true)
             {
                 return BasicReply("Avatar is in the blacklist", [avatar]);
@@ -611,7 +603,7 @@ namespace SecondBotEvents.Commands
                 Time = new System.DateTime(3030, 03, 03)
             };
             targetparcel.AccessBlackList.Add(entry);
-            targetparcel.Update(GetClient());
+            targetparcel.UpdateParcelAccessList(GetClient(), AccessList.Ban, targetparcel.AccessBlackList);
             return BasicReply("ok", [avatar]);
         }
 
@@ -635,23 +627,18 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild avatar", [avatar]);
             }
-            bool alreadyBanned = false;
-            ParcelAccessEntry removeentry = new();
-            foreach (ParcelAccessEntry E in targetparcel.AccessBlackList)
-            {
-                if (E.AgentID == avataruuid)
-                {
-                    alreadyBanned = true;
-                    removeentry = E;
-                    break;
-                }
-            }
+            bool alreadyBanned = targetparcel.AccessBlackList.Any(e => e.AgentID == avataruuid);
             if (alreadyBanned == false)
             {
                 return BasicReply("Avatar is already unbanned", [avatar]);
             }
-            targetparcel.AccessBlackList.Remove(removeentry);
-            targetparcel.Update(GetClient());
+            // Find the entry to remove
+            var entryToRemove = targetparcel.AccessBlackList.FirstOrDefault(e => e.AgentID == avataruuid);
+            if (entryToRemove.AgentID != UUID.Zero)
+            {
+                targetparcel.AccessBlackList.Remove(entryToRemove);
+            }
+            targetparcel.UpdateParcelAccessList(GetClient(), AccessList.Ban, targetparcel.AccessBlackList);
             return BasicReply("ok", [avatar]);
         }
 
