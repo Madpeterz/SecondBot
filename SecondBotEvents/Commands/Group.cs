@@ -75,12 +75,9 @@ namespace SecondBotEvents.Commands
             {
                 Action = GroupBanAction.Unban;
             }
-            List<UUID> avatarstoaction =
-            [
-                avataruuid
-            ];
-            GetClient().Groups.RequestBanAction(groupuuid, Action, [.. avatarstoaction]);
-            return BasicReply("Accepted");
+            GetClient().Groups.EjectUser(groupuuid, avataruuid); //Eject first
+            GetClient().Groups.RequestBanAction(groupuuid, Action, [avataruuid]);
+            return BasicReply("Accepted "+ Action.ToString()+" for "+avataruuid);
         }
 
 

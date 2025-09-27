@@ -1709,21 +1709,21 @@ namespace OpenMetaverse
         /// <param name="callback">Callback</param>
         public void RequestBanAction(UUID groupID, GroupBanAction action, UUID[] agents, EventHandler<EventArgs> callback)
         {
-            Uri uri = GetGroupAPIUri(groupID);
-            if (uri == null) { return; }
-
-            Uri cap = Client.Network.CurrentSim.Caps.CapabilityURI("GroupBanAction");
-            if (cap == null) { return; }
-
+            Uri baseCap = GetGroupAPIUri(groupID);
+            if (baseCap == null)
+            {
+                Logger.Log("Unable to get Cap url for GroupAPIv1", Helpers.LogLevel.Warning, Client);
+            }
             OSDMap payload = new OSDMap { ["ban_action"] = (int)action };
             OSDArray banIDs = new OSDArray(agents.Length);
-            foreach (var agent in agents)
+            for (int i = 0; i < agents.Length; i++)
             {
+                UUID agent = agents[i];
                 banIDs.Add(agent);
             }
             payload["ban_ids"] = banIDs;
 
-            Task req = Client.HttpCapsClient.PostRequestAsync(cap, OSDFormat.Xml, payload, CancellationToken.None,
+            Task req = Client.HttpCapsClient.PostRequestAsync(baseCap, OSDFormat.Xml, payload, CancellationToken.None,
                 (response, data, error) =>
             {
                 if (error != null) { return; }
