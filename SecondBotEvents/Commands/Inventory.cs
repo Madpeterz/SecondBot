@@ -1,9 +1,7 @@
 ﻿using BetterSecondBot.Static;
-using Discord;
-using LibreMetaverse;
+using Newtonsoft.Json;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
-using Org.BouncyCastle.Utilities.Collections;
 using SecondBotEvents.Services;
 using System;
 using System.Collections.Generic;
@@ -11,7 +9,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static Betalgo.Ranul.OpenAI.ObjectModels.RealtimeModels.RealtimeEventTypes;
+using System.Threading.Tasks;
 
 namespace SecondBotEvents.Commands
 {
@@ -77,8 +75,8 @@ namespace SecondBotEvents.Commands
             return null;
         }
 
-        [About("rezs the item at the bots current location")]
-        [ReturnHints("UUID of rezzed item")]
+        [About("[BLOCKING] rezs the item at the bots current location")]
+        [ReturnHints("UUID for rez request to server")]
         [ReturnHintsFailure("Invaild item UUID")]
         [ReturnHintsFailure("Unable to find item")]
         [ReturnHintsFailure("Error not in a sim")]
@@ -119,8 +117,57 @@ namespace SecondBotEvents.Commands
             return BasicReply(rezedobject.ToString(), [item]);
         }
 
-        [About("rezs the item at the parcel center")]
-        [ReturnHints("UUID of rezzed item")]
+        [About("rezs the item at the bots current location")]
+        [ReturnHints("UUID = the request UUID so you can check the result in the reply")]
+        [ReturnHints("Smart reply: json object of {request:\"\",status:BOOL,message:\"\",data:\"\"")]
+        [ReturnHintsFailure("Invaild item UUID")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ArgHints("item", "What to rez", "UUID")]
+        [ArgHints("replyto", "Where to send the reply to", "SMART")]
+        [CmdTypeDo()]
+        public object AsyncRezObject(string item, string replyto)
+        {
+            if (UUID.TryParse(item, out UUID targetitem) == false)
+            {
+                return Failure("Invaild item UUID: " + item, [item]);
+            }
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value, [item]);
+            }
+            string request = UUID.Random().Guid.ToString();
+            Task.Run(() =>
+            {
+                InventoryNode find = SearchInventoryStore(targetitem);
+                InventoryItem itm = null;
+                if (find != null && find.Data is InventoryItem itemfound)
+                {
+                    itm = itemfound;
+                }
+                if (itm == null)
+                {
+                    itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+                }
+                if (itm == null)
+                {
+                    // Optionally, send a failure reply to smartreply target here
+                    string failedreply = new InventoryAsyncReply(request, false, item, UUID.Zero.ToString()).ToJson();
+                    master.CommandsService.SmartCommandReply(replyto, failedreply, "AsyncRezObject");
+                    return;
+                }
+                Vector3 loc = GetClient().Self.RelativePosition;
+                UUID rezedobject = GetClient().Inventory.RequestRezFromInventory(GetClient().Network.CurrentSim, GetClient().Self.SimRotation, loc, itm);
+                string reply = new InventoryAsyncReply(request, true, item,rezedobject.ToString()).ToJson();
+                master.CommandsService.SmartCommandReply(replyto, reply, "AsyncRezObject");
+            });
+
+            return BasicReply(request, [item, replyto]);
+        }
+
+        [About("[BLOCKING] rezs the item at the parcel center")]
+        [ReturnHints("UUID  for rez request to server")]
         [ReturnHintsFailure("Invaild item UUID")]
         [ReturnHintsFailure("Unable to find item")]
         [ReturnHintsFailure("Error not in a sim")]
@@ -173,8 +220,75 @@ namespace SecondBotEvents.Commands
             UUID rezedobject = GetClient().Inventory.RequestRezFromInventory(GetClient().Network.CurrentSim, GetClient().Self.SimRotation, resat, itm);
             return BasicReply(rezedobject.ToString(), [item]);
         }
-        [About("rezs the item at the target location")]
-        [ReturnHints("UUID of rezzed item")]
+
+        [About("rezs the item at the parcel center")]
+        [ReturnHints("requestUUID check the smart reply for results")]
+        [ReturnHints("Smart reply: json object of {request:\"\",status:BOOL,message:\"\",data:\"\"")]
+        [ReturnHintsFailure("Invaild item UUID")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Invaild Z offset")]
+        [ReturnHintsFailure("Z offset must be between -2 and 2")]
+        [ArgHints("item", "what to rez", "UUID")]
+        [ArgHints("zoffset", "Z offset to apply (range -2 to 2)", "Number", "0.5")]
+        [ArgHints("replyto", "Where to send the reply to", "SMART")]
+        [CmdTypeDo()]
+        public object AsyncRezObjectParcelCenter(string item, string zoffset, string replyto)
+        {
+            if (UUID.TryParse(item, out UUID targetitem) == false)
+            {
+                return Failure("Invaild item UUID: " + item, [item]);
+            }
+            if (float.TryParse(zoffset, out float zoff) == false)
+            {
+                return Failure("Invaild Z offset: " + zoffset, [item]);
+            }
+            if (zoff < -2 || zoff > 2)
+            {
+                return Failure("Z offset must be between -2 and 2", [item, zoffset]);
+            }
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value, [item]);
+            }
+            string request = UUID.Random().Guid.ToString();
+            Task.Run(() =>
+            {
+                InventoryNode find = SearchInventoryStore(targetitem);
+                InventoryItem itm = null;
+                if (find != null)
+                {
+                    if (find.Data is InventoryItem itemfound)
+                    {
+                        itm = itemfound;
+                    }
+                }
+                if (itm == null)
+                {
+                    // cant get the item from store try and download it
+                    itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+                }
+                if (itm == null)
+                {
+                    string failedreply = new InventoryAsyncReply(request, false, item, UUID.Zero.ToString()).ToJson();
+                    master.CommandsService.SmartCommandReply(replyto, failedreply, "AsyncRezObjectParcelCenter");
+                    return;
+                }
+                float x = targetparcel.AABBMin.X + ((targetparcel.AABBMax.X - targetparcel.AABBMin.X) / 2);
+                float y = targetparcel.AABBMin.Y + ((targetparcel.AABBMax.Y - targetparcel.AABBMin.Y) / 2);
+                Vector3 resat = new Vector3(x, y, GetClient().Self.RelativePosition.Z + zoff);
+                UUID rezedobject = GetClient().Inventory.RequestRezFromInventory(GetClient().Network.CurrentSim, GetClient().Self.SimRotation, resat, itm);
+                string reply = new InventoryAsyncReply(request, true, item, rezedobject.ToString()).ToJson();
+                master.CommandsService.SmartCommandReply(replyto, reply, "AsyncRezObjectParcelCenter");
+            });
+            return BasicReply(request, [item, replyto]);
+        }
+
+
+
+        [About("[BLOCKING] rezs the item at the target location")]
+        [ReturnHints("UUID for rez request to server")]
         [ReturnHintsFailure("Invaild item UUID")]
         [ReturnHintsFailure("Unable to find item")]
         [ReturnHintsFailure("Error not in a sim")]
@@ -229,6 +343,74 @@ namespace SecondBotEvents.Commands
             Vector3 resat = new Vector3(x1, y1, z1);
             UUID rezedobject = GetClient().Inventory.RequestRezFromInventory(GetClient().Network.CurrentSim, GetClient().Self.SimRotation, resat, itm);
             return BasicReply(rezedobject.ToString(), [item]);
+        }
+
+        [About("rezs the item at the target location")]
+        [ReturnHints("requestUUID check the smart reply for results")]
+        [ReturnHints("Smart reply: json object of {request:\"\",status:BOOL,message:\"\",data:\"\"")]
+        [ReturnHintsFailure("Invaild item UUID")]
+        [ReturnHintsFailure("Error not in a sim")]
+        [ReturnHintsFailure("Parcel data not ready")]
+        [ReturnHintsFailure("Unable to unpack [X,y,z] cord")]
+        [ArgHints("item", "what to rez", "UUID")]
+        [ArgHints("x", "X cord to rez at", "Number", "123")]
+        [ArgHints("y", "Y cord to rez at", "Number", "45")]
+        [ArgHints("z", "Z cord to rez at", "Number", "26")]
+        [ArgHints("replyto", "Where to send the reply to", "SMART")]
+        [CmdTypeDo()]
+        public object AsyncRezObjectOnPos(string item, string x, string y, string z, string replyto)
+        {
+            if (UUID.TryParse(item, out UUID targetitem) == false)
+            {
+                return Failure("Invaild item UUID: " + item, [item]);
+            }
+            KeyValuePair<bool, string> tests = SetupCurrentParcel();
+            if (tests.Key == false)
+            {
+                return Failure(tests.Value, [item]);
+            }
+            if (float.TryParse(x, out float x1) == false)
+            {
+                return Failure("Unable to unpack X cord", [item]);
+            }
+            if (float.TryParse(y, out float y1) == false)
+            {
+                return Failure("Unable to unpack X cord", [item]);
+            }
+            if (float.TryParse(z, out float z1) == false)
+            {
+                return Failure("Unable to unpack X cord", [item]);
+            }
+            string request = UUID.Random().Guid.ToString();
+            Task.Run(() =>
+                {
+                    InventoryNode find = SearchInventoryStore(targetitem);
+                    InventoryItem itm = null;
+                    if (find != null)
+                    {
+                        if (find.Data is InventoryItem itemfound)
+                        {
+                            itm = itemfound;
+                        }
+                    }
+                    if (itm == null)
+                    {
+                        // cant get the item from store try and download it
+                        itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+                    }
+                    if (itm == null)
+                    {
+                        string failedreply = new InventoryAsyncReply(request, false, item, UUID.Zero.ToString()).ToJson();
+                        master.CommandsService.SmartCommandReply(replyto, failedreply, "AsyncRezObjectOnPos");
+                        return;
+                    }
+
+                    Vector3 resat = new Vector3(x1, y1, z1);
+                    UUID rezedobject = GetClient().Inventory.RequestRezFromInventory(GetClient().Network.CurrentSim, GetClient().Self.SimRotation, resat, itm);
+                    string reply = new InventoryAsyncReply(request, true, item, rezedobject.ToString()).ToJson();
+                    master.CommandsService.SmartCommandReply(replyto, rezedobject.ToString(), "AsyncRezObjectOnPos");
+                });
+            return BasicReply(request, [item, replyto]);
         }
 
 
@@ -463,7 +645,7 @@ namespace SecondBotEvents.Commands
             return BasicReply(reply.ToString(), [item]);
         }
 
-        [About("sends a item to an avatar via a path")]
+        [About("[BLOCKING] sends a item to an avatar via a path")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Failed")]
         [ReturnHintsFailure("Invaild avatar uuid")]
@@ -492,7 +674,49 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok", [path, avatar]);
         }
 
-        [About("sends a item to an avatar")]
+        [About("sends a item to an avatar via a path")]
+        [ReturnHints("RequestUUID check the smart reply for results")]
+        [ReturnHints("Smart reply: json object of {request:\"\",status:BOOL,message:\"\",data:\"\"")]
+        [ReturnHintsFailure("Failed")]
+        [ArgHints("path", "item path and name", "Text", "Objects/DemoItem")]
+        [ArgHints("avatar", "Who we are sending it to", "AVATAR")]
+        [ArgHints("replyto", "Where to send the reply to", "SMART")]
+        [CmdTypeDo()]
+        public object AsyncSendItemByPath(string path, string avatar, string replyto)
+        {
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("Invaild avatar uuid", [path, avatar]);
+            }
+            string request = UUID.Random().Guid.ToString();
+            Task.Run(() =>
+            {
+                UUID targetitem = GetClient().Inventory.FindObjectByPath(GetClient().Inventory.Store.RootFolder.UUID, GetClient().Self.AgentID, path, TimeSpan.FromSeconds(15));
+                string reply = "";
+                if (targetitem == UUID.Zero)
+                {
+                    reply = new InventoryAsyncReply(request, false, path, "Unable to find item via path").ToJson();
+                    master.CommandsService.SmartCommandReply(replyto, reply, "AsyncSendItemByPath");
+                    return;
+                }
+                InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(25));
+                if (itm == null)
+                {
+                    reply = new InventoryAsyncReply(request, false, path, "Unable to find item with found uuid").ToJson();
+                    master.CommandsService.SmartCommandReply(replyto, reply, "AsyncSendItemByPath");
+                    return;
+                }
+                GetClient().Inventory.GiveItem(itm.UUID, itm.Name, itm.AssetType, avataruuid, false);
+                reply = new InventoryAsyncReply(request, true, path, itm.UUID.ToString()).ToJson();
+                master.CommandsService.SmartCommandReply(replyto, reply, "AsyncSendItemByPath");
+            });
+            return BasicReply(request, [path, avatar, replyto]);
+        }
+
+
+
+        [About("[BLOCKING] sends a item to an avatar")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Failed")]
         [ReturnHintsFailure("Invaild avatar uuid")]
@@ -520,6 +744,47 @@ namespace SecondBotEvents.Commands
             GetClient().Inventory.GiveItem(itm.UUID, itm.Name, itm.AssetType, avataruuid, false);
             return BasicReply("ok", [item, avatar]);
         }
+
+        [About("sends a item to an avatar")]
+        [ReturnHints("RequestUUID check the smart reply for results")]
+        [ReturnHints("Smart reply: json object of {request:\"\",status:BOOL,message:\"\",data:\"\"")]
+        [ReturnHintsFailure("Failed")]
+        [ReturnHintsFailure("Invaild avatar uuid")]
+        [ReturnHintsFailure("Invaild item uuid")]
+        [ArgHints("item", "what are we sending", "UUID")]
+        [ArgHints("avatar", "Who are we sending it to", "AVATAR")]
+        [ArgHints("replyto", "Where to send the reply to", "SMART")]
+        [CmdTypeDo()]
+        public object AsyncSendItem(string item, string avatar, string replyto)
+        {
+            ProcessAvatar(avatar);
+            if (avataruuid == UUID.Zero)
+            {
+                return Failure("Invaild avatar uuid", [item, avatar]);
+            }
+            if (UUID.TryParse(item, out UUID targetitem) == false)
+            {
+                return Failure("Invaild item uuid", [item, avatar]);
+            }
+            string request = UUID.Random().Guid.ToString();
+            Task.Run(() =>
+            {
+                InventoryItem itm = GetClient().Inventory.FetchItem(targetitem, GetClient().Self.AgentID, TimeSpan.FromSeconds(25));
+                string reply = "";
+                if (itm == null)
+                {
+                    reply = new InventoryAsyncReply(request, false, item, "Unable to find item").ToJson();
+                    master.CommandsService.SmartCommandReply(replyto, reply, "AsyncSendItem");
+                    return;
+                }
+                GetClient().Inventory.GiveItem(itm.UUID, itm.Name, itm.AssetType, avataruuid, false);
+                reply = new InventoryAsyncReply(request, true, item, itm.UUID.ToString()).ToJson();
+                master.CommandsService.SmartCommandReply(replyto, reply, "AsyncSendItem");
+            });
+            return BasicReply(request, [item, avatar, replyto]);
+        }
+
+
         [About("sends a item to an avatar with extra steps to bypass inventory searchs")]
         [ReturnHints("ok")]
         [ReturnHintsFailure("Failed")]
@@ -622,7 +887,7 @@ namespace SecondBotEvents.Commands
             return BasicReply("ok", [folder, avatar]);
         }
 
-        [About("Transfers a item [ARG 2] to a objects inventory [ARG 1] (And if set with the script running state [ARG 3])")]
+        [About("[BLOCKING] Transfers a item [ARG 2] to a objects inventory [ARG 1] (And if set with the script running state [ARG 3])")]
         [ReturnHints("Transfering running script")]
         [ReturnHints("Transfering inventory")]
         [ReturnHintsFailure("Invaild item uuid")]
@@ -689,6 +954,87 @@ namespace SecondBotEvents.Commands
             }
             GetClient().Inventory.UpdateTaskInventory(RealObject.Key, itm);
             return BasicReply("Transfering inventory", [item, objectuuid, running]);
+        }
+
+        [About("Transfers a item [ARG 2] to a objects inventory [ARG 1] (And if set with the script running state [ARG 3])")]
+        [ReturnHints("RequestUUID check the smart reply for results")]
+        [ReturnHints("Smart reply: json object of {request:\"\",status:BOOL,message:\"\",data:\"\"")]
+        [ReturnHintsFailure("Invaild item uuid")]
+        [ReturnHintsFailure("Invaild object uuid")]
+        [ReturnHintsFailure("Invaild running")]
+        [ArgHints("item", "what are we sending", "UUID")]
+        [ArgHints("object", "were are we sending it", "UUID")]
+        [ArgHints("running", "should it be running", "BOOL")]
+        [ArgHints("replyto", "Where to send the reply to", "SMART")]
+        [CmdTypeDo()]
+        public object AsyncTransferInventoryToObject(string item, string objectuuid, string running, string replyto)
+        {
+            if (UUID.TryParse(item, out UUID itemuuid) == false)
+            {
+                return Failure("Invaild item uuid", [item, objectuuid, running]);
+            }
+            if (UUID.TryParse(objectuuid, out UUID objectUUID) == false)
+            {
+                return Failure("Invaild object uuid", [item, objectuuid, running]);
+            }
+            if (bool.TryParse(running, out bool runscript) == false)
+            {
+                return Failure("Invaild running", [item, objectuuid, running]);
+            }
+            string request = UUID.Random().Guid.ToString();
+            Task.Run(() =>
+            {
+                string reply = "";
+                InventoryItem itm = GetClient().Inventory.FetchItem(itemuuid, GetClient().Self.AgentID, TimeSpan.FromSeconds(15));
+                if (itm == null)
+                {
+                    reply = new InventoryAsyncReply(request, false, item, "Unable to find inventory").ToJson();
+                    master.CommandsService.SmartCommandReply(replyto, reply, "AsyncTransferInventoryToObject");
+                    return;
+                }
+                Dictionary<uint, Primitive> objects_copy = GetClient().Network.CurrentSim.ObjectsPrimitives.ToDictionary(k => k.Key, v => v.Value);
+                KeyValuePair<uint, Primitive> RealObject = new(0, null);
+                foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
+                {
+                    if (Obj.Value.ID == objectUUID)
+                    {
+                        RealObject = Obj;
+                        break;
+                    }
+                }
+                if (RealObject.Value == null)
+                {
+                    GetClient().Objects.RequestObjectMedia(objectUUID, GetClient().Network.CurrentSim, null);
+                    foreach (KeyValuePair<uint, Primitive> Obj in objects_copy)
+                    {
+                        if (Obj.Value.ID == objectUUID)
+                        {
+                            RealObject = Obj;
+                            break;
+                        }
+                    }
+                    reply = new InventoryAsyncReply(request, false, objectuuid, "Unable to find object").ToJson();
+                    master.CommandsService.SmartCommandReply(replyto, reply, "AsyncTransferInventoryToObject");
+                    return;
+                }
+                bool scriptState = runscript;
+                if (itm.AssetType != AssetType.LSLText)
+                {
+                    scriptState = false;
+                }
+                if (itm.AssetType == AssetType.LSLText)
+                {
+                    GetClient().Inventory.CopyScriptToTask(RealObject.Key, itm, scriptState);
+                    reply = new InventoryAsyncReply(request, true, item, "Transfering script [state: \" + scriptState.ToString() + \"]").ToJson();
+                    master.CommandsService.SmartCommandReply(replyto, reply, "AsyncTransferInventoryToObject");
+                    return;
+                }
+                GetClient().Inventory.UpdateTaskInventory(RealObject.Key, itm);
+                reply = new InventoryAsyncReply(request, true, item, "Transfering item").ToJson();
+                master.CommandsService.SmartCommandReply(replyto, reply, "AsyncTransferInventoryToObject");
+                return;
+            });
+            return BasicReply(request, [item, objectuuid,running, replyto]);
         }
 
         [About("Requests the inventory folder layout as a json object InventoryMapFolder<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>subfolders: InventoryMapFolder[]</li></ul>")]
@@ -829,6 +1175,25 @@ namespace SecondBotEvents.Commands
                 return A.Data.UUID;
             }
             return UUID.Zero;
+        }
+    }
+
+    public class InventoryAsyncReply
+    {
+        public string requestUUID;
+        public bool status = false;
+        public string message = "";
+        public string data = "";
+        public InventoryAsyncReply(string req, bool stat, string msg, string dat)
+        {
+            requestUUID = req;
+            status = stat;
+            message = msg;
+            data = dat;
+        }
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this);
         }
     }
 }
