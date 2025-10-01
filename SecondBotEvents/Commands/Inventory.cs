@@ -1060,8 +1060,8 @@ namespace SecondBotEvents.Commands
             return Failure("Error");
         }
 
-        [About("Requests the contents of a folder as an array of InventoryMapItem<br/>Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>typename: String</li></ul>")]
-        [ReturnHints("array of InventoryMapItem")]
+        [About("[Blocking] Requests the contents of a folder as an array of InventoryMapItem<br/>Can block for upto 45 secs!")]
+        [ReturnHints("array of InventoryMapItem Formated as follows<br/>InventoryMapItem<br/><ul><li>id: UUID</li><li>name: String</li><li>typename: String</li></ul>")]
         [ReturnHintsFailure("Invaild folder UUID")]
         [ArgHints("folderUUID", "the folder to fetch (Found via: inventory/folders)","UUID")]
         [CmdTypeGet()]
@@ -1072,6 +1072,27 @@ namespace SecondBotEvents.Commands
                 return Failure("Invaild folder UUID", [folderUUID]);
             }
             return BasicReply(HelperInventory.MapFolderInventoryJson(GetClient(), folder), [folderUUID]);
+        }
+
+        [About("Requests the contents of a folder as an array of InventoryMapItem")]
+        [ReturnHints("RequestUUID check the smart reply for results")]
+        [ReturnHints("Smart reply: json object of {request:\"\",status:BOOL,message:\"\",data:\"\"")]
+        [ReturnHintsFailure("Invaild folder UUID")]
+        [ArgHints("folderUUID", "the folder to fetch (Found via: inventory/folders)", "UUID")]
+        [CmdTypeGet()]
+        public object AsyncInventoryContents(string folderUUID, string replyto)
+        {
+            if (UUID.TryParse(folderUUID, out UUID folder) == false)
+            {
+                return Failure("Invaild folder UUID", [folderUUID]);
+            }
+            string request = UUID.Random().Guid.ToString();
+            Task.Run(() => {
+                string results = HelperInventory.MapFolderInventoryJson(GetClient(), folder);
+                string reply = new InventoryAsyncReply(request, true, folderUUID, results).ToJson();
+                master.CommandsService.SmartCommandReply(replyto, reply, "AsyncInventoryContents");
+            });
+            return BasicReply(request, [folderUUID, replyto]);
         }
 
         [About("creates a folder in a folder")]
