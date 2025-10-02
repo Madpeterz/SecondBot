@@ -1024,6 +1024,28 @@ namespace SecondBotEvents.Services
 
         protected List<string> preloadingFolders = [];
         protected bool preloadDone = true;
+        public int preloadFolderCount = 0;
+
+        public int GetPreloadedFolderCount()
+        {
+            return preloadFolderCount;
+        }
+        public bool preloadInventoryReady()
+        {
+            if(myConfig.GetPrefetchInventory() == false)
+            {
+                return true;
+            }
+            else if(preloadFolderCount == 0)
+            {
+                return false;
+            }
+            else if(preloadingFolders.Count() > 0)
+            {
+                return false;
+            }
+            return true;
+        }
 
         protected async void preloadFolder(string foldername,UUID folder, int maxDepth, int currentDepth)
         {
@@ -1040,7 +1062,8 @@ namespace SecondBotEvents.Services
                 InventorySortOrder.ByName, TimeSpan.FromSeconds(30), false);
                 foreach (InventoryBase item in foldercontents)
                 {
-                    if (item is InventoryFolder == false)
+                    string entrytype = item.GetType().Name.Replace("Inventory", "");
+                    if (entrytype != "Folder")
                     {
                         continue;
                     }
@@ -1052,6 +1075,7 @@ namespace SecondBotEvents.Services
                 }
                 lock (preloadingFolders)
                 {
+                    preloadFolderCount++;
                     preloadingFolders.Remove(folder.Guid.ToString());
                 }
             });

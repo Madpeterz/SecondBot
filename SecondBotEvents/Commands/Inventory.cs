@@ -1075,6 +1075,30 @@ namespace SecondBotEvents.Commands
             return BasicReply(HelperInventory.MapFolderInventoryJson(GetClient(), folder), [folderUUID]);
         }
 
+        [About("Checks if the inventory preload is done")]
+        [ReturnHints("Ready")]
+        [ReturnHintsFailure("Not ready")]
+        [CmdTypeGet()]
+        public object InventoryPreloadDone()
+        {
+            if (master.DataStoreService.preloadInventoryReady() == false)
+            {
+                return Failure("Not ready");
+            }
+            else
+            {
+                return BasicReply("Ready");
+            }
+        }
+
+        [About("Requests the number of folders preloaded")]
+        [ReturnHints("number of preloaded folders")]
+        [CmdTypeGet()]
+        public object InventoryPreloadFolderCount()
+        {
+            return BasicReply(master.DataStoreService.GetPreloadedFolderCount().ToString());
+        }
+
 
         [About("Requests the mapped inventory on the bot using catched data only")]
         [ReturnHints("a json data object with: " +
@@ -1096,17 +1120,19 @@ namespace SecondBotEvents.Commands
             InventoryNodeEntry myentry = new InventoryNodeEntry();
             myentry.Name = name;
             myentry.UUID = folder.Guid.ToString();
-            myentry.InventoryType = "folder";
+            myentry.InventoryType = "Folder";
             List<InventoryBase> folderlist = GetClient().Inventory.Store.GetContents(folder);
             foreach (InventoryBase entry in folderlist)
             {
-                if(entry is InventoryFolder)
+                
+                if (entry is InventoryFolder)
                 {
                     myentry.Children.Add(LoadInventoryNode(entry.UUID, entry.Name));
                 }
                 else if (entry is InventoryItem)
                 {
-                    myentry.Children.Add(new InventoryNodeEntry() { Children = null, InventoryType = "item", Name = entry.Name, UUID = entry.UUID.ToString() });
+                    string entrytype = entry.GetType().Name.Replace("Inventory", "");
+                    myentry.Children.Add(new InventoryNodeEntry() { Children = null, InventoryType = entrytype, Name = entry.Name, UUID = entry.UUID.ToString() });
                 }
             }
             return myentry;
