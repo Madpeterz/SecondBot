@@ -19,6 +19,8 @@ namespace SecondBotEvents.Services
     {
         protected new DataStoreConfig myConfig;
         protected bool botConnected = false;
+        private static readonly Random _delayRandom = new();
+        
         public DataStoreService(EventsSecondBot setMaster) : base(setMaster)
         {
             myConfig = new DataStoreConfig(master.fromEnv,master.fromFolder);
@@ -1055,7 +1057,7 @@ namespace SecondBotEvents.Services
                 {
                     preloadingFolders.Add(folder.Guid.ToString());
                 }
-                await Task.Delay(1000 * currentDepth);
+                await Task.Delay(_delayRandom.Next(500, 1251) * (currentDepth+1));
                 List<InventoryBase> foldercontents = GetClient().Inventory.FolderContents(
                 GetClient().Inventory.Store.RootFolder.UUID,
                 GetClient().Self.AgentID, true, true,
@@ -1357,6 +1359,3 @@ namespace SecondBotEvents.Services
         public long time = SecondbotHelpers.UnixTimeNow();
     }
 }
-
-
-
