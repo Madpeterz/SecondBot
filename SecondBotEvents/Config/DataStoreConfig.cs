@@ -18,10 +18,20 @@ namespace SecondBotEvents.Config
             settings.Add("PrefetchGroupRoles");
             settings.Add("PrefetchEstateBanlist");
             settings.Add("PrefetchAvatarDisplaynames");
+            settings.Add("PrefetchInventory");
+            settings.Add("PrefetchInventoryDepth");
             settings.Add("AutoCleanKeyValueStore");
             settings.Add("CleanKeyValueStoreAfterMins");
             settings.Add("CommandHistoryLimit");
             settings.Add("HideStatusOutput");
+        }
+        public int GetPrefetchInventoryDepth()
+        {
+            return ReadSettingAsInt("PrefetchInventoryDepth", 2);
+        }
+        public bool GetPrefetchInventory()
+        {
+            return ReadSettingAsBool("PrefetchInventory", false);
         }
 
         public bool GetPrefetchAvatarDisplaynames()

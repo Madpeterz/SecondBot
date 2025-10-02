@@ -10,6 +10,8 @@ using SecondBotEvents.Commands;
 using OpenMetaverse.ImportExport.Collada14;
 using System.Threading.Tasks;
 using OpenMetaverse.Messages.Linden;
+using Org.BouncyCastle.Asn1.BC;
+using Swan;
 
 namespace SecondBotEvents.Services
 {
@@ -206,6 +208,17 @@ namespace SecondBotEvents.Services
                             avatarsKey2Displayname.Remove(A.Key);
                         }
                     }
+                }
+            }
+            if (myConfig.GetPrefetchInventory() == true)
+            {
+                if(preloadDone == false)
+                {
+                    if(preloadingFolders.Count() == 0)
+                    {
+                        preloadDone = true;
+                    }
+                    return "Loading "+preloadingFolders.Count()+" inventory folders";
                 }
             }
             int sum = commandHistories.Count + KeyValueStoreLastUsed.Count + KeyValueStore.Count +
@@ -999,7 +1012,51 @@ namespace SecondBotEvents.Services
             GetClient().Avatars.AvatarPropertiesReply += AvatarDetailsReply;
             GetClient().Groups.RequestCurrentGroups();
             _ = GetClient().Self.RetrieveInstantMessages();
+            if(myConfig.GetPrefetchInventory() == true)
+            {
+                preloadDone = false;
+                Task.Run(() =>
+                {
+                    preloadFolder("root", GetClient().Inventory.Store.RootFolder.UUID, myConfig.GetPrefetchInventoryDepth(), 0);
+                });
+            }
         }
+
+        protected List<string> preloadingFolders = [];
+        protected bool preloadDone = true;
+
+        protected async void preloadFolder(string foldername,UUID folder, int maxDepth, int currentDepth)
+        {
+            await Task.Run(async () =>
+            {
+                lock (preloadingFolders)
+                {
+                    preloadingFolders.Add(folder.Guid.ToString());
+                }
+                await Task.Delay(1000 * currentDepth);
+                List<InventoryBase> foldercontents = GetClient().Inventory.FolderContents(
+                GetClient().Inventory.Store.RootFolder.UUID,
+                GetClient().Self.AgentID, true, true,
+                InventorySortOrder.ByName, TimeSpan.FromSeconds(30), false);
+                foreach (InventoryBase item in foldercontents)
+                {
+                    if (item is InventoryFolder == false)
+                    {
+                        continue;
+                    }
+                    if ((currentDepth + 1) > maxDepth)
+                    {
+                        continue;
+                    }
+                    preloadFolder(item.Name, item.UUID, maxDepth, currentDepth + 1);
+                }
+                lock (preloadingFolders)
+                {
+                    preloadingFolders.Remove(folder.Guid.ToString());
+                }
+            });
+        }
+
         readonly string[] hard_blocked_agents = ["secondlife", "second life"];
         protected void ChatFromSim(object o, ChatEventArgs e)
         {

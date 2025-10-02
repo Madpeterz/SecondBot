@@ -436,14 +436,15 @@ namespace SecondBotEvents.Services
 
         public void CommandNotice(string command,string source, string args,bool accepted, string results)
         {
-            if(myConfig.GetCommandHistoryLogResults() == false)
-            {
-                results = "";
-            }
+
             BotCommandNotice e = new(command, args, source, accepted, results);
             EventHandler<BotCommandNotice> handler = BotclientCommandEventNotices;
             handler?.Invoke(this, e);
-            if(master.BotClient.basicCfg.GetLogCommands() == true)
+            if (myConfig.GetCommandHistoryLogResults() == false)
+            {
+                return;
+            }
+            if (master.BotClient.basicCfg.GetLogCommands() == true)
             {
                 LogFormater.Info("Command log:" + JsonConvert.SerializeObject(e));
             }
