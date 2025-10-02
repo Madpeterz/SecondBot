@@ -1079,10 +1079,10 @@ namespace SecondBotEvents.Commands
         [About("Requests the mapped inventory on the bot using catched data only")]
         [ReturnHints("a json data object with: " +
             "{" +
-            "Name: String"+
-            "UUID: String"+
-            "InventoryType: String"+
-            "Children: null or a copy of this data object"+
+            "   Name: String<br/>"+
+            "   UUID: String<br/>" +
+            "   InventoryType: String<br/>" +
+            "   Children: null or a copy of this data object"+
             "}")]
         [CmdTypeGet()]
         public object InventoryContentsCatched()
