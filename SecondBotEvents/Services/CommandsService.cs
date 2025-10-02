@@ -446,6 +446,10 @@ namespace SecondBotEvents.Services
             }
             if (master.BotClient.basicCfg.GetLogCommands() == true)
             {
+                if(e.results.Length >= 100)
+                {
+                    e.results = e.results.Substring(0, 100) + "...";
+                }
                 LogFormater.Info("Command log:" + JsonConvert.SerializeObject(e));
             }
         }

@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
+using Org.BouncyCastle.Tls;
 using SecondBotEvents.Services;
 using System;
 using System.Collections.Generic;
@@ -1074,6 +1075,44 @@ namespace SecondBotEvents.Commands
             return BasicReply(HelperInventory.MapFolderInventoryJson(GetClient(), folder), [folderUUID]);
         }
 
+
+        [About("Requests the mapped inventory on the bot using catched data only")]
+        [ReturnHints("a json data object with: " +
+            "{" +
+            "Name: String"+
+            "UUID: String"+
+            "InventoryType: String"+
+            "Children: null or a copy of this data object"+
+            "}")]
+        [CmdTypeGet()]
+        public object InventoryContentsCatched()
+        {
+            InventoryNodeEntry root = LoadInventoryNode(GetClient().Inventory.Store.RootFolder.UUID,"root");
+            return BasicReply(JsonConvert.SerializeObject(root));
+        }
+
+        protected InventoryNodeEntry LoadInventoryNode(UUID folder, string name="")
+        {
+            InventoryNodeEntry myentry = new InventoryNodeEntry();
+            myentry.Name = name;
+            myentry.UUID = folder.Guid.ToString();
+            myentry.InventoryType = "folder";
+            List<InventoryBase> folderlist = GetClient().Inventory.Store.GetContents(folder);
+            foreach (InventoryBase entry in folderlist)
+            {
+                if(entry is InventoryFolder)
+                {
+                    myentry.Children.Add(LoadInventoryNode(entry.UUID, entry.Name));
+                }
+                else if (entry is InventoryItem)
+                {
+                    myentry.Children.Add(new InventoryNodeEntry() { Children = null, InventoryType = "item", Name = entry.Name, UUID = entry.UUID.ToString() });
+                }
+            }
+            return myentry;
+        }
+
+
         [About("Requests the contents of a folder as an array of InventoryMapItem")]
         [ReturnHints("RequestUUID check the smart reply for results")]
         [ReturnHints("Smart reply: json object of {request:\"\",status:BOOL,message:\"\",data:\"\"")]
@@ -1197,6 +1236,14 @@ namespace SecondBotEvents.Commands
             }
             return UUID.Zero;
         }
+    }
+
+    public class InventoryNodeEntry
+    {
+        public string UUID { get; set; }
+        public string Name { get; set; }
+        public List<InventoryNodeEntry> Children { get; set; } = new List<InventoryNodeEntry>();
+        public string InventoryType { get; set; }
     }
 
     public class InventoryAsyncReply
