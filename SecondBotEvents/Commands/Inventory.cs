@@ -1124,16 +1124,13 @@ namespace SecondBotEvents.Commands
             List<InventoryBase> folderlist = GetClient().Inventory.Store.GetContents(folder);
             foreach (InventoryBase entry in folderlist)
             {
-                
-                if (entry is InventoryFolder)
+                string entrytype = entry.GetType().Name.Replace("Inventory", "");
+                if (entrytype == "Folder")
                 {
                     myentry.Children.Add(LoadInventoryNode(entry.UUID, entry.Name));
+                    continue;
                 }
-                else if (entry is InventoryItem)
-                {
-                    string entrytype = entry.GetType().Name.Replace("Inventory", "");
-                    myentry.Children.Add(new InventoryNodeEntry() { Children = null, InventoryType = entrytype, Name = entry.Name, UUID = entry.UUID.ToString() });
-                }
+                myentry.Children.Add(new InventoryNodeEntry() { Children = null, InventoryType = entrytype, Name = entry.Name, UUID = entry.UUID.ToString() });
             }
             return myentry;
         }
