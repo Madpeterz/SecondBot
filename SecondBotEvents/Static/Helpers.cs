@@ -70,7 +70,7 @@ namespace SecondBotEvents
                 return e.Message;
             }
         }
-        public static bool inrange(float current,float min,float max)
+        public static bool InRange(float current,float min,float max)
         {
             if(current <= max)
             {
@@ -81,7 +81,7 @@ namespace SecondBotEvents
             }
             return false;
         }
-        public static bool inrange(double current, double min, double max)
+        public static bool InRange(double current, double min, double max)
         {
             if (current <= max)
             {
@@ -92,11 +92,11 @@ namespace SecondBotEvents
             }
             return false;
         }
-        public static bool inbox(float expected, float current, float drift)
+        public static bool Inbox(float expected, float current, float drift)
         {
-            return distance_check(expected, current, drift, true);
+            return DistanceCheck(expected, current, drift, true);
         }
-        public static bool distance_check(float expected, float current, float drift, bool current_value)
+        public static bool DistanceCheck(float expected, float current, float drift, bool current_value)
         {
             if (current > (expected + drift))
             {
@@ -148,7 +148,7 @@ namespace SecondBotEvents
             var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
             return (long)timeSpan.TotalSeconds;
         }
-        public static bool notempty(string V)
+        public static bool NotEmpty(string V)
         {
             if (V != null)
             {
@@ -160,7 +160,7 @@ namespace SecondBotEvents
             return false;
         }
 
-        public static bool isempty(string V)
+        public static bool IsEmpty(string V)
         {
             if (V != null)
             {
@@ -172,7 +172,7 @@ namespace SecondBotEvents
             return true;
         }
 
-        public static bool notempty(string[] V)
+        public static bool NotEmpty(string[] V)
         {
             if (V != null)
             {

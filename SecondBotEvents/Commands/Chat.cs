@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using OpenMetaverse;
 using SecondBotEvents.Services;
 
@@ -12,7 +12,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object LocalChatHistory()
         {
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetLocalChat()));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetLocalChat()));
         }
 
         [About("sends a message to localchat (Normal chat)")]
@@ -23,7 +23,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeDo()]
         public object Say(string channel, string message)
         {
-            if (SecondbotHelpers.isempty(message) == true)
+            if (SecondbotHelpers.IsEmpty(message) == true)
             {
                 return Failure("Message empty", [channel, message]);
             }
@@ -44,7 +44,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeDo()]
         public object Shout(string channel, string message)
         {
-            if (SecondbotHelpers.isempty(message) == true)
+            if (SecondbotHelpers.IsEmpty(message) == true)
             {
                 return Failure("Message empty", [channel, message]);
             }
@@ -65,7 +65,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeDo()]
         public object Whisper(string channel, string message)
         {
-            if (SecondbotHelpers.isempty(message) == true)
+            if (SecondbotHelpers.IsEmpty(message) == true)
             {
                 return Failure("Message empty", [channel, message]);
             }
@@ -94,7 +94,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("avatar lookup", [avatar, message]);
             }
-            if (SecondbotHelpers.isempty(message) == true)
+            if (SecondbotHelpers.IsEmpty(message) == true)
             {
                 return Failure("Message empty", [avatar, message]);
             }
@@ -108,7 +108,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object chatwindows()
         {
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetAvatarImWindows()));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetAvatarImWindows()));
         }
 
         [About("gets a list of chat windows from avatars with unread messages")]
@@ -116,7 +116,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object listwithunread()
         {
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetAvatarImWindowsUnread()));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetAvatarImWindowsUnread()));
         }
 
         [About("gets if there are any unread im messages from avatars at all")]
@@ -139,7 +139,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("avatar UUID invaild");
             }
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetAvatarImWindow(avatarUUID)));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetAvatarImWindow(avatarUUID)));
         }
 
     }

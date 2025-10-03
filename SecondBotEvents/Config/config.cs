@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -76,7 +76,7 @@ namespace SecondBotEvents.Config
             SimpleIO IO = new();
             IO.ChangeRoot(fromFolder);
             string writeFile = filename + ".json";
-            IO.WriteFile(writeFile, JsonConvert.SerializeObject(saveMe));
+            IO.WriteFile(writeFile, JsonSerializer.Serialize(saveMe));
 
         }
         protected void LoadSettingsFromFile(string fromFolder)
@@ -96,7 +96,7 @@ namespace SecondBotEvents.Config
                 {
                     settings.Add(x.Key);
                     string value = x.Value.ToString();
-                    if (SecondbotHelpers.notempty(value) == false)
+                    if (SecondbotHelpers.NotEmpty(value) == false)
                     {
                         mysettings.Add(x.Key, "");
                         continue;

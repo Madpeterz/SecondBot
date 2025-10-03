@@ -1,5 +1,5 @@
 ﻿using BetterSecondBot.Static;
-using Newtonsoft.Json;
+using System.Text.Json;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using Org.BouncyCastle.Tls;
@@ -804,11 +804,11 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild item uuid", [itemuuid, itemname, itemtype, avatar]);
             }
-            if(SecondbotHelpers.isempty(itemname) == true)
+            if(SecondbotHelpers.IsEmpty(itemname) == true)
             {
                 return Failure("Invaild item name", [itemuuid, itemname, itemtype, avatar]);
             }
-            if (SecondbotHelpers.isempty(itemtype) == true)
+            if (SecondbotHelpers.IsEmpty(itemtype) == true)
             {
                 return Failure("Invaild item name", [itemuuid, itemname, itemtype, avatar]);
             }
@@ -1112,7 +1112,7 @@ namespace SecondBotEvents.Commands
         public object InventoryContentsCatched()
         {
             InventoryNodeEntry root = LoadInventoryNode(GetClient().Inventory.Store.RootFolder.UUID,"My Inventory");
-            return BasicReply(JsonConvert.SerializeObject(root));
+            return BasicReply(JsonSerializer.Serialize(root));
         }
 
         protected InventoryNodeEntry LoadInventoryNode(UUID folder, string name="")
@@ -1284,7 +1284,7 @@ namespace SecondBotEvents.Commands
         }
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this);
+            return JsonSerializer.Serialize(this);
         }
     }
 }

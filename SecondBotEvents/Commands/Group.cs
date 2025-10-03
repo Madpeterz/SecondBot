@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using OpenMetaverse;
 using SecondBotEvents.Services;
 using System.Collections.Generic;
@@ -41,7 +41,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild group UUID", [group]);
             }
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroupMembers(groupuuid)));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetGroupMembers(groupuuid)));
         }
 
         [About("Attempts to ban/unban a given avatar from a group")]
@@ -212,11 +212,11 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unknown group", [group, title, message]);
             }
-            if (SecondbotHelpers.notempty(title) == false)
+            if (SecondbotHelpers.NotEmpty(title) == false)
             {
                 return Failure("Title empty", [group, title, message]);
             }
-            if (SecondbotHelpers.notempty(message) == false)
+            if (SecondbotHelpers.NotEmpty(message) == false)
             {
                 return Failure("Message empty", [group, title, message]);
             }
@@ -303,11 +303,11 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unknown group", [group, title, message, attachment]);
             }
-            if (SecondbotHelpers.notempty(title) == false)
+            if (SecondbotHelpers.NotEmpty(title) == false)
             {
                 return Failure("Title empty", [group, title, message, attachment]);
             }
-            if (SecondbotHelpers.notempty(message) == false)
+            if (SecondbotHelpers.NotEmpty(message) == false)
             {
                 return Failure("Message empty", [group, title, message, attachment]);
             }
@@ -328,7 +328,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object GetGroupList()
         {
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroups()));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetGroups()));
         }
 
         [About("Forces the bot to reload the groups list")]
@@ -357,7 +357,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unknown group", [group]);
             }
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroupRoles(groupuuid)));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetGroupRoles(groupuuid)));
         }
 
         [About("fetchs a list of all groups with unread messages")]
@@ -365,7 +365,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object GroupchatListAllUnreadGroups()
         {
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetAllGroupsChatWithUnread()));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetAllGroupsChatWithUnread()));
         }
 
         [About("checks if a given group has any unread messages")]
@@ -416,7 +416,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Group UUID invaild", [group]);
             }
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetGroupChatHistory(groupUUID)));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetGroupChatHistory(groupUUID)));
         }
 
         [About("sends a message to the groupchat")]

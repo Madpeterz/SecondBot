@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenMetaverse;
-using Newtonsoft.Json;
+using System.Text.Json;
 using SecondBotEvents.Services;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace SecondBotEvents.Commands
 {
@@ -16,7 +14,7 @@ namespace SecondBotEvents.Commands
         [ReturnHintsFailure("Invaild avatar uuid")]
         [ReturnHintsFailure("Unknown store type")]
         [ReturnHintsFailure("Unable to process request store")]
-        [ArgHints("store", "What type of request to accept", "Text", "GroupInvite", new string[] { "FriendRequest", "InventoryOffer", "GroupInvite", "Teleport" })]
+        [ArgHints("store", "What type of request to accept", "Text", "GroupInvite", ["FriendRequest", "InventoryOffer", "GroupInvite", "Teleport"])]
         [ArgHints("avatar", "Who to accept the request from", "AVATAR")]
         [ArgHints("remove", "Should this remove the entry", "BOOL")]
         [CmdTypeDo()]
@@ -47,7 +45,7 @@ namespace SecondBotEvents.Commands
         [ReturnHints("false")]
         [ReturnHintsFailure("Invaild avatar uuid")]
         [ReturnHintsFailure("Unknown store type")]
-        [ArgHints("store", "What type of request to accept", "Text", "GroupInvite", new string[] { "FriendRequest", "InventoryOffer", "GroupInvite", "Teleport" })]
+        [ArgHints("store", "What type of request to accept", "Text", "GroupInvite", ["FriendRequest", "InventoryOffer", "GroupInvite", "Teleport"])]
         [ArgHints("avatar", "Who to accept the request from", "AVATAR")]
         [CmdTypeDo()]
         public Object IsOnAcceptNext(string store, string avatar)
@@ -97,7 +95,7 @@ namespace SecondBotEvents.Commands
                     BetterNearMe.Add(details);
                 }
             }
-            return BasicReply(JsonConvert.SerializeObject(BetterNearMe));
+            return BasicReply(JsonSerializer.Serialize(BetterNearMe));
         }
 
         [About("Requests the given avatars profile image")]
@@ -230,7 +228,7 @@ namespace SecondBotEvents.Commands
                     NearMe.Add(av.ID, av.Name);
                 }
             }
-            return BasicReply(JsonConvert.SerializeObject(NearMe));
+            return BasicReply(JsonSerializer.Serialize(NearMe));
         }
 
         [About("searchs the AV database if not found triggers a lookup")]
@@ -241,12 +239,11 @@ namespace SecondBotEvents.Commands
         [CmdTypeDo()]
         public object Key2Name(string uuid)
         {
-            UUID avUUID = UUID.Zero;
-            if (UUID.TryParse(uuid, out avUUID) == false)
+            if (UUID.TryParse(uuid, out _) == false)
             {
                 return Failure("Not a vaild UUID");
             }
-            return BasicReply(master.DataStoreService.GetAvatarName(avUUID));
+            return BasicReply(master.DataStoreService.GetAvatarName(UUID.Zero));
         }
 
         [About("searchs the AV database if not found triggers a lookup")]

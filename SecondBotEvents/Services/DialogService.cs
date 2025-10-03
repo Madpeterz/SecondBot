@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.Linq;
 using Swan;
 using SecondBotEvents.Commands;
@@ -190,7 +190,7 @@ namespace SecondBotEvents.Services
                     objectname = e.ObjectName,
                     expires = expiresAt
                 };
-                string eventMessage = JsonConvert.SerializeObject(window);
+                string eventMessage = JsonSerializer.Serialize(window);
                 foreach(int a in DialogRelayChannels)
                 {
                     if(a >= 0)

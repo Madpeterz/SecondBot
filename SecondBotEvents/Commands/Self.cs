@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using OpenMetaverse;
 using OpenMetaverse.ImportExport.Collada14;
 using SecondBotEvents.Services;
@@ -22,14 +22,14 @@ namespace SecondBotEvents.Commands
         [CmdTypeDo()]
         public object SendEmail(string to, string subject, string body)
         {
-            if (SecondbotHelpers.isempty(to) == true) {
+            if (SecondbotHelpers.IsEmpty(to) == true) {
                 return Failure("to is empty");
             }
-            else if (SecondbotHelpers.isempty(subject) == true)
+            else if (SecondbotHelpers.IsEmpty(subject) == true)
             {
                 return Failure("subject is empty", [to]);
             }
-            else if (SecondbotHelpers.isempty(body) == true)
+            else if (SecondbotHelpers.IsEmpty(body) == true)
             {
                 return Failure("body is empty", [to, subject]);
             }
@@ -90,11 +90,11 @@ namespace SecondBotEvents.Commands
         [CmdTypeSet()]
         public object SetKeyValue(string Key, string Value)
         {
-            if (SecondbotHelpers.isempty(Key) == false)
+            if (SecondbotHelpers.IsEmpty(Key) == false)
             {
                 return Failure("Key is empty", [Key, Value]);
             }
-            if (SecondbotHelpers.isempty(Value) == false)
+            if (SecondbotHelpers.IsEmpty(Value) == false)
             {
                 return Failure("Value is empty", [Key, Value]);
             }
@@ -109,7 +109,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeSet()]
         public object ClearKeyValue(string Key)
         {
-            if (SecondbotHelpers.isempty(Key) == false)
+            if (SecondbotHelpers.IsEmpty(Key) == false)
             {
                 return Failure("Key is empty", [Key]);
             }
@@ -218,7 +218,7 @@ namespace SecondBotEvents.Commands
             List<string> reply = [];
             foreach (CommandHistory A in master.DataStoreService.GetCommandHistory())
             {
-                reply.Add(JsonConvert.SerializeObject(A));
+                reply.Add(JsonSerializer.Serialize(A));
                 if (reply.Count >= 5)
                 {
                     break;

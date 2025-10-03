@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using OpenMetaverse;
 using SecondBotEvents.Config;
 using System;
@@ -218,7 +218,7 @@ namespace SecondBotEvents.Services
                 sourcetype = source,
                 sourceoption = filter
             };
-            string eventMessage = JsonConvert.SerializeObject(a);
+            string eventMessage = JsonSerializer.Serialize(a);
             relayEventExtended relayEventExtended = new()
             {
                 source = source,
@@ -230,7 +230,7 @@ namespace SecondBotEvents.Services
                 message = message,
                 unixtime = SecondbotHelpers.UnixTimeNow().ToString()
             };
-            string eventMessageExtended = JsonConvert.SerializeObject(relayEventExtended);
+            string eventMessageExtended = JsonSerializer.Serialize(relayEventExtended);
 
             while (loop <= myConfig.GetRelayCount())
             {

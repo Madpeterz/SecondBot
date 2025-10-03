@@ -1,5 +1,5 @@
 ﻿using EmbedIO;
-using Newtonsoft.Json;
+using System.Text.Json;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using OpenMetaverse.StructuredData;
@@ -372,7 +372,7 @@ namespace SecondBotEvents.Commands
             }
             string covenantText = covenantAssetRead.Value;
             // Return the result as a JSON object, including the text
-            return BasicReply(JsonConvert.SerializeObject(new
+            return BasicReply(JsonSerializer.Serialize(new
             {
                 Fetched = covenantAssetRead.Key,
                 CovenantID = result.CovenantID.ToString(),
@@ -580,7 +580,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeDo()]
         public object SimMessage(string message)
         {
-            if (SecondbotHelpers.notempty(message) == false)
+            if (SecondbotHelpers.NotEmpty(message) == false)
             {
                 return Failure("Message empty", [message]);
             }
@@ -638,7 +638,7 @@ namespace SecondBotEvents.Commands
                 { "X", region.X.ToString() },
                 { "Y", region.Y.ToString() }
             };
-            return BasicReply(JsonConvert.SerializeObject(reply));
+            return BasicReply(JsonSerializer.Serialize(reply));
         }
 
         [About("Requests the estate banlist")]
@@ -646,7 +646,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object GetEstateBanList()
         {
-            return BasicReply(JsonConvert.SerializeObject(master.DataStoreService.GetEstateBans()));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetEstateBans()));
         }
 
         [About("Attempts to add/remove the avatar to/from the Estate banlist")]

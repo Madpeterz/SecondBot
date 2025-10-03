@@ -1,6 +1,6 @@
 ﻿using OpenMetaverse;
 using SecondBotEvents.Services;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -34,7 +34,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("no map access or updating", [avatar]);
             }
-            return BasicReply(JsonConvert.SerializeObject(loc), [avatar]);
+            return BasicReply(JsonSerializer.Serialize(loc), [avatar]);
         }
 
         [About("Gets the friendslist")]
@@ -56,7 +56,7 @@ namespace SecondBotEvents.Commands
                 CleanedFriendsList.Add(entry);
                 index++;
             }
-            return BasicReply(JsonConvert.SerializeObject(CleanedFriendsList));
+            return BasicReply(JsonSerializer.Serialize(CleanedFriendsList));
         }
 
         [About("Updates the friend perms for avatar avatar to State \n if true grants (Online/Map/Modify) perms")]

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using SecondBotEvents.Services;
@@ -20,7 +20,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object NotecardRead(string notecardInventoryUUID, string replytarget)
         {
-            if(SecondbotHelpers.isempty(replytarget) == true)
+            if(SecondbotHelpers.IsEmpty(replytarget) == true)
             {
                 return Failure("replytarget not set");
             }
@@ -33,20 +33,20 @@ namespace SecondBotEvents.Commands
             };
             if (UUID.TryParse(notecardInventoryUUID, out var uuid) == false)
             {
-                master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
+                master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply), "NotecardRead");
                 return Failure(reply.content, [notecardInventoryUUID]);
             }
             reply.content = "Unable to find inventory item";
             InventoryItem item = GetClient().Inventory.FetchItem(uuid, GetClient().Self.AgentID, new System.TimeSpan(0, 1, 30));
             if (item == null)
             {
-                master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
+                master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply), "NotecardRead");
                 return Failure(reply.content, [notecardInventoryUUID]);
             }
             reply.content = "Inventory item is not a notecard";
             if (item.InventoryType != InventoryType.Notecard)
             {
-                master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
+                master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply), "NotecardRead");
                 return Failure(reply.content, [notecardInventoryUUID]); ;
             }
             InventoryNotecard notecard = (InventoryNotecard)item;
@@ -55,7 +55,7 @@ namespace SecondBotEvents.Commands
                 if (transfer.Success == false)
                 {
                     reply.content = "!ERROR! - unable to read notecard";
-                    master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
+                    master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply), "NotecardRead");
                 }
                 else
                 {
@@ -77,7 +77,7 @@ namespace SecondBotEvents.Commands
                     reply.content = contents;
                     reply.name = notecard.Name;
                     reply.status = true;
-                    master.CommandsService.SmartCommandReply(replytarget, JsonConvert.SerializeObject(reply), "NotecardRead");
+                    master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply), "NotecardRead");
                 }
             }
             );
@@ -93,11 +93,11 @@ namespace SecondBotEvents.Commands
         [CmdTypeSet()]
         public object NotecardAdd(string collection, string content)
         {
-            if (SecondbotHelpers.notempty(collection) == false)
+            if (SecondbotHelpers.NotEmpty(collection) == false)
             {
                 return Failure("Collection value is empty", [collection, content]);
             }
-            if (SecondbotHelpers.notempty(content) == false)
+            if (SecondbotHelpers.NotEmpty(content) == false)
             {
                 return Failure("Content value is empty", [collection, content]);
             }
@@ -112,7 +112,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeSet()]
         public object NotecardClear(string collection)
         {
-            if (SecondbotHelpers.notempty(collection) == false)
+            if (SecondbotHelpers.NotEmpty(collection) == false)
             {
                 return Failure("Collection value is empty", [collection]);
             }
@@ -132,11 +132,11 @@ namespace SecondBotEvents.Commands
         [CmdTypeDo()]
         public object NotecardSend(string avatar, string collection, string notecardname)
         {
-            if (SecondbotHelpers.notempty(collection) == false)
+            if (SecondbotHelpers.NotEmpty(collection) == false)
             {
                 return Failure("Collection value is empty", [avatar, collection, notecardname]);
             }
-            if (SecondbotHelpers.notempty(notecardname) == false)
+            if (SecondbotHelpers.NotEmpty(notecardname) == false)
             {
                 return Failure("Notecardname value is empty", [avatar, collection, notecardname]);
             }
@@ -170,11 +170,11 @@ namespace SecondBotEvents.Commands
         [CmdTypeDo()]
         public object NotecardDirectSend(string avatar, string content, string notecardname)
         {
-            if (SecondbotHelpers.notempty(notecardname) == false)
+            if (SecondbotHelpers.NotEmpty(notecardname) == false)
             {
                 return Failure("notecardname value is empty", [avatar, content, notecardname]);
             }
-            if (SecondbotHelpers.notempty(content) == false)
+            if (SecondbotHelpers.NotEmpty(content) == false)
             {
                 return Failure("content value is empty", [avatar, content, notecardname]);
             }

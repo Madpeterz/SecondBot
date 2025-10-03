@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using OpenMetaverse;
 using RestSharp;
 using SecondBotEvents.Services;
@@ -22,11 +22,11 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object FetchNextNotecard(string endpoint, string endpointcode)
         {
-            if (SecondbotHelpers.notempty(endpoint) == false)
+            if (SecondbotHelpers.NotEmpty(endpoint) == false)
             {
                 return Failure("Endpoint is empty", [endpoint, endpointcode]);
             }
-            if (SecondbotHelpers.notempty(endpointcode) == false)
+            if (SecondbotHelpers.NotEmpty(endpointcode) == false)
             {
                 return Failure("Endpointcode is empty", [endpoint, endpointcode]);
             }
@@ -48,7 +48,7 @@ namespace SecondBotEvents.Commands
             }
             try
             {
-                NotecardEndpoint server_reply = JsonConvert.DeserializeObject<NotecardEndpoint>(endpoint_checks.Content);
+                NotecardEndpoint server_reply = JsonSerializer.Deserialize<NotecardEndpoint>(endpoint_checks.Content);
                 if (server_reply.status == false)
                 {
                     return Failure("Bad reply: " + server_reply.message, [endpoint, endpointcode]);

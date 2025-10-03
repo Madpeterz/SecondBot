@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using Newtonsoft.Json.Linq;
 using OpenMetaverse;
 using SecondBotEvents.Config;
@@ -245,7 +245,10 @@ namespace SecondBotEvents.Services
                     return;
                 }
                 mode = "IM";
-                UUID.TryParse(UUIDfetch, out target_avatar);
+                if(UUID.TryParse(UUIDfetch, out target_avatar) == false)
+                {
+                    return;
+                }
             }
             else if (new EmailAddressAttribute().IsValid(target) == true)
             {
@@ -322,7 +325,7 @@ namespace SecondBotEvents.Services
                             reply = "Error";
                             if (processed != null)
                             {
-                                reply = JsonConvert.SerializeObject(processed);
+                                reply = JsonSerializer.Serialize(processed);
                             }
                             CommandNotice(C.command, source, String.Join("@@@", C.args), true, reply);
                             return new KeyValuePair<bool, string>(status, reply);
@@ -450,7 +453,7 @@ namespace SecondBotEvents.Services
                 {
                     e.results = e.results.Substring(0, 100) + "...";
                 }
-                LogFormater.Info("Command log:" + JsonConvert.SerializeObject(e));
+                LogFormater.Info("Command log:" + JsonSerializer.Serialize(e));
             }
         }
     }
@@ -606,7 +609,7 @@ namespace SecondBotEvents.Services
         {
             dynamic ret = jToken[key];
             if (ret == null) return defaultValue;
-            if (ret is JObject) return JsonConvert.DeserializeObject<T>(ret.ToString());
+            if (ret is JObject) return JsonSerializer.Deserialize<T>(ret.ToString());
             return (T)ret;
         }
     }

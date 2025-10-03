@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Threading;
 using RabbitMQ.Client.Events;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Swan;
 using OpenMetaverse;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -19,7 +19,7 @@ namespace SecondBotEvents.Services
         {
             try
             {
-                JsonCommandFormat result = JsonConvert.DeserializeObject<JsonCommandFormat>(Encoding.UTF8.GetString(e.Body.ToArray()));
+                JsonCommandFormat result = JsonSerializer.Deserialize<JsonCommandFormat>(Encoding.UTF8.GetString(e.Body.ToArray()));
                 if (result == null || string.IsNullOrEmpty(result.CommandName))
                 {
                     if (myConfig.GetLogDebug() == true)
@@ -45,7 +45,7 @@ namespace SecondBotEvents.Services
         {
             try
             {
-                JsonNotecardFormat result = JsonConvert.DeserializeObject<JsonNotecardFormat>(Encoding.UTF8.GetString(e.Body.ToArray()));
+                JsonNotecardFormat result = JsonSerializer.Deserialize<JsonNotecardFormat>(Encoding.UTF8.GetString(e.Body.ToArray()));
                 if (
                     result == null ||
                     string.IsNullOrEmpty(result.Name) ||
@@ -82,7 +82,7 @@ namespace SecondBotEvents.Services
             Console.WriteLine("Message received: " + Encoding.UTF8.GetString(e.Body.ToArray()));
             try
             {
-                JsonMessageFormat result = JsonConvert.DeserializeObject<JsonMessageFormat>(Encoding.UTF8.GetString(e.Body.ToArray()));
+                JsonMessageFormat result = JsonSerializer.Deserialize<JsonMessageFormat>(Encoding.UTF8.GetString(e.Body.ToArray()));
                 if (result == null || string.IsNullOrEmpty(result.UUID) || string.IsNullOrEmpty(result.Message))
                 {
                     if (myConfig.GetLogDebug() == true)
@@ -113,7 +113,7 @@ namespace SecondBotEvents.Services
             Console.WriteLine("Message received: " + Encoding.UTF8.GetString(e.Body.ToArray()));
             try
             {
-                JsonMessageFormat result = JsonConvert.DeserializeObject<JsonMessageFormat>(Encoding.UTF8.GetString(e.Body.ToArray()));
+                JsonMessageFormat result = JsonSerializer.Deserialize<JsonMessageFormat>(Encoding.UTF8.GetString(e.Body.ToArray()));
                 if (result == null || string.IsNullOrEmpty(result.UUID) || string.IsNullOrEmpty(result.Message))
                 {
                     if (myConfig.GetLogDebug() == true)
@@ -151,9 +151,8 @@ namespace SecondBotEvents.Services
                 return;
             }
         }
-        ConnectionFactory factory;
-        IConnection connection;
-        Dictionary<string, IChannel> channels = new Dictionary<string, IChannel>();
+        protected IConnection connection;
+        protected Dictionary<string, IChannel> channels = [];
         public override void Start(bool updateEnabled = false, bool setEnabledTo = false)
         {
             if (updateEnabled == true)
@@ -209,7 +208,7 @@ namespace SecondBotEvents.Services
             return new KeyValuePair<bool, string>(true, "Message sent to queue " + Qname);
         }
 
-        protected void connectService()
+        protected void ConnectService()
         {
             if (connection != null && connection.IsOpen == true)
             {
@@ -219,9 +218,11 @@ namespace SecondBotEvents.Services
             var endpoints = new System.Collections.Generic.List<AmqpTcpEndpoint> {
               new AmqpTcpEndpoint(myConfig.GetHostIP(),myConfig.GetHostPort()),
             };
-            ConnectionFactory factory = new ConnectionFactory();
-            factory.UserName = myConfig.GetHostUsername();
-            factory.Password = myConfig.GetHostPassword();
+            ConnectionFactory factory = new ConnectionFactory
+            {
+                UserName = myConfig.GetHostUsername(),
+                Password = myConfig.GetHostPassword()
+            };
             try
             {
                 connection = factory.CreateConnectionAsync(endpoints).Await();
@@ -232,10 +233,10 @@ namespace SecondBotEvents.Services
                     return;
                 }
 
-                createChannelWorker(myConfig.GetNotecardQueue(), "NotecardMessageEvent");
-                createChannelWorker(myConfig.GetCommandQueue(), "CommandMessageEvent");
-                createChannelWorker(myConfig.GetImQueue(), "ImMessageEvent");
-                createChannelWorker(myConfig.GetGroupImQueue(), "GroupMessageEvent");
+                CreateChannelWorker(myConfig.GetNotecardQueue(), "NotecardMessageEvent");
+                CreateChannelWorker(myConfig.GetCommandQueue(), "CommandMessageEvent");
+                CreateChannelWorker(myConfig.GetImQueue(), "ImMessageEvent");
+                CreateChannelWorker(myConfig.GetGroupImQueue(), "GroupMessageEvent");
             }
             catch (Exception ex)
             {
@@ -250,7 +251,7 @@ namespace SecondBotEvents.Services
 
         }
 
-        protected async void createChannelWorker(string queueName, string functionpointer)
+        protected async void CreateChannelWorker(string queueName, string functionpointer)
         {
             IChannel channel = connection.CreateChannelAsync().Await();
             channels.Add(queueName, channel);
@@ -299,7 +300,7 @@ namespace SecondBotEvents.Services
             }
             LogFormater.Info("Rabbit service [Attached to new client]");
             hasSecondbot = true;
-            connectService();
+            ConnectService();
         }
 
         public override void Stop()

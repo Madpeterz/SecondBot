@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using SecondBotEvents.Services;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +38,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            if (SecondbotHelpers.notempty(why) == false)
+            if (SecondbotHelpers.NotEmpty(why) == false)
             {
                 return Failure("Why empty", [serverid, memberid, why]);
             }
@@ -63,7 +63,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(reply.Value.First());
             }
-            return BasicReply(JsonConvert.SerializeObject(reply.Value));
+            return BasicReply(JsonSerializer.Serialize(reply.Value));
         }
 
         [About("Clears messages on the server sent by the member in the last 13 days, 22hours 59mins")]
@@ -128,7 +128,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Discord client not ready");
             }
-            if (SecondbotHelpers.notempty(message) == false)
+            if (SecondbotHelpers.NotEmpty(message) == false)
             {
                 return Failure("message empty", [serverid, channelid, tts, message]);
             }

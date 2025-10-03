@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using OpenMetaverse;
 using SecondBotEvents.Services;
 using System;
@@ -82,7 +82,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("No objects found");
             }
-            return BasicReply(JsonConvert.SerializeObject(reply));
+            return BasicReply(JsonSerializer.Serialize(reply));
         }
 
         [About("Fetchs the current bot")]
@@ -158,7 +158,7 @@ namespace SecondBotEvents.Commands
                 { "y", (int)Math.Round(GetClient().Self.SimPosition.Y) },
                 { "z", (int)Math.Round(GetClient().Self.SimPosition.Z) }
             };
-            return BasicReply(JsonConvert.SerializeObject(pos));
+            return BasicReply(JsonSerializer.Serialize(pos));
         }
     }
 

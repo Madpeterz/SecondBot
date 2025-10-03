@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.Linq;
 using Swan;
 using RestSharp;
@@ -33,7 +33,7 @@ namespace SecondBotEvents.Services
             {
                 foreach(string A in InventoryEvents[detail["itemtype"]])
                 {
-                    string output = JsonConvert.SerializeObject(detail);
+                    string output = JsonSerializer.Serialize(detail);
                     if(UUID.TryParse(A, out UUID OutputAvatar) == true)
                     {
                         if (OutputAvatar != UUID.Zero)
@@ -259,7 +259,7 @@ namespace SecondBotEvents.Services
                 args, 
                 myConfig.GetOutputSecret()
             );
-            string output = JsonConvert.SerializeObject(e);
+            string output = JsonSerializer.Serialize(e);
             if(myConfig.GetOutputChannel() >= 0)
             {
                 GetClient().Self.Chat(output, myConfig.GetOutputChannel(), ChatType.Normal);
@@ -268,7 +268,7 @@ namespace SecondBotEvents.Services
             {
                 GetClient().Self.InstantMessage(OutputAvatar, output);
             }
-            if(SecondbotHelpers.isempty(myConfig.GetOutputHttpURL()) == false)
+            if(SecondbotHelpers.IsEmpty(myConfig.GetOutputHttpURL()) == false)
             {
                 if(myConfig.GetOutputHttpURL().StartsWith("http") == false)
                 {

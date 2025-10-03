@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using OpenMetaverse;
 using SecondBotEvents.Config;
 using System;
@@ -62,15 +62,15 @@ namespace SecondBotEvents.Services
                 }
 
             }
-            chatHistorySize = inrange(3,10,myConfig.GetChatHistoryMessages());
-            localchatRateLimit = inrange(1, 10, myConfig.GetLocalchatRateLimiter());
-            groupchatRateLimit = inrange(1, 10, myConfig.GetGroupReplyRateLimiter());
-            imchatRateLimit = inrange(1, 10, myConfig.GetImReplyRateLimiter());
+            chatHistorySize = InRange(3,10,myConfig.GetChatHistoryMessages());
+            localchatRateLimit = InRange(1, 10, myConfig.GetLocalchatRateLimiter());
+            groupchatRateLimit = InRange(1, 10, myConfig.GetGroupReplyRateLimiter());
+            imchatRateLimit = InRange(1, 10, myConfig.GetImReplyRateLimiter());
             running = true;
             master.BotClientNoticeEvent += BotClientRestart;
         }
 
-        protected int inrange(int value, int min, int max)
+        protected static int InRange(int value, int min, int max)
         {
             if (value < min) return min;
             else if(value > max) return max;
@@ -113,9 +113,9 @@ namespace SecondBotEvents.Services
                 return "Disabled";
             }
             upkeep();
-            if (chatHistoryAI.Count() > 0)
+            if (chatHistoryAI.Count > 0)
             {
-                return "Enabled running: " + chatHistoryAI.Count().ToString() + " chat windows";
+                return "Enabled running: " + chatHistoryAI.Count.ToString() + " chat windows";
             }
             return "Enabled No chat history";
         }
@@ -220,9 +220,9 @@ namespace SecondBotEvents.Services
             }
         }
 
-        Dictionary<UUID, List<KeyValuePair<string, string>>> chatHistoryAI = [];
-        Dictionary<UUID, long> ChatHistoryLastAccessed = [];
-        Dictionary<UUID, long> ChatRateLimiter = [];
+        protected Dictionary<UUID, List<KeyValuePair<string, string>>> chatHistoryAI = [];
+        protected Dictionary<UUID, long> ChatHistoryLastAccessed = [];
+        protected Dictionary<UUID, long> ChatRateLimiter = [];
 
         protected long lastUpkeep = 0;
         protected void upkeep()
@@ -248,18 +248,9 @@ namespace SecondBotEvents.Services
                         }
                         foreach(UUID a in needcleaning)
                         {
-                            if(chatHistoryAI.ContainsKey(a))
-                            {
-                                chatHistoryAI.Remove(a);
-                            }
-                            if(ChatHistoryLastAccessed.ContainsKey(a))
-                            {
-                                ChatHistoryLastAccessed.Remove(a);
-                            }
-                            if (ChatRateLimiter.ContainsKey(a))
-                            {
-                                ChatRateLimiter.Remove(a);
-                            }
+                            chatHistoryAI.Remove(a);
+                            ChatHistoryLastAccessed.Remove(a);
+                            ChatRateLimiter.Remove(a);
                         }
                     }
         }
@@ -328,7 +319,7 @@ namespace SecondBotEvents.Services
                         return chatHistoryAI[store]; // nothing in memory use the default store
                     }
                     redisDb.KeyExpire(readkey, TimeSpan.FromMinutes(myConfig.GetRedisMaxageMins())); // update the expire value
-                    return JsonConvert.DeserializeObject<List<KeyValuePair<string, string>>>(rawstring);
+                    return JsonSerializer.Deserialize<List<KeyValuePair<string, string>>>(rawstring);
                 }
                 return NoRedisStoreFound(store);
             }
@@ -423,24 +414,24 @@ namespace SecondBotEvents.Services
             {
                 return false;
             }
-            int maxsize = inrange(1, 9999, myConfig.GetRedisCountLocal());
+            int maxsize = InRange(1, 9999, myConfig.GetRedisCountLocal());
             if(avatarchat == true)
             {
-                maxsize = inrange(1, 9999, myConfig.GetRedisCountIm());
+                maxsize = InRange(1, 9999, myConfig.GetRedisCountIm());
             }
             else if(groupchat == true)
             {
-                maxsize = inrange(1, 9999, myConfig.GetRedisCountGroup());
+                maxsize = InRange(1, 9999, myConfig.GetRedisCountGroup());
             }
             // trim the history using targeted max values
-            while (history.Count() > maxsize + 1)
+            while (history.Count > maxsize + 1)
             {
                 history.RemoveAt(1);
             }
             RedisKey writekey = new(myConfig.GetRedisPrefix() + store.Guid.ToString());
             try
             {
-                string savestring = JsonConvert.SerializeObject(history);
+                string savestring = JsonSerializer.Serialize(history);
                 if (savestring == null)
                 {
                     LogFormater.Warn("Redis failed to convert history into savable format");
@@ -475,7 +466,7 @@ namespace SecondBotEvents.Services
         protected List<KeyValuePair<string, string>> BasicSaveHistory(UUID store, List<KeyValuePair<string, string>> history)
         {
             // trim the history using basic config
-            while (history.Count() > chatHistorySize + 1)
+            while (history.Count > chatHistorySize + 1)
             {
                 history.RemoveAt(1);
             }
@@ -519,11 +510,7 @@ namespace SecondBotEvents.Services
                             {
                                 throw new ArgumentException("Invalid role provided in history. Role must be 'system', 'user', or 'assistant'.");
                             }
-                            string thismessage = entry.Value;
-                            if(thismessage == null)
-                            {
-                                throw new ArgumentException("Message can not be empty");
-                            }
+                            string thismessage = entry.Value ?? throw new ArgumentException("Message can not be empty");
                             if (role == "system") messages.Add(ChatMessage.FromSystem(thismessage));
                             else if (role == "user") messages.Add(ChatMessage.FromUser(thismessage));
                             else if (role == "assistant") messages.Add(ChatMessage.FromAssistant(thismessage));
@@ -538,7 +525,7 @@ namespace SecondBotEvents.Services
                         return;
                     }
                 }
-            if(messages.Count() == 0)
+            if(messages.Count == 0)
             {
                 LogFormater.Warn("No messages given");
                 return;
@@ -581,7 +568,7 @@ namespace SecondBotEvents.Services
                     completionResult = await openAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
                     {
                         Messages = messages,
-                        Model = openAI_Models.GetModel(myConfig.GetUseModel())
+                        Model = OpenAIModels.GetModel(myConfig.GetUseModel())
                     });
 
                 }
@@ -705,7 +692,7 @@ namespace SecondBotEvents.Services
         }
     }
 
-    public class openAI_Models
+    public class OpenAIModels
     {
         public static string GetModel(string input)
         {

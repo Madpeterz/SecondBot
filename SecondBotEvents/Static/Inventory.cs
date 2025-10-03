@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using OpenMetaverse;
 using OpenMetaverse.ImportExport.Collada14;
 using System;
@@ -146,7 +146,7 @@ namespace BetterSecondBot.Static
         }
         public static string MapFolderInventoryJson(GridClient bot,UUID folder)
         {
-            return JsonConvert.SerializeObject(getfolderinventory(bot, folder));
+            return JsonSerializer.Serialize(getfolderinventory(bot, folder));
         }
 
         public static KeyValuePair<string,string> MapFolderInventoryHumanReadable(GridClient bot, UUID folder)
@@ -192,7 +192,7 @@ namespace BetterSecondBot.Static
                     }
                     if (topLevel != null)
                     {
-                        return JsonConvert.SerializeObject(DoMapFolderJson(bot, topLevel, subfolders));
+                        return JsonSerializer.Serialize(DoMapFolderJson(bot, topLevel, subfolders));
                     }
                 }
             }

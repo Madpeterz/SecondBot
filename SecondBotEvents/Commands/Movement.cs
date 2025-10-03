@@ -22,7 +22,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Convert to float has failed", [height]);
             }
-            if (SecondbotHelpers.inrange(level, -2.0, 2.0) == false)
+            if (SecondbotHelpers.InRange(level, -2.0, 2.0) == false)
             {
                 return Failure("height value out of range(-2.0 to 2.0)", [height]);
             }
@@ -45,15 +45,15 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Convert to vector has failed", [x, y, z]);
             }
-            if (SecondbotHelpers.inrange(pos.X, 0, 255) == false)
+            if (SecondbotHelpers.InRange(pos.X, 0, 255) == false)
             {
                 return Failure("x value out of range 0-255", [x, y, z]);
             }
-            if (SecondbotHelpers.inrange(pos.Y, 0, 255) == false)
+            if (SecondbotHelpers.InRange(pos.Y, 0, 255) == false)
             {
                 return Failure("y value out of range 0-255", [x, y, z]);
             }
-            if (SecondbotHelpers.inrange(pos.Z, 0, 5000) == false)
+            if (SecondbotHelpers.InRange(pos.Z, 0, 5000) == false)
             {
                 return Failure("z value out of range 0-5000", [x, y, z]);
             }
@@ -135,15 +135,15 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild vector", [vector]);
             }
-            if (SecondbotHelpers.inrange(pos.X, 0, 255) == false)
+            if (SecondbotHelpers.InRange(pos.X, 0, 255) == false)
             {
                 return Failure("Vector x value is out of range 0-255", [vector]);
             }
-            if (SecondbotHelpers.inrange(pos.Y, 0, 255) == false)
+            if (SecondbotHelpers.InRange(pos.Y, 0, 255) == false)
             {
                 return Failure("Vector y value is out of range 0-255", [vector]);
             }
-            if (SecondbotHelpers.inrange(pos.Z, 0, 5000) == false)
+            if (SecondbotHelpers.InRange(pos.Z, 0, 5000) == false)
             {
                 return Failure("Vector z value is out of range 0-5000", [vector]);
             }
@@ -233,7 +233,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeDo()]
         public object TeleportSLURL(string slurl)
         {
-            if (SecondbotHelpers.notempty(slurl) == false)
+            if (SecondbotHelpers.NotEmpty(slurl) == false)
             {
                 return Failure("slurl is empty", [slurl]);
             }

@@ -97,7 +97,7 @@ namespace SecondBotEvents
         protected bool exitNow = false;
         public EventsSecondBot(string[] args)
         {
-            if (SecondbotHelpers.notempty(Environment.GetEnvironmentVariable("basic_Username")) == true)
+            if (SecondbotHelpers.NotEmpty(Environment.GetEnvironmentVariable("basic_Username")) == true)
             {
                 fromEnv = true;
             }

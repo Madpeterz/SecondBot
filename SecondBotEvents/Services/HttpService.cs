@@ -13,7 +13,6 @@ using System.Text.Json;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Org.BouncyCastle.Utilities;
 using Swan;
 
@@ -160,7 +159,7 @@ namespace SecondBotEvents.Services
             {
                 return "Command request rejected";
             }
-            return JsonConvert.SerializeObject(master.CommandsService.RunCommand("HTTP", C));
+            return JsonSerializer.Serialize(master.CommandsService.RunCommand("HTTP", C));
         }
         public static async Task SerializationCallback(IHttpContext context, object? data)
         {
@@ -223,7 +222,7 @@ namespace SecondBotEvents.Services
 
         protected object BasicReply(string input)
         {
-            return BasicReply(input, Array.Empty<string>(), GetCallingCommand());
+            return BasicReply(input, [], GetCallingCommand());
         }
 
         protected object BasicReply(string input, string[] args)
@@ -250,12 +249,12 @@ namespace SecondBotEvents.Services
 
         protected object Failure(string input)
         {
-            return Failure(input, GetCallingCommand(), Array.Empty<string>(), null);
+            return Failure(input, GetCallingCommand(), [], null);
         }
 
         protected static string GetCallingCommand()
         {
-            string commandName = "Unable to get";
+            string commandName;
             try
             {
                 int index = 2;
@@ -343,7 +342,7 @@ namespace SecondBotEvents.Services
         public string about = about;
         public string defaultValueType = defaultValueType ?? string.Empty; // Default to empty string if not provided
         public string exampleValue = exampleValue ?? string.Empty; // Default to empty string if not provided
-        public string[] acceptedValues = acceptedValues ?? Array.Empty<string>(); // Default to empty array if not provided
+        public string[] acceptedValues = acceptedValues ?? []; // Default to empty array if not provided
     }
 
     public class SecondbotWebApi(EventsSecondBot setmaster) : WebApiController
@@ -364,7 +363,7 @@ namespace SecondBotEvents.Services
 
         public string Run([FormField] string commandName, [FormField] string args, [FormField] string signing, [FormField] string unixtime)
         {
-            string[] myArgs = Array.Empty<string>();
+            string[] myArgs = [];
             if(args != null)
             {
                 myArgs = args.Split("~#~", StringSplitOptions.RemoveEmptyEntries);
@@ -385,7 +384,7 @@ namespace SecondBotEvents.Services
             {
                 return "Command request rejected";
             }
-            return JsonConvert.SerializeObject(master.CommandsService.RunCommand("HTTP",C));
+            return JsonSerializer.Serialize(master.CommandsService.RunCommand("HTTP",C));
         }
     }
 

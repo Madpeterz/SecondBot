@@ -1,7 +1,7 @@
 ﻿using OpenMetaverse;
 using SecondBotEvents.Config;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json;
 using RestSharp;
 using OpenMetaverse.StructuredData;
 using System.Linq;

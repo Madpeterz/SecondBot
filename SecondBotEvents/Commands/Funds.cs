@@ -83,7 +83,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Amount out of range", [objectuuid, primname, amount]);
             }
-            if(SecondbotHelpers.notempty(primname) == false)
+            if(SecondbotHelpers.NotEmpty(primname) == false)
             {
                 return Failure("Primname is empty", [objectuuid, primname, amount]);
             }
