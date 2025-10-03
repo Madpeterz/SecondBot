@@ -1092,11 +1092,11 @@ namespace SecondBotEvents.Commands
         }
 
         [About("Requests the number of folders preloaded")]
-        [ReturnHints("number of preloaded folders")]
+        [ReturnHints("folders:X,items:X as a string")]
         [CmdTypeGet()]
-        public object InventoryPreloadFolderCount()
+        public object InventoryPreloadCount()
         {
-            return BasicReply(master.DataStoreService.GetPreloadedFolderCount().ToString());
+            return BasicReply("folders:"+ master.DataStoreService.GetPreloadedFolderCount().ToString()+",items:"+master.DataStoreService.GetPreloadedItemCount().ToString());
         }
 
 
@@ -1111,7 +1111,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object InventoryContentsCatched()
         {
-            InventoryNodeEntry root = LoadInventoryNode(GetClient().Inventory.Store.RootFolder.UUID,"root");
+            InventoryNodeEntry root = LoadInventoryNode(GetClient().Inventory.Store.RootFolder.UUID,"My Inventory");
             return BasicReply(JsonConvert.SerializeObject(root));
         }
 

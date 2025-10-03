@@ -223,11 +223,13 @@ namespace SecondBotEvents.Services
                     return "Loading "+preloadingFolders.Count()+" inventory folders";
                 }
             }
+            
             int sum = commandHistories.Count + KeyValueStoreLastUsed.Count + KeyValueStore.Count +
                 chatWindowsOwner.Count + chatWindowsIsGroup.Count + chatWindowsUnread.Count +
                 chatWindows.Count + localChatHistory.Count + groupRoles.Count +
                 groupMembers.Count + groupsKey2Name.Count + avatarsName2Key.Count + avprops.Count;
-            return sum.ToString();
+            string returndat = "Total entrys: "+sum.ToString()+", Preloaded inventory: "+preloadFolderCount.ToString()+" folders and "+preloadItemCount.ToString()+" items";
+            return returndat;
         }
 
         public void AddCommandToHistory(bool status, string command, string[] args, string results=null)
@@ -1017,20 +1019,25 @@ namespace SecondBotEvents.Services
             if(myConfig.GetPrefetchInventory() == true)
             {
                 preloadDone = false;
-                Task.Run(() =>
+                _ = Task.Run(async () =>
                 {
-                    preloadFolder("root", GetClient().Inventory.Store.RootFolder.UUID, myConfig.GetPrefetchInventoryDepth(), 0);
+                    await preloadFolder("root", GetClient().Inventory.Store.RootFolder.UUID, myConfig.GetPrefetchInventoryDepth(), 0);
                 });
             }
         }
 
         protected List<string> preloadingFolders = [];
         protected bool preloadDone = true;
-        public int preloadFolderCount = 0;
+        protected int preloadFolderCount = 0;
+        protected int preloadItemCount = 0;
 
         public int GetPreloadedFolderCount()
         {
             return preloadFolderCount;
+        }
+        public int GetPreloadedItemCount()
+        {
+            return preloadItemCount;
         }
         public bool preloadInventoryReady()
         {
@@ -1049,38 +1056,49 @@ namespace SecondBotEvents.Services
             return true;
         }
 
-        protected async void preloadFolder(string foldername,UUID folder, int maxDepth, int currentDepth)
+        protected async Task preloadFolder(string foldername,UUID folder, int maxDepth, int currentDepth)
         {
-            await Task.Run(async () =>
+            lock (preloadingFolders)
             {
-                lock (preloadingFolders)
+                preloadingFolders.Add(folder.Guid.ToString());
+            }
+            
+            await Task.Delay(_delayRandom.Next(500, 1251) * (currentDepth+1));
+            
+            List<InventoryBase> foldercontents = GetClient().Inventory.FolderContents(
+            folder,
+            GetClient().Self.AgentID, true, true,
+            InventorySortOrder.ByDate, TimeSpan.FromSeconds(30), false);
+            
+            List<Task> subFolderTasks = [];
+            
+            foreach (InventoryBase item in foldercontents)
+            {
+                string entrytype = item.GetType().Name.Replace("Inventory", "");
+                if (entrytype != "Folder")
                 {
-                    preloadingFolders.Add(folder.Guid.ToString());
+                    Interlocked.Increment(ref preloadItemCount);
+                    continue;
                 }
-                await Task.Delay(_delayRandom.Next(500, 1251) * (currentDepth+1));
-                List<InventoryBase> foldercontents = GetClient().Inventory.FolderContents(
-                GetClient().Inventory.Store.RootFolder.UUID,
-                GetClient().Self.AgentID, true, true,
-                InventorySortOrder.ByName, TimeSpan.FromSeconds(30), false);
-                foreach (InventoryBase item in foldercontents)
+                if ((currentDepth + 1) > maxDepth)
                 {
-                    string entrytype = item.GetType().Name.Replace("Inventory", "");
-                    if (entrytype != "Folder")
-                    {
-                        continue;
-                    }
-                    if ((currentDepth + 1) > maxDepth)
-                    {
-                        continue;
-                    }
-                    preloadFolder(item.Name, item.UUID, maxDepth, currentDepth + 1);
+                    continue;
                 }
-                lock (preloadingFolders)
-                {
-                    preloadFolderCount++;
-                    preloadingFolders.Remove(folder.Guid.ToString());
-                }
-            });
+                // Start loading subfolder but don't wait for it yet
+                subFolderTasks.Add(preloadFolder(item.Name, item.UUID, maxDepth, currentDepth + 1));
+            }
+            
+            // Wait for all subfolder tasks to complete
+            if (subFolderTasks.Count > 0)
+            {
+                await Task.WhenAll(subFolderTasks);
+            }
+            
+            lock (preloadingFolders)
+            {
+                preloadFolderCount++;
+                preloadingFolders.Remove(folder.Guid.ToString());
+            }
         }
 
         readonly string[] hard_blocked_agents = ["secondlife", "second life"];
