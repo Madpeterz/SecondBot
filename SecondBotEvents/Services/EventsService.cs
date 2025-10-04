@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Linq;
 using Swan;
 using RestSharp;
+using System.Threading.Tasks;
 
 namespace SecondBotEvents.Services
 {
@@ -28,44 +29,48 @@ namespace SecondBotEvents.Services
 
         public void InventoryUpdateEvent(Dictionary<string, string> detail)
         {
-            detail["itemtype"] = detail["itemtype"].ToLower().FirstCharToUpper();
-            if (InventoryEvents.ContainsKey(detail["itemtype"]) == true)
+            Task.Run(() =>
             {
-                foreach(string A in InventoryEvents[detail["itemtype"]])
-                {
-                    string output = JsonSerializer.Serialize(detail);
-                    if(UUID.TryParse(A, out UUID OutputAvatar) == true)
-                    {
-                        if (OutputAvatar != UUID.Zero)
-                        {
-                            GetClient().Self.InstantMessage(OutputAvatar, output);
-                        }
-                    }
-                    else if (A.StartsWith("http") == true)
-                    {
-                        long unixtime = SecondbotHelpers.UnixTimeNow();
-                        string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "EventService" + GetClient().Self.AgentID + output+master.CommandsService.myConfig.GetSharedSecret());
-                        var client = new RestClient(A);
-                        var request = new RestRequest("Inventory/Update", Method.Post);
-                        request.AddParameter("token", token);
-                        request.AddParameter("unixtime", unixtime.ToString());
-                        request.AddParameter("method", "Inventory");
-                        request.AddParameter("action", "Update");
-                        request.AddParameter("botname", GetClient().Self.Name);
-                        request.AddParameter("event", output);
-                        request.AddHeader("content-type", "application/x-www-form-urlencoded");
-                        client.ExecutePostAsync(request);
-                    }
-                    else if (int.TryParse(A, out int chann) == true)
-                    {
-                        if (chann >= 0)
-                        {
-                            GetClient().Self.Chat(output, chann, ChatType.Normal);
-                        }
-                    }
 
+                detail["itemtype"] = detail["itemtype"].ToLower().FirstCharToUpper();
+                if (InventoryEvents.ContainsKey(detail["itemtype"]) == true)
+                {
+                    foreach (string A in InventoryEvents[detail["itemtype"]])
+                    {
+                        string output = JsonSerializer.Serialize(detail);
+                        if (UUID.TryParse(A, out UUID OutputAvatar) == true)
+                        {
+                            if (OutputAvatar != UUID.Zero)
+                            {
+                                GetClient().Self.InstantMessage(OutputAvatar, output);
+                            }
+                        }
+                        else if (A.StartsWith("http") == true)
+                        {
+                            long unixtime = SecondbotHelpers.UnixTimeNow();
+                            string token = SecondbotHelpers.GetSHA1(unixtime.ToString() + "EventService" + GetClient().Self.AgentID + output + master.CommandsService.myConfig.GetSharedSecret());
+                            var client = new RestClient(A);
+                            var request = new RestRequest("Inventory/Update", Method.Post);
+                            request.AddParameter("token", token);
+                            request.AddParameter("unixtime", unixtime.ToString());
+                            request.AddParameter("method", "Inventory");
+                            request.AddParameter("action", "Update");
+                            request.AddParameter("botname", GetClient().Self.Name);
+                            request.AddParameter("event", output);
+                            request.AddHeader("content-type", "application/x-www-form-urlencoded");
+                            client.ExecutePostAsync(request);
+                        }
+                        else if (int.TryParse(A, out int chann) == true)
+                        {
+                            if (chann >= 0)
+                            {
+                                GetClient().Self.Chat(output, chann, ChatType.Normal);
+                            }
+                        }
+
+                    }
                 }
-            }
+            });
         }
 
         Dictionary<string, List<string>> InventoryEvents = [];
