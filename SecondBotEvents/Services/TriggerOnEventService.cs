@@ -412,15 +412,17 @@ namespace SecondBotEvents.Services
             lock (lockouts)
             {
                 long newvalue = SecondbotHelpers.UnixTimeNow() + (mins * 60);
-                if (lockouts.ContainsKey(uuid) == true)
+                if (lockouts.TryGetValue(uuid, out var currentValue))
                 {
-                    if (lockouts[uuid] < newvalue)
+                    if (currentValue < newvalue)
                     {
                         lockouts[uuid] = newvalue;
                     }
-                    return;
                 }
-                lockouts.Add(uuid, newvalue);
+                else
+                {
+                    lockouts.Add(uuid, newvalue);
+                }
             }
         }
 
@@ -468,43 +470,66 @@ namespace SecondBotEvents.Services
             }
             return defaultvalue;
         }
-        protected void TriggerEvent(string eventName, Dictionary<string,string> args)
+        protected void TriggerEvent(string eventName, Dictionary<string, string> args)
         {
-            if (waitingForTimer == true)
-            {
+            if (waitingForTimer)
                 return;
-            }
-            if (myConfig.GetDebugMe() == true)
-            {
-                StringBuilder debugoutme = new();
-                string debugoutmeaddon = "";
-                foreach(KeyValuePair<string,string> Ar in args)
-                {
-                    debugoutme.Append(Ar.Key);
-                    debugoutme.Append("=");
-                    debugoutme.Append(Ar.Value);
-                    debugoutme.Append(debugoutmeaddon);
-                    debugoutmeaddon = ",";
-                }
-                LogFormater.Info("OnEvent Service (DebugMe) TriggerEvent "+eventName+" args: "+ debugoutme.ToString());
-            }
-            if (MyCustomEvents.ContainsKey(eventName) == false)
-            {
-                if (myConfig.GetDebugMe() == true)
-                {
-                    LogFormater.Info("OnEvent Service (DebugMe) Not a tracked event");
-                }
-                return;
-            }
-            string avataruuid = inArgsOrDefault("avataruuid", args, null);
 
-            List<int> AvPos = GetAvPos(avataruuid);
-            Vector3 A = GetClient().Self.SimPosition;
-            List<int> BotPos = [(int)Math.Round(A.X), (int)Math.Round(A.Y), (int)Math.Round(A.Z)];
-            Dictionary<string, string> values = new()
+            if (myConfig.GetDebugMe())
+                LogDebugEventArgs(eventName, args);
+
+            if (!MyCustomEvents.TryGetValue(eventName, out var customEvents))
+            {
+                if (myConfig.GetDebugMe())
+                    LogFormater.Info("OnEvent Service (DebugMe) Not a tracked event");
+                return;
+            }
+
+            string avataruuid = inArgsOrDefault("avataruuid", args, null);
+            List<int> avatarPos = GetAvPos(avataruuid);
+            Vector3 botPosition = GetClient().Self.SimPosition;
+
+            var values = BuildEventValues(args, eventName, avataruuid, avatarPos, botPosition);
+
+            if (myConfig.GetDebugMe())
+                LogFormater.Info($"OnEvent Service (DebugMe) There are {customEvents.Count} events to trigger");
+
+            int eventId = -1;
+            foreach (var customEvent in customEvents)
+            {
+                eventId++;
+                if (!EventPreChecks(customEvent, values, eventName, eventId))
+                    continue;
+
+                if (!EventRuleChecks(customEvent, values, eventName, eventId))
+                    continue;
+
+                if (myConfig.GetDebugMe())
+                    LogFormater.Info($"OnEvent Service (DebugMe) Triggering {customEvent.Actions.Count} actions for event id {eventId + 1}");
+
+                TriggerEventActions(customEvent.Actions, values, eventId);
+            }
+        }
+
+        private void LogDebugEventArgs(string eventName, Dictionary<string, string> args)
+        {
+            var debugBuilder = new StringBuilder();
+            string separator = "";
+            foreach (var arg in args)
+            {
+                debugBuilder.Append($"{arg.Key}={arg.Value}{separator}");
+                separator = ",";
+            }
+            LogFormater.Info($"OnEvent Service (DebugMe) TriggerEvent {eventName} args: {debugBuilder}");
+        }
+
+        private Dictionary<string, string> BuildEventValues(
+            Dictionary<string, string> args, string eventName, string avataruuid, List<int> avatarPos, Vector3 botPosition)
+        {
+            return new Dictionary<string, string>
             {
                 { "alertmessage", inArgsOrDefault("alertmessage", args, "none") },
-                { "message",  inArgsOrDefault("message", args, "none") },
+                { "message", inArgsOrDefault("message", args, "none") },
                 { "funds", inArgsOrDefault("funds", args, "-1") },
                 { "eventype", eventName },
                 { "groupuuid", inArgsOrDefault("groupuuid", args, "none") },
@@ -516,147 +541,121 @@ namespace SecondBotEvents.Services
                 { "avatarparcel", GetAvParcel(avataruuid) },
                 { "botsim", GetClient().Network.CurrentSim.Name },
                 { "botparcel", GetBotParcel() },
-                { "avatarx", AvPos[0].ToString() },
-                { "avatary", AvPos[1].ToString() },
-                { "avatarz", AvPos[2].ToString() },
-                { "avatardistance", AvPos[3].ToString() },
-                { "botx", AvPos[0].ToString() },
-                { "boty", AvPos[1].ToString() },
-                { "botz", AvPos[2].ToString() },
+                { "avatarx", avatarPos[0].ToString() },
+                { "avatary", avatarPos[1].ToString() },
+                { "avatarz", avatarPos[2].ToString() },
+                { "avatardistance", avatarPos[3].ToString() },
+                { "botx", avatarPos[0].ToString() },
+                { "boty", avatarPos[1].ToString() },
+                { "botz", avatarPos[2].ToString() },
                 { "clockhour", DateTime.Now.ToString("HH") },
                 { "clockmin", DateTime.Now.ToString("mm") },
                 { "dayofweek", ((int)DateTime.Now.DayOfWeek).ToString() }
             };
-            if (myConfig.GetDebugMe() == true)
-            {
-                LogFormater.Info("OnEvent Service (DebugMe) There are "+ MyCustomEvents[eventName].Count.ToString()+" events to trigger");
-            }
-            int eventid = -1;
-            foreach (CustomOnEvent E in MyCustomEvents[eventName])
-            {
-                eventid++;
-                bool canFireEvent = true;
-                if ((E.Source == "GroupMemberJoin") || (E.Source == "GroupMemberLeave"))
-                {
-                    if (E.MonitorFlags[0] != values["groupuuid"])
-                    {
-                        if (myConfig.GetDebugMe() == true)
-                        {
-                            LogFormater.Info("OnEvent Service (DebugMe) Failed checks on " + eventName + " id " + (eventid + 1).ToString() + " failed Group checks");
-                        }
-                        continue;
-                    }
-                }
-                else if ((E.Source == "GuestJoins") || (E.Source == "GuestLeaves"))
-                {
-                    if (
-                        (E.MonitorFlags[0] != values["botsim"]) || 
-                        (E.MonitorFlags[1] != values["botparcel"]) || 
-                        (E.MonitorFlags[1] != values["avatarparcel"])
-                    )
-                    {
-                        if (myConfig.GetDebugMe() == true)
-                        {
-                            LogFormater.Info("OnEvent Service (DebugMe) Failed checks on " + eventName + " id " + (eventid + 1).ToString() + " failed Guest checks");
-                        }
-                        continue;
-                    }
-                }
-                int loop = 0;
-                while(loop < E.WhereChecksLeft.Count)
-                {
-                    string left = swapvalues(E.WhereChecksLeft[loop],values);
-                    string center = E.WhereChecksCenter[loop];
-                    string right = swapvalues(E.WhereChecksRight[loop], values);
-                    int leftAsInt = -1;
-                    int rightAsInt = -1;
-                    int.TryParse(left, out leftAsInt);
-                    int.TryParse(right, out rightAsInt);
-                    bool leftAsBool = false;
-                    if(left == "true") leftAsBool = true;
-                    bool rightAsBool = false;
-                    if (right == "true") rightAsBool = true;
-                    bool leftContactinsRight = left.Contains(right);
-                    UUID leftAsUUID = UUID.Zero;
-                    bool leftIsUUID = UUID.TryParse(left, out leftAsUUID);
-                    UUID rightAsUUID = UUID.Zero;
-                    bool rightIsUUID = UUID.TryParse(right, out rightAsUUID);
-                    bool leftIsInGroup = false;
-                    bool leftIsLockedout = IsLockedout(left);
-                    bool leftIsEven = true;
-                    bool leftIsDivs = true;
-                    if (leftAsInt != 0)
-                    {
-                        leftIsEven = ((leftAsInt % 2) == 0);
-                        if(rightAsInt != 0)
-                        {
-                            leftIsDivs = ((leftAsInt % rightAsInt) == 0);
-                        }
-                    }
-                    if ((leftIsUUID == true) && (rightIsUUID == true))
-                    {
-                        leftIsInGroup = master.DataStoreService.IsGroupMember(rightAsUUID, leftAsUUID);
-                    }
-                    if ((center == "IS") && (left != right)) { canFireEvent = false; }
-                    else if ((center == "NOT") && (left == right)) { canFireEvent = false; }
-                    else if ((center == "IS_UUID") && (leftIsUUID != rightAsBool)) { canFireEvent = false; }
-                    else if ((center == "MISSING") && (leftContactinsRight == true)) { canFireEvent = false; }
-                    else if ((center == "CONTAINS") && (leftContactinsRight == false)) { canFireEvent = false; }
-                    else if ((center == "IN_GROUP") && (leftIsInGroup == false)) { canFireEvent = false; }
-                    else if ((center == "NOT_IN_GROUP") && (leftIsUUID == true) && (rightIsUUID == true) && (leftIsInGroup == true)) { canFireEvent = false; }
-                    else if ((center == "LESSTHAN") && (leftAsInt >= rightAsInt)) { canFireEvent = false; }
-                    else if ((center == "MORETHAN") && (leftAsInt <= rightAsInt)) { canFireEvent = false; }
-                    else if ((center == "LOCKOUT") && (leftIsLockedout != rightAsBool)) { canFireEvent = false; }
-                    else if ((center == "IS_EVEN") && (leftIsEven != rightAsBool)) { canFireEvent = false; }
-                    else if ((center == "DIVISIBLE") && (leftIsDivs == false)) { canFireEvent = false; }
-                    if (canFireEvent == false)
-                    {
-                        if (myConfig.GetDebugMe() == true)
-                        {
-                            LogFormater.Info("OnEvent Service (DebugMe) Failed checks on " + eventName + " id " + (eventid + 1).ToString()+" rule id "+(loop+1).ToString()+" #"+center);
-                        }
-                        break;
-                    }
-                    loop++;
-                }
-                if (canFireEvent == false)
-                {
-                    continue;
-                }
-                if (myConfig.GetDebugMe() == true)
-                {
-                    LogFormater.Info("OnEvent Service (DebugMe) Triggering "+E.Actions.Count().ToString()+ " actions for event id "+(eventid+1).ToString());
-                }
-                int loop2 = 1;
-                foreach (string action in E.Actions)
-                {
-                    string useaction = swapvalues(action, values);
-                    string[] bits = useaction.Split('=');
-                    if(bits.Length == 2)
-                    {
-                        if (bits[0] == "lockout")
-                        {
-                            bits = bits[1].Split("+");
-                            if(bits.Length == 2)
-                            {
-                                if (int.TryParse(bits[1],out int mins) == true)
-                                {
-                                    AddToLockout(bits[0], mins);
-                                }
-                            }
-                            continue;
-                        }
-                    }
-                    if (myConfig.GetDebugMe() == true)
-                    {
-                        LogFormater.Info("OnEvent Service (DebugMe) Triggering " + useaction + " actions for event id " + (loop2).ToString());
-                    }
-                    loop2++;
-                    master.CommandsService.CommandInterfaceCaller(useaction, false, false, "OnEvents");
-                }
-            }
         }
 
+        private bool EventPreChecks(CustomOnEvent customEvent, Dictionary<string, string> values, string eventName, int eventId)
+        {
+            // Group member event check
+            if ((customEvent.Source == "GroupMemberJoin" || customEvent.Source == "GroupMemberLeave") &&
+                customEvent.MonitorFlags[0] != values["groupuuid"])
+            {
+                if (myConfig.GetDebugMe())
+                    LogFormater.Info($"OnEvent Service (DebugMe) Failed checks on {eventName} id {eventId + 1} failed Group checks");
+                return false;
+            }
+
+            // Guest event check
+            if ((customEvent.Source == "GuestJoins" || customEvent.Source == "GuestLeaves") &&
+                (customEvent.MonitorFlags[0] != values["botsim"] ||
+                 customEvent.MonitorFlags[1] != values["botparcel"] ||
+                 customEvent.MonitorFlags[1] != values["avatarparcel"]))
+            {
+                if (myConfig.GetDebugMe())
+                    LogFormater.Info($"OnEvent Service (DebugMe) Failed checks on {eventName} id {eventId + 1} failed Guest checks");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool EventRuleChecks(CustomOnEvent customEvent, Dictionary<string, string> values, string eventName, int eventId)
+        {
+            for (int i = 0; i < customEvent.WhereChecksLeft.Count; i++)
+            {
+                string left = swapvalues(customEvent.WhereChecksLeft[i], values);
+                string center = customEvent.WhereChecksCenter[i];
+                string right = swapvalues(customEvent.WhereChecksRight[i], values);
+
+                if (!EvaluateRule(left, center, right))
+                {
+                    if (myConfig.GetDebugMe())
+                        LogFormater.Info($"OnEvent Service (DebugMe) Failed checks on {eventName} id {eventId + 1} rule id {i + 1} #{center}");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private bool EvaluateRule(string left, string center, string right)
+        {
+            int.TryParse(left, out int leftAsInt);
+            int.TryParse(right, out int rightAsInt);
+
+            bool leftAsBool = left == "true";
+            bool rightAsBool = right == "true";
+            bool leftContainsRight = left.Contains(right);
+
+            bool leftIsUUID = UUID.TryParse(left, out UUID leftAsUUID);
+            bool rightIsUUID = UUID.TryParse(right, out UUID rightAsUUID);
+
+            bool leftIsInGroup = leftIsUUID && rightIsUUID && master.DataStoreService.IsGroupMember(rightAsUUID, leftAsUUID);
+            bool leftIsLockedout = IsLockedout(left);
+
+            bool leftIsEven = leftAsInt != 0 && (leftAsInt % 2 == 0);
+            bool leftIsDivisible = leftAsInt != 0 && rightAsInt != 0 && (leftAsInt % rightAsInt == 0);
+
+            return center switch
+            {
+                "IS" => left == right,
+                "NOT" => left != right,
+                "IS_UUID" => leftIsUUID == rightAsBool,
+                "MISSING" => !leftContainsRight,
+                "CONTAINS" => leftContainsRight,
+                "IN_GROUP" => leftIsInGroup,
+                "NOT_IN_GROUP" => !(leftIsUUID && rightIsUUID && leftIsInGroup),
+                "LESSTHAN" => leftAsInt < rightAsInt,
+                "MORETHAN" => leftAsInt > rightAsInt,
+                "LOCKOUT" => leftIsLockedout == rightAsBool,
+                "IS_EVEN" => leftIsEven == rightAsBool,
+                "DIVISIBLE" => leftIsDivisible,
+                _ => true
+            };
+        }
+
+        private void TriggerEventActions(List<string> actions, Dictionary<string, string> values, int eventId)
+        {
+            int actionIndex = 1;
+            foreach (var action in actions)
+            {
+                string resolvedAction = swapvalues(action, values);
+                string[] bits = resolvedAction.Split('=');
+
+                if (bits.Length == 2 && bits[0] == "lockout")
+                {
+                    var lockoutParts = bits[1].Split('+');
+                    if (lockoutParts.Length == 2 && int.TryParse(lockoutParts[1], out int mins))
+                        AddToLockout(lockoutParts[0], mins);
+                    continue;
+                }
+
+                if (myConfig.GetDebugMe())
+                    LogFormater.Info($"OnEvent Service (DebugMe) Triggering {resolvedAction} actions for event id {actionIndex}");
+
+                actionIndex++;
+                master.CommandsService.CommandInterfaceCaller(resolvedAction, false, false, "OnEvents");
+            }
+        }
         protected string swapvalues(string input, Dictionary<string, string> values)
         {
             foreach(KeyValuePair<string, string> pair in values)
@@ -672,7 +671,7 @@ namespace SecondBotEvents.Services
             {
                 return [-1, -1, -1, -1];
             }
-            foreach (Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.ToDictionary(k => k.Key, v => v.Value).Values)
+            foreach (Avatar A in GetClient().Network.CurrentSim.ObjectsAvatars.Values)
             {
                 if (A.ID != avUUID)
                 {
