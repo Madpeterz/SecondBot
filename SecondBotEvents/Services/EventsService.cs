@@ -33,9 +33,9 @@ namespace SecondBotEvents.Services
             {
 
                 detail["itemtype"] = detail["itemtype"].ToLower().FirstCharToUpper();
-                if (InventoryEvents.ContainsKey(detail["itemtype"]) == true)
+                if (InventoryEvents.TryGetValue(detail["itemtype"], out var targets))
                 {
-                    foreach (string A in InventoryEvents[detail["itemtype"]])
+                    foreach (string A in targets)
                     {
                         string output = JsonSerializer.Serialize(detail);
                         if (UUID.TryParse(A, out UUID OutputAvatar) == true)
