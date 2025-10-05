@@ -58,6 +58,7 @@ ENV basic_Username='' \
 	discord_ClientToken='' \
 	discord_AllowDiscordCommands='false' \
 	discord_hideChatterName='false' \
+	discord_ClearChatOnConnect='true' \
 	events_Enabled='false' \
 	events_GroupMemberJoins='false' \
 	events_GroupMemberLeaves='false' \

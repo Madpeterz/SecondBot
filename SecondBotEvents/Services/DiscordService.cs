@@ -726,10 +726,14 @@ namespace SecondBotEvents.Services
                 {
                     continue;
                 }
-                if(channel.Name != "commands")
+                if(myConfig.GetClearChatOnConnect() == true)
                 {
-                    CleanChannel(channel);
+                    if (channel.Name != "commands")
+                    {
+                        CleanChannel(channel);
+                    }
                 }
+
                 WantedTextChannels.Remove(channel.Name);
                 if (ChannelMap.ContainsKey(channel.Name) == true)
                 {
@@ -1024,15 +1028,28 @@ namespace SecondBotEvents.Services
             }
         }
 
-        protected async void CleanChannel(ITextChannel channel)
+        protected void CleanChannel(ITextChannel channel)
         {
-            IEnumerable<IMessage> messages = await channel.GetMessagesAsync(100, CacheMode.AllowDownload).FlattenAsync();
-            IEnumerable<IMessage> filtered = messages.Where(x => (DateTimeOffset.UtcNow - x.Timestamp).TotalDays <= 14);
-            if(filtered.Count() == 0)
+            Task.Run(async() =>
             {
-                return;
-            }
-            await channel.DeleteMessagesAsync(filtered);
+                IEnumerable<IMessage> messages = await channel.GetMessagesAsync(100, CacheMode.AllowDownload).FlattenAsync();
+
+                // Bulk delete messages newer than 14 days
+                var bulkDeletable = messages.Where(x => (DateTimeOffset.UtcNow - x.Timestamp).TotalDays <= 14).ToList();
+                if (bulkDeletable.Count > 0)
+                {
+                    await channel.DeleteMessagesAsync(bulkDeletable);
+                }
+
+                // Individually delete messages older than 14 days
+                messages = messages.Where(x => (DateTimeOffset.UtcNow - x.Timestamp).TotalDays > 14).ToList();
+                foreach (var msg in messages)
+                {
+                    await msg.DeleteAsync();
+                    // Optionally, add a small delay to avoid rate limits
+                    await Task.Delay(500);
+                }
+            }).ConfigureAwait(false);
         }
 
         protected string StatusPrefill()
@@ -1174,94 +1191,94 @@ namespace SecondBotEvents.Services
             switch (flag)
             {
                 case "CreateInstantInvite":
-                    NewPerms = NewPerms.Modify(flagValue);
+                    NewPerms = NewPerms.Modify(createInstantInvite: flagValue);
                     break;
                 case "KickMembers":
-                    NewPerms = NewPerms.Modify(null, flagValue);
+                    NewPerms = NewPerms.Modify(kickMembers: flagValue);
                     break;
                 case "BanMembers":
-                    NewPerms = NewPerms.Modify(null, null, flagValue);
+                    NewPerms = NewPerms.Modify(banMembers: flagValue);
                     break;
                 case "Administrator":
-                    NewPerms = NewPerms.Modify(null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(administrator: flagValue);
                     break;
                 case "ManageChannels":
-                    NewPerms = NewPerms.Modify(null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(manageChannels: flagValue);
                     break;
                 case "ManageGuild":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(manageGuild: flagValue);
                     break;
                 case "AddReactions":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(addReactions: flagValue);
                     break;
                 case "ViewAuditLog":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(viewAuditLog: flagValue);
                     break;
                 case "SendTTSMessages":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(sendTTSMessages: flagValue);
                     break;
                 case "AttachFiles":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(attachFiles: flagValue);
                     break;
                 case "ReadMessageHistory":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(readMessageHistory: flagValue);
                     break;
                 case "MentionEveryone":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(mentionEveryone: flagValue);
                     break;
                 case "UseExternalEmojis":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(useExternalEmojis: flagValue);
                     break;
                 case "Connect":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(connect: flagValue);
                     break;
                 case "Speak":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(speak: flagValue);
                     break;
                 case "MuteMembers":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(muteMembers: flagValue);
                     break;
                 case "UseVAD":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(useVoiceActivation: flagValue);
                     break;
                 case "MoveMembers":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(moveMembers: flagValue);
                     break;
                 case "EmbedLinks":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(embedLinks: flagValue);
                     break;
                 case "PrioritySpeaker":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(prioritySpeaker: flagValue);
                     break;
                 case "Stream":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(stream: flagValue);
                     break;
                 case "ChangeNickname":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(changeNickname: flagValue);
                     break;
                 case "ManageNicknames":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(manageNicknames: flagValue);
                     break;
                 case "ManageRoles":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(manageRoles: flagValue);
                     break;
                 case "DeafenMembers":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(deafenMembers: flagValue);
                     break;
                 case "ManageMessages":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(manageMessages: flagValue);
                     break;
                 case "ViewChannel":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(viewChannel: flagValue);
                     break;
                 case "SendMessages":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(sendMessages: flagValue);
                     break;
                 case "ManageWebhooks":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(manageWebhooks: flagValue);
                     break;
                 case "ManageEmojisAndStickers":
-                    NewPerms = NewPerms.Modify(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, flagValue);
+                    NewPerms = NewPerms.Modify(manageEmojisAndStickers: flagValue);
                     break;
                 default:
                     break;

@@ -18,7 +18,13 @@ namespace SecondBotEvents.Config
             settings.Add("InteractionHttpTarget");
             settings.Add("InteractionChannelNumber");
             settings.Add("hideChatterName");
+            settings.Add("ClearChatOnConnect");
             settings.Add("HideStatusOutput");
+        }
+
+        public bool GetClearChatOnConnect()
+        {
+            return ReadSettingAsBool("ClearChatOnConnect", true);
         }
 
         public bool GetEnabled()
