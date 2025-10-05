@@ -1,15 +1,16 @@
-﻿using System.Text.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using OpenMetaverse;
+using OpenMetaverse.ImportExport.Collada14;
 using SecondBotEvents.Config;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using System.Reflection;
-using System.Net.Http;
-using OpenMetaverse.ImportExport.Collada14;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net.Http;
+using System.Reflection;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 
 namespace SecondBotEvents.Services
 {
@@ -325,7 +326,11 @@ namespace SecondBotEvents.Services
                             reply = "Error";
                             if (processed != null)
                             {
-                                reply = JsonSerializer.Serialize(processed);
+                                var options = new JsonSerializerOptions
+                                {
+                                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                                };
+                                reply = JsonSerializer.Serialize(processed, options);
                             }
                             CommandNotice(C.command, source, String.Join("@@@", C.args), true, reply);
                             return new KeyValuePair<bool, string>(status, reply);
