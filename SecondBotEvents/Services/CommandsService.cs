@@ -13,13 +13,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SecondBotEvents.Services
 {
-    public class BotCommandNotice(string Setcommand, string Setargs, string Setsource, bool Setaccepted, string Setresults)
+    public class BotCommandNotice(string command, string args, string source, bool accepted, string results)
     {
-        public string command = Setcommand;
-        public string args = Setargs;
-        public string source = Setsource;
-        public bool accepted = Setaccepted;
-        public string results = Setresults;
+        public string command { get; set; } = command;
+        public string args { get; set; } = args;
+        public string source { get; set; } = source;
+        public bool accepted { get; set; } = accepted;
+        public string results { get; set; } = results;
     }
     public class CommandsService : BotServices
     {
