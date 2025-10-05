@@ -839,7 +839,7 @@ namespace SecondBotEvents.Commands
         }
 
         [About("Updates a flag setting for a parcel")]
-        [ReturnHints("true|false")]
+        [ReturnHints("true")]
         [ReturnHintsFailure("Error not in a sim")]
         [ReturnHintsFailure("Parcel data not ready")]
         [ReturnHintsFailure("Incorrect perms to control parcel")]
@@ -897,7 +897,7 @@ namespace SecondBotEvents.Commands
                 }
             }
             targetparcel.Update(GetClient());
-            return BasicReply("Applying perms", [escapedflagdata]);
+            return BasicReply("true", [escapedflagdata]);
         }
 
         [About("transfers the current parcel ownership to the assigned group")]
