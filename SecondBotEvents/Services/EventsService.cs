@@ -37,7 +37,7 @@ namespace SecondBotEvents.Services
                 {
                     foreach (string A in targets)
                     {
-                        string output = JsonSerializer.Serialize(detail);
+                        string output = JsonSerializer.Serialize(detail, JsonOptions.UnsafeRelaxed);
                         if (UUID.TryParse(A, out UUID OutputAvatar) == true)
                         {
                             if (OutputAvatar != UUID.Zero)
@@ -264,7 +264,7 @@ namespace SecondBotEvents.Services
                 args, 
                 myConfig.GetOutputSecret()
             );
-            string output = JsonSerializer.Serialize(e);
+            string output = JsonSerializer.Serialize(e, JsonOptions.UnsafeRelaxed);
             if(myConfig.GetOutputChannel() >= 0)
             {
                 GetClient().Self.Chat(output, myConfig.GetOutputChannel(), ChatType.Normal);

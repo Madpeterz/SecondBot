@@ -95,7 +95,7 @@ namespace SecondBotEvents.Commands
                     BetterNearMe.Add(details);
                 }
             }
-            return BasicReply(JsonSerializer.Serialize(BetterNearMe));
+            return BasicReply(JsonSerializer.Serialize(BetterNearMe, JsonOptions.UnsafeRelaxed));
         }
 
         [About("Requests the given avatars profile image")]
@@ -228,7 +228,7 @@ namespace SecondBotEvents.Commands
                     NearMe.Add(av.ID, av.Name);
                 }
             }
-            return BasicReply(JsonSerializer.Serialize(NearMe));
+            return BasicReply(JsonSerializer.Serialize(NearMe, JsonOptions.UnsafeRelaxed));
         }
 
         [About("searchs the AV database if not found triggers a lookup")]

@@ -34,7 +34,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("no map access or updating", [avatar]);
             }
-            return BasicReply(JsonSerializer.Serialize(loc), [avatar]);
+            return BasicReply(JsonSerializer.Serialize(loc, JsonOptions.UnsafeRelaxed), [avatar]);
         }
 
         [About("Gets the friendslist")]
@@ -56,7 +56,7 @@ namespace SecondBotEvents.Commands
                 CleanedFriendsList.Add(entry);
                 index++;
             }
-            return BasicReply(JsonSerializer.Serialize(CleanedFriendsList));
+            return BasicReply(JsonSerializer.Serialize(CleanedFriendsList, JsonOptions.UnsafeRelaxed));
         }
 
         [About("Updates the friend perms for avatar avatar to State \n if true grants (Online/Map/Modify) perms")]

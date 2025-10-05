@@ -145,7 +145,7 @@ namespace SecondBotEvents.Services
         {
             if(myConfig.GetEnableDebug() == true)
             {
-                LogFormater.Warn("Interaction debug:" + JsonSerializer.Serialize(new InteractionEvent(from, eventype, status, why, setMisc)));
+                LogFormater.Warn("Interaction debug:" + JsonSerializer.Serialize(new InteractionEvent(from, eventype, status, why, setMisc), JsonOptions.UnsafeRelaxed));
             }
             if (myConfig.GetEnableJsonOutputEvents() == false)
             {
@@ -153,7 +153,7 @@ namespace SecondBotEvents.Services
             }
             master.CommandsService.SmartCommandReply(
                 myConfig.GetJsonOutputEventsTarget(), 
-                JsonSerializer.Serialize(new InteractionEvent(from, eventype, status, why, setMisc)), 
+                JsonSerializer.Serialize(new InteractionEvent(from, eventype, status, why, setMisc), JsonOptions.UnsafeRelaxed), 
                 "interactions"
             );
         }
@@ -171,7 +171,7 @@ namespace SecondBotEvents.Services
         {
             if (myConfig.GetEnableDebug() == true)
             {
-                LogFormater.Warn("Interaction debug:" + JsonSerializer.Serialize(misc));
+                LogFormater.Warn("Interaction debug:" + JsonSerializer.Serialize(misc, JsonOptions.UnsafeRelaxed));
             }
             if (myConfig.GetEnableJsonOutputEvents() == false)
             {
@@ -180,7 +180,7 @@ namespace SecondBotEvents.Services
             misc.Add("eventsource", source);
             master.CommandsService.SmartCommandReply(
                 myConfig.GetJsonOutputEventsTarget(),
-                JsonSerializer.Serialize(misc),
+                JsonSerializer.Serialize(misc, JsonOptions.UnsafeRelaxed),
                 "interactions"
             );
         }

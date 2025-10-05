@@ -159,7 +159,7 @@ namespace SecondBotEvents.Services
             {
                 return "Command request rejected";
             }
-            return JsonSerializer.Serialize(master.CommandsService.RunCommand("HTTP", C));
+            return JsonSerializer.Serialize(master.CommandsService.RunCommand("HTTP", C), JsonOptions.UnsafeRelaxed);
         }
         public static async Task SerializationCallback(IHttpContext context, object? data)
         {
@@ -384,7 +384,7 @@ namespace SecondBotEvents.Services
             {
                 return "Command request rejected";
             }
-            return JsonSerializer.Serialize(master.CommandsService.RunCommand("HTTP",C));
+            return JsonSerializer.Serialize(master.CommandsService.RunCommand("HTTP",C), JsonOptions.UnsafeRelaxed);
         }
     }
 

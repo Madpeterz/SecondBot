@@ -431,7 +431,7 @@ namespace SecondBotEvents.Services
             RedisKey writekey = new(myConfig.GetRedisPrefix() + store.Guid.ToString());
             try
             {
-                string savestring = JsonSerializer.Serialize(history);
+                string savestring = JsonSerializer.Serialize(history, JsonOptions.UnsafeRelaxed);
                 if (savestring == null)
                 {
                     LogFormater.Warn("Redis failed to convert history into savable format");

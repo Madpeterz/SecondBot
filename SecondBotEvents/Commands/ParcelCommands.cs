@@ -106,7 +106,7 @@ namespace SecondBotEvents.Commands
             {
                 reply.Add(A.Name, A.SnapshotID.ToString());
             }
-            return BasicReply(JsonSerializer.Serialize(reply));
+            return BasicReply(JsonSerializer.Serialize(reply, JsonOptions.UnsafeRelaxed));
         }
 
         [About("Requests the current parcel size")]
@@ -245,7 +245,7 @@ namespace SecondBotEvents.Commands
                 };
                 reply.parcels.Add(R);
             }
-            return BasicReply(JsonSerializer.Serialize(reply));
+            return BasicReply(JsonSerializer.Serialize(reply, JsonOptions.UnsafeRelaxed));
         }
 
         [About("Cancels the current parcel the bot is in sale")]
@@ -341,7 +341,7 @@ namespace SecondBotEvents.Commands
             collection.Add("ForSale", targetparcel.Flags.HasFlag(ParcelFlags.ForSale).ToString());
             collection.Add("Cost", targetparcel.SalePrice.ToString());
             collection.Add("SaleTarget", targetparcel.AuthBuyerID.ToString());
-            return BasicReply(JsonSerializer.Serialize(collection));
+            return BasicReply(JsonSerializer.Serialize(collection, JsonOptions.UnsafeRelaxed));
         }
 
         [About("Make a request to the landsale directory")]
@@ -407,7 +407,7 @@ namespace SecondBotEvents.Commands
                 int counter = (100 * GetpageNum);
                 foreach(DirectoryParcel parcel in e.DirParcels)
                 {
-                    collection.Add(JsonSerializer.Serialize(parcel));
+                    collection.Add(JsonSerializer.Serialize(parcel, JsonOptions.UnsafeRelaxed));
                     counter++;
                 }
                 landresultsTimeout.Set();
@@ -422,7 +422,7 @@ namespace SecondBotEvents.Commands
                 return Failure("Timed out while doing land search");
             }
             GetClient().Directory.DirLandReply -= LandSearchResultsReply;
-            string reply = JsonSerializer.Serialize(collection);
+            string reply = JsonSerializer.Serialize(collection, JsonOptions.UnsafeRelaxed);
 
             return BasicReply(reply, [filterRegion, filterPrice, filterArea, pageNum, timeout]);
         }
@@ -537,7 +537,7 @@ namespace SecondBotEvents.Commands
             {
                 collection.Add(cfg.ToString(), targetparcel.Flags.HasFlag(cfg).ToString());
             }
-            return BasicReply(JsonSerializer.Serialize(collection));
+            return BasicReply(JsonSerializer.Serialize(collection, JsonOptions.UnsafeRelaxed));
         }
 
         [About("Ejects an avatar")]
@@ -785,7 +785,7 @@ namespace SecondBotEvents.Commands
             collection.Add("OtherPrims", targetparcel.OtherPrims.ToString());
             collection.Add("MaxPrims", targetparcel.MaxPrims.ToString());
             collection.Add("ParcelPrimBonus", targetparcel.ParcelPrimBonus.ToString());
-            return BasicReply(JsonSerializer.Serialize(collection));
+            return BasicReply(JsonSerializer.Serialize(collection, JsonOptions.UnsafeRelaxed));
         }
         [About("Controls who can trigger audio on this parcel\n if everyone is set to true then grouponly will switch to false")]
         [ReturnHints("ok")]
@@ -1064,7 +1064,7 @@ namespace SecondBotEvents.Commands
             reply.delay = delays * 1000;
             reply.parcelName = targetparcel.Name;
             reply.regionName = GetClient().Network.CurrentSim.Name;
-            return BasicReply(JsonSerializer.Serialize(reply));
+            return BasicReply(JsonSerializer.Serialize(reply, JsonOptions.UnsafeRelaxed));
         }
 
         [About("Returns a rezzed object")]
@@ -1131,7 +1131,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("No objects found in the parcel");
             }
-            return BasicReply(JsonSerializer.Serialize(objects));
+            return BasicReply(JsonSerializer.Serialize(objects, JsonOptions.UnsafeRelaxed));
         }
 
         [About("Updates the current parcels media settings \n" +

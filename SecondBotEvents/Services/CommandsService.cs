@@ -326,11 +326,7 @@ namespace SecondBotEvents.Services
                             reply = "Error";
                             if (processed != null)
                             {
-                                var options = new JsonSerializerOptions
-                                {
-                                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                                };
-                                reply = JsonSerializer.Serialize(processed, options);
+                                reply = JsonSerializer.Serialize(processed, JsonOptions.UnsafeRelaxed);
                             }
                             CommandNotice(C.command, source, String.Join("@@@", C.args), true, reply);
                             return new KeyValuePair<bool, string>(status, reply);
@@ -448,17 +444,13 @@ namespace SecondBotEvents.Services
             BotCommandNotice e = new(command, args, source, accepted, results);
             EventHandler<BotCommandNotice> handler = BotclientCommandEventNotices;
             handler?.Invoke(this, e);
-            if (myConfig.GetCommandHistoryLogResults() == false)
-            {
-                return;
-            }
             if (master.BotClient.basicCfg.GetLogCommands() == true)
             {
-                if(e.results.Length >= 100)
+                if (myConfig.GetCommandHistoryLogResults() == false)
                 {
-                    e.results = e.results.Substring(0, 100) + "...";
+                    e.results = "~hidden~";
                 }
-                LogFormater.Info("Command log:" + JsonSerializer.Serialize(e));
+                LogFormater.Info("Command log:" + JsonSerializer.Serialize(e, JsonOptions.UnsafeRelaxed));
             }
         }
     }
@@ -617,5 +609,13 @@ namespace SecondBotEvents.Services
             if (ret is JObject) return JsonSerializer.Deserialize<T>(ret.ToString());
             return (T)ret;
         }
+    }
+
+    public static class JsonOptions
+    {
+        public static readonly JsonSerializerOptions UnsafeRelaxed = new()
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
     }
 }

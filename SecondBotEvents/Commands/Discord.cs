@@ -63,7 +63,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure(reply.Value.First());
             }
-            return BasicReply(JsonSerializer.Serialize(reply.Value));
+            return BasicReply(JsonSerializer.Serialize(reply.Value, JsonOptions.UnsafeRelaxed));
         }
 
         [About("Clears messages on the server sent by the member in the last 13 days, 22hours 59mins")]

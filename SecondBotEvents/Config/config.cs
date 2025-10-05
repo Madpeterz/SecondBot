@@ -1,11 +1,12 @@
-﻿using System.Text.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using SecondBotEvents.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime;
 using System.Text;
+using System.Text.Json;
 
 
 namespace SecondBotEvents.Config
@@ -76,7 +77,7 @@ namespace SecondBotEvents.Config
             SimpleIO IO = new();
             IO.ChangeRoot(fromFolder);
             string writeFile = filename + ".json";
-            IO.WriteFile(writeFile, JsonSerializer.Serialize(saveMe));
+            IO.WriteFile(writeFile, JsonSerializer.Serialize(saveMe, JsonOptions.UnsafeRelaxed));
 
         }
         protected void LoadSettingsFromFile(string fromFolder)

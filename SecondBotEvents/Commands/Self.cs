@@ -218,7 +218,7 @@ namespace SecondBotEvents.Commands
             List<string> reply = [];
             foreach (CommandHistory A in master.DataStoreService.GetCommandHistory())
             {
-                reply.Add(JsonSerializer.Serialize(A));
+                reply.Add(JsonSerializer.Serialize(A, JsonOptions.UnsafeRelaxed));
                 if (reply.Count >= 5)
                 {
                     break;

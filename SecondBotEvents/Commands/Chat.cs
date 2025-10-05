@@ -12,7 +12,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object LocalChatHistory()
         {
-            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetLocalChat()));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetLocalChat(), JsonOptions.UnsafeRelaxed));
         }
 
         [About("sends a message to localchat (Normal chat)")]
@@ -108,7 +108,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object chatwindows()
         {
-            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetAvatarImWindows()));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetAvatarImWindows(), JsonOptions.UnsafeRelaxed));
         }
 
         [About("gets a list of chat windows from avatars with unread messages")]
@@ -116,7 +116,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object listwithunread()
         {
-            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetAvatarImWindowsUnread()));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetAvatarImWindowsUnread(), JsonOptions.UnsafeRelaxed));
         }
 
         [About("gets if there are any unread im messages from avatars at all")]
@@ -139,7 +139,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("avatar UUID invaild");
             }
-            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetAvatarImWindow(avatarUUID)));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetAvatarImWindow(avatarUUID), JsonOptions.UnsafeRelaxed));
         }
 
     }

@@ -82,7 +82,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("No objects found");
             }
-            return BasicReply(JsonSerializer.Serialize(reply));
+            return BasicReply(JsonSerializer.Serialize(reply, JsonOptions.UnsafeRelaxed));
         }
 
         [About("Fetchs the current bot")]
@@ -158,7 +158,7 @@ namespace SecondBotEvents.Commands
                 { "y", (int)Math.Round(GetClient().Self.SimPosition.Y) },
                 { "z", (int)Math.Round(GetClient().Self.SimPosition.Z) }
             };
-            return BasicReply(JsonSerializer.Serialize(pos));
+            return BasicReply(JsonSerializer.Serialize(pos, JsonOptions.UnsafeRelaxed));
         }
     }
 

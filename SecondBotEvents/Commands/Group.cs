@@ -41,7 +41,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Invaild group UUID", [group]);
             }
-            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetGroupMembers(groupuuid)));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetGroupMembers(groupuuid), JsonOptions.UnsafeRelaxed));
         }
 
         [About("Attempts to ban/unban a given avatar from a group")]
@@ -328,7 +328,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object GetGroupList()
         {
-            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetGroups()));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetGroups(), JsonOptions.UnsafeRelaxed));
         }
 
         [About("Forces the bot to reload the groups list")]
@@ -357,7 +357,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Unknown group", [group]);
             }
-            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetGroupRoles(groupuuid)));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetGroupRoles(groupuuid), JsonOptions.UnsafeRelaxed));
         }
 
         [About("fetchs a list of all groups with unread messages")]
@@ -365,7 +365,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object GroupchatListAllUnreadGroups()
         {
-            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetAllGroupsChatWithUnread()));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetAllGroupsChatWithUnread(), JsonOptions.UnsafeRelaxed));
         }
 
         [About("checks if a given group has any unread messages")]
@@ -416,7 +416,7 @@ namespace SecondBotEvents.Commands
             {
                 return Failure("Group UUID invaild", [group]);
             }
-            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetGroupChatHistory(groupUUID)));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetGroupChatHistory(groupUUID), JsonOptions.UnsafeRelaxed));
         }
 
         [About("sends a message to the groupchat")]

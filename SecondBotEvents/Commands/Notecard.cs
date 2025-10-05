@@ -33,20 +33,20 @@ namespace SecondBotEvents.Commands
             };
             if (UUID.TryParse(notecardInventoryUUID, out var uuid) == false)
             {
-                master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply), "NotecardRead");
+                master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply, JsonOptions.UnsafeRelaxed), "NotecardRead");
                 return Failure(reply.content, [notecardInventoryUUID]);
             }
             reply.content = "Unable to find inventory item";
             InventoryItem item = GetClient().Inventory.FetchItem(uuid, GetClient().Self.AgentID, new System.TimeSpan(0, 1, 30));
             if (item == null)
             {
-                master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply), "NotecardRead");
+                master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply, JsonOptions.UnsafeRelaxed), "NotecardRead");
                 return Failure(reply.content, [notecardInventoryUUID]);
             }
             reply.content = "Inventory item is not a notecard";
             if (item.InventoryType != InventoryType.Notecard)
             {
-                master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply), "NotecardRead");
+                master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply, JsonOptions.UnsafeRelaxed), "NotecardRead");
                 return Failure(reply.content, [notecardInventoryUUID]); ;
             }
             InventoryNotecard notecard = (InventoryNotecard)item;
@@ -55,7 +55,7 @@ namespace SecondBotEvents.Commands
                 if (transfer.Success == false)
                 {
                     reply.content = "!ERROR! - unable to read notecard";
-                    master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply), "NotecardRead");
+                    master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply, JsonOptions.UnsafeRelaxed), "NotecardRead");
                 }
                 else
                 {
@@ -77,7 +77,7 @@ namespace SecondBotEvents.Commands
                     reply.content = contents;
                     reply.name = notecard.Name;
                     reply.status = true;
-                    master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply), "NotecardRead");
+                    master.CommandsService.SmartCommandReply(replytarget, JsonSerializer.Serialize(reply, JsonOptions.UnsafeRelaxed), "NotecardRead");
                 }
             }
             );

@@ -218,7 +218,7 @@ namespace SecondBotEvents.Services
                 sourcetype = source,
                 sourceoption = filter
             };
-            string eventMessage = JsonSerializer.Serialize(a);
+            string eventMessage = JsonSerializer.Serialize(a, JsonOptions.UnsafeRelaxed);
             relayEventExtended relayEventExtended = new()
             {
                 source = source,
@@ -230,7 +230,7 @@ namespace SecondBotEvents.Services
                 message = message,
                 unixtime = SecondbotHelpers.UnixTimeNow().ToString()
             };
-            string eventMessageExtended = JsonSerializer.Serialize(relayEventExtended);
+            string eventMessageExtended = JsonSerializer.Serialize(relayEventExtended, JsonOptions.UnsafeRelaxed);
 
             while (loop <= myConfig.GetRelayCount())
             {

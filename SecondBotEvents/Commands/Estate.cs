@@ -380,7 +380,7 @@ namespace SecondBotEvents.Commands
                 EstateName = result.EstateName.ToString(),
                 EstateOwnerID = result.EstateOwnerID.ToString(),
                 CovenantText = covenantAssetRead.Value
-            }));
+            }, JsonOptions.UnsafeRelaxed));
         }
 
         [About("Sets the extended region info for the sim you are on")]
@@ -638,7 +638,7 @@ namespace SecondBotEvents.Commands
                 { "X", region.X.ToString() },
                 { "Y", region.Y.ToString() }
             };
-            return BasicReply(JsonSerializer.Serialize(reply));
+            return BasicReply(JsonSerializer.Serialize(reply, JsonOptions.UnsafeRelaxed));
         }
 
         [About("Requests the estate banlist")]
@@ -646,7 +646,7 @@ namespace SecondBotEvents.Commands
         [CmdTypeGet()]
         public object GetEstateBanList()
         {
-            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetEstateBans()));
+            return BasicReply(JsonSerializer.Serialize(master.DataStoreService.GetEstateBans(), JsonOptions.UnsafeRelaxed));
         }
 
         [About("Attempts to add/remove the avatar to/from the Estate banlist")]

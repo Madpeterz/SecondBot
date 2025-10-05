@@ -190,7 +190,7 @@ namespace SecondBotEvents.Services
                     objectname = e.ObjectName,
                     expires = expiresAt
                 };
-                string eventMessage = JsonSerializer.Serialize(window);
+                string eventMessage = JsonSerializer.Serialize(window, JsonOptions.UnsafeRelaxed);
                 foreach(int a in DialogRelayChannels)
                 {
                     if(a >= 0)

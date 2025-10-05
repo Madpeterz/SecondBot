@@ -1112,7 +1112,7 @@ namespace SecondBotEvents.Commands
         public object InventoryContentsCatched()
         {
             InventoryNodeEntry root = LoadInventoryNode(GetClient().Inventory.Store.RootFolder.UUID,"My Inventory");
-            return BasicReply(JsonSerializer.Serialize(root));
+            return BasicReply(JsonSerializer.Serialize(root, JsonOptions.UnsafeRelaxed));
         }
 
         protected InventoryNodeEntry LoadInventoryNode(UUID folder, string name="")
@@ -1284,7 +1284,7 @@ namespace SecondBotEvents.Commands
         }
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this);
+            return JsonSerializer.Serialize(this, JsonOptions.UnsafeRelaxed);
         }
     }
 }
