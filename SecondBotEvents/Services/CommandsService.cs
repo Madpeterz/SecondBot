@@ -615,7 +615,8 @@ namespace SecondBotEvents.Services
     {
         public static readonly JsonSerializerOptions UnsafeRelaxed = new()
         {
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            IncludeFields = true,
         };
     }
 }
