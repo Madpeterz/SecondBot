@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SecondBotEvents.Services
 {
@@ -611,12 +612,39 @@ namespace SecondBotEvents.Services
         }
     }
 
+    public class UUIDJsonConverter : JsonConverter<UUID>
+    {
+        public override UUID Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            // Read UUID from string
+            return new UUID(reader.GetString());
+        }
+
+        public override void Write(Utf8JsonWriter writer, UUID value, JsonSerializerOptions options)
+        {
+            // Write UUID as string
+            writer.WriteStringValue(value.ToString());
+        }
+
+        // For dictionary key support
+        public override UUID ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return new UUID(reader.GetString());
+        }
+
+        public override void WriteAsPropertyName(Utf8JsonWriter writer, UUID value, JsonSerializerOptions options)
+        {
+            writer.WritePropertyName(value.ToString());
+        }
+    }
+
     public static class JsonOptions
     {
         public static readonly JsonSerializerOptions UnsafeRelaxed = new()
         {
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             IncludeFields = true,
+            Converters = { new UUIDJsonConverter() }
         };
     }
 }
