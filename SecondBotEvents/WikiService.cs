@@ -1,20 +1,11 @@
 ﻿using OpenMetaverse;
-using OpenMetaverse.ImportExport.Collada14;
 using RestSharp.Extensions;
 using SecondBotEvents.Services;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
-using System.Net;
 using System.Reflection;
-using System.Resources;
-using System.Security.Policy;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using static log4net.Appender.RollingFileAppender;
-using static StackExchange.Redis.Role;
 
 namespace SecondBotEvents
 {
