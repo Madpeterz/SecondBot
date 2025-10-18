@@ -11,6 +11,19 @@ using System.Text.Json;
 
 namespace SecondBotEvents.Config
 {
+    public class ConfigDescriptor
+    {
+        public string argname = "";
+        public string argtype = "";
+        public string argvalue = "";
+
+        public ConfigDescriptor(string argname, string argtype, string argvalue)
+        {
+            this.argname = argname;
+            this.argtype = argtype;
+            this.argvalue = argvalue;
+        }
+    }
     public abstract class Config
     {
         protected Dictionary<string, string> mysettings = [];
@@ -18,6 +31,51 @@ namespace SecondBotEvents.Config
         protected string filename = "config";
         protected bool loaded = false;
         protected bool tryLoadfromEnv = false;
+
+        public List<ConfigDescriptor> DescribeConfig()
+        {
+            List<ConfigDescriptor> settingsDescribed = [];
+            // Reorder settings: "Enabled" first, "HideStatusOutput" last if present
+            if (settings.Contains("Enabled"))
+            {
+                settings.Remove("Enabled");
+                settings.Insert(0, "Enabled");
+            }
+            if (settings.Contains("HideStatusOutput"))
+            {
+                settings.Remove("HideStatusOutput");
+                settings.Add("HideStatusOutput");
+            }
+            foreach (var setting in settings)
+            {
+                Type configType = this.GetType();
+                string accessor = "Get" + StringExtensions.FirstCharToUpper(setting);
+                MethodInfo method = configType.GetMethod(accessor);
+
+                if (method != null)
+                {
+                    // Get the return type
+                    Type returnType = method.ReturnType;
+                    object value = method.Invoke(this, null);
+                    Dictionary<string, string> typeMapping = new()
+                    {
+                        { "System.String", "Text" },
+                        { "System.Int32", "Number" },
+                        { "System.UInt64", "Number" }, // everything is a int if you dont check the size 
+                        { "System.Boolean", "True|False" },
+                        { "System.Double", "Float" }, // lies :P but SL does not have the concept of double
+                        { "System.String[]", "CSV" } // more lies but we convert them anyway
+                    };
+                    string typeName = returnType.FullName != null && typeMapping.ContainsKey(returnType.FullName) ? typeMapping[returnType.FullName] : returnType.Name;
+                    if(typeName == "CSV")
+                    {
+                        value = string.Join(",", (string[])value);
+                    }
+                    settingsDescribed.Add(new ConfigDescriptor(setting, typeName, value.ToString()));
+                }
+            }
+            return settingsDescribed;
+        }
 
         public Config(bool fromENV, string fromFolder="")
         {
@@ -56,23 +114,21 @@ namespace SecondBotEvents.Config
                 LoadSettingsFromEnv();
                 return;
             }
-            LoadSettingsFromFile(fromFolder);
+            if (fromFolder != "")
+            {
+                LoadSettingsFromFile(fromFolder);
+            }
+            
         }
 
         protected void MakeSettingsFile(string fromFolder)
         {
+            List<ConfigDescriptor> myconfigread = DescribeConfig();
+
             Dictionary<string, string> saveMe = [];
-            Type thisType = this.GetType();
-            foreach (string setting in settings)
+            foreach (ConfigDescriptor entry in myconfigread)
             {
-                string reader = "Get"+ StringExtensions.FirstCharToUpper(setting);
-                MethodInfo theMethod = thisType.GetMethod(reader);
-                if (theMethod == null)
-                {
-                    continue;
-                }
-                string value = theMethod.Invoke(this, null).ToString();
-                saveMe.Add(setting, value);
+                saveMe.Add(entry.argname, entry.argvalue);
             }
             SimpleIO IO = new();
             IO.ChangeRoot(fromFolder);

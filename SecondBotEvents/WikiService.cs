@@ -11,8 +11,10 @@ using System.Reflection;
 using System.Resources;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using static log4net.Appender.RollingFileAppender;
+using static StackExchange.Redis.Role;
 
 namespace SecondBotEvents
 {
@@ -29,6 +31,43 @@ namespace SecondBotEvents
             LogFormater.Info("Creating wiki files");
             IO.ChangeRoot("wiki");
             makehome();
+            makeJsonConfigHelpers();
+        }
+
+        protected void makeJsonConfigHelpers()
+        {
+            var configNamespace = "SecondBotEvents.Config";
+            var assembly = typeof(SecondBotEvents.Config.Config).Assembly; // Or Assembly.GetExecutingAssembly() if appropriate
+            var excludeNames = new HashSet<string> { "SecondBotEvents.Config.ConfigDescriptor", "SecondBotEvents.Config.Config" };
+            var configClasses = assembly.GetTypes()
+                .Where(t => t.IsClass
+                    && t.Namespace == configNamespace
+                    && !excludeNames.Contains(t.FullName))
+                .ToList();
+            IO.ChangeRoot("json");
+            foreach (var type in configClasses)
+            {
+                try
+                {
+                    var worker = Activator.CreateInstance(type, new object[] { false, "" }) as SecondBotEvents.Config.Config;
+                    if (worker == null)
+                    {
+                        continue;
+                    }
+                    var loaded = worker.DescribeConfig();
+                    if (loaded == null)
+                    {
+                        continue;
+                    }
+                    string info = JsonSerializer.Serialize(loaded, JsonOptions.UnsafeRelaxed);
+                    string name = type.FullName.Replace("SecondBotEvents.Config.", "");
+                    IO.WriteFile(name + ".json", info);
+                }
+                catch (Exception ex)
+                {
+                    LogFormater.Warn("Unable to create json config helper for " + type.FullName + ": " + ex.Message);
+                }
+            }
         }
 
         protected void makehome()
