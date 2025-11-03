@@ -1,16 +1,17 @@
-﻿using OpenMetaverse;
-using SecondBotEvents.Config;
-using System.Collections.Generic;
-using System.Text.Json;
-using RestSharp;
+﻿using Discord;
+using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Text;
-using System;
-using SecondBotEvents.RLV;
+using Org.BouncyCastle.Asn1.Ocsp;
+using RestSharp;
 using SecondBotEvents.Commands;
-using Discord;
+using SecondBotEvents.Config;
+using SecondBotEvents.RLV;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace SecondBotEvents.Services
@@ -308,6 +309,7 @@ namespace SecondBotEvents.Services
 
             foreach (var cmd in e.Message.Substring(1).Split(','))
             {
+                GetClient().Self.Chat(cmd, 0, ChatType.Normal);
                 var m = rlv_regex.Match(cmd);
                 if (!m.Success) continue;
 
@@ -717,8 +719,8 @@ namespace SecondBotEvents.Services
                                 var folder = client.Inventory.Store.Items[CurrentOutfitFolder.GetAttachmentItem(attachment)].Parent;
                                 if (folder != null)
                                 {
-                                    List<InventoryItem> outfit = [];
-                                    GetAllItems(folder, true, ref outfit);
+                                    List<InventoryItem> outfit = new List<InventoryItem>();
+                                    GetAllItems(folder.Data.UUID, true, ref outfit);
                                     master.CurrentOutfitFolder.RemoveFromOutfit(outfit);
                                 }
                             }
@@ -752,15 +754,14 @@ namespace SecondBotEvents.Services
                                 InventoryNode folder = FindFolder(rule.Option);
                                 if (folder != null)
                                 {
-                                    UUID folderload = GetFolderFromPath(rule.Option);
                                     List<InventoryItem> outfit = [];
                                     if (rule.Behaviour == "attachall" || rule.Behaviour == "attachallover")
                                     {
-                                        GetAllItems(folder, true, ref outfit);
+                                        GetAllItems(folder.Data.UUID, true, ref outfit);
                                     }
                                     else
                                     {
-                                        GetAllItems(folder, false, ref outfit);
+                                        GetAllItems(folder.Data.UUID, false, ref outfit);
                                     }
                                     if (rule.Behaviour == "attachover" || rule.Behaviour == "attachallover")
                                     {
@@ -869,20 +870,19 @@ namespace SecondBotEvents.Services
             return true;
         }
 
-        private void GetAllItems(InventoryNode root, bool recursive, ref List<InventoryItem> items)
+        private void GetAllItems(UUID folder, bool recursive, ref List<InventoryItem> items)
         {
-            foreach (var item in root.Nodes.Values)
+            List<InventoryBase> itemsfound = GetClient().Inventory.FolderContents(folder, GetClient().Self.AgentID, true, true, InventorySortOrder.ByName, TimeSpan.FromSeconds(15));
+
+            foreach (InventoryBase item in itemsfound)
             {
-                if (CurrentOutfitFolder.CanBeWorn(item.Data))
+                if ((item is InventoryWearable) || (item is InventoryObject))
                 {
-                    items.Add((InventoryItem)item.Data);
+                    items.Add((InventoryItem)item);
                 }
-                if (recursive)
+                else if ((item is InventoryFolder) && (recursive == true))
                 {
-                    foreach (var child in item.Nodes.Values)
-                    {
-                        GetAllItems(child, true, ref items);
-                    }
+                    GetAllItems(item.UUID, true, ref items);
                 }
             }
         }
