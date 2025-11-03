@@ -309,7 +309,6 @@ namespace SecondBotEvents.Services
 
             foreach (var cmd in e.Message.Substring(1).Split(','))
             {
-                GetClient().Self.Chat(cmd, 0, ChatType.Normal);
                 var m = rlv_regex.Match(cmd);
                 if (!m.Success) continue;
 
