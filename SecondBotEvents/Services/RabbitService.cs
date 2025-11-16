@@ -10,6 +10,8 @@ using System.Text.Json;
 using Swan;
 using OpenMetaverse;
 using Microsoft.Extensions.Logging.Abstractions;
+using System.Text.RegularExpressions;
+using SecondBotEvents.Commands;
 
 namespace SecondBotEvents.Services
 {
@@ -30,9 +32,9 @@ namespace SecondBotEvents.Services
                 }
                 if (myConfig.GetLogDebug() == true)
                 {
-                    LogFormater.Info($"Command Message UUID: {result.CommandName}, args: {String.Join(",", result.commandArgs)}");
+                    LogFormater.Info($"Command Message UUID: {result.CommandName}, args: {String.Join(",", result.CommandArgs)}");
                 }
-                SignedCommand C = new(master.CommandsService, "rabbit", result.CommandName, "", result.commandArgs, 0, "", false, 0, "", false);
+                SignedCommand C = new(master.CommandsService, "rabbit", result.CommandName, "", result.CommandArgs, 0, "", false, 0, "", false);
                 master.CommandsService.RunCommand("rabbit", C, false);
             }
             catch (Exception E)
@@ -95,12 +97,8 @@ namespace SecondBotEvents.Services
                 {
                     LogFormater.Info($"IM Message UUID: {result.UUID}, Message: {result.Message}");
                 }
-                if (UUID.TryParse(result.UUID, out UUID uuid) == false)
-                {
-                    LogFormater.Warn("IM Message UUID is not valid: " + result.UUID);
-                    return Task.CompletedTask;
-                }
-                GetClient().Self.InstantMessage(uuid, result.Message);
+                SignedCommand C = new SignedCommand(master.CommandsService, "rabbit", "IM", "notused", new string[] {result.UUID, result.Message }, 0, "", false, 0, "notused", false);
+                master.CommandsService.RunCommand("rabbit", C, false);
             }
             catch (Exception E)
             {
@@ -126,12 +124,8 @@ namespace SecondBotEvents.Services
                 {
                     LogFormater.Info($"Group Message UUID: {result.UUID}, Message: {result.Message}");
                 }
-                if (UUID.TryParse(result.UUID, out UUID uuid) == false)
-                {
-                    LogFormater.Warn("Group Message UUID is not valid: " + result.UUID);
-                    return Task.CompletedTask;
-                }
-                GetClient().Self.InstantMessageGroup(uuid, result.Message);
+                SignedCommand C = new SignedCommand(master.CommandsService, "rabbit", "Groupchat", "notused", new string[] { result.UUID, result.Message }, 0, "", false, 0, "notused", false);
+                master.CommandsService.RunCommand("rabbit", C, false);
             }
             catch (Exception E)
             {
@@ -332,21 +326,21 @@ namespace SecondBotEvents.Services
 
     public class JsonMessageFormat
     {
-        public string UUID;
-        public string Message;
+        public string UUID { get; set; }
+        public string Message { get; set; }
     }
 
     public class JsonCommandFormat
     {
-        public string CommandName;
-        public string[] commandArgs;
+        public string CommandName { get; set; }
+        public string[] CommandArgs { get; set; }
     }
 
     public class JsonNotecardFormat
     {
-        public string Name;
-        public string Subject;
-        public string Content;
-        public string UUID;
+        public string Name { get; set; }
+        public string Subject { get; set; }
+        public string Content { get; set; }
+        public string UUID { get; set; }
     }
 }
