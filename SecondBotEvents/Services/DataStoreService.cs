@@ -607,7 +607,7 @@ namespace SecondBotEvents.Services
          *  lookup the avatar
          */
 
-        public bool KnownAvatar(string name, UUID avatarId)
+        protected void SyncAvatarsHashMap()
         {
             int currentHash = GetClient().Network.CurrentSim.ObjectsAvatars.GetHashCode();
             if (currentHash != ObjectsAvatarsHash)
@@ -619,65 +619,91 @@ namespace SecondBotEvents.Services
                     AddAvatar(A.ID, A.Name);
                 }
             }
-            if (avatarId != UUID.Zero)
-            {
-                if(avatarsName2Key.ContainsValue(avatarId) == false)
-                {
-                    bool hasReply = false;
-                    AutoResetEvent fetchEvent = new(false);
-                    void callback(object sender, UUIDNameReplyEventArgs e)
-                    {
-                        foreach (KeyValuePair<UUID, string> av in e.Names)
-                        {
-                            if (av.Key == avatarId)
-                            {
-                                hasReply = true;
-                                fetchEvent.Set();
-                            }
-                        }
-                    }
-                    GetClient().Avatars.UUIDNameReply += callback;
-                    GetClient().Avatars.RequestAvatarName(avatarId);
+        }
 
-                    fetchEvent.WaitOne(1000, false);
-                    GetClient().Avatars.UUIDNameReply -= callback;
-                    return hasReply;
-                }
+        protected bool KnownAvatarUUID(UUID avatarId)
+        {
+            if (avatarsName2Key.ContainsValue(avatarId) == true)
+            {
                 return true;
+            }
+            bool hasReply = false;
+            AutoResetEvent fetchEvent = new(false);
+            void callback(object sender, UUIDNameReplyEventArgs e)
+            {
+                foreach (KeyValuePair<UUID, string> av in e.Names)
+                {
+                    if (av.Key == avatarId)
+                    {
+                        hasReply = true;
+                        fetchEvent.Set();
+                    }
+                }
+            }
+            GetClient().Avatars.UUIDNameReply += callback;
+            GetClient().Avatars.RequestAvatarName(avatarId);
+
+            fetchEvent.WaitOne(1000, false);
+            GetClient().Avatars.UUIDNameReply -= callback;
+            return hasReply;
+        }
+        protected bool KnownAvatarName(string name)
+        {
+            if (name == null)
+            {
+                return false;
             }
             string[] bits = name.Split(' ');
             if (bits.Length == 1)
             {
                 name += " Resident";
             }
-            if (avatarsName2Key.ContainsKey(name) == false)
+            if (avatarsName2Key.ContainsKey(name) == true)
             {
-                UUID wantedReplyID = UUID.SecureRandom();
-                
-                bool hasReply = false;
-                AutoResetEvent fetchEvent = new(false);
-                void callback(object sender, AvatarPickerReplyEventArgs e)
+                return true;
+            }
+            UUID wantedReplyID = UUID.SecureRandom();
+
+            bool hasReply = false;
+            AutoResetEvent fetchEvent = new(false);
+            void callback(object sender, AvatarPickerReplyEventArgs e)
+            {
+                if (e.QueryID == wantedReplyID)
                 {
-                    if (e.QueryID == wantedReplyID)
+                    foreach (KeyValuePair<UUID, string> av in e.Avatars)
                     {
-                        foreach (KeyValuePair<UUID, string> av in e.Avatars)
+                        if (av.Value == name)
                         {
-                            if (av.Value == name)
-                            {
-                                hasReply = true;
-                                fetchEvent.Set();
-                            }
+                            hasReply = true;
+                            fetchEvent.Set();
                         }
                     }
                 }
-                GetClient().Avatars.AvatarPickerReply += callback;
-                GetClient().Avatars.RequestAvatarNameSearch(name, wantedReplyID);
-
-                fetchEvent.WaitOne(1000, false);
-                GetClient().Avatars.AvatarPickerReply -= callback;
-                return hasReply;
             }
-            return true;
+            GetClient().Avatars.AvatarPickerReply += callback;
+            GetClient().Avatars.RequestAvatarNameSearch(name, wantedReplyID);
+
+            fetchEvent.WaitOne(1000, false);
+            GetClient().Avatars.AvatarPickerReply -= callback;
+            return hasReply;
+        }
+
+        public bool KnownAvatar(string name, UUID avatarId)
+        {
+            SyncAvatarsHashMap();
+            if (avatarId == UUID.Zero)
+            {
+                return false;
+            }
+            if(KnownAvatarUUID(avatarId) == true)
+            {
+                return true;
+            }   
+            if(KnownAvatarName(name) == true)
+            {
+                return true;
+            }
+            return false;
         }
 
         public void GetAvatarNames(List<UUID> avatars)
