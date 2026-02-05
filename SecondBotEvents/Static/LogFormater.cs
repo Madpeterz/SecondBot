@@ -56,22 +56,8 @@ namespace SecondBotEvents
 
         public static string GetClockStamp()
         {
-            var date = DateTime.Now;
-            StringBuilder n = new();
-            n.Append("[");
-            if (date.Hour < 10)
-            {
-                n.Append("0");
-            }
-            n.Append(date.Hour.ToString());
-            n.Append(":");
-            if (date.Minute < 10)
-            {
-                n.Append("0");
-            }
-            n.Append(date.Minute.ToString());
-            n.Append("] ");
-            return n.ToString();
+            // Format: [dd-MM-yyyy HH:mm] 
+            return $"[{DateTime.Now:dd-MM-yy HH:mm}] ";
         }
 
         private static string Add(string message, ConsoleLogLogLevel Level, bool send_to_console = true)
