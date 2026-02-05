@@ -722,9 +722,9 @@ namespace SecondBotEvents.Services
         protected void TrackAvatarsOnParcel()
         {
             long dif = SecondbotHelpers.UnixTimeNow() - lastAvUpdate;
-            if (dif < 30)
+            if (dif < 10)
             {
-                // only check for changes every 30 secs
+                // only check for changes every 10 secs
                 return;
             }
             lastAvUpdate = SecondbotHelpers.UnixTimeNow();
@@ -743,6 +743,10 @@ namespace SecondBotEvents.Services
                 return;
             }
             avatarhash = hash;
+            if (GuestListLoaded == false)
+            {
+                LogFormater.Info("OnEvent Service [Guest list ready to track]");
+            }
 
             if (GuestListLoaded == true)
             {
