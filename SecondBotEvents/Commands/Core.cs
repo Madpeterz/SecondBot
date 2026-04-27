@@ -1,4 +1,4 @@
-﻿using SecondBotEvents.Services;
+using SecondBotEvents.Services;
 
 namespace SecondBotEvents.Commands
 {
@@ -28,7 +28,7 @@ namespace SecondBotEvents.Commands
         public int x { get; set; }
         public int y { get; set; }
         public int z { get; set; }
-        public int range { get; set; }
+        public double range { get; set; }
 
     }
 
