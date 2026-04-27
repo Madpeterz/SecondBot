@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using OpenMetaverse;
 using System.Text.Json;
@@ -83,14 +83,20 @@ namespace SecondBotEvents.Commands
             {
                 if (av.ID != GetClient().Self.AgentID)
                 {
+                    Vector3 globalPos = av.Position;
+                    if (av.ParentID != 0 && GetClient().Network.CurrentSim.ObjectsPrimitives.TryGetValue(av.ParentID, out Primitive parentObj))
+                    {
+                        globalPos = parentObj.Position + (av.Position * parentObj.Rotation);
+                    }
+
                     NearMeDetails details = new()
                     {
                         id = av.ID.ToString(),
                         name = av.Name,
-                        x = (int)Math.Round(av.Position.X),
-                        y = (int)Math.Round(av.Position.Y),
-                        z = (int)Math.Round(av.Position.Z),
-                        range = (int)Math.Round(Vector3.Distance(av.Position, GetClient().Self.SimPosition))
+                        x = (int)Math.Round(globalPos.X),
+                        y = (int)Math.Round(globalPos.Y),
+                        z = (int)Math.Round(globalPos.Z),
+                        range = Math.Round(Vector3.Distance(globalPos, GetClient().Self.SimPosition), 2)
                     };
                     BetterNearMe.Add(details);
                 }
